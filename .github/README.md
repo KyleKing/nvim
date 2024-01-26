@@ -5,6 +5,7 @@ My personal `nvim` configuration. Based on:
 - [nvim-lua/kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim) and [dam9000/kickstart-modular.nvim](https://github.com/dam9000/kickstart-modular.nvim)
 - [AstroNvim/AstroNvim](https://github.com/AstroNvim/AstroNvim) and [AstroNvim/astrocommunity](https://github.com/AstroNvim/astrocommunity)
 - [LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
+- [tomodachi94/dotfiles](https://github.com/tomodachi94/dotfiles/tree/main/nvim)
 
 ## MacOS (and Linux) Install
 
