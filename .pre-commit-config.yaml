@@ -51,10 +51,6 @@ repos:
         additional_dependencies: ["mdformat-mkdocs[recommended]>=2.0.1"]
         args: [--wrap=no]
         exclude: CODE_TAG_SUMMARY\.md
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.17.2
-    hooks:
-      - id: typos
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.23.1
     hooks:
