@@ -1,6 +1,10 @@
+local telescope = require "telescope"
+telescope.setup(opts)
+telescope.load_extension "fzf"
+
 -- [[ Configure Telescope ]]
 -- See `:help telescope` and `:help telescope.setup()`
-require("telescope").setup {
+telescope.setup {
   defaults = {
     mappings = {
       i = {
@@ -12,7 +16,7 @@ require("telescope").setup {
 }
 
 -- Enable telescope fzf native, if installed
-pcall(require("telescope").load_extension, "fzf")
+pcall(telescope.load_extension, "fzf")
 
 -- Telescope live_grep in git root
 -- Function to find the git root directory based on the current buffer's path
