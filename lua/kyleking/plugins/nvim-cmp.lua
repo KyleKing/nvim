@@ -14,5 +14,5 @@ return {}
 --     -- Adds a number of user-friendly snippets
 --     "rafamadriz/friendly-snippets",
 --   },
---   config = function() require "kyleking.plugins.configs.nvim-cmp"() end,
+-- config = function(...) require "kyleking.plugins.configs.nvim-cmp"(...) end,
 -- }
