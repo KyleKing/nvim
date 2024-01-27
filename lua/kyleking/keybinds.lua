@@ -6,6 +6,8 @@
 vim.g.mapleader = " " -- Set <space> as the leader key
 vim.g.maplocalleader = "," -- set default local leader key
 
+-- PLANNED: review these keybinds
+
 -- vim.keymap.set("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
 
 -- -- Convenience functions for yanking/putting
