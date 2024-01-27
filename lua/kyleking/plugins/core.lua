@@ -1,16 +1,4 @@
 return {
-  { "folke/which-key.nvim", opts = {} },
-  {
-    -- Use gc/gb for toggling comments
-    "echasnovski/mini.comment",
-    dependencies = { "JoosepAlviste/nvim-ts-context-commentstring" },
-    opts = {
-      hooks = {
-        pre = function() require("ts_context_commentstring.internal").update_commentstring {} end,
-      },
-    },
-  },
-
   -- PLANNED: Additional plugins from kickstart
 
   -- {
