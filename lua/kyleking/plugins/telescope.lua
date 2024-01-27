@@ -113,5 +113,5 @@ return {
     -- },
   },
   cmd = "Telescope",
-  config = function(...) require "kyleking.plugins.configs.telescope" end,
+  config = function() require "kyleking.plugins.configs.telescope" end,
 }
