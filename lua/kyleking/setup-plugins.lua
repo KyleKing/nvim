@@ -24,11 +24,9 @@ vim.keymap.set("n", "<Leader>pi", function() require("lazy").install() end)
 -- maps.n["<Leader>pu"] = { function() require("lazy").check() end, desc = "Plugins Check Updates" }
 -- maps.n["<Leader>pU"] = { function() require("lazy").update() end, desc = "Plugins Update" }
 
-
-
--- -- Setup theme
--- vim.cmd("syntax enable")
--- vim.cmd.colorscheme("catppuccin")
+-- Setup theme
+vim.cmd "syntax enable"
+vim.cmd.colorscheme "catppuccin"
 
 -- -- Setup keybinds
 -- vim.keymap.set("n", "<Leader>pp", require("lazy").home)
