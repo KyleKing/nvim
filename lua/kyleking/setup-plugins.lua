@@ -16,21 +16,13 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup "kyleking.plugins"
 
 -- Configure key lazy.nvim bindings
--- FIXME: How to display help text in which key?
--- maps.n[""] = { , desc = "Plugins Install" }
-vim.keymap.set("n", "<Leader>pi", function() require("lazy").install() end)
--- maps.n["<Leader>ps"] = { function() require("lazy").home() end, desc = "Plugins Status" }
--- maps.n["<Leader>pS"] = { function() require("lazy").sync() end, desc = "Plugins Sync" }
--- maps.n["<Leader>pu"] = { function() require("lazy").check() end, desc = "Plugins Check Updates" }
--- maps.n["<Leader>pU"] = { function() require("lazy").update() end, desc = "Plugins Update" }
+vim.keymap.set("n", "<Leader>pp", require("lazy").home, { desc = "Plugins Home" })
+vim.keymap.set("n", "<Leader>pi", require("lazy").install, { desc = "Plugins Install" })
+vim.keymap.set("n", "<Leader>ps", require("lazy").install, { desc = "Plugins Status" })
+vim.keymap.set("n", "<Leader>pS", require("lazy").install, { desc = "Plugins Sync" })
+vim.keymap.set("n", "<Leader>pu", require("lazy").install, { desc = "Plugins Check Updates" })
+vim.keymap.set("n", "<Leader>pU", require("lazy").install, { desc = "Plugins Update" })
 
 -- Setup theme
 vim.cmd "syntax enable"
 vim.cmd.colorscheme "catppuccin"
-
--- -- Setup keybinds
--- vim.keymap.set("n", "<Leader>pp", require("lazy").home)
--- vim.keymap.set("n", "<Leader>pc", require("lazy").check)
--- vim.keymap.set("n", "<Leader>px", require("lazy").clean)
--- vim.keymap.set("n", "<Leader>pu", require("lazy").update)
--- vim.keymap.set("n", "<Leader>ps", require("lazy").sync)
