@@ -22,6 +22,12 @@ return {
     direction = "float",
     float_opts = { border = "rounded" },
   },
+  init = function()
+    local wk = require "which-key"
+    wk.register {
+      ["<leader>t"] = { name = "+ToggleTerm" },
+    }
+  end,
   keys = {
     {
       "<Leader>gg",
@@ -34,32 +40,34 @@ return {
       desc = "ToggleTerm lazygit",
     },
     {
+      -- https://github.com/dundee/gdu
       "<Leader>tu",
       function()
-        local gdu = vim.fn.has "mac" == 1 and "gdu-go" or "gdu"
-        astro.toggle_term_cmd(gdu)
+        local astro = require "astro.utils"
+        astro.toggle_term_cmd "gdu"
       end,
-      desc = "ToggleTerm gdu",
+      desc = "ToggleTerm gdu (Disk Usage)",
     },
     {
+      -- https://github.com/ClementTsang/bottom
       "<Leader>tt",
       function()
         local astro = require "astro.utils"
         astro.toggle_term_cmd "btm"
       end,
-      desc = "ToggleTerm btm",
+      desc = "ToggleTerm 'bottom' Processes",
     },
     {
       "<Leader>tp",
       function()
         local astro = require "astro.utils"
-        astro.toggle_term_cmd(python)
+        astro.toggle_term_cmd "python"
       end,
       desc = "ToggleTerm python",
     },
     { "<Leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
     { "<Leader>th", "<Cmd>ToggleTerm size=10 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
     { "<Leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" },
-    { "<C-'>", "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal" },
+    { "<C-'>", "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal", mode = { "n", "t" } },
   },
 }
