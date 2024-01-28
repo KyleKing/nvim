@@ -13,6 +13,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Loads all files in `plugins/*.lua`
+-- Organized into subdirectories based on tags from NeovimCraft
+-- Note: all subdirectories need to be added to plugins/init.lua
 require("lazy").setup "kyleking.plugins"
 
 -- Configure key lazy.nvim bindings
