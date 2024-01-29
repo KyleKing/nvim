@@ -8,6 +8,7 @@ return {
   { import = "kyleking.plugins.lsp" },
   { import = "kyleking.plugins.marks" },
   { import = "kyleking.plugins.mini" },
+  { import = "kyleking.plugins.search" },
   { import = "kyleking.plugins.session" },
   { import = "kyleking.plugins.syntax" },
   { import = "kyleking.plugins.tabline" },

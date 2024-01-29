@@ -1,6 +1,7 @@
 -- See `:help vim.opt`
 --  Or for `vim.opt.clipboard`, see `:help 'clipboard'` for documentation
 
+vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
 vim.opt.backspace:append { "nostop" } -- don't stop backspace at insert
 vim.opt.breakindent = true -- wrap indent to match  line start
 vim.opt.clipboard = "unnamedplus" -- connection to the system clipboard
@@ -39,12 +40,12 @@ vim.opt.undofile = true -- enable persistent undo
 vim.opt.updatetime = 300 -- length of time to wait before triggering the plugin
 vim.opt.viewoptions:remove "curdir" -- disable saving current directory with views
 vim.opt.virtualedit = "block" -- allow going past end of line in visual block mode
-vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
+-- vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
 
+-- Set highlight on search
+vim.opt.hlsearch = false
+
 -- PLANNED: consider additional options
--- -- Set highlight on search
--- vim.opt.hlsearch = false
---
 -- -- Set completeopt to have a better completion experience
 -- vim.opt.completeopt = 'menuone,noselect'
