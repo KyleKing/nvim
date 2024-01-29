@@ -24,10 +24,10 @@ require("lazy").setup "kyleking.plugins"
 -- Configure key lazy.nvim bindings
 vim.keymap.set("n", "<Leader>pp", require("lazy").home, { desc = "Plugins Home" })
 vim.keymap.set("n", "<Leader>pi", require("lazy").install, { desc = "Plugins Install" })
-vim.keymap.set("n", "<Leader>ps", require("lazy").install, { desc = "Plugins Status" })
-vim.keymap.set("n", "<Leader>pS", require("lazy").install, { desc = "Plugins Sync" })
-vim.keymap.set("n", "<Leader>pu", require("lazy").install, { desc = "Plugins Check Updates" })
-vim.keymap.set("n", "<Leader>pU", require("lazy").install, { desc = "Plugins Update" })
+vim.keymap.set("n", "<Leader>ps", require("lazy").status, { desc = "Plugins Status" })
+vim.keymap.set("n", "<Leader>pS", require("lazy").sync, { desc = "Plugins Sync" })
+vim.keymap.set("n", "<Leader>pu", require("lazy").check, { desc = "Plugins Check Updates" })
+vim.keymap.set("n", "<Leader>pU", require("lazy").update, { desc = "Plugins Update" })
 
 -- Setup theme
 vim.cmd "syntax enable"
