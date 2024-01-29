@@ -1,12 +1,11 @@
--- PLANNED: Revisit nvim-cmp
 return {
   -- Autocompletion
   "hrsh7th/nvim-cmp",
   enabled = false, -- PLANNED: investigate
   dependencies = {
-    -- Snippet Engine & its associated nvim-cmp source
-    "L3MON4D3/LuaSnip",
-    "saadparwaiz1/cmp_luasnip",
+    -- -- Snippet Engine & its associated nvim-cmp source
+    -- "L3MON4D3/LuaSnip",
+    -- "saadparwaiz1/cmp_luasnip",
 
     -- Adds LSP completion capabilities
     "hrsh7th/cmp-nvim-lsp",
@@ -15,5 +14,5 @@ return {
     -- Adds a number of user-friendly snippets
     "rafamadriz/friendly-snippets",
   },
-  config = function(...) require "kyleking.plugins.configs.nvim-cmp"(...) end,
+  config = function(...) require "kyleking.plugins._configs.nvim-cmp"(...) end,
 }

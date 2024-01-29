@@ -1,4 +1,3 @@
--- PLANNED: Configure LSP
 return {
   -- LSP Configuration & Plugins
   "neovim/nvim-lspconfig",
@@ -15,5 +14,5 @@ return {
     -- Additional lua configuration, makes nvim stuff amazing!
     "folke/neodev.nvim",
   },
-  config = function(...) require "kyleking.plugins.configs.lsp"(...) end,
+  config = function(...) require "kyleking.plugins._configs.lsp"(...) end,
 }

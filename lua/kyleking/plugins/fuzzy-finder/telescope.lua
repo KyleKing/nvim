@@ -35,7 +35,7 @@ return {
     -- },
   },
   cmd = "Telescope",
-  config = function(...) require "kyleking.plugins.configs.telescope"(...) end,
+  config = function(...) require "kyleking.plugins._configs.telescope"(...) end,
   keys = {
     {
       "<Leader>gb",
