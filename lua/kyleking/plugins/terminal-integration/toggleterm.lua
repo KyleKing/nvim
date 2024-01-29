@@ -25,6 +25,12 @@ return {
   init = function()
     local wk = require "which-key"
     wk.register {
+      ["<leader>S"] = { name = "+Session" },
+      ["<leader>f"] = { name = "+Find" },
+      ["<leader>g"] = { name = "+General" },
+      ["<leader>l"] = { name = "+LSP" },
+      ["<leader>p"] = { name = "+Plugins" },
+      ["<leader>s"] = { name = "+Search" },
       ["<leader>t"] = { name = "+ToggleTerm" },
     }
   end,
