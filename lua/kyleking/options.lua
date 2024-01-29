@@ -43,9 +43,6 @@ vim.opt.virtualedit = "block" -- allow going past end of line in visual block mo
 -- vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
 
--- Set highlight on search
-vim.opt.hlsearch = false
-
 -- PLANNED: consider additional options
 -- -- Set completeopt to have a better completion experience
 -- vim.opt.completeopt = 'menuone,noselect'
