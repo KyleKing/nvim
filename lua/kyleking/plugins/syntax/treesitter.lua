@@ -1,3 +1,4 @@
+-- PLANNED: take a look at: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/treesitter.lua
 return {
   "nvim-treesitter/nvim-treesitter",
   main = "nvim-treesitter.configs",

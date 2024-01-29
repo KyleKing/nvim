@@ -1,3 +1,4 @@
+-- PLANNED: take a look at: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/telescope.lua
 return function(_)
   local telescope = require "telescope"
   local actions = require "telescope.actions"
@@ -47,9 +48,6 @@ return function(_)
       },
     },
   }
-
-  -- Enable telescope fzf native, if installed
-  pcall(telescope.load_extension, "fzf")
 
   -- Telescope live_grep in git root
   -- Function to find the git root directory based on the current buffer's path

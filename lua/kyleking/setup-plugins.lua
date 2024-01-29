@@ -22,12 +22,13 @@ vim.opt.rtp:prepend(lazypath, {
 require("lazy").setup "kyleking.plugins"
 
 -- Configure key lazy.nvim bindings
-vim.keymap.set("n", "<Leader>pp", require("lazy").home, { desc = "Plugins Home" })
-vim.keymap.set("n", "<Leader>pi", require("lazy").install, { desc = "Plugins Install" })
-vim.keymap.set("n", "<Leader>ps", require("lazy").status, { desc = "Plugins Status" })
-vim.keymap.set("n", "<Leader>pS", require("lazy").sync, { desc = "Plugins Sync" })
-vim.keymap.set("n", "<Leader>pu", require("lazy").check, { desc = "Plugins Check Updates" })
-vim.keymap.set("n", "<Leader>pU", require("lazy").update, { desc = "Plugins Update" })
+local K = vim.keymap.set
+K("n", "<Leader>pp", require("lazy").home, { desc = "Plugins Home" })
+K("n", "<Leader>pi", require("lazy").install, { desc = "Plugins Install" })
+K("n", "<Leader>pS", require("lazy").sync, { desc = "Plugins Sync" })
+K("n", "<Leader>pu", require("lazy").check, { desc = "Plugins Check Updates" })
+K("n", "<Leader>pU", require("lazy").update, { desc = "Plugins Update" })
+K("n", "<Leader>pl", require("lazy").update, { desc = "Plugins Log" })
 
 -- Setup theme
 vim.cmd "syntax enable"
