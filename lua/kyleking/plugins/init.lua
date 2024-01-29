@@ -10,5 +10,6 @@ return {
   { import = "kyleking.plugins.mini" },
   { import = "kyleking.plugins.session" },
   { import = "kyleking.plugins.syntax" },
+  { import = "kyleking.plugins.tabline" },
   { import = "kyleking.plugins.terminal-integration" },
 }
