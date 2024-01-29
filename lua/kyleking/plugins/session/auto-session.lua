@@ -1,6 +1,5 @@
 return {
   "rmagatti/auto-session",
-  enabled = false,
   lazy = false,
   dependencies = { "nvim-telescope/telescope.nvim" }, -- Required for search_session
   opts = {
