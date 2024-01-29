@@ -10,7 +10,11 @@ if not vim.loop.fs_stat(lazypath) then
     lazypath,
   }
 end
-vim.opt.rtp:prepend(lazypath)
+vim.opt.rtp:prepend(lazypath, {
+  change_detection = {
+    notify = false,
+  },
+})
 
 -- Loads all files in `plugins/*.lua`
 -- Organized into subdirectories based on tags from NeovimCraft
