@@ -1,6 +1,7 @@
 return {
   {
     "catppuccin/nvim",
+    enabled = false, -- Currently unused
     name = "catppuccin",
     ---@type CatppuccinOptions
     opts = {

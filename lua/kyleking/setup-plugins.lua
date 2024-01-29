@@ -12,8 +12,11 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath, {
   change_detection = {
-    notify = false,
+    -- automatically check for config file changes and reload the ui
+    enabled = false,
+    notify = false, -- get a notification when changes are found
   },
+  defaults = { lazy = true },
 })
 
 -- Loads all files in `plugins/*.lua`
@@ -32,4 +35,4 @@ K("n", "<Leader>pl", require("lazy").update, { desc = "Plugins Log" })
 
 -- Setup theme
 vim.cmd "syntax enable"
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme "nightfox"
