@@ -1,7 +1,7 @@
 return {
   "rmagatti/auto-session",
   lazy = false,
-  -- dependencies = { "nvim-telescope/telescope.nvim" },
+  -- dependencies = { "nvim-telescope/telescope.nvim" }, -- Required for search_session
   opts = {
     auto_save_enabled = true,
     auto_restore_enabled = true,
@@ -17,5 +17,10 @@ return {
     local K = vim.keymap.set
     K("n", "<leader>Sr", "<cmd>SessionRestore<CR>", { desc = "Restore session for cwd" })
     K("n", "<leader>Ss", "<cmd>SessionSave<CR>", { desc = "Save session for auto session root dir" })
+
+    -- Set mapping for searching a session.
+    K("n", "<C-s>", require("auto-session.session-lens").search_session, {
+      noremap = true,
+    })
   end,
 }
