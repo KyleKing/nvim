@@ -2,6 +2,7 @@
 return {
   { import = "kyleking.plugins.colorscheme" },
   { import = "kyleking.plugins.completion" },
+  { import = "kyleking.plugins.editing-support" },
   { import = "kyleking.plugins.fuzzy-finder" },
   { import = "kyleking.plugins.keybinding" },
   { import = "kyleking.plugins.lsp" },
