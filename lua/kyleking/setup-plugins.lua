@@ -10,7 +10,12 @@ if not vim.loop.fs_stat(lazypath) then
     lazypath,
   }
 end
-vim.opt.rtp:prepend(lazypath, {
+vim.opt.rtp:prepend(lazypath)
+
+-- Loads all files in `plugins/*.lua`
+-- Organized into subdirectories based on tags from NeovimCraft
+-- Note: all subdirectories need to be added to plugins/init.lua
+require("lazy").setup("kyleking.plugins", {
   change_detection = {
     -- automatically check for config file changes and reload the ui
     enabled = false,
@@ -18,11 +23,6 @@ vim.opt.rtp:prepend(lazypath, {
   },
   defaults = { lazy = true },
 })
-
--- Loads all files in `plugins/*.lua`
--- Organized into subdirectories based on tags from NeovimCraft
--- Note: all subdirectories need to be added to plugins/init.lua
-require("lazy").setup "kyleking.plugins"
 
 -- Configure key lazy.nvim bindings
 local K = vim.keymap.set
