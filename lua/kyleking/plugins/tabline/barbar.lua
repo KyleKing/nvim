@@ -1,4 +1,4 @@
--- FIXME: Add descriptions
+-- FIXME: Add desc for each command that is kept
 local opts = { noremap = true, silent = true, desc = "placeholder!" }
 
 return {
@@ -9,9 +9,7 @@ return {
     "nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
   },
   init = function() vim.g.barbar_auto_setup = false end,
-  opts = {
-    minimum_padding = 0,
-  },
+  opts = {},
   keys = {
     -- TODO: De-dupe with nap and choose more consistent keybinds
 

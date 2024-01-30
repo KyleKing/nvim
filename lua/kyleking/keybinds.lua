@@ -6,17 +6,17 @@
 vim.g.mapleader = " " -- Set <space> as the leader key
 vim.g.maplocalleader = "," -- set default local leader key
 
+local K = vim.keymap.set
+
 -- TODO: review these keybinds from kickstart
 
--- vim.keymap.set("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
+K("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
 
 -- -- Convenience functions for yanking/putting
 -- vim.keymap.set("n", "<Leader>y", "*y")
 -- vim.keymap.set("n", "<Leader>p", "*p")
 -- vim.keymap.set("n", "<Leader>Y", "+y")
 -- vim.keymap.set("n", "<Leader>P", "+p")
-
--- vim.keymap.set("n", "<Leader>fd", vim.cmd.NERDTreeToggle)
 
 -- -- Be smart.
 -- vim.cmd("cnoreabbrev W w")
@@ -38,10 +38,6 @@ vim.g.maplocalleader = "," -- set default local leader key
 --   return "dd"
 -- end, { expr = true })
 
--- -- KeyK("for better default experience
--- -- See `:help vim.keymap.set()`
--- vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
-
 -- -- Remap for dealing with word wrap
 -- vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 -- vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
@@ -52,20 +48,11 @@ vim.g.maplocalleader = "," -- set default local leader key
 -- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 -- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
--- -- [[ Highlight on yank ]]
--- -- See `:help vim.highlight.on_yank()`
--- local highlight_group = vim.api.nvim_create_augroup("YankHighlight", { clear = true })
--- vim.api.nvim_create_autocmd("TextYankPost", {
---   callback = function() vim.highlight.on_yank() end,
---   group = highlight_group,
---   pattern = "*",
--- })
-
 -- TODO: Finish importing astro core keymaps
 
 -- Normal --
 -- Standard Operations
-local K = vim.keymap.set
+-- PLANNED: These appear to match ones above from kickstart -- need to dedupe if keeping either
 -- K("n", "j", "v:count == 0 ? 'gj' : 'j'", expr = true, desc = "Move cursor down" })
 -- K("n", "k", "v:count == 0 ? 'gk' : 'k'", expr = true, desc = "Move cursor up" })
 K("n", "<Leader>w", "<Cmd>w<CR>", { desc = "Save" })
@@ -135,28 +122,28 @@ K("n", "\\", "<Cmd>split<CR>", { desc = "Horizontal Split" })
 -- K("n", "<Leader>bsi", function() require("astrocore.buffer").sort "bufnr" end, { desc = "By buffer number" })
 -- K("n", "<Leader>bsm", function() require("astrocore.buffer").sort "modified" end, { desc = "By modification" })
 
--- K("n", "<Leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
--- K("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Previous diagnostic" })
--- K("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
--- K("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
+K("n", "<Leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
+K("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Previous diagnostic" })
+K("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
+K("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
 
 -- -- Navigate tabs
 -- K("n", "]t", function() vim.cmd.tabnext() end, { desc = "Next tab" })
 -- K("n", "[t", function() vim.cmd.tabprevious() end, { desc = "Previous tab" })
 
--- -- Split navigation
--- K("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
--- K("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
--- K("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
--- K("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
--- K("n", "<C-Up>", "<Cmd>resize -2<CR>", { desc = "Resize split up" })
--- K("n", "<C-Down>", "<Cmd>resize +2<CR>", { desc = "Resize split down" })
--- K("n", "<C-Left>", "<Cmd>vertical resize -2<CR>", { desc = "Resize split left" })
--- K("n", "<C-Right>", "<Cmd>vertical resize +2<CR>", { desc = "Resize split right" })
+-- Split navigation
+K("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
+K("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
+K("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
+K("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
+K("n", "<C-Up>", "<Cmd>resize -2<CR>", { desc = "Resize split up" })
+K("n", "<C-Down>", "<Cmd>resize +2<CR>", { desc = "Resize split down" })
+K("n", "<C-Left>", "<Cmd>vertical resize -2<CR>", { desc = "Resize split left" })
+K("n", "<C-Right>", "<Cmd>vertical resize +2<CR>", { desc = "Resize split right" })
 
--- -- Stay in indent mode
--- K("v", "<S-Tab>", "<gv", { desc = "Unindent line" })
--- K("v", "<Tab>", ">gv", { desc = "Indent line" })
+-- Stay in indent mode
+K("v", "<S-Tab>", "<gv", { desc = "Unindent line" })
+K("v", "<Tab>", ">gv", { desc = "Indent line" })
 
 -- -- Improved Terminal Navigation
 -- K("t", "<C-h>", "<Cmd>wincmd h<CR>", { desc = "Terminal left window navigation" })

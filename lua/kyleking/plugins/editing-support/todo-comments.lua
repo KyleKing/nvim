@@ -1,9 +1,14 @@
 return {
   "folke/todo-comments.nvim",
   event = "BufRead",
-  dependencies = { "nvim-lua/plenary.nvim" },
+  cmd = { "TodoTrouble", "TodoTelescope", "TodoLocList", "TodoQuickFix" },
+  dependencies = { "nvim-telescope/telescope.nvim" },
+  keys = {
+    { "<Leader>st", "<Cmd>TodoTelescope<CR>", { desc = "Search TODOs" } },
+    -- PLANNED: Integrate with trouble
+    -- { "<Leader>sT", "<Cmd>TodoTrouble<CR>", { desc = "TODOs (Trouble)" } },
+  },
   opts = {
-    -- PLANNED: Extend keywords recognized as todo comments
     keywords = {
       PLANNED = { icon = " ", color = "hint" },
     },

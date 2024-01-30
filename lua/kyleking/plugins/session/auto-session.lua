@@ -1,7 +1,7 @@
 -- FIXME: De-conflict with lazy.nvim window on launch (https://github.com/rmagatti/auto-session/issues/223#issuecomment-1666658887)
 return {
   "rmagatti/auto-session",
-  -- lazy = "VeryLazy",
+  lazy = false,
   dependencies = { "nvim-telescope/telescope.nvim" }, -- Required for search_session
   opts = {
     auto_save_enabled = true,
