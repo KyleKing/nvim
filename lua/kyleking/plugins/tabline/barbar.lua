@@ -1,4 +1,6 @@
+-- FIXME: Add descriptions
 local opts = { noremap = true, silent = true, desc = "placeholder!" }
+
 return {
   "romgrk/barbar.nvim",
   lazy = false,
@@ -7,8 +9,12 @@ return {
     "nvim-tree/nvim-web-devicons", -- OPTIONAL: for file icons
   },
   init = function() vim.g.barbar_auto_setup = false end,
-  opts = {},
+  opts = {
+    minimum_padding = 0,
+  },
   keys = {
+    -- TODO: De-dupe with nap and choose more consistent keybinds
+
     -- Move to previous/next
     { "<A-,>", "<Cmd>BufferPrevious<CR>", opts },
     { "<A-.>", "<Cmd>BufferNext<CR>", opts },
