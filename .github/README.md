@@ -7,6 +7,8 @@ My personal `nvim` configuration. Based on:
 - [LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
 - [tomodachi94/dotfiles](https://github.com/tomodachi94/dotfiles/tree/main/nvim)
 
+My preference is for optionated plugins that require minimal configuration.
+
 ## MacOS (and Linux) Install
 
 ```sh
@@ -22,3 +24,11 @@ nvim
 ```
 
 Any missing CLI tools should be flagged by running `:checkhealth` in `nvim`
+
+## Missing Functionality
+
+- [ ] Completions
+- [ ] Autoformat
+- [ ] Removal of commented code and astrocore references
+- [ ] LSP code diagnostics and Trouble
+- [ ] Epanded language support (recognize comments for configuration files with '#')
