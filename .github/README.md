@@ -28,7 +28,10 @@ Any missing CLI tools should be flagged by running `:checkhealth` in `nvim`
 ## Missing Functionality
 
 - [ ] Completions
-- [ ] Autoformat
+- [ ] See function signature
+- [ ] Autoformat (Conform vs. AstronVim option)
+- [ ] Go To Definition
 - [ ] Removal of commented code and astrocore references
 - [ ] LSP code diagnostics and Trouble
 - [ ] Epanded language support (recognize comments for configuration files with '#')
+- [ ] Fully implement all selected plugins
