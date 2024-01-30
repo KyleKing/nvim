@@ -14,4 +14,5 @@ return {
   { import = "kyleking.plugins.syntax" },
   { import = "kyleking.plugins.tabline" },
   { import = "kyleking.plugins.terminal-integration" },
+  { import = "kyleking.plugins.utility" },
 }
