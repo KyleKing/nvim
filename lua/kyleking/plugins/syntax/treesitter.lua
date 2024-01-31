@@ -4,6 +4,17 @@ return {
   main = "nvim-treesitter.configs",
   dependencies = {
     { "nvim-treesitter/nvim-treesitter-textobjects" },
+    {
+      "lukas-reineke/indent-blankline.nvim",
+      main = "ibl",
+      dependencies = {
+        "TheGLander/indent-rainbowline.nvim",
+      },
+      opts = function(_, opts)
+        -- Other blankline configuration here
+        return require("indent-rainbowline").make_opts(opts)
+      end,
+    },
   },
   cmd = {
     "TSBufDisable",
@@ -40,10 +51,10 @@ return {
   opts = function()
     return {
       -- Add languages to be installed here that you want installed for treesitter
-      -- PLANNED: 'rust', 'tsx', 'javascript', 'typescript',
+      -- PLANNED: 'rust', 'tsx', 'javascript', 'typescript', 'html', 'css', 'json', 'toml'
       ensure_installed = { "lua", "python", "vimdoc", "vim", "bash" },
 
-      -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
+      -- Autoinstall languages that are not installed
       auto_install = false,
       -- Install languages synchronously (only applied to `ensure_installed`)
       sync_install = false,
@@ -56,6 +67,7 @@ return {
         enable = true,
         disable = function(_, bufnr) return vim.b[bufnr].large_buf end,
       },
+      -- TODO: Review how to use these keybinds!
       incremental_selection = {
         enable = true,
         keymaps = {
