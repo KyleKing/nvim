@@ -1,8 +1,10 @@
--- PLANNED: take a look at: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/treesitter.lua
 return {
   "nvim-treesitter/nvim-treesitter",
+  lazy = false,
   main = "nvim-treesitter.configs",
-  dependencies = { "nvim-treesitter/nvim-treesitter-textobjects" },
+  dependencies = {
+    { "nvim-treesitter/nvim-treesitter-textobjects" },
+  },
   cmd = {
     "TSBufDisable",
     "TSBufEnable",
@@ -18,7 +20,13 @@ return {
     "TSUpdate",
     "TSUpdateSync",
   },
-  build = ":TSUpdate",
+  build = function()
+    if #vim.api.nvim_list_uis() == 0 then
+      vim.cmd.TSUpdateSync() -- update sync if running headless
+    else
+      vim.cmd.TSUpdate() -- otherwise update async
+    end
+  end,
   init = function(plugin)
     -- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
     -- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which
