@@ -1,6 +1,7 @@
 {
   "auto-session": { "branch": "main", "commit": "51196ca66b38fc1660fdf50031cb0b31a199b7c9" },
   "barbar.nvim": { "branch": "master", "commit": "c3ab0dbfe143ffb89a245e5b530f5349d6bb64e1" },
+  "ccc.nvim": { "branch": "main", "commit": "ec6e23fd2c0bf4ffcf71c1271acdcee6e2c6f49c" },
   "gitsigns.nvim": { "branch": "main", "commit": "2c2463dbd82eddd7dbab881c3a62cfbfbe3c67ae" },
   "lazy.nvim": { "branch": "main", "commit": "aedcd79811d491b60d0a6577a9c1701063c2a609" },
   "mini.comment": { "branch": "main", "commit": "b0b359ada4293cdcea7ab4072dfd5b031aac3f8e" },
