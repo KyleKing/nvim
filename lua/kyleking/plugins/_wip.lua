@@ -63,4 +63,15 @@ return {
       },
     },
   },
+
+  {
+    "nvim-pack/nvim-spectre",
+    enabled = false,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    build = false,
+    cmd = "Spectre",
+    opts = { open_cmd = "noswapfile vnew" },
+  },
 }

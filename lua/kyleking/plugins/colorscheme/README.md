@@ -9,3 +9,4 @@
 - "roflolilolmao/oceanic-next.nvim" (OceanicNext)
 - "sickill/vim-monokai" (monokai)
 - "sonph/onehalf" (onehalfdark)
+- [RRethy/nvim-base16](https://github.com/RRethy/nvim-base16)
