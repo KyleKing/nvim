@@ -4,25 +4,6 @@ return {
   main = "nvim-treesitter.configs",
   dependencies = {
     { "nvim-treesitter/nvim-treesitter-textobjects" },
-    {
-      "hiphish/rainbow-delimiters.nvim",
-      config = function()
-        local rainbow = require "rainbow-delimiters"
-        ---@type rainbow_delimiters.config
-        vim.g.rainbow_delimiters = {
-          strategy = {
-            [""] = rainbow.strategy["global"],
-            vim = rainbow.strategy["local"],
-          },
-          query = {
-            [""] = "rainbow-delimiters",
-            latex = "rainbow-blocks",
-            lua = "rainbow-blocks",
-            html = "rainbow-tags",
-          },
-        }
-      end,
-    },
   },
   cmd = {
     "TSBufDisable",
