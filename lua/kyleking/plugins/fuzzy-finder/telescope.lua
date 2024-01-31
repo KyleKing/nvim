@@ -3,6 +3,7 @@ return {
   dependencies = {
     { "nvim-lua/plenary.nvim", lazy = false },
     { "nvim-telescope/telescope-fzf-native.nvim", enabled = vim.fn.executable "make" == 1, build = "make" },
+    { "nvim-telescope/telescope-media-files.nvim" }, -- FYI: requires 'brew install chafa'
     -- PLANNED: revisit lsp integration
     -- {
     --   "AstroNvim/astrolsp",
