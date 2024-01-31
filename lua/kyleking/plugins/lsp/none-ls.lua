@@ -1,3 +1,5 @@
+-- PLANNED: See example of searching for configuration file
+--  https://github.com/uga-rosa/dotfiles/blob/8c86962fe8b3504c58e30e41e64f552cafe81620/nvim/lua/rc/plugins/lsp.lua#L320-L340
 return {
   "nvimtools/none-ls.nvim",
   enabled = false, -- PLANNED: Drop-in replacement for null-ls
