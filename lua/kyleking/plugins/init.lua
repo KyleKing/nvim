@@ -1,5 +1,6 @@
 -- See setup-plugins.lua. Each folder is a tag from NeovimCraft's site
 return {
+  { import = "kuleking.plugins.formatting" },
   { import = "kyleking.plugins.color" },
   { import = "kyleking.plugins.colorscheme" },
   { import = "kyleking.plugins.completion" },

@@ -76,7 +76,7 @@ return {
       desc = "Find words in current buffer",
     },
     {
-      "<Leader>fa", -- PLANNED: a was for astronvim
+      "<Leader>fa", -- PLANNED: 'a' was for astronvim
       function()
         require("telescope.builtin").find_files {
           prompt_title = "Config Files",

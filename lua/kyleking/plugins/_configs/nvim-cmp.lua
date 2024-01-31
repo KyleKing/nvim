@@ -1,3 +1,5 @@
+-- PLANNED: reference https://github.com/phaberest/nvim-config/blob/main/lua/plugins/cmp.lua
+
 return function(_)
   -- [[ Configure nvim-cmp ]]
   -- See `:help cmp`

@@ -39,4 +39,28 @@ return {
     enabled = false,
     config = function() require("lsp_signature").setup() end,
   },
+
+  {
+    "Wansmer/treesj",
+    enabled = false,
+    keys = {
+      { "J", "<cmd>TSJToggle<cr>", desc = "Join Toggle" },
+    },
+    opts = {
+      use_default_keymaps = false,
+      max_join_length = 150,
+    },
+  },
+  {
+    "cshuaimin/ssr.nvim",
+    enabled = false,
+    keys = {
+      {
+        "<leader>sj",
+        function() require("ssr").open() end,
+        mode = { "n", "x" },
+        desc = "Structural Replace",
+      },
+    },
+  },
 }
