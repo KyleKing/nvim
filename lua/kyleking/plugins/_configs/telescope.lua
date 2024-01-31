@@ -34,8 +34,6 @@ return function(_)
   }
   telescope.setup(opts)
 
-  telescope.load_extension "fzf"
-
   -- [[ Configure Telescope ]]
   -- See `:help telescope` and `:help telescope.setup()`
   telescope.setup {

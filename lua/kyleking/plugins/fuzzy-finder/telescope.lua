@@ -1,9 +1,12 @@
 return {
   "nvim-telescope/telescope.nvim",
   dependencies = {
-    { "nvim-lua/plenary.nvim", lazy = false },
+    { "nvim-lua/plenary.nvim" },
     { "nvim-telescope/telescope-fzf-native.nvim", enabled = vim.fn.executable "make" == 1, build = "make" },
     { "nvim-telescope/telescope-media-files.nvim" }, -- FYI: requires 'brew install chafa'
+    {
+      "nvim-telescope/telescope-live-grep-args.nvim",
+    },
     -- PLANNED: revisit lsp integration
     -- {
     --   "AstroNvim/astrolsp",
@@ -36,7 +39,14 @@ return {
     -- },
   },
   cmd = "Telescope",
-  config = function(...) require "kyleking.plugins._configs.telescope"(...) end,
+  config = function(...)
+    local telescope = require "telescope"
+    telescope.load_extension "fzf"
+    telescope.load_extension "media_files"
+    telescope.load_extension "live_grep_args"
+
+    require "kyleking.plugins._configs.telescope"(...)
+  end,
   keys = {
     {
       "<Leader>gb",

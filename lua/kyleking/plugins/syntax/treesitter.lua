@@ -1,6 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  lazy = false,
+  event = "BufRead",
   main = "nvim-treesitter.configs",
   dependencies = {
     { "nvim-treesitter/nvim-treesitter-textobjects" },
