@@ -1,10 +1,11 @@
 -- See setup-plugins.lua. Each folder is a tag from NeovimCraft's site
 return {
-  { import = "kuleking.plugins.formatting" },
+  { import = "kyleking.plugins.bars-and-lines" },
   { import = "kyleking.plugins.color" },
   { import = "kyleking.plugins.colorscheme" },
   { import = "kyleking.plugins.completion" },
   { import = "kyleking.plugins.editing-support" },
+  { import = "kyleking.plugins.formatting" },
   { import = "kyleking.plugins.fuzzy-finder" },
   { import = "kyleking.plugins.keybinding" },
   { import = "kyleking.plugins.lsp" },
@@ -14,7 +15,6 @@ return {
   { import = "kyleking.plugins.search" },
   { import = "kyleking.plugins.session" },
   { import = "kyleking.plugins.syntax" },
-  { import = "kyleking.plugins.tabline" },
   { import = "kyleking.plugins.terminal-integration" },
   { import = "kyleking.plugins.utility" },
 }
