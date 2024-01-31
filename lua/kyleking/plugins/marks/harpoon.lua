@@ -6,6 +6,7 @@ return {
   dependencies = { "nvim-lua/plenary.nvim" },
   lazy = false,
   init = function()
+    -- PLANNED: refactor to use standard Lazy opts/keys
     local harpoon = require "harpoon"
 
     -- REQUIRED
