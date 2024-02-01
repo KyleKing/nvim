@@ -13,6 +13,11 @@ return {
     { "]b", "<Cmd>BufferNext<CR>", { noremap = true, silent = true, desc = "Buffer Next" } },
     -- Close buffer(s)
     { "<leader>bc", "<Cmd>BufferClose<CR>", { noremap = true, silent = true, desc = "Buffer Close Current" } },
+    {
+      "<leader>bCF",
+      "<Cmd>confirm BufferClose<CR>",
+      { noremap = true, silent = true, desc = "Force Buffer Close Current" },
+    },
     { "<leader>bCa", "<Cmd>BufferWipeout<CR>", { noremap = true, silent = true, desc = "Buffer Close All" } },
     {
       "<leader>bCc",
