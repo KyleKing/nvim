@@ -30,7 +30,8 @@
 | TODO    | Respect smartcase with:                                                                                                                   | 2024-01-30  | [lua/kyleking/plugins/search/hlslens.lua:18](https://github.com/KyleKing/nvim/blame/59733dd2fbf5a2643e56976f53fc04920538f5bb/lua/kyleking/plugins/search/hlslens.lua#L18)                             |
 | PLANNED | 'rust', 'tsx', 'javascript', 'typescript', 'html', 'css', 'json', 'toml'                                                                  | 2024-01-31  | [lua/kyleking/plugins/syntax/treesitter.lua:78](https://github.com/KyleKing/nvim/blame/28015fbd83728e302707d707f7c327f6a62bd879/lua/kyleking/plugins/syntax/treesitter.lua#L54)                       |
 | TODO    | Review how to use these keybinds!                                                                                                         | 2024-01-31  | [lua/kyleking/plugins/syntax/treesitter.lua:94](https://github.com/KyleKing/nvim/blame/28015fbd83728e302707d707f7c327f6a62bd879/lua/kyleking/plugins/syntax/treesitter.lua#L70)                       |
+| PLANNED | consider SemGrep rule for require() or not (e.g. the initial install will fail when telescope isn't available)                            | 2024-02-01  | [run-semgrep.sh:10](https://github.com/KyleKing/nvim/blame/main/run-semgrep.sh#L10)                                                                                                                  |
 
-Found code tags for TODO (3), PLANNED (25)
+Found code tags for TODO (3), PLANNED (26)
 
 <!-- calcipy_skip_tags -->
