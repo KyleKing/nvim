@@ -1,6 +1,5 @@
 return {
   "EdenEast/nightfox.nvim",
-  lazy = "VeryLazy",
   opts = {
     options = {
       dim_inactive = false, -- Non focused panes set to alternative background

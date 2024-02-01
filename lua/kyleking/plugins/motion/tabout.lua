@@ -1,6 +1,7 @@
 return {
   "abecodes/tabout.nvim",
   event = "InsertEnter",
+  enabled = false, -- PLANNED: this conflicts with indenting the current line
   dependencies = {
     { "nvim-treesitter/nvim-treesitter" },
     {
