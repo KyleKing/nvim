@@ -12,10 +12,10 @@ local K = vim.keymap.set
 -- K("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
 
 -- Convenience functions for yanking/putting to difference registers
-K("n", "<Leader>y", "*y", { desc = "Yank to *" })
-K("n", "<Leader>p", "*p", { desc = "Yank from *" })
-K("n", "<Leader>Y", "+y", { desc = "Yank to +" })
-K("n", "<Leader>P", "+p", { desc = "Paste from +" })
+K("n", "<leader>ry", "*y", { desc = "Yank to *" })
+K("n", "<leader>rp", "*p", { desc = "Yank from *" })
+K("n", "<leader>rY", "+y", { desc = "Yank to +" })
+K("n", "<leader>rP", "+p", { desc = "Paste from +" })
 
 -- Keep the register clean when using `dd`
 K("n", "dd", function()
