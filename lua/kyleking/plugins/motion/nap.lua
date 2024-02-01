@@ -1,5 +1,6 @@
 return {
   "liangxianzhe/nap.nvim",
-  lazy = false,
+  event = "VeryLazy",
+  enabled = false,
   opts = {},
 }

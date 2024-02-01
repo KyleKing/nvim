@@ -74,4 +74,39 @@ return {
     cmd = "Spectre",
     opts = { open_cmd = "noswapfile vnew" },
   },
+
+  {
+    "tpope/vim-fugitive",
+    enabled = false,
+    cmd = {
+      "G",
+      "Git",
+      "Gvdiffsplit",
+      "Gread",
+      "Gwrite",
+      "Ggrep",
+      "GMove",
+      "GDelete",
+      "GBrowse",
+      "GRemove",
+      "GRename",
+      "Glgrep",
+      "Gedit",
+    },
+    ft = { "fugitive" },
+  },
+
+  {
+    "folke/trouble.nvim",
+    enabled = false,
+    cmd = "TroubleToggle",
+  },
+
+  {
+    "lewis6991/gitsigns.nvim",
+    enabled = false,
+    opts = {
+      -- See `:help gitsigns.txt`
+    },
+  },
 }
