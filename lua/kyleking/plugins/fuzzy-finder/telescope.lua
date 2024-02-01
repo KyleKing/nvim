@@ -126,7 +126,7 @@ return {
       additional_vim_regex_highlighting = false,
     },
   },
-  config = function(...)
+  init = function(...)
     local telescope = require "telescope"
     telescope.load_extension "fzf"
     telescope.load_extension "media_files"
