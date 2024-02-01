@@ -126,14 +126,14 @@ return {
     --   opts = function(_, opts)
     --     local maps = opts.mappings
     --     maps.n["<Leader>lD"] =
-    --       { function() require("telescope.builtin").diagnostics() end, desc = "Search diagnostics" }
-    --     if maps.n.gd then maps.n.gd[1] = function() require("telescope.builtin").lsp_definitions() end end
-    --     if maps.n.gI then maps.n.gI[1] = function() require("telescope.builtin").lsp_implementations() end end
-    --     if maps.n.gr then maps.n.gr[1] = function() require("telescope.builtin").lsp_references() end end
+    --       { require("telescope.builtin").diagnostics, desc = "Search diagnostics" }
+    --     if maps.n.gd then maps.n.gd[1] = require("telescope.builtin").lsp_definitions() end end
+    --     if maps.n.gI then maps.n.gI[1] = require("telescope.builtin").lsp_implementations() end end
+    --     if maps.n.gr then maps.n.gr[1] = require("telescope.builtin").lsp_references() end end
     --     if maps.n["<Leader>lR"] then
-    --       maps.n["<Leader>lR"][1] = function() require("telescope.builtin").lsp_references() end
+    --       maps.n["<Leader>lR"][1] = require("telescope.builtin").lsp_references() end
     --     end
-    --     if maps.n.gT then maps.n.gT[1] = function() require("telescope.builtin").lsp_type_definitions() end end
+    --     if maps.n.gT then maps.n.gT[1] = require("telescope.builtin").lsp_type_definitions() end end
     --     if maps.n["<Leader>lG"] then
     --       maps.n["<Leader>lG"][1] = function()
     --         vim.ui.input({ prompt = "Symbol Query: (leave empty for word under cursor)" }, function(query)
@@ -161,6 +161,8 @@ return {
     config(...) -- FIXME: Merge above into config/keys/etc.
   end,
   keys = {
+    { "<Leader>f<CR>", require("telescope.builtin").resume, desc = "★ Resume previous search ★" },
+
     {
       "<Leader>gb",
       function() require("telescope.builtin").git_branches { use_file_path = true } end,
@@ -181,11 +183,10 @@ return {
       function() require("telescope.builtin").git_status { use_file_path = true } end,
       desc = "Git status",
     },
-    { "<Leader>f<CR>", function() require("telescope.builtin").resume() end, desc = "Resume previous search" },
-    { "<Leader>f'", function() require("telescope.builtin").marks() end, desc = "Find marks" },
+    { "<Leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
     {
       "<Leader>f/",
-      function() require("telescope.builtin").current_buffer_fuzzy_find() end,
+      require("telescope.builtin").current_buffer_fuzzy_find,
       desc = "Find words in current buffer",
     },
     {
@@ -199,27 +200,27 @@ return {
       end,
       desc = "Find nvim config files",
     },
-    { "<Leader>fb", function() require("telescope.builtin").buffers() end, desc = "Find buffers" },
-    { "<Leader>fc", function() require("telescope.builtin").grep_string() end, desc = "Find word under cursor" },
-    { "<Leader>fC", function() require("telescope.builtin").commands() end, desc = "Find commands" },
-    { "<Leader>ff", function() require("telescope.builtin").find_files() end, desc = "Find files" },
+    { "<Leader>fb", require("telescope.builtin").buffers, desc = "Find buffers" },
+    { "<Leader>fc", require("telescope.builtin").grep_string, desc = "Find word under cursor" },
+    { "<Leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
+    { "<Leader>ff", require("telescope.builtin").find_files, desc = "Find files" },
     {
       "<Leader>fF",
       function() require("telescope.builtin").find_files { hidden = true, no_ignore = true } end,
       desc = "Find all files",
     },
-    { "<Leader>fh", function() require("telescope.builtin").help_tags() end, desc = "Find help" },
-    { "<Leader>fk", function() require("telescope.builtin").keymaps() end, desc = "Find keymaps" },
-    { "<Leader>fm", function() require("telescope.builtin").man_pages() end, desc = "Find man" },
-    { "<Leader>fn", function() require("telescope").extensions.notify.notify() end, desc = "Find notifications" },
-    { "<Leader>fo", function() require("telescope.builtin").oldfiles() end, desc = "Find history" },
-    { "<Leader>fr", function() require("telescope.builtin").registers() end, desc = "Find registers" },
+    { "<Leader>fh", require("telescope.builtin").help_tags, desc = "Find help" },
+    { "<Leader>fk", require("telescope.builtin").keymaps, desc = "Find keymaps" },
+    { "<Leader>fm", require("telescope.builtin").man_pages, desc = "Find man" },
+    { "<Leader>fn", require("telescope").extensions.notify.notify, desc = "Find notifications" },
+    { "<Leader>fo", require("telescope.builtin").oldfiles, desc = "Find history" },
+    { "<Leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
     {
       "<Leader>ft",
       function() require("telescope.builtin").colorscheme { enable_preview = true } end,
       desc = "Find themes",
     },
-    { "<Leader>fw", function() require("telescope.builtin").live_grep() end, desc = "Find words" },
+    { "<Leader>fw", require("telescope.builtin").live_grep, desc = "Find words" },
     {
       "<Leader>fW",
       function()
@@ -231,7 +232,7 @@ return {
     },
     {
       "<Leader>ls",
-      function() require("telescope.builtin").lsp_document_symbols() end,
+      require("telescope.builtin").lsp_document_symbols,
       desc = "Search symbols",
     },
   },
