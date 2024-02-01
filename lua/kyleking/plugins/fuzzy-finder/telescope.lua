@@ -100,15 +100,6 @@ local config = function(_)
     }
   end
   vim.keymap.set("n", "<leader>s/", telescope_live_grep_open_files, { desc = "[S]earch [/] in Open Files" })
-  vim.keymap.set("n", "<leader>ss", require("telescope.builtin").builtin, { desc = "[S]earch [S]elect Telescope" })
-  vim.keymap.set("n", "<leader>gf", require("telescope.builtin").git_files, { desc = "Search [G]it [F]iles" })
-  vim.keymap.set("n", "<leader>sf", require("telescope.builtin").find_files, { desc = "[S]earch [F]iles" })
-  vim.keymap.set("n", "<leader>sh", require("telescope.builtin").help_tags, { desc = "[S]earch [H]elp" })
-  vim.keymap.set("n", "<leader>sw", require("telescope.builtin").grep_string, { desc = "[S]earch current [W]ord" })
-  vim.keymap.set("n", "<leader>sg", require("telescope.builtin").live_grep, { desc = "[S]earch by [G]rep" })
-  vim.keymap.set("n", "<leader>sG", ":LiveGrepGitRoot<cr>", { desc = "[S]earch by [G]rep on Git Root" })
-  vim.keymap.set("n", "<leader>sd", require("telescope.builtin").diagnostics, { desc = "[S]earch [D]iagnostics" })
-  vim.keymap.set("n", "<leader>sr", require("telescope.builtin").resume, { desc = "[S]earch [R]esume" })
 end
 
 return {
@@ -161,8 +152,18 @@ return {
     config(...) -- FIXME: Merge above into config/keys/etc.
   end,
   keys = {
-    { "<Leader>f<CR>", require("telescope.builtin").resume, desc = "★ Resume previous search ★" },
+    -- (Alt) Keybindings
+    { "<leader>ss", require("telescope.builtin").builtin, { desc = "[S]earch [S]elect Telescope" } },
+    { "<leader>gf", require("telescope.builtin").git_files, { desc = "Search [G]it [F]iles" } },
+    { "<leader>sf", require("telescope.builtin").find_files, { desc = "[S]earch [F]iles" } },
+    { "<leader>sh", require("telescope.builtin").help_tags, { desc = "[S]earch [H]elp" } },
+    { "<leader>sw", require("telescope.builtin").grep_string, { desc = "[S]earch current [W]ord" } },
+    { "<leader>sg", require("telescope.builtin").live_grep, { desc = "[S]earch by [G]rep" } },
+    { "<leader>sG", ":LiveGrepGitRoot<cr>", { desc = "[S]earch by [G]rep on Git Root" } },
+    { "<leader>sd", require("telescope.builtin").diagnostics, { desc = "[S]earch [D]iagnostics" } },
+    { "<leader>sr", require("telescope.builtin").resume, { desc = "[S]earch [R]esume" } },
 
+    -- Leader-g
     {
       "<Leader>gb",
       function() require("telescope.builtin").git_branches { use_file_path = true } end,
@@ -183,6 +184,14 @@ return {
       function() require("telescope.builtin").git_status { use_file_path = true } end,
       desc = "Git status",
     },
+    -- Leader-l
+    {
+      "<Leader>ls",
+      require("telescope.builtin").lsp_document_symbols,
+      desc = "Search symbols",
+    },
+    -- Leader-f
+    { "<Leader>f<CR>", require("telescope.builtin").resume, desc = "★ Resume previous search ★" },
     { "<Leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
     {
       "<Leader>f/",
@@ -212,7 +221,7 @@ return {
     { "<Leader>fh", require("telescope.builtin").help_tags, desc = "Find help" },
     { "<Leader>fk", require("telescope.builtin").keymaps, desc = "Find keymaps" },
     { "<Leader>fm", require("telescope.builtin").man_pages, desc = "Find man" },
-    { "<Leader>fn", require("telescope").extensions.notify.notify, desc = "Find notifications" },
+    -- { "<Leader>fn", require("telescope").extensions.notify.notify, desc = "Find notifications" },
     { "<Leader>fo", require("telescope.builtin").oldfiles, desc = "Find history" },
     { "<Leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
     {
@@ -229,11 +238,6 @@ return {
         }
       end,
       desc = "Find words in all files",
-    },
-    {
-      "<Leader>ls",
-      require("telescope.builtin").lsp_document_symbols,
-      desc = "Search symbols",
     },
   },
 }

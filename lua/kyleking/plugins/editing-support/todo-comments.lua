@@ -10,7 +10,7 @@ return {
   },
   opts = {
     keywords = {
-      PLANNED = { icon = " ", color = "hint" },
+      PLANNED = { icon = " ", color = "hint", alt = { "FYI" } },
     },
   },
 }
