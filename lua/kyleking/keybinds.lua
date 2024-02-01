@@ -8,6 +8,7 @@ vim.g.maplocalleader = "," -- set default local leader key
 
 local K = vim.keymap.set
 
+-- PLANNED: is this keybind useful?
 -- K("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
 
 -- Convenience functions for yanking/putting to difference registers
@@ -33,18 +34,13 @@ K("n", "<Leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
 K("n", "<Leader>n", "<Cmd>enew<CR>", { desc = "New File" })
 K("n", "<C-s>", "<Cmd>w!<CR>", { desc = "Force write" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
-K("n", "|", "<Cmd>vsplit<CR>", { desc = "Vertical Split" })
-K("n", "\\", "<Cmd>split<CR>", { desc = "Horizontal Split" })
 
 -- -- Plugin Manager
--- K("n", "<Leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
+-- PLANNED: K("n", "<Leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
 
-K("n", "<Leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
-K("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Previous diagnostic" })
-K("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
-K("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
-
--- Split navigation
+-- Managing Splits
+K("n", "|", "<Cmd>vsplit<CR>", { desc = "Vertical Split" })
+K("n", "\\", "<Cmd>split<CR>", { desc = "Horizontal Split" })
 K("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
 K("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
 K("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
@@ -54,9 +50,11 @@ K("n", "<C-Down>", "<Cmd>resize +2<CR>", { desc = "Resize split down" })
 K("n", "<C-Left>", "<Cmd>vertical resize -2<CR>", { desc = "Resize split left" })
 K("n", "<C-Right>", "<Cmd>vertical resize +2<CR>", { desc = "Resize split right" })
 
--- Stay in indent mode
+-- Adjust indent and stay in indent mode
 K("v", "<S-Tab>", "<gv", { desc = "Unindent line" })
 K("v", "<Tab>", ">gv", { desc = "Indent line" })
+
+-- PLANNED: review these additional keybinds
 
 -- -- Improved Terminal Navigation
 -- K("t", "<C-h>", "<Cmd>wincmd h<CR>", { desc = "Terminal left window navigation" })

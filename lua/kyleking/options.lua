@@ -34,7 +34,7 @@ vim.opt.splitbelow = true -- splitting a new window below the current one
 vim.opt.splitright = true -- splitting a new window at the right of the current one
 vim.opt.tabstop = 2 -- number of space in a tab
 vim.opt.termguicolors = true -- enable 24-bit RGB color in the TUI
-vim.opt.timeoutlen = 300 -- shorten key timeout length a little bit for which-key
+vim.opt.timeoutlen = 500 -- shorten key timeout length a little bit for which-key
 vim.opt.title = true -- set terminal title to the filename and path
 vim.opt.undofile = true -- enable persistent undo
 vim.opt.updatetime = 300 -- length of time to wait before triggering the plugin
@@ -42,9 +42,4 @@ vim.opt.viewoptions:remove "curdir" -- disable saving current directory with vie
 vim.opt.virtualedit = "block" -- allow going past end of line in visual block mode
 -- vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
-
--- vim.opt.colorcolumn = "80,120" -- PLANNED: Find a way to add these
-
--- PLANNED: consider additional options
--- -- Set completeopt to have a better completion experience
--- vim.opt.completeopt = 'menuone,noselect'
+vim.opt.colorcolumn = "80,120" -- highlighted screen columns
