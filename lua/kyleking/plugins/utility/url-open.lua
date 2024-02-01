@@ -1,6 +1,6 @@
 return {
   "sontungexpt/url-open",
-  lazy = true,
+  event = "BufRead",
   cmd = "URLOpenUnderCursor",
   opts = {},
   keys = {

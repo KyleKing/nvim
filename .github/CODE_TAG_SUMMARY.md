@@ -27,10 +27,9 @@
 | PLANNED | Revisit                                                                                                                                   | 2024-01-29  | [lua/kyleking/plugins/motion/leap.lua:4](https://github.com/KyleKing/nvim/blame/d024912df9b858b991bdb4c8ddc2bf197551d986/lua/kyleking/plugins/motion/leap.lua#L4)                                     |
 | PLANNED | this conflicts with indenting the current line                                                                                            | 2024-02-01  | [lua/kyleking/plugins/motion/tabout.lua:4](https://github.com/KyleKing/nvim/blame/5f35908bd3ccadcabd32b886e99c4e37b9d0083e/lua/kyleking/plugins/motion/tabout.lua#L4)                                 |
 | TODO    | Respect smartcase with:                                                                                                                   | 2024-01-30  | [lua/kyleking/plugins/search/hlslens.lua:18](https://github.com/KyleKing/nvim/blame/59733dd2fbf5a2643e56976f53fc04920538f5bb/lua/kyleking/plugins/search/hlslens.lua#L18)                             |
-| FIXME   | De-conflict with lazy.nvim window on launch (https://github.com/rmagatti/auto-session/issues/223#issuecomment-1666658887)                 | 2024-01-30  | [lua/kyleking/plugins/session/auto-session.lua:1](https://github.com/KyleKing/nvim/blame/59733dd2fbf5a2643e56976f53fc04920538f5bb/lua/kyleking/plugins/session/auto-session.lua#L1)                   |
 | PLANNED | 'rust', 'tsx', 'javascript', 'typescript', 'html', 'css', 'json', 'toml'                                                                  | 2024-01-31  | [lua/kyleking/plugins/syntax/treesitter.lua:78](https://github.com/KyleKing/nvim/blame/28015fbd83728e302707d707f7c327f6a62bd879/lua/kyleking/plugins/syntax/treesitter.lua#L54)                       |
 | TODO    | Review how to use these keybinds!                                                                                                         | 2024-01-31  | [lua/kyleking/plugins/syntax/treesitter.lua:94](https://github.com/KyleKing/nvim/blame/28015fbd83728e302707d707f7c327f6a62bd879/lua/kyleking/plugins/syntax/treesitter.lua#L70)                       |
 
-Found code tags for FIXME (2), TODO (3), PLANNED (23)
+Found code tags for FIXME (1), TODO (3), PLANNED (23)
 
 <!-- calcipy_skip_tags -->
