@@ -67,7 +67,7 @@ repos:
     hooks:
       - id: tags
         description: "Create a `CODE_TAG_SUMMARY.md` with a table for TODO- and FIXME-style code comments"
-        entry: calcipy-tags tags --base-dir=.github --filename=CODE_TAG_SUMMARY.md
+        entry: calcipy-tags tags --filename=.github/CODE_TAG_SUMMARY.md
         language: system
         name: Tags
         pass_filenames: false
