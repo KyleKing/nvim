@@ -1,53 +1,5 @@
 -- PLANNED: take a look at: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/telescope.lua
-local config = function(_)
-  local telescope = require "telescope"
-  local actions = require "telescope.actions"
-  -- PLANNED: local get_icon = require("astroui").get_icon
-  local opts = {
-    defaults = {
-      -- PLANNED: git_worktrees = require("astrocore").config.git_worktrees,
-      -- prompt_prefix = get_icon("Selected", 1),
-      -- selection_caret = get_icon("Selected", 1),
-      file_ignore_patterns = { ".git/", "node_modules/", ".venv/" },
-      path_display = { "truncate" },
-      sorting_strategy = "ascending",
-      layout_config = {
-        horizontal = { prompt_position = "top", preview_width = 0.55 },
-        vertical = { mirror = false },
-        width = 0.87,
-        height = 0.80,
-        preview_cutoff = 120,
-      },
-      mappings = {
-        i = {
-          ["<C-n>"] = actions.cycle_history_next,
-          ["<C-p>"] = actions.cycle_history_prev,
-          ["<C-j>"] = actions.move_selection_next,
-          ["<C-k>"] = actions.move_selection_previous,
-        },
-        n = { q = actions.close },
-      },
-    },
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = false,
-    },
-  }
-  telescope.setup(opts)
-
-  -- [[ Configure Telescope ]]
-  -- See `:help telescope` and `:help telescope.setup()`
-  telescope.setup {
-    defaults = {
-      mappings = {
-        i = {
-          ["<C-u>"] = false,
-          ["<C-d>"] = false,
-        },
-      },
-    },
-  }
-
+local function register_live_grep_git_root()
   -- Telescope live_grep in git root
   -- Function to find the git root directory based on the current buffer's path
   local function find_git_root()
@@ -79,27 +31,22 @@ local config = function(_)
       search_dirs = { git_root },
     } end
   end
-
   vim.api.nvim_create_user_command("LiveGrepGitRoot", live_grep_git_root, {})
+end
 
-  -- See `:help telescope.builtin`
-  vim.keymap.set("n", "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" })
-  vim.keymap.set("n", "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" })
-  vim.keymap.set("n", "<leader>/", function()
-    -- You can pass additional configuration to telescope to change theme, layout, etc.
-    require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown {
-      winblend = 10,
-      previewer = false,
-    })
-  end, { desc = "[/] Fuzzily search in current buffer" })
+local function live_grep_open_files()
+  require("telescope.builtin").live_grep {
+    grep_open_files = true,
+    prompt_title = "Live Grep in Open Files",
+  }
+end
 
-  local function telescope_live_grep_open_files()
-    require("telescope.builtin").live_grep {
-      grep_open_files = true,
-      prompt_title = "Live Grep in Open Files",
-    }
-  end
-  vim.keymap.set("n", "<leader>s/", telescope_live_grep_open_files, { desc = "[S]earch [/] in Open Files" })
+local function fuzzy_search_current_buffer()
+  -- You can pass additional configuration to telescope to change theme, layout, etc.
+  require("telescope.builtin").current_buffer_fuzzy_find(require("telescope.themes").get_dropdown {
+    winblend = 10,
+    previewer = false,
+  })
 end
 
 return {
@@ -108,9 +55,7 @@ return {
     { "nvim-lua/plenary.nvim" },
     { "nvim-telescope/telescope-fzf-native.nvim", enabled = vim.fn.executable "make" == 1, build = "make" },
     { "nvim-telescope/telescope-media-files.nvim" }, -- FYI: requires 'brew install chafa'
-    {
-      "nvim-telescope/telescope-live-grep-args.nvim",
-    },
+    { "nvim-telescope/telescope-live-grep-args.nvim" },
     -- PLANNED: revisit lsp integration
     -- {
     --   "AstroNvim/astrolsp",
@@ -143,13 +88,51 @@ return {
     -- },
   },
   cmd = "Telescope",
+  opts = {
+    defaults = {
+      -- PLANNED: local get_icon = require("astroui").get_icon
+      -- prompt_prefix = get_icon("Selected", 1),
+      -- selection_caret = get_icon("Selected", 1),
+      -- PLANNED: git_worktrees = require("astrocore").config.git_worktrees,
+      -- PLANNED: git_worktrees = require("astrocore").config.git_worktrees,
+      file_ignore_patterns = { ".git/", "node_modules/", ".venv/" },
+      path_display = { "truncate" },
+      sorting_strategy = "ascending",
+      layout_config = {
+        horizontal = { prompt_position = "top", preview_width = 0.55 },
+        vertical = { mirror = false },
+        width = 0.87,
+        height = 0.80,
+        preview_cutoff = 120,
+      },
+      mappings = {
+        i = {
+          ["<C-n>"] = function() require("telescope.actions").cycle_history_next() end,
+          ["<C-p>"] = function() require("telescope.actions").cycle_history_prev() end,
+          ["<C-j>"] = function() require("telescope.actions").move_selection_next() end,
+          ["<C-k>"] = function() require("telescope.actions").move_selection_previous() end,
+        },
+        n = {
+          q = function() require("telescope.actions").close() end,
+        },
+        i = {
+          ["<C-u>"] = false,
+          ["<C-d>"] = false,
+        },
+      },
+    },
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = false,
+    },
+  },
   config = function(...)
     local telescope = require "telescope"
     telescope.load_extension "fzf"
     telescope.load_extension "media_files"
     telescope.load_extension "live_grep_args"
 
-    config(...) -- FIXME: Merge above into config/keys/etc.
+    register_live_grep_git_root()
   end,
   keys = {
     -- (Alt) Keybindings
@@ -162,6 +145,10 @@ return {
     { "<leader>sG", ":LiveGrepGitRoot<cr>", { desc = "[S]earch by [G]rep on Git Root" } },
     { "<leader>sd", require("telescope.builtin").diagnostics, { desc = "[S]earch [D]iagnostics" } },
     { "<leader>sr", require("telescope.builtin").resume, { desc = "[S]earch [R]esume" } },
+    { "<leader>s/", live_grep_open_files, { desc = "[S]earch [/] in Open Files" } },
+    { "<leader>/", fuzzy_search_current_buffer, { desc = "[/] Fuzzily search in current buffer" } },
+    { "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" } },
+    { "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" } },
 
     -- Leader-g
     {

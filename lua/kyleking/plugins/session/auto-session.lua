@@ -1,4 +1,4 @@
-local handle_restore_when_lazy_syncs = function()
+local function handle_restore_when_lazy_syncs()
   -- From: https://github.com/rmagatti/auto-session/issues/223#issuecomment-1666658887
   local autocmd = vim.api.nvim_create_autocmd
 
