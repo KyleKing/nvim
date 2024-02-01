@@ -26,12 +26,17 @@ return {
     local wk = require "which-key"
     wk.register {
       ["<leader>S"] = { name = "+Session" },
+      ["<leader>b"] = { name = "+Buffer" },
+      ["<leader>bC"] = { name = "+Close" },
+      ["<leader>bO"] = { name = "+Order" },
       ["<leader>f"] = { name = "+Find" },
-      ["<leader>g"] = { name = "+General" },
+      ["<leader>g"] = { name = "+Git" },
       ["<leader>l"] = { name = "+LSP" },
       ["<leader>p"] = { name = "+Plugins" },
       ["<leader>s"] = { name = "+Search" },
       ["<leader>t"] = { name = "+ToggleTerm" },
+      ["<leader>u"] = { name = "+UI" },
+      ["<leader>z"] = { name = "+Z?" },
     }
   end,
   keys = {

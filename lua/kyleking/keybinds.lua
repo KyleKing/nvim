@@ -8,53 +8,25 @@ vim.g.maplocalleader = "," -- set default local leader key
 
 local K = vim.keymap.set
 
--- TODO: review these keybinds from kickstart
+-- K("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
 
-K("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
+-- Convenience functions for yanking/putting to difference registers
+K("n", "<Leader>y", "*y", { desc = "Yank to *" })
+K("n", "<Leader>p", "*p", { desc = "Yank from *" })
+K("n", "<Leader>Y", "+y", { desc = "Yank to +" })
+K("n", "<Leader>P", "+p", { desc = "Paste from +" })
 
--- -- Convenience functions for yanking/putting
--- vim.keymap.set("n", "<Leader>y", "*y")
--- vim.keymap.set("n", "<Leader>p", "*p")
--- vim.keymap.set("n", "<Leader>Y", "+y")
--- vim.keymap.set("n", "<Leader>P", "+p")
+-- Keep the register clean when using `dd`
+K("n", "dd", function()
+  if vim.fn.getline "." == "" then return '"_dd' end
+  return "dd"
+end, { expr = true })
 
--- -- Be smart.
--- vim.cmd("cnoreabbrev W w")
--- vim.cmd("cnoreabbrev Qa! qa!")
--- vim.cmd("cnoreabbrev QA! qa!")
--- vim.cmd("cnoreabbrev Wq wq")
--- vim.cmd("cnoreabbrev WQ wq")
--- vim.cmd("cnoreabbrev Q q")
--- vim.cmd("cnoreabbrev Q! q!")
+-- Remap for dealing with word wrap
+K("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, desc = "Move cursor up" })
+K("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, desc = "Move cursor down" })
 
--- vim.cmd("xnoremap j gj")
--- vim.cmd("xnoremap k gk")
--- vim.cmd("xnoremap <Down> gj")
--- vim.cmd("xnoremap <Up> gk")
-
--- -- Keep the register clean when using `dd`
--- vim.keymap.set("n", "dd", function()
---   if vim.fn.getline "." == "" then return '"_dd' end
---   return "dd"
--- end, { expr = true })
-
--- -- Remap for dealing with word wrap
--- vim.keymap.set("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
--- vim.keymap.set("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- -- Diagnostic keymaps
--- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
--- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
--- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
--- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
-
--- TODO: Finish importing astro core keymaps
-
--- Normal --
 -- Standard Operations
--- PLANNED: These appear to match ones above from kickstart -- need to dedupe if keeping either
--- K("n", "j", "v:count == 0 ? 'gj' : 'j'", expr = true, desc = "Move cursor down" })
--- K("n", "k", "v:count == 0 ? 'gk' : 'k'", expr = true, desc = "Move cursor up" })
 K("n", "<Leader>w", "<Cmd>w<CR>", { desc = "Save" })
 K("n", "<Leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
 K("n", "<Leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
@@ -63,73 +35,14 @@ K("n", "<C-s>", "<Cmd>w!<CR>", { desc = "Force write" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 K("n", "|", "<Cmd>vsplit<CR>", { desc = "Vertical Split" })
 K("n", "\\", "<Cmd>split<CR>", { desc = "Horizontal Split" })
--- K("n", "gx", astro.system_open, desc = "Open the file under cursor with system app" })
 
 -- -- Plugin Manager
 -- K("n", "<Leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
-
--- -- Manage Buffers
--- K("n", "<Leader>c", function() require("astrocore.buffer").close() end, { desc = "Close buffer" })
--- K("n", "<Leader>C", function() require("astrocore.buffer").close(0, true) end, { desc = "Force close buffer" })
--- K(
---   "n",
---   "]b",
---   function() require("astrocore.buffer").nav(vim.v.count > 0 and vim.v.count or 1) end,
---   { desc = "Next buffer" }
--- )
--- K(
---   "n",
---   "[b",
---   function() require("astrocore.buffer").nav(-(vim.v.count > 0 and vim.v.count or 1)) end,
---   { desc = "Previous buffer" }
--- )
--- K(
---   "n",
---   ">b",
---   function() require("astrocore.buffer").move(vim.v.count > 0 and vim.v.count or 1) end,
---   { desc = "Move buffer tab right" }
--- )
--- K(
---   "n",
---   "<b",
---   function() require("astrocore.buffer").move(-(vim.v.count > 0 and vim.v.count or 1)) end,
---   { desc = "Move buffer tab left" }
--- )
-
--- K(
---   "n",
---   "<Leader>bc",
---   function() require("astrocore.buffer").close_all(true) end,
---   { desc = "Close all buffers except current" }
--- )
--- K("n", "<Leader>bC", function() require("astrocore.buffer").close_all() end, { desc = "Close all buffers" })
--- K(
---   "n",
---   "<Leader>bl",
---   function() require("astrocore.buffer").close_left() end,
---   { desc = "Close all buffers to the left" }
--- )
--- K("n", "<Leader>bp", function() require("astrocore.buffer").prev() end, { desc = "Previous buffer" })
--- K(
---   "n",
---   "<Leader>br",
---   function() require("astrocore.buffer").close_right() end,
---   { desc = "Close all buffers to the right" }
--- )
--- K("n", "<Leader>bse", function() require("astrocore.buffer").sort "extension" end, { desc = "By extension" })
--- K("n", "<Leader>bsr", function() require("astrocore.buffer").sort "unique_path" end, { desc = "By relative path" })
--- K("n", "<Leader>bsp", function() require("astrocore.buffer").sort "full_path" end, { desc = "By full path" })
--- K("n", "<Leader>bsi", function() require("astrocore.buffer").sort "bufnr" end, { desc = "By buffer number" })
--- K("n", "<Leader>bsm", function() require("astrocore.buffer").sort "modified" end, { desc = "By modification" })
 
 K("n", "<Leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
 K("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Previous diagnostic" })
 K("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
 K("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
-
--- -- Navigate tabs
--- K("n", "]t", function() vim.cmd.tabnext() end, { desc = "Next tab" })
--- K("n", "[t", function() vim.cmd.tabprevious() end, { desc = "Previous tab" })
 
 -- Split navigation
 K("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
