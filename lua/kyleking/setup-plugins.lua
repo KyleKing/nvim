@@ -37,6 +37,7 @@ vim.cmd("syntax enable")
 vim.cmd.colorscheme("nightfox")
 -- Override line number styles
 -- Alternatively, override the theme directly: https://stackoverflow.com/a/76039670/3219667
-vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#578E74", bold = true })
-vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#AF6A7A", bold = true })
-vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#576F8E", bold = true })
+-- Colors from Nord Frost color scheme: https://www.nordtheme.com/
+vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#98bbba", bold = true })
+-- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#94bfce", bold = true })
+vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#87a0be", bold = true })
