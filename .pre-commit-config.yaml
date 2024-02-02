@@ -46,6 +46,16 @@ repos:
     rev: v3.14.0
     hooks:
       - id: commitizen
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v4.0.0-alpha.8"
+    hooks:
+      - id: prettier
+        additional_dependencies:
+          # Note: this version must be the same as the hook revision
+          - "prettier@4.0.0-alpha.8"
+          - "prettier-plugin-sh"
+        exclude: \.copier-answers\.yml|tests/.*/cassettes/.*\.yaml
+        types_or: [html, javascript, json, shell, yaml]
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
     hooks:
@@ -57,12 +67,7 @@ repos:
     rev: v0.23.1
     hooks:
       - id: toml-sort-fix
-        args:
-          [
-            --in-place,
-            --all,
-            --trailing-comma-inline-array,
-          ]
+        args: [--in-place, --all, --trailing-comma-inline-array]
   - repo: local
     hooks:
       - id: selene
