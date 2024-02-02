@@ -18,7 +18,7 @@
   "neotab.nvim": { "branch": "master", "commit": "f831660ace2660b9f3da78c1b19650c60f179e02" },
   "nightfox.nvim": { "branch": "main", "commit": "a408e6bb101066952b81de9c11be367114bd561f" },
   "nvim-hlslens": { "branch": "main", "commit": "8ffc64bb6b624612cf762982b92633f283f7a715" },
-  "nvim-treesitter": { "branch": "master", "commit": "d2b4563230bb3564fa3c0f74373b2700d69f28b4" },
+  "nvim-treesitter": { "branch": "master", "commit": "b7e1a6c2cdc934315cd1914f25763a2a8038c855" },
   "nvim-treesitter-textobjects": { "branch": "master", "commit": "8edd5a6d96936bdff23333d3bc177481388839e5" },
   "nvim-ts-context-commentstring": { "branch": "main", "commit": "1277b4a1f451b0f18c0790e1a7f12e1e5fdebfee" },
   "nvim-web-devicons": { "branch": "master", "commit": "aaec87dbdaa776bfa0a13c8694bec9bcb7454719" },

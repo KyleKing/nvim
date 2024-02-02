@@ -43,3 +43,16 @@ vim.opt.virtualedit = "block" -- allow going past end of line in visual block mo
 -- vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
 vim.opt.colorcolumn = "80,120" -- highlighted screen columns
+
+-- Custom filetypes
+vim.filetype.add({
+   extension = {
+      conf = "conf",
+      mdx = "markdown",
+   },
+   pattern = {
+      [".*%.env.*"] = "sh",
+      ["ignore$"] = "conf",
+   },
+   filename = {},
+})

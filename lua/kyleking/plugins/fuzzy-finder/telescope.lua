@@ -143,7 +143,7 @@ return {
       { "<leader>bs", fuzzy_search_current_buffer, desc = "Fuzzily search in current buffer" },
 
       -- Leader-b
-      { "<leader>bb", require("telescope.builtin").buffers, desc = "Find in open [b]uffers" },
+      { "<leader>bf", require("telescope.builtin").buffers, desc = "Find in open [b]uffers" },
       { "<leader>br", require("telescope.builtin").oldfiles, desc = "Find [r]ecently opened files" },
 
       -- Leader-g

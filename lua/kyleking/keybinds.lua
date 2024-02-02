@@ -28,12 +28,26 @@ K("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, desc = "M
 K("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, desc = "Move cursor down" })
 
 -- Standard Operations
-K("n", "<Leader>w", "<Cmd>w<CR>", { desc = "Save" })
+K("n", "<Leader>w", "<Cmd>update<CR>", { desc = "Save if modified" })
+K("n", "<Leader>W", "<Cmd>wall<CR>", { desc = "Save all" })
 K("n", "<Leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
 K("n", "<Leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
 K("n", "<Leader>n", "<Cmd>enew<CR>", { desc = "New File" })
 K("n", "<C-s>", "<Cmd>w!<CR>", { desc = "Force write" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
+
+-- Move line up and down in NORMAL and VISUAL modes
+-- Reference: https://vim.fandom.com/wiki/Moving_lines_up_or_down
+K("n", "<C-j>", "<CMD>move .+1<CR>", { desc = "Move up one line" })
+K("n", "<C-k>", "<CMD>move .-2<CR>", { desc = "Move down one line" })
+K("x", "<C-j>", ":move '>+1<CR>gv=gv", { desc = "Move up one line" })
+K("x", "<C-k>", ":move '<-2<CR>gv=gv", { desc = "Move down one line" })
+
+-- Use operator pending mode to visually select the whole buffer
+--  e.g. dA = delete buffer ALL, yA = copy whole buffer ALL
+-- Based on: https://github.com/numToStr/dotfiles/blob/c8dcb7bea3c1cc64d74559804071c861dae6e851/neovim/.config/nvim/lua/numToStr/keybinds.lua#L48C1-L51
+K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
+K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
 -- -- Plugin Manager
 -- PLANNED: K("n", "<Leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
