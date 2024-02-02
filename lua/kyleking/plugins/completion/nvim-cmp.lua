@@ -55,6 +55,7 @@ end
 
 return {
   "hrsh7th/nvim-cmp",
+  enabled = false, -- PLANNED: this configuration didn't work out-of-the-box and will need to revisit after configuring lsp
   dependencies = {
     -- Snippet Engine & its associated nvim-cmp source
     "L3MON4D3/LuaSnip",

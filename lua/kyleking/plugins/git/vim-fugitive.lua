@@ -1,7 +1,22 @@
 return {
   "tpope/vim-fugitive",
-  enabled = false, -- PLANNED: investigate
   dependencies = {
     "tpope/vim-rhubarb",
   },
+  cmd = {
+    "G",
+    "Git",
+    "Gvdiffsplit",
+    "Gread",
+    "Gwrite",
+    "Ggrep",
+    "GMove",
+    "GDelete",
+    "GBrowse",
+    "GRemove",
+    "GRename",
+    "Glgrep",
+    "Gedit",
+  },
+  ft = { "fugitive" },
 }
