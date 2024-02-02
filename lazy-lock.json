@@ -15,6 +15,7 @@
   "mini.surround": { "branch": "main", "commit": "5ceb6a12d3761bc719fbdad5432c89333deb1498" },
   "mini.trailspace": { "branch": "main", "commit": "60d0eca6703b55285e33b0da00105cde50d188df" },
   "mkdx": { "branch": "master", "commit": "ee667cad506954b706c3fa972fbaaad46b1bf028" },
+  "nap.nvim": { "branch": "main", "commit": "98037cff509a12412cf8f32d1b12a9fdcad558ad" },
   "nightfox.nvim": { "branch": "main", "commit": "a408e6bb101066952b81de9c11be367114bd561f" },
   "nvim-cmp": { "branch": "main", "commit": "538e37ba87284942c1d76ed38dd497e54e65b891" },
   "nvim-hlslens": { "branch": "main", "commit": "8ffc64bb6b624612cf762982b92633f283f7a715" },
