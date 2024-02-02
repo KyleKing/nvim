@@ -4,6 +4,7 @@
   "ccc.nvim": { "branch": "main", "commit": "ec6e23fd2c0bf4ffcf71c1271acdcee6e2c6f49c" },
   "dial.nvim": { "branch": "master", "commit": "27eb570085db2ef44bff4f620d3806039184651c" },
   "gx.nvim": { "branch": "main", "commit": "eba0eef8143060428c9baf9b14bda6f76b5547b3" },
+  "highlight-undo.nvim": { "branch": "main", "commit": "50a6884a8476be04ecce8f1c4ed692c5000ef0a1" },
   "indent-blankline.nvim": { "branch": "master", "commit": "12e92044d313c54c438bd786d11684c88f6f78cd" },
   "lazy.nvim": { "branch": "main", "commit": "aedcd79811d491b60d0a6577a9c1701063c2a609" },
   "lsp_signature.nvim": { "branch": "master", "commit": "fed2c8389c148ff1dfdcdca63c2b48d08a50dea0" },
