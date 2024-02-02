@@ -1,6 +1,6 @@
 local rel_filename = {
    "filename",
-   file_status = false,
+   file_status = true,
    new_file_status = true,
    path = 1, -- 0: Filename, 1: Relative path, 2: Absolute path
    shorting_target = 40, -- Shortens path to leave 'n' spaces in the window

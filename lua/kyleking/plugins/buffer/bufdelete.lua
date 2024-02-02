@@ -1,6 +1,6 @@
 return {
    "famiu/bufdelete.nvim",
-   cmds = { ":Bdelete", ":Bwipeout" },
+   cmd = { "Bdelete", "Bwipeout" },
    keys = {
       { "<leader>bc", ":Bdelete<CR>", desc = "Close current buffer" },
       { "<leader>bw", ":Bwipeout<CR>", desc = "Wipeout buffer (including marks)" },

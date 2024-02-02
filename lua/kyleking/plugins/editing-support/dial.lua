@@ -1,3 +1,4 @@
+-- All options: https://github.com/monaqa/dial.nvim?tab=readme-ov-file#augend-alias
 return {
    "monaqa/dial.nvim",
    keys = {
