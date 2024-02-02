@@ -1,4 +1,4 @@
 return {
-  "folke/trouble.nvim",
-  cmd = "TroubleToggle",
+   "folke/trouble.nvim",
+   cmd = "TroubleToggle",
 }

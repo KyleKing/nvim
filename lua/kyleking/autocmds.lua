@@ -4,22 +4,22 @@ local augroup = function(name) return vim.api.nvim_create_augroup(name, { clear 
 
 local augroups = {}
 local augroup_keys = {
-  "HighlightYank",
-  "ReloadBuffer",
+   "HighlightYank",
+   "ReloadBuffer",
 }
 
 for _, augroup_key in ipairs(augroup_keys) do
-  table.insert(augroups, augroup(augroup_key))
+   table.insert(augroups, augroup(augroup_key))
 end
 
 -- Highlight yanked text.
 autocmd("TextYankPost", {
-  group = augroups.HighlightYank,
-  callback = function() vim.highlight.on_yank { higroup = "IncSearch", timeout = 200 } end,
+   group = augroups.HighlightYank,
+   callback = function() vim.highlight.on_yank({ higroup = "IncSearch", timeout = 200 }) end,
 })
 
 -- Reload buffer on enter or focus.
 autocmd({ "BufEnter", "FocusGained" }, {
-  group = augroups.ReloadBuffer,
-  command = "silent! !",
+   group = augroups.ReloadBuffer,
+   command = "silent! !",
 })

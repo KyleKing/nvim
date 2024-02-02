@@ -1,4 +1,4 @@
 return {
-  "SidOfc/mkdx",
-  ft = { "md", "markdown", "vimwiki", "vimwiki.markdown" },
+   "SidOfc/mkdx",
+   ft = { "md", "markdown", "vimwiki", "vimwiki.markdown" },
 }

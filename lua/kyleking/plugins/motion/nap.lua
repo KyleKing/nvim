@@ -1,5 +1,5 @@
 return {
-  "liangxianzhe/nap.nvim",
-  event = "BufRead",
-  opts = {},
+   "liangxianzhe/nap.nvim",
+   event = "BufRead",
+   opts = {},
 }

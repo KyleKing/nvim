@@ -19,32 +19,32 @@ M.user_terminals = {}
 ---@param opts? table The new options that should be merged with the default table
 ---@return table # The merged table
 function M.extend_tbl(default, opts)
-  opts = opts or {}
-  return default and vim.tbl_deep_extend("force", default, opts) or opts
+   opts = opts or {}
+   return default and vim.tbl_deep_extend("force", default, opts) or opts
 end
 
 --- Sync Lazy and then update Mason
 function M.update_packages()
-  require("lazy").sync { wait = true }
-  require("astrocore.mason").update_all()
+   require("lazy").sync({ wait = true })
+   require("astrocore.mason").update_all()
 end
 
 --- Partially reload AstroNvim user settings. Includes core vim options, mappings, and highlights. This is an experimental feature and may lead to instabilities until restart.
 function M.reload()
-  local was_modifiable = vim.opt.modifiable:get()
+   local was_modifiable = vim.opt.modifiable:get()
 
-  local reload_module = require("plenary.reload").reload_module
-  reload_module "astronivm.options"
-  if package.loaded["config.options"] then reload_module "config.options" end
+   local reload_module = require("plenary.reload").reload_module
+   reload_module("astronivm.options")
+   if package.loaded["config.options"] then reload_module("config.options") end
 
-  if not was_modifiable then vim.opt.modifiable = true end
-  local success, fault = pcall(require, "astronvim.options")
-  if not success then vim.api.nvim_err_writeln("Failed to load " .. module .. "\n\n" .. fault) end
-  if not was_modifiable then vim.opt.modifiable = false end
-  local lazy = require "lazy"
-  lazy.reload { plugins = { M.get_plugin "astrocore" } }
-  if M.is_available "astroui" then lazy.reload { plugins = { M.get_plugin "astroui" } } end
-  vim.cmd.doautocmd "ColorScheme"
+   if not was_modifiable then vim.opt.modifiable = true end
+   local success, fault = pcall(require, "astronvim.options")
+   if not success then vim.api.nvim_err_writeln("Failed to load " .. module .. "\n\n" .. fault) end
+   if not was_modifiable then vim.opt.modifiable = false end
+   local lazy = require("lazy")
+   lazy.reload({ plugins = { M.get_plugin("astrocore") } })
+   if M.is_available("astroui") then lazy.reload({ plugins = { M.get_plugin("astroui") } }) end
+   vim.cmd.doautocmd("ColorScheme")
 end
 
 --- Insert one or more values into a list like table and maintain that you do not insert non-unique values (THIS MODIFIES `lst`)
@@ -52,17 +52,17 @@ end
 ---@param ... any Values to be inserted
 ---@return any[] # The modified list like table
 function M.list_insert_unique(lst, ...)
-  if not lst then lst = {} end
-  assert(vim.tbl_islist(lst), "Provided table is not a list like table")
-  local added = {}
-  vim.tbl_map(function(v) added[v] = true end, lst)
-  for _, val in ipairs { ... } do
-    if not added[val] then
-      table.insert(lst, val)
-      added[val] = true
-    end
-  end
-  return lst
+   if not lst then lst = {} end
+   assert(vim.tbl_islist(lst), "Provided table is not a list like table")
+   local added = {}
+   vim.tbl_map(function(v) added[v] = true end, lst)
+   for _, val in ipairs({ ... }) do
+      if not added[val] then
+         table.insert(lst, val)
+         added[val] = true
+      end
+   end
+   return lst
 end
 
 --- Serve a notification with a title of AstroNvim
@@ -70,31 +70,31 @@ end
 ---@param type integer|nil The type of the notification (:help vim.log.levels)
 ---@param opts? table The nvim-notify options to use (:help notify-options)
 function M.notify(msg, type, opts)
-  vim.schedule(function() vim.notify(msg, type, M.extend_tbl({ title = "AstroNvim" }, opts)) end)
+   vim.schedule(function() vim.notify(msg, type, M.extend_tbl({ title = "AstroNvim" }, opts)) end)
 end
 
 --- Open a URL under the cursor with the current operating system
 ---@param path string The path of the file to open with the system opener
 function M.system_open(path)
-  vim.fn.jobstart(vim.fn.extend({ "open" }, { path or vim.fn.expand "<cfile>" }), { detach = true })
+   vim.fn.jobstart(vim.fn.extend({ "open" }, { path or vim.fn.expand("<cfile>") }), { detach = true })
 end
 
 --- Toggle a user terminal if it exists, if not then create a new one and save it
 ---@param opts string|table A terminal command string or a table of options for Terminal:new() (Check toggleterm.nvim documentation for table format)
 function M.toggle_term_cmd(opts)
-  local terms = M.user_terminals
-  -- if a command string is provided, create a basic table for Terminal:new() options
-  if type(opts) == "string" then opts = { cmd = opts, hidden = true } end
-  local num = vim.v.count > 0 and vim.v.count or 1
-  -- if terminal doesn't exist yet, create it
-  if not terms[opts.cmd] then terms[opts.cmd] = {} end
-  if not terms[opts.cmd][num] then
-    if not opts.count then opts.count = vim.tbl_count(terms) * 100 + num end
-    if not opts.on_exit then opts.on_exit = function() terms[opts.cmd][num] = nil end end
-    terms[opts.cmd][num] = require("toggleterm.terminal").Terminal:new(opts)
-  end
-  -- toggle the terminal
-  terms[opts.cmd][num]:toggle()
+   local terms = M.user_terminals
+   -- if a command string is provided, create a basic table for Terminal:new() options
+   if type(opts) == "string" then opts = { cmd = opts, hidden = true } end
+   local num = vim.v.count > 0 and vim.v.count or 1
+   -- if terminal doesn't exist yet, create it
+   if not terms[opts.cmd] then terms[opts.cmd] = {} end
+   if not terms[opts.cmd][num] then
+      if not opts.count then opts.count = vim.tbl_count(terms) * 100 + num end
+      if not opts.on_exit then opts.on_exit = function() terms[opts.cmd][num] = nil end end
+      terms[opts.cmd][num] = require("toggleterm.terminal").Terminal:new(opts)
+   end
+   -- toggle the terminal
+   terms[opts.cmd][num]:toggle()
 end
 
 --- A placeholder variable used to queue section names to be registered by which-key
@@ -103,79 +103,79 @@ M.which_key_queue = nil
 
 --- Register queued which-key mappings
 function M.which_key_register()
-  if M.which_key_queue then
-    for mode, registration in pairs(M.which_key_queue) do
-      wk.register(registration, { mode = mode })
-    end
-    M.which_key_queue = nil
-  end
+   if M.which_key_queue then
+      for mode, registration in pairs(M.which_key_queue) do
+         wk.register(registration, { mode = mode })
+      end
+      M.which_key_queue = nil
+   end
 end
 
 --- Get an empty table of mappings with a key for each map mode
 ---@return table<string,table> # a table with entries for each map mode
 function M.empty_map_table()
-  local maps = {}
-  for _, mode in ipairs { "", "n", "v", "x", "s", "o", "!", "i", "l", "c", "t" } do
-    maps[mode] = {}
-  end
-  if vim.fn.has "nvim-0.10.0" == 1 then
-    for _, abbr_mode in ipairs { "ia", "ca", "!a" } do
-      maps[abbr_mode] = {}
-    end
-  end
-  return maps
+   local maps = {}
+   for _, mode in ipairs({ "", "n", "v", "x", "s", "o", "!", "i", "l", "c", "t" }) do
+      maps[mode] = {}
+   end
+   if vim.fn.has("nvim-0.10.0") == 1 then
+      for _, abbr_mode in ipairs({ "ia", "ca", "!a" }) do
+         maps[abbr_mode] = {}
+      end
+   end
+   return maps
 end
 
 --- Table based API for setting keybindings
 ---@param map_table AstroCoreMappings A nested table where the first key is the vim mode, the second key is the key to map, and the value is the function to set the mapping to
 ---@param base? vim.api.keyset.keymap A base set of options to set on every keybinding
 function M.set_mappings(map_table, base)
-  local was_no_which_key_queue = not M.which_key_queue
-  -- iterate over the first keys for each mode
-  base = vim.tbl_deep_extend("force", { silent = true }, base or {})
-  for mode, maps in pairs(map_table) do
-    -- iterate over each keybinding set in the current mode
-    for keymap, options in pairs(maps) do
-      -- build the options for the command accordingly
-      if options then
-        local cmd
-        local keymap_opts = base
-        if type(options) == "string" then
-          cmd = options
-        else
-          cmd = options[1]
-          keymap_opts = vim.tbl_deep_extend("force", keymap_opts, options)
-          keymap_opts[1] = nil
-        end
-        if not cmd or keymap_opts.name then -- if which-key mapping, queue it
-          if not keymap_opts.name then keymap_opts.name = keymap_opts.desc end
-          if not M.which_key_queue then M.which_key_queue = {} end
-          if not M.which_key_queue[mode] then M.which_key_queue[mode] = {} end
-          M.which_key_queue[mode][keymap] = keymap_opts
-        else -- if not which-key mapping, set it
-          vim.keymap.set(mode, keymap, cmd, keymap_opts)
-        end
+   local was_no_which_key_queue = not M.which_key_queue
+   -- iterate over the first keys for each mode
+   base = vim.tbl_deep_extend("force", { silent = true }, base or {})
+   for mode, maps in pairs(map_table) do
+      -- iterate over each keybinding set in the current mode
+      for keymap, options in pairs(maps) do
+         -- build the options for the command accordingly
+         if options then
+            local cmd
+            local keymap_opts = base
+            if type(options) == "string" then
+               cmd = options
+            else
+               cmd = options[1]
+               keymap_opts = vim.tbl_deep_extend("force", keymap_opts, options)
+               keymap_opts[1] = nil
+            end
+            if not cmd or keymap_opts.name then -- if which-key mapping, queue it
+               if not keymap_opts.name then keymap_opts.name = keymap_opts.desc end
+               if not M.which_key_queue then M.which_key_queue = {} end
+               if not M.which_key_queue[mode] then M.which_key_queue[mode] = {} end
+               M.which_key_queue[mode][keymap] = keymap_opts
+            else -- if not which-key mapping, set it
+               vim.keymap.set(mode, keymap, cmd, keymap_opts)
+            end
+         end
       end
-    end
-  end
-  if was_no_which_key_queue and M.which_key_queue then M.on_load("which-key.nvim", M.which_key_register) end
+   end
+   if was_no_which_key_queue and M.which_key_queue then M.on_load("which-key.nvim", M.which_key_register) end
 end
 
 --- regex used for matching a valid URL/URI string
 M.url_matcher =
-  "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
+   "\\v\\c%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)%([&:#*@~%_\\-=?!+;/0-9a-z]+%(%([.;/?]|[.][.]+)[&:#*@~%_\\-=?!+/0-9a-z]+|:\\d+|,%(%(%(h?ttps?|ftp|file|ssh|git)://|[a-z]+[@][a-z]+[.][a-z]+:)@![0-9a-z]+))*|\\([&:#*@~%_\\-=?!+;/.0-9a-z]*\\)|\\[[&:#*@~%_\\-=?!+;/.0-9a-z]*\\]|\\{%([&:#*@~%_\\-=?!+;/.0-9a-z]*|\\{[&:#*@~%_\\-=?!+;/.0-9a-z]*})\\})+"
 
 --- Delete the syntax matching rules for URLs/URIs if set
 function M.delete_url_match()
-  for _, match in ipairs(vim.fn.getmatches()) do
-    if match.group == "HighlightURL" then vim.fn.matchdelete(match.id) end
-  end
+   for _, match in ipairs(vim.fn.getmatches()) do
+      if match.group == "HighlightURL" then vim.fn.matchdelete(match.id) end
+   end
 end
 
 --- Add syntax matching rules for highlighting URLs/URIs
 function M.set_url_match()
-  M.delete_url_match()
-  if require("astrocore").config.features.highlighturl then vim.fn.matchadd("HighlightURL", M.url_matcher, 15) end
+   M.delete_url_match()
+   if require("astrocore").config.features.highlighturl then vim.fn.matchadd("HighlightURL", M.url_matcher, 15) end
 end
 
 --- Run a shell command and capture the output and if the command succeeded or failed
@@ -183,14 +183,14 @@ end
 ---@param show_error? boolean Whether or not to show an unsuccessful command as an error to the user
 ---@return string|nil # The result of a successfully executed command or nil
 function M.cmd(cmd, show_error)
-  if type(cmd) == "string" then cmd = { cmd } end
-  if vim.fn.has "win32" == 1 then cmd = vim.list_extend({ "cmd.exe", "/C" }, cmd) end
-  local result = vim.fn.system(cmd)
-  local success = vim.api.nvim_get_vvar "shell_error" == 0
-  if not success and (show_error == nil or show_error) then
-    vim.api.nvim_err_writeln(("Error running command %s\nError message:\n%s"):format(table.concat(cmd, " "), result))
-  end
-  return success and assert(result):gsub("[\27\155][][()#;?%d]*[A-PRZcf-ntqry=><~]", "") or nil
+   if type(cmd) == "string" then cmd = { cmd } end
+   if vim.fn.has("win32") == 1 then cmd = vim.list_extend({ "cmd.exe", "/C" }, cmd) end
+   local result = vim.fn.system(cmd)
+   local success = vim.api.nvim_get_vvar("shell_error") == 0
+   if not success and (show_error == nil or show_error) then
+      vim.api.nvim_err_writeln(("Error running command %s\nError message:\n%s"):format(table.concat(cmd, " "), result))
+   end
+   return success and assert(result):gsub("[\27\155][][()#;?%d]*[A-PRZcf-ntqry=><~]", "") or nil
 end
 
 --- Get the first worktree that a file belongs to
@@ -198,25 +198,25 @@ end
 ---@param worktrees table<string, string>[]? an array like table of worktrees with entries `toplevel` and `gitdir`, default retrieves from `vim.g.git_worktrees`
 ---@return table<string, string>|nil # a table specifying the `toplevel` and `gitdir` of a worktree or nil if not found
 function M.file_worktree(file, worktrees)
-  worktrees = worktrees or require("astrocore").config.git_worktrees
-  if not worktrees then return end
-  file = file or vim.fn.expand "%" --[[@as string]]
-  for _, worktree in ipairs(worktrees) do
-    if
-      M.cmd({
-        "git",
-        "--work-tree",
-        worktree.toplevel,
-        "--git-dir",
-        worktree.gitdir,
-        "ls-files",
-        "--error-unmatch",
-        file,
-      }, false)
-    then
-      return worktree
-    end
-  end
+   worktrees = worktrees or require("astrocore").config.git_worktrees
+   if not worktrees then return end
+   file = file or vim.fn.expand("%") --[[@as string]]
+   for _, worktree in ipairs(worktrees) do
+      if
+         M.cmd({
+            "git",
+            "--work-tree",
+            worktree.toplevel,
+            "--git-dir",
+            worktree.gitdir,
+            "ls-files",
+            "--error-unmatch",
+            file,
+         }, false)
+      then
+         return worktree
+      end
+   end
 end
 
 -- --- Setup and configure AstroCore

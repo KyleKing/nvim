@@ -2,14 +2,14 @@
 --  Or for `vim.opt.clipboard`, see `:help 'clipboard'` for documentation
 
 vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
-vim.opt.backspace:append { "nostop" } -- don't stop backspace at insert
+vim.opt.backspace:append({ "nostop" }) -- don't stop backspace at insert
 vim.opt.breakindent = true -- wrap indent to match  line start
 vim.opt.clipboard = "unnamedplus" -- connection to the system clipboard
 vim.opt.cmdheight = 0 -- hide command line unless needed
 vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Options for insert mode completion
 vim.opt.copyindent = true -- copy the previous indentation on autoindenting
 vim.opt.cursorline = true -- highlight the text line of the cursor
-vim.opt.diffopt:append { "algorithm:histogram", "linematch:60" } -- enable linematch diff algorithm
+vim.opt.diffopt:append({ "algorithm:histogram", "linematch:60" }) -- enable linematch diff algorithm
 vim.opt.expandtab = true -- enable the use of space in tab
 vim.opt.fileencoding = "utf-8" -- file content encoding for the buffer
 vim.opt.fillchars = { eob = " " } -- disable `~` on nonexistent lines
@@ -25,7 +25,7 @@ vim.opt.preserveindent = true -- preserve indent structure as much as possible
 vim.opt.pumheight = 10 -- height of the pop up menu
 vim.opt.relativenumber = true -- show relative numberline
 vim.opt.shiftwidth = 2 -- number of space inserted for indentation
-vim.opt.shortmess:append { s = true, I = true } -- disable search count wrap and startup messages
+vim.opt.shortmess:append({ s = true, I = true }) -- disable search count wrap and startup messages
 vim.opt.showmode = false -- disable showing modes in command line
 vim.opt.showtabline = 1 -- (default) show tabline only if more than one tab
 vim.opt.signcolumn = "yes" -- always show the sign column
@@ -38,7 +38,7 @@ vim.opt.timeoutlen = 500 -- shorten key timeout length a little bit for which-ke
 vim.opt.title = true -- set terminal title to the filename and path
 vim.opt.undofile = true -- enable persistent undo
 vim.opt.updatetime = 300 -- length of time to wait before triggering the plugin
-vim.opt.viewoptions:remove "curdir" -- disable saving current directory with views
+vim.opt.viewoptions:remove("curdir") -- disable saving current directory with views
 vim.opt.virtualedit = "block" -- allow going past end of line in visual block mode
 -- vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
