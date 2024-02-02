@@ -1,6 +1,7 @@
 return {
   "romgrk/barbar.nvim",
   event = "UIEnter",
+  enabled = false, -- FYI: use plain buffers instead
   dependencies = {
     "lewis6991/gitsigns.nvim", -- for git status
     "nvim-tree/nvim-web-devicons", -- for file icons
