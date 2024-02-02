@@ -8,10 +8,10 @@ vim.g.maplocalleader = "," -- set default local leader key
 
 local K = vim.keymap.set
 
--- PLANNED: is this keybind useful?
--- K("n", "<Esc>", ":nohl<CR>:echo<CR>") -- Clear highlighting and buffer
+K("n", "<Esc>", ":nohlsearch<CR>") -- Clear last search highlighting
 
 -- Convenience functions for yanking/putting to difference registers
+-- PLANNED: also consider 0p, but figure out how these can be useful first
 K("n", "<leader>ry", "*y", { desc = "Yank to *" })
 K("n", "<leader>rp", "*p", { desc = "Yank from *" })
 K("n", "<leader>rY", "+y", { desc = "Yank to +" })

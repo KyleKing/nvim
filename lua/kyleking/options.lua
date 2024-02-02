@@ -37,12 +37,13 @@ vim.opt.termguicolors = true -- enable 24-bit RGB color in the TUI
 vim.opt.timeoutlen = 500 -- shorten key timeout length a little bit for which-key
 vim.opt.title = true -- set terminal title to the filename and path
 vim.opt.undofile = true -- enable persistent undo
-vim.opt.updatetime = 300 -- length of time to wait before triggering the plugin
+vim.opt.updatetime = 250 -- length of time to wait before triggering the plugin
 vim.opt.viewoptions:remove("curdir") -- disable saving current directory with views
 vim.opt.virtualedit = "block" -- allow going past end of line in visual block mode
 -- vim.opt.wrap = false -- disable wrapping of lines longer than the width of window
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
 vim.opt.colorcolumn = "80,120" -- highlighted screen columns
+vim.opt.scrolloff = 8 -- Number of screen lines to keep above and below the cursor
 
 -- Custom filetypes
 vim.filetype.add({
