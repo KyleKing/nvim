@@ -135,20 +135,17 @@ return {
     register_live_grep_git_root()
   end,
   keys = {
-    -- (Alt) Keybindings
+    -- PLANNED: Merge these keybindings with those below
     { "<leader>ss", require("telescope.builtin").builtin, desc = "[S]earch [S]elect Telescope" },
     { "<leader>gf", require("telescope.builtin").git_files, desc = "Search [G]it [F]iles" },
-    { "<leader>sf", require("telescope.builtin").find_files, desc = "[S]earch [F]iles" },
-    { "<leader>sh", require("telescope.builtin").help_tags, desc = "[S]earch [H]elp" },
-    { "<leader>sw", require("telescope.builtin").grep_string, desc = "[S]earch current [W]ord" },
-    { "<leader>sg", require("telescope.builtin").live_grep, desc = "[S]earch by [G]rep" },
     { "<leader>sG", ":LiveGrepGitRoot<cr>", desc = "[S]earch by [G]rep on Git Root" },
     { "<leader>sd", require("telescope.builtin").diagnostics, desc = "[S]earch [D]iagnostics" },
-    { "<leader>sr", require("telescope.builtin").resume, desc = "[S]earch [R]esume" },
     { "<leader>bS", live_grep_open_files, desc = "[S]earch in Open Files" },
     { "<leader>bs", fuzzy_search_current_buffer, desc = "Fuzzily search in current buffer" },
-    { "<leader>?", require("telescope.builtin").oldfiles, desc = "[?] Find recently opened files" },
-    { "<leader>b<space>", require("telescope.builtin").buffers, desc = "Find existing buffers" },
+
+    -- Leader-b
+    { "<leader>bb", require("telescope.builtin").buffers, desc = "Find in open [b]uffers" },
+    { "<leader>br", require("telescope.builtin").oldfiles, desc = "Find [r]ecently opened files" },
 
     -- Leader-g
     {
@@ -178,7 +175,7 @@ return {
       desc = "Search symbols",
     },
     -- Leader-f
-    { "<Leader>f<CR>", require("telescope.builtin").resume, desc = "★ Resume previous search ★" },
+    { "<Leader><CR>", require("telescope.builtin").resume, desc = "Resume last Telescope session" },
     { "<Leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
     {
       "<Leader>b\\",
@@ -196,8 +193,7 @@ return {
       end,
       desc = "Find nvim config files",
     },
-    { "<Leader>bF", require("telescope.builtin").buffers, desc = "Find buffers" },
-    { "<Leader>fc", require("telescope.builtin").grep_string, desc = "Find word under cursor" },
+    { "<Leader>f*", require("telescope.builtin").grep_string, desc = "Find word under cursor" },
     { "<Leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
     { "<Leader>ff", require("telescope.builtin").find_files, desc = "Find files" },
     {
@@ -205,11 +201,10 @@ return {
       function() require("telescope.builtin").find_files { hidden = true, no_ignore = true } end,
       desc = "Find all files",
     },
-    { "<Leader>fh", require("telescope.builtin").help_tags, desc = "Find help" },
+    { "<Leader>fh", require("telescope.builtin").help_tags, desc = "Find in nvim help" },
     { "<Leader>fk", require("telescope.builtin").keymaps, desc = "Find keymaps" },
     { "<Leader>fm", require("telescope.builtin").man_pages, desc = "Find man" },
     -- { "<Leader>fn", require("telescope").extensions.notify.notify, desc = "Find notifications" },
-    { "<Leader>fo", require("telescope.builtin").oldfiles, desc = "Find history" },
     { "<Leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
     -- {
     --   "<Leader>ft",
