@@ -24,6 +24,6 @@ return {
          opts = { handlers = {} },
       },
    },
-   event = "User AstroFile",
+   event = "BufRead",
    opts = function() return { on_attach = require("astrolsp").on_attach } end,
 }

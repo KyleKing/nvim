@@ -1,0 +1,3 @@
+-- PLANNED: use logic from AstroCore to identify project root directory
+-- Useful for identifying parent directories with configuration files that are not at the git root directory
+-- https://github.com/AstroNvim/astrocore/blob/af8311f2002ad6e2735fa3a72590e799d64e514a/lua/astrocore/rooter.lua
