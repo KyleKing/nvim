@@ -35,3 +35,8 @@ K("n", "<Leader>pl", require("lazy").update, { desc = "Plugins Log" })
 -- Setup theme
 vim.cmd("syntax enable")
 vim.cmd.colorscheme("nightfox")
+-- Override line number styles
+-- Alternatively, override the theme directly: https://stackoverflow.com/a/76039670/3219667
+vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#578E74", bold = true })
+vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#AF6A7A", bold = true })
+vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#576F8E", bold = true })
