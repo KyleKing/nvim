@@ -14,6 +14,7 @@ return {
   { import = "kyleking.plugins.motion" },
   { import = "kyleking.plugins.search" },
   { import = "kyleking.plugins.session" },
+  { import = "kyleking.plugins.split-and-window" },
   { import = "kyleking.plugins.syntax" },
   { import = "kyleking.plugins.terminal-integration" },
   { import = "kyleking.plugins.utility" },
