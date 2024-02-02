@@ -136,19 +136,19 @@ return {
   end,
   keys = {
     -- (Alt) Keybindings
-    { "<leader>ss", require("telescope.builtin").builtin, { desc = "[S]earch [S]elect Telescope" } },
-    { "<leader>gf", require("telescope.builtin").git_files, { desc = "Search [G]it [F]iles" } },
-    { "<leader>sf", require("telescope.builtin").find_files, { desc = "[S]earch [F]iles" } },
-    { "<leader>sh", require("telescope.builtin").help_tags, { desc = "[S]earch [H]elp" } },
-    { "<leader>sw", require("telescope.builtin").grep_string, { desc = "[S]earch current [W]ord" } },
-    { "<leader>sg", require("telescope.builtin").live_grep, { desc = "[S]earch by [G]rep" } },
-    { "<leader>sG", ":LiveGrepGitRoot<cr>", { desc = "[S]earch by [G]rep on Git Root" } },
-    { "<leader>sd", require("telescope.builtin").diagnostics, { desc = "[S]earch [D]iagnostics" } },
-    { "<leader>sr", require("telescope.builtin").resume, { desc = "[S]earch [R]esume" } },
-    { "<leader>s/", live_grep_open_files, { desc = "[S]earch [/] in Open Files" } },
-    { "<leader>/", fuzzy_search_current_buffer, { desc = "[/] Fuzzily search in current buffer" } },
-    { "<leader>?", require("telescope.builtin").oldfiles, { desc = "[?] Find recently opened files" } },
-    { "<leader><space>", require("telescope.builtin").buffers, { desc = "[ ] Find existing buffers" } },
+    { "<leader>ss", require("telescope.builtin").builtin, desc = "[S]earch [S]elect Telescope" },
+    { "<leader>gf", require("telescope.builtin").git_files, desc = "Search [G]it [F]iles" },
+    { "<leader>sf", require("telescope.builtin").find_files, desc = "[S]earch [F]iles" },
+    { "<leader>sh", require("telescope.builtin").help_tags, desc = "[S]earch [H]elp" },
+    { "<leader>sw", require("telescope.builtin").grep_string, desc = "[S]earch current [W]ord" },
+    { "<leader>sg", require("telescope.builtin").live_grep, desc = "[S]earch by [G]rep" },
+    { "<leader>sG", ":LiveGrepGitRoot<cr>", desc = "[S]earch by [G]rep on Git Root" },
+    { "<leader>sd", require("telescope.builtin").diagnostics, desc = "[S]earch [D]iagnostics" },
+    { "<leader>sr", require("telescope.builtin").resume, desc = "[S]earch [R]esume" },
+    { "<leader>bS", live_grep_open_files, desc = "[S]earch in Open Files" },
+    { "<leader>bs", fuzzy_search_current_buffer, desc = "Fuzzily search in current buffer" },
+    { "<leader>?", require("telescope.builtin").oldfiles, desc = "[?] Find recently opened files" },
+    { "<leader>b<space>", require("telescope.builtin").buffers, desc = "Find existing buffers" },
 
     -- Leader-g
     {
@@ -181,7 +181,7 @@ return {
     { "<Leader>f<CR>", require("telescope.builtin").resume, desc = "★ Resume previous search ★" },
     { "<Leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
     {
-      "<Leader>f/",
+      "<Leader>b\\",
       require("telescope.builtin").current_buffer_fuzzy_find,
       desc = "Find words in current buffer",
     },
@@ -196,7 +196,7 @@ return {
       end,
       desc = "Find nvim config files",
     },
-    { "<Leader>fb", require("telescope.builtin").buffers, desc = "Find buffers" },
+    { "<Leader>bF", require("telescope.builtin").buffers, desc = "Find buffers" },
     { "<Leader>fc", require("telescope.builtin").grep_string, desc = "Find word under cursor" },
     { "<Leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
     { "<Leader>ff", require("telescope.builtin").find_files, desc = "Find files" },
@@ -211,11 +211,11 @@ return {
     -- { "<Leader>fn", require("telescope").extensions.notify.notify, desc = "Find notifications" },
     { "<Leader>fo", require("telescope.builtin").oldfiles, desc = "Find history" },
     { "<Leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
-    {
-      "<Leader>ft",
-      function() require("telescope.builtin").colorscheme { enable_preview = true } end,
-      desc = "Find themes",
-    },
+    -- {
+    --   "<Leader>ft",
+    --   function() require("telescope.builtin").colorscheme { enable_preview = true } end,
+    --   desc = "Find themes",
+    -- },
     { "<Leader>fw", require("telescope.builtin").live_grep, desc = "Find words" },
     {
       "<Leader>fW",
