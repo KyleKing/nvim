@@ -112,13 +112,11 @@ return {
                ["<C-p>"] = function() require("telescope.actions").cycle_history_prev() end,
                ["<C-j>"] = function() require("telescope.actions").move_selection_next() end,
                ["<C-k>"] = function() require("telescope.actions").move_selection_previous() end,
+               ["<C-u>"] = false,
+               ["<C-d>"] = false,
             },
             n = {
                q = function() require("telescope.actions").close() end,
-            },
-            i = {
-               ["<C-u>"] = false,
-               ["<C-d>"] = false,
             },
          },
       },
@@ -127,7 +125,7 @@ return {
          additional_vim_regex_highlighting = false,
       },
    },
-   init = function(...)
+   init = function()
       local telescope = require("telescope")
       telescope.load_extension("fzf")
       telescope.load_extension("media_files")
