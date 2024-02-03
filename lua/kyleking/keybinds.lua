@@ -22,8 +22,8 @@ K("n", "<leader>rP", "+p", { desc = "Paste from +" })
 
 -- Keep the register clean when using `dd`
 K("n", "dd", function()
-   if vim.fn.getline(".") == "" then return '"_dd' end
-   return "dd"
+    if vim.fn.getline(".") == "" then return '"_dd' end
+    return "dd"
 end, { expr = true })
 
 -- Remap for dealing with word wrap

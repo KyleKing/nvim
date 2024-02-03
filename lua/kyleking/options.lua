@@ -47,13 +47,13 @@ vim.opt.scrolloff = 8 -- Number of screen lines to keep above and below the curs
 
 -- Custom filetypes
 vim.filetype.add({
-   extension = {
-      conf = "conf",
-      mdx = "markdown",
-   },
-   pattern = {
-      [".*%.env.*"] = "sh",
-      ["ignore$"] = "conf",
-   },
-   filename = {},
+    extension = {
+        conf = "conf",
+        mdx = "markdown",
+    },
+    pattern = {
+        [".*%.env.*"] = "sh",
+        ["ignore$"] = "conf",
+    },
+    filename = {},
 })

@@ -4,12 +4,12 @@ local augroup = vim.api.nvim_create_augroup("kyleking", { clear = true })
 
 -- Highlight the region on yank
 create_autocmd("TextYankPost", {
-   group = augroup,
-   callback = function() vim.highlight.on_yank({ higroup = "IncSearch" }) end,
+    group = augroup,
+    callback = function() vim.highlight.on_yank({ higroup = "IncSearch" }) end,
 })
 
 -- Reload buffer on enter or focus.
 create_autocmd({ "BufEnter", "FocusGained" }, {
-   group = augroup,
-   command = "silent! !",
+    group = augroup,
+    command = "silent! !",
 })
