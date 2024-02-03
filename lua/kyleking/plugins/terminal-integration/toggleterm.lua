@@ -32,6 +32,7 @@ return {
          ["<leader>f"] = { name = "+Find" },
          ["<leader>g"] = { name = "+Git" },
          ["<leader>l"] = { name = "+LSP" },
+         ["<leader>m"] = { name = "+Move" },
          ["<leader>p"] = { name = "+Plugins" },
          ["<leader>r"] = { name = "+Register" },
          ["<leader>s"] = { name = "+Search" },

@@ -4,6 +4,7 @@
   "ccc.nvim": { "branch": "main", "commit": "ec6e23fd2c0bf4ffcf71c1271acdcee6e2c6f49c" },
   "dial.nvim": { "branch": "master", "commit": "27eb570085db2ef44bff4f620d3806039184651c" },
   "fidget.nvim": { "branch": "main", "commit": "1d1042d418ee8cb70d68f1e38db639844331c093" },
+  "gitsigns.nvim": { "branch": "main", "commit": "2c2463dbd82eddd7dbab881c3a62cfbfbe3c67ae" },
   "gx.nvim": { "branch": "main", "commit": "eba0eef8143060428c9baf9b14bda6f76b5547b3" },
   "highlight-undo.nvim": { "branch": "main", "commit": "50a6884a8476be04ecce8f1c4ed692c5000ef0a1" },
   "hlargs.nvim": { "branch": "main", "commit": "e881f3a424139cc70c83121ec548732efdd67682" },
@@ -42,5 +43,7 @@
   "toggleterm.nvim": { "branch": "main", "commit": "b49df5cdce67a8964d1b027dae94bde212092b51" },
   "trouble.nvim": { "branch": "main", "commit": "f1168feada93c0154ede4d1fe9183bf69bac54ea" },
   "url-open": { "branch": "main", "commit": "9f8f4a56ac709f26aa17d8ef921b272bf2262a30" },
+  "vim-fugitive": { "branch": "master", "commit": "e7bf502a6ae492f42a91d231864e25630286319b" },
+  "vim-rhubarb": { "branch": "master", "commit": "ee69335de176d9325267b0fd2597a22901d927b1" },
   "which-key.nvim": { "branch": "main", "commit": "4433e5ec9a507e5097571ed55c02ea9658fb268a" }
 }

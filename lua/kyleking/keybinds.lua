@@ -41,10 +41,10 @@ K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 
 -- Move line up and down in NORMAL and VISUAL modes
 -- Reference: https://vim.fandom.com/wiki/Moving_lines_up_or_down
-K("n", "<leader>mj", "<CMD>move .+1<CR>", { desc = "Move up one line" })
-K("n", "<leader>mk", "<CMD>move .-2<CR>", { desc = "Move down one line" })
-K("x", "<leader>mj", ":move '>+1<CR>gv=gv", { desc = "Move up one line" })
-K("x", "<leader>mk", ":move '<-2<CR>gv=gv", { desc = "Move down one line" })
+K("n", "<leader>mJ", "<CMD>move .+1<CR>", { desc = "Move up one line" })
+K("n", "<leader>mK", "<CMD>move .-2<CR>", { desc = "Move down one line" })
+K("x", "<leader>mJ", ":move '>+1<CR>gv=gv", { desc = "Move up one line" })
+K("x", "<leader>mK", ":move '<-2<CR>gv=gv", { desc = "Move down one line" })
 
 -- Use operator pending mode to visually select the whole buffer
 --  e.g. dA = delete buffer ALL, yA = copy whole buffer ALL

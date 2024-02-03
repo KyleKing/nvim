@@ -8,6 +8,7 @@ return {
    { import = "kyleking.plugins.editing-support" },
    { import = "kyleking.plugins.formatting" },
    { import = "kyleking.plugins.fuzzy-finder" },
+   { import = "kyleking.plugins.git" },
    { import = "kyleking.plugins.keybinding" },
    { import = "kyleking.plugins.lsp" },
    { import = "kyleking.plugins.marks" },
