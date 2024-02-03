@@ -96,7 +96,7 @@ return {
             -- selection_caret = get_icon("Selected", 1),
             -- PLANNED: git_worktrees = require("astrocore").config.git_worktrees,
             -- PLANNED: git_worktrees = require("astrocore").config.git_worktrees,
-            file_ignore_patterns = { ".git/", "node_modules/", ".venv/" },
+            file_ignore_patterns = { "\\.git/", "node_modules/", ".venv/" },
             path_display = { "truncate" },
             sorting_strategy = "ascending",
             layout_config = {
