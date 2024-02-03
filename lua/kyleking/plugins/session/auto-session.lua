@@ -43,7 +43,8 @@ end
 
 return {
    "rmagatti/auto-session",
-   lazy = true, -- FYI: resolve conflict with lazy.nvim panel on start (in combination with handle_restore_when_lazy_syncs)
+   lazy = false,
+   -- lazy = true, -- FYI: resolve conflict with lazy.nvim panel on start (in combination with handle_restore_when_lazy_syncs)
    dependencies = { "nvim-telescope/telescope.nvim" }, -- Required for search_session
    opts = {
       auto_save_enabled = true,
@@ -57,12 +58,13 @@ return {
       -- Recommend in docs for best experience
       vim.opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
-      handle_restore_when_lazy_syncs()
+      -- PLANNED: is this still necessary now that I'm only using buffers and not tabs?
+      -- handle_restore_when_lazy_syncs()
    end,
    keys = {
+      { "<leader>Sd", "<cmd>SessionDelete<CR>", desc = "Delete Session" },
       { "<leader>Sr", "<cmd>SessionRestore<CR>", desc = "Restore Session" },
       { "<leader>Ss", "<cmd>SessionSave<CR>", desc = "Save Session" },
-      -- Set mapping for searching a session.
       {
          "<leader>St",
          function() require("auto-session.session-lens").search_session() end,

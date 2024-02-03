@@ -1,20 +1,8 @@
 -- Minimal configuration from: https://github.com/neovim/nvim-lspconfig?tab=readme-ov-file#suggested-configuration
 -- PLANNED: see project-local guidance: https://github.com/neovim/nvim-lspconfig/wiki/Project-local-settings
-local function config()
-   -- See logs with `:LspInfo` and `:LspLog`
-   vim.lsp.set_log_level("debug")
 
-   -- Setup language servers.
+local function config_lua()
    local lspconfig = require("lspconfig")
-   lspconfig.pyright.setup({})
-   lspconfig.tsserver.setup({})
-   lspconfig.rust_analyzer.setup({
-      -- Server-specific settings. See `:help lspconfig-setup`
-      settings = {
-         ["rust-analyzer"] = {},
-      },
-   })
-
    lspconfig.lua_ls.setup({
       on_init = function(client)
          local path = client.workspace_folders[1].name
@@ -26,13 +14,6 @@ local function config()
                      -- (most likely LuaJIT in the case of Neovim)
                      version = "LuaJIT",
                   },
-                  -- diagnostics = {
-                  --    -- Get the language server to recognize the `vim` global
-                  --    globals = {
-                  --       "vim",
-                  --       "require",
-                  --    },
-                  -- },
                   -- Make the server aware of Neovim runtime files
                   workspace = {
                      checkThirdParty = false,
@@ -52,13 +33,32 @@ local function config()
          return true
       end,
    })
+end
+
+local function config_python()
+   local lspconfig = require("lspconfig")
+   lspconfig.pyright.setup({})
+end
+
+local function config_typescript()
+   local lspconfig = require("lspconfig")
+   lspconfig.tsserver.setup({})
+end
+
+local function config()
+   -- See logs with `:LspInfo` and `:LspLog`
+   vim.lsp.set_log_level("debug")
+
+   config_lua()
+   config_python()
+   config_typescript()
 
    -- Global mappings.
    -- See `:help vim.diagnostic.*` for documentation on any of the below functions
-   vim.keymap.set("n", "<space>le", vim.diagnostic.open_float)
-   vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-   vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
-   vim.keymap.set("n", "<space>lq", vim.diagnostic.setloclist)
+   vim.keymap.set("n", "<space>le", vim.diagnostic.open_float, { desc = "Open Float" })
+   vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to Previous" })
+   vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to Next" })
+   vim.keymap.set("n", "<space>lq", vim.diagnostic.setloclist, { desc = "Set Loc List" })
 
    -- Use LspAttach autocommand to only map the following keys
    -- after the language server attaches to the current buffer
@@ -70,7 +70,7 @@ local function config()
 
          -- Buffer local mappings.
          -- See `:help vim.lsp.*` for documentation on any of the below functions
-         local opts = { buffer = ev.buf }
+         local opts = { buffer = ev.buf, desc = "LspPlacholder" }
          vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
          vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)

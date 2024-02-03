@@ -1,5 +1,7 @@
+---@diagnostic disable: lowercase-global
+
 -- Global objects
-globals = { "vim"}
+globals = { "vim" }
 
 -- Rerun tests only if their modification time changed
 cache = true
