@@ -20,15 +20,16 @@ function M.path_exists(path)
     return false
 end
 
-function M.get_python_path(fname)
+function M.get_python_path()
     -- Use activated virtualenv
     if vim.env.VIRTUAL_ENV then return M.path_join({ vim.env.VIRTUAL_ENV, "bin", "python" }) end
 
     -- Adapted from: https://github.com/dlvhdr/dotfiles/blob/89246142aa3b78a7c9ce8262a6dc0a04d1cbb724/.config/nvim/lua/dlvhdr/plugins/lsp/servers/pyright.lua#L3-L18
-    local util = require("lspconfig.util")
-    local root_files = { "pyproject.toml", ".venv", ".tox" }
-    local root_dir = util.root_pattern(unpack(root_files))(fname)
-    vim.notify(root_dir)
+    local root_dir = vim.fn.getcwd()
+    -- local util = require("lspconfig.util")
+    -- local root_files = { "pyproject.toml", ".venv", ".tox" }
+    -- local root_dir = util.root_pattern(unpack(root_files))(fname)
+    -- vim.notify(root_dir)
 
     -- If poetry is configured, use the root_dir's poetry virtual environment
     local pyproject_match = vim.fn.glob(M.path_join({ root_dir, "pyproject.toml" }))

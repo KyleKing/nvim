@@ -26,8 +26,7 @@ local function config()
     -- See logs with `:LspInfo` and `:LspLog`
     -- vim.lsp.set_log_level("debug")
 
-    local fname = vim.fn.getcwd()
-    local python_path = require("kyleking.utils.system").get_python_path(fname)
+    local python_path = require("kyleking.utils.system").get_python_path()
 
     config_lua()
     config_pyright(python_path)
