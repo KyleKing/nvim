@@ -21,7 +21,5 @@ return {
         { "#", [[#<Cmd>lua require('hlslens').start()<CR>]], { noremap = true, silent = true, desc = "Match Word" } },
         { "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], { noremap = true, silent = true, desc = "Match Word" } },
         { "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], { noremap = true, silent = true, desc = "Match Word" } },
-        -- Turn off highlighting
-        { "<Leader>l", "<Cmd>noh<CR>", { noremap = true, silent = true, desc = "Turn Off Search Highlight" } },
     },
 }
