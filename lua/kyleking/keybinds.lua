@@ -5,6 +5,9 @@
 -- See `:help mapleader`
 vim.g.mapleader = " " -- Set <space> as the leader key
 vim.g.maplocalleader = "," -- set default local leader key
+-- Remove space mapping that moves cursor to the right
+-- Refernce: https://vi.stackexchange.com/a/16393/44707
+vim.api.nvim_set_keymap("", "<Space>", "<Nop>", { noremap = true, silent = true })
 
 local K = vim.keymap.set
 
@@ -38,10 +41,10 @@ K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 
 -- Move line up and down in NORMAL and VISUAL modes
 -- Reference: https://vim.fandom.com/wiki/Moving_lines_up_or_down
-K("n", "<C-j>", "<CMD>move .+1<CR>", { desc = "Move up one line" })
-K("n", "<C-k>", "<CMD>move .-2<CR>", { desc = "Move down one line" })
-K("x", "<C-j>", ":move '>+1<CR>gv=gv", { desc = "Move up one line" })
-K("x", "<C-k>", ":move '<-2<CR>gv=gv", { desc = "Move down one line" })
+K("n", "<leader>mj", "<CMD>move .+1<CR>", { desc = "Move up one line" })
+K("n", "<leader>mk", "<CMD>move .-2<CR>", { desc = "Move down one line" })
+K("x", "<leader>mj", ":move '>+1<CR>gv=gv", { desc = "Move up one line" })
+K("x", "<leader>mk", ":move '<-2<CR>gv=gv", { desc = "Move down one line" })
 
 -- Use operator pending mode to visually select the whole buffer
 --  e.g. dA = delete buffer ALL, yA = copy whole buffer ALL
@@ -70,14 +73,7 @@ K("v", "<Tab>", ">gv", { desc = "Indent line" })
 
 -- PLANNED: review these additional keybinds
 
--- -- Improved Terminal Navigation
--- K("t", "<C-h>", "<Cmd>wincmd h<CR>", { desc = "Terminal left window navigation" })
--- K("t", "<C-j>", "<Cmd>wincmd j<CR>", { desc = "Terminal down window navigation" })
--- K("t", "<C-k>", "<Cmd>wincmd k<CR>", { desc = "Terminal up window navigation" })
--- K("t", "<C-l>", "<Cmd>wincmd l<CR>", { desc = "Terminal right window navigation" })
-
 -- -- Custom menu for modification of the user experience
--- K("n", "<Leader>ub", function() require("astrocore.toggles").background() end, { desc = "Toggle background" })
 -- K("n", "<Leader>ug", function() require("astrocore.toggles").signcolumn() end, { desc = "Toggle signcolumn" })
 -- K("n", "<Leader>uh", function() require("astrocore.toggles").foldcolumn() end, { desc = "Toggle foldcolumn" })
 -- K("n", "<Leader>ui", function() require("astrocore.toggles").indent() end, { desc = "Change indent setting" })
@@ -87,7 +83,6 @@ K("v", "<Tab>", ">gv", { desc = "Indent line" })
 -- K("n", "<Leader>up", function() require("astrocore.toggles").paste() end, { desc = "Toggle paste mode" })
 -- K("n", "<Leader>us", function() require("astrocore.toggles").spell() end, { desc = "Toggle spellcheck" })
 -- K("n", "<Leader>uS", function() require("astrocore.toggles").conceal() end, { desc = "Toggle conceal" })
--- K("n", "<Leader>ut", function() require("astrocore.toggles").tabline() end, { desc = "Toggle tabline" })
 -- K("n", "<Leader>uu", function() require("astrocore.toggles").url_match() end, { desc = "Toggle URL highlight" })
 -- K("n", "<Leader>uw", function() require("astrocore.toggles").wrap() end, { desc = "Toggle wrap" })
 -- K("n", "<Leader>uy", function() require("astrocore.toggles").buffer_syntax() end, { desc = "Toggle syntax highlight" })
