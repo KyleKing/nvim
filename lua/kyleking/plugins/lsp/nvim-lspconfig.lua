@@ -20,6 +20,9 @@ local function config()
     -- See logs with `:LspInfo` and `:LspLog`
     -- vim.lsp.set_log_level("debug")
 
+    local python_path = require("kyleking.utils.system").get_python_path(root_dir)
+    vim.notify(python_path, "error")
+
     config_lua()
     config_pyright()
     config_typescript()
