@@ -6,9 +6,15 @@ local function config_lua()
     lspconfig.lua_ls.setup({})
 end
 
-local function config_pyright()
+local function config_pyright(python_path)
     local lspconfig = require("lspconfig")
-    lspconfig.pyright.setup({})
+    lspconfig.pyright.setup({
+        settings = {
+            python = {
+                pythonPath = python_path,
+            },
+        },
+    })
 end
 
 local function config_typescript()
@@ -20,11 +26,11 @@ local function config()
     -- See logs with `:LspInfo` and `:LspLog`
     -- vim.lsp.set_log_level("debug")
 
-    local python_path = require("kyleking.utils.system").get_python_path(root_dir)
-    vim.notify(python_path, "error")
+    local fname = vim.fn.getcwd()
+    local python_path = require("kyleking.utils.system").get_python_path(fname)
 
     config_lua()
-    config_pyright()
+    config_pyright(python_path)
     config_typescript()
 
     -- Global mappings.
