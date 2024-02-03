@@ -117,7 +117,7 @@ end
 ---@param worktrees table<string, string>[]? an array like table of worktrees with entries `toplevel` and `gitdir`, default retrieves from `vim.g.git_worktrees`
 ---@return table<string, string>|nil # a table specifying the `toplevel` and `gitdir` of a worktree or nil if not found
 function M.file_worktree(file, worktrees)
-   worktrees = worktrees or require("astrocore").config.git_worktrees
+   worktrees = worktrees or vim.g.git_worktrees
    if not worktrees then return end
    file = file or vim.fn.expand("%") --[[@as string]]
    for _, worktree in ipairs(worktrees) do
