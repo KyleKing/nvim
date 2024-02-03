@@ -10,6 +10,6 @@ return {
         use_diagnostic_signs = true,
     },
     keys = {
-        { "<leader>x", "<cmd>TroubleToggle<cr>", desc = "Troubles?" },
+        { "<leader>lT", "<cmd>TroubleToggle<cr>", desc = "Show Trouble" },
     },
 }

@@ -1,5 +1,7 @@
 -- Adapted from: https://github.com/Tastyep/LunarVim/blob/master/lua/lvim/core/log.lua
---
+
+local system_utils = require("kyleking.utils.system_utils")
+
 local Log = {}
 
 Log.levels = {
@@ -138,7 +140,7 @@ end
 ---Retrieves the handle of the logger object
 ---@return table|nil logger handle if found
 function Log:get_logger()
-    local logger_ok, logger = pcall(function() return require("structlog").get_logger("lvim") end)
+    local logger_ok, logger = pcall(function() return require("structlog").get_logger("kyleking") end)
     if logger_ok and logger then return logger end
 
     logger = self:init()
@@ -151,7 +153,7 @@ end
 
 ---Retrieves the path of the logfile
 ---@return string path of the logfile
-function Log:get_path() return string.format("%s/%s.log", get_cache_dir(), "lvim") end
+function Log:get_path() return string.format("%s/%s.log", system_utils:get_cache_dir(), "kyleking") end
 
 ---Add a log entry at TRACE level
 ---@param msg any

@@ -26,10 +26,11 @@ return {
         --     vim.wo[win].spell = false
         -- end,
     },
-    config = function(opts)
-        local notify = require("notify")
-        notify.setup(opts)
-        -- Set this as the default notification when called by `vim.notify("Display text", "info")`
-        vim.notify = notify
-    end,
+    -- -- FYI: this is only necessary if structlog/log.lua is removed
+    -- config = function(opts)
+    --     local notify = require("notify")
+    --     notify.setup(opts)
+    --     -- Set this as the default notification when called by `vim.notify("Display text", "info")`
+    --     vim.notify = notify
+    -- end,
 }

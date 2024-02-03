@@ -26,7 +26,7 @@ local function config()
     -- See logs with `:LspInfo` and `:LspLog`
     -- vim.lsp.set_log_level("debug")
 
-    local python_path = require("kyleking.utils.system").get_python_path()
+    local python_path = require("kyleking.utils.system_utils").get_python_path()
 
     config_lua()
     config_pyright(python_path)
@@ -49,25 +49,49 @@ local function config()
 
             -- Buffer local mappings.
             -- See `:help vim.lsp.*` for documentation on any of the below functions
-            local opts = { buffer = ev.buf, desc = "LspPlacholder" }
-            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-            vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
-            vim.keymap.set("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, opts)
-            vim.keymap.set("n", "<leader>lwr", vim.lsp.buf.remove_workspace_folder, opts)
+            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = ev.buf, desc = "Go to Declaration" })
+            vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "Go to Defintion" })
+            vim.keymap.set("n", "<leader>lK", vim.lsp.buf.hover, { buffer = ev.buf, desc = "Hover" })
+            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = ev.buf, desc = "Go to Implementation" })
+            vim.keymap.set("n", "<leader>lH", vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "Signature Help" })
+            vim.keymap.set(
+                "n",
+                "<leader>lwa",
+                vim.lsp.buf.add_workspace_folder,
+                { buffer = ev.buf, desc = "Add Folder" }
+            )
+            vim.keymap.set(
+                "n",
+                "<leader>lwr",
+                vim.lsp.buf.remove_workspace_folder,
+                { buffer = ev.buf, desc = "Remove Folder" }
+            )
             vim.keymap.set(
                 "n",
                 "<leader>lwl",
                 function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
-                opts
+                { buffer = ev.buf, desc = "Show Folders" }
             )
-            vim.keymap.set("n", "<leader>D", vim.lsp.buf.type_definition, opts)
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-            vim.keymap.set({ "n", "v" }, "<leader>lc", vim.lsp.buf.code_action, opts)
-            vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-            vim.keymap.set("n", "<leader>f", function() vim.lsp.buf.format({ async = true }) end, opts)
+            vim.keymap.set(
+                "n",
+                "<leader>lD",
+                vim.lsp.buf.type_definition,
+                { buffer = ev.buf, desc = "Type Definition" }
+            )
+            vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP Rename" })
+            vim.keymap.set(
+                { "n", "v" },
+                "<leader>lc",
+                vim.lsp.buf.code_action,
+                { buffer = ev.buf, desc = "Code Action" }
+            )
+            vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = ev.buf, desc = "Buffer References" })
+            vim.keymap.set(
+                "n",
+                "<leader>lf",
+                function() vim.lsp.buf.format({ async = true }) end,
+                { buffer = ev.buf, desc = "Format" }
+            )
         end,
     })
 end
