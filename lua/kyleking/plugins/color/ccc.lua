@@ -18,7 +18,7 @@ return {
         -- Toggle highlights when entering then leaving visual mode to avoid visual conflicts
         -- Source: https://github.com/uga-rosa/ccc.nvim/issues/78#issuecomment-1562682423
         --  and: https://vi.stackexchange.com/a/38571/44707
-        -- FYI: pressing 'v' while in visual-line mode triggers higlight enable, but that's actually sort of a feature
+        -- FYI: pressing 'v' while in visual-line mode triggers higlight enable
         vim.api.nvim_create_autocmd("ModeChanged", {
             pattern = "*:[vV\\x16]*",
             callback = function() vim.cmd.CccHighlighterDisable() end,
