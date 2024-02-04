@@ -14,4 +14,16 @@ return {
             lsp = true,
         },
     },
+    init = function()
+        -- Toggle highlights when entering then leaving visual mode to avoid visual conflicts
+        -- Source: https://github.com/uga-rosa/ccc.nvim/issues/78#issuecomment-1562682423
+        vim.api.nvim_create_autocmd("ModeChanged", {
+            pattern = "*:[vV\\x16]",
+            callback = function() vim.cmd.CccHighlighterDisable() end,
+        })
+        vim.api.nvim_create_autocmd("ModeChanged", {
+            pattern = "[vV\\x16]:*",
+            callback = function() vim.cmd.CccHighlighterEnable() end,
+        })
+    end,
 }
