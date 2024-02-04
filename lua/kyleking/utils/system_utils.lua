@@ -3,14 +3,6 @@ local M = {}
 -- Adapted from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/c2a9e81699021f4ccaac7c574cc42ca4211a499a/lua/neo-tree/utils/init.lua#L789C1-L789C23
 M.path_separator = "/"
 
-function M.set_cache_dir()
-    -- Set the cache directory for storing logs and other cached files
-    vim.g.kyleking_cache_dir = "~/.cache/nvim/kyleking"
-    if vim.fn.isdirectory(vim.g.kyleking_cache_dir) ~= 0 then vim.fn.system("mkdir -p " .. vim.g.kyleking_cache_dir) end
-end
-
-function M.get_cache_dir() return assert(vim.g.kyleking_cache_dir, "set_cache_dir has not yet been called") end
-
 function M.path_join(parts) return table.concat(parts, M.path_separator) end
 
 function M.path_exists(path)

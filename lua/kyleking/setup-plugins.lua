@@ -1,5 +1,3 @@
-require("kyleking.utils.system_utils").set_cache_dir() -- Must be called once (and first)
-
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then

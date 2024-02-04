@@ -1,14 +1,5 @@
 -- See setup-plugins.lua. Each folder is a tag from NeovimCraft's site
 return {
-    { -- Must be called first to configure logging globally
-        "Tastyep/structlog.nvim",
-        lazy = false,
-        init = function()
-            local log = require("kyleking.utils.log")
-            log.init()
-            log.set_level("DEBUG")
-        end,
-    },
     { import = "kyleking.plugins.bars-and-lines" },
     { import = "kyleking.plugins.buffer" },
     { import = "kyleking.plugins.color" },
