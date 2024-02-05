@@ -3,9 +3,9 @@ return {
     event = "BufRead",
     cmd = { "CccPick", "CccConvert", "CccHighlighterEnable", "CccHighlighterDisable", "CccHighlighterToggle" },
     keys = {
-        { "<leader>uC", "<cmd>CccHighlighterToggle<cr>", desc = "Toggle colorizer" },
-        { "<leader>zc", "<cmd>CccConvert<cr>", desc = "Convert color" },
-        { "<leader>zp", "<cmd>CccPick<cr>", desc = "Pick Color" },
+        { "<leader>ucC", "<cmd>CccHighlighterToggle<cr>", desc = "Toggle colorizer" },
+        { "<leader>ucc", "<cmd>CccConvert<cr>", desc = "Convert color" },
+        { "<leader>ucp", "<cmd>CccPick<cr>", desc = "Pick Color" },
     },
     opts = {
         default_color = "#40BFBF", -- FYI: just used for manually testing on changes

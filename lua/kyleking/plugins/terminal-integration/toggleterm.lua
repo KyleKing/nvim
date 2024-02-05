@@ -22,30 +22,9 @@ return {
         direction = "float",
         float_opts = { border = "rounded" },
     },
-    init = function()
-        local wk = require("which-key")
-        wk.register({
-            ["<leader>S"] = { name = "+Session" },
-            ["<leader>b"] = { name = "+Buffer" },
-            ["<leader>bC"] = { name = "+Close" },
-            ["<leader>bO"] = { name = "+Order" },
-            ["<leader>f"] = { name = "+Find" },
-            ["<leader>g"] = { name = "+Git" },
-            ["<leader>h"] = { name = "+Hunk (git)", mode = { "n", "v" } },
-            ["<leader>l"] = { name = "+LSP", mode = { "n", "v" } },
-            ["<leader>lw"] = { name = "+Workspace" },
-            ["<leader>m"] = { name = "+Move", mode = { "n", "v" } },
-            ["<leader>p"] = { name = "+Plugins" },
-            ["<leader>r"] = { name = "+Register" },
-            ["<leader>s"] = { name = "+Search" },
-            ["<leader>t"] = { name = "+ToggleTerm" },
-            ["<leader>u"] = { name = "+UI" },
-            ["<leader>z"] = { name = "+Z?" },
-        })
-    end,
     keys = {
         {
-            "<Leader>gg",
+            "<leader>gg",
             function()
                 local astro = require("astro.utils")
                 local worktree = astro.file_worktree()
@@ -55,18 +34,18 @@ return {
             end,
             desc = "ToggleTerm lazygit",
         },
-        {
-            -- https://github.com/dundee/gdu
-            "<Leader>tu",
-            function()
-                local astro = require("astro.utils")
-                astro.toggle_term_cmd("gdu")
-            end,
-            desc = "ToggleTerm gdu (Disk Usage)",
-        },
+        -- {
+        --     -- https://github.com/dundee/gdu
+        --     "<leader>tu",
+        --     function()
+        --         local astro = require("astro.utils")
+        --         astro.toggle_term_cmd("gdu")
+        --     end,
+        --     desc = "ToggleTerm gdu (Disk Usage)",
+        -- },
         {
             -- https://github.com/ClementTsang/bottom
-            "<Leader>tt",
+            "<leader>tb",
             function()
                 local astro = require("astro.utils")
                 astro.toggle_term_cmd("btm")
@@ -74,16 +53,16 @@ return {
             desc = "ToggleTerm 'bottom' Processes",
         },
         {
-            "<Leader>tp",
+            "<leader>tp",
             function()
                 local astro = require("astro.utils")
                 astro.toggle_term_cmd("python")
             end,
             desc = "ToggleTerm python",
         },
-        { "<Leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
-        { "<Leader>th", "<Cmd>ToggleTerm size=10 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
-        { "<Leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" },
+        { "<leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
+        { "<leader>th", "<Cmd>ToggleTerm size=15 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
+        { "<leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" },
         { "<C-'>", "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal", mode = { "n", "t" } },
     },
 }

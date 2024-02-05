@@ -58,8 +58,8 @@ return {
             map("n", "<leader>hD", function() gs.diffthis("~") end, { desc = "git diff against last commit" })
 
             -- Toggles
-            map("n", "<leader>tb", gs.toggle_current_line_blame, { desc = "toggle git blame line" })
-            map("n", "<leader>td", gs.toggle_deleted, { desc = "toggle git show deleted" })
+            map("n", "<leader>ugb", gs.toggle_current_line_blame, { desc = "toggle git blame line" })
+            map("n", "<leader>tgd", gs.toggle_deleted, { desc = "toggle git show deleted" })
 
             -- Text object
             map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "select git hunk" })
