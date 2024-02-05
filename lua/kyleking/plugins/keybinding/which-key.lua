@@ -22,7 +22,7 @@ return {
             ["<leader>bO"] = { name = "+Order" },
             ["<leader>f"] = { name = "+Find" },
             ["<leader>g"] = { name = "+Git" },
-            ["<leader>h"] = { name = "+Hunk (Git)", mode = { "n", "v" } },
+            -- ["<leader>h"] = { name = "+Hunk (Git)", mode = { "n", "v" } }, -- FYI: doesn't work because of on_attach
             ["<leader>l"] = { name = "+LSP", mode = { "n", "v" } },
             ["<leader>lw"] = { name = "+Workspace" },
             ["<leader>m"] = { name = "+Move", mode = { "n", "v" } },
