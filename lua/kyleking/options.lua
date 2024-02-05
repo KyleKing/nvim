@@ -44,6 +44,8 @@ vim.opt.virtualedit = "block" -- allow going past end of line in visual block mo
 vim.opt.writebackup = false -- disable making a backup before overwriting a file
 vim.opt.colorcolumn = "80,120" -- highlighted screen columns
 vim.opt.scrolloff = 8 -- Number of screen lines to keep above and below the cursor
+vim.opt.wildmenu = false -- allows you to use <Left> or <Right>
+vim.opt.wildmode = "full:lastused" -- complete the first full match immediately <https://stackoverflow.com/a/76471693/3219667>
 
 -- Custom filetypes
 vim.filetype.add({
