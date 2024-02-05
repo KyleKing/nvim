@@ -47,7 +47,6 @@ return {
                 { desc = "reset git hunk" }
             )
             -- normal mode
-            map("n", "<leader>hs", gs.stage_hunk, { desc = "git stage hunk" })
             map("n", "<leader>hr", gs.reset_hunk, { desc = "git reset hunk" })
             map("n", "<leader>hS", gs.stage_buffer, { desc = "git Stage buffer" })
             map("n", "<leader>hu", gs.undo_stage_hunk, { desc = "undo stage hunk" })
@@ -57,12 +56,20 @@ return {
             map("n", "<leader>hd", gs.diffthis, { desc = "git diff against index" })
             map("n", "<leader>hD", function() gs.diffthis("~") end, { desc = "git diff against last commit" })
 
-            -- Toggles
-            map("n", "<leader>ugb", gs.toggle_current_line_blame, { desc = "toggle git blame line" })
-            map("n", "<leader>tgd", gs.toggle_deleted, { desc = "toggle git show deleted" })
-
             -- Text object
             map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "select git hunk" })
         end,
+    },
+    keys = {
+        -- Hunks
+        { "<leader>hs", function() require("gitsigns").stage_hunk() end, desc = "git stage hunk" },
+
+        -- Toggles
+        {
+            "<leader>ugb",
+            function() require("gitsigns").toggle_current_line_blame() end,
+            desc = "toggle git blame line",
+        },
+        { "<leader>ugd", function() require("gitsigns").toggle_deleted() end, desc = "toggle git show deleted" },
     },
 }
