@@ -9,7 +9,7 @@ return {
             "AstroNvim/astrolsp",
             opts = function(_, opts)
                 local maps = opts.mappings
-                maps.n["<Leader>lI"] = {
+                maps.n["<leader>lI"] = {
                     "<Cmd>NullLsInfo<CR>",
                     desc = "Null-ls information",
                     cond = function() return vim.fn.exists(":NullLsInfo") > 0 end,

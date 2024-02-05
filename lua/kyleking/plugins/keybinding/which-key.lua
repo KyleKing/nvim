@@ -22,7 +22,7 @@ return {
             ["<leader>bO"] = { name = "+Order" },
             ["<leader>f"] = { name = "+Find" },
             ["<leader>g"] = { name = "+Git" },
-            ["<leader>h"] = { name = "+Hunk", mode = { "n", "v" } },
+            ["<leader>h"] = { name = "+Hunk (Git)", mode = { "n", "v" } },
             ["<leader>l"] = { name = "+LSP", mode = { "n", "v" } },
             ["<leader>lw"] = { name = "+Workspace" },
             ["<leader>m"] = { name = "+Move", mode = { "n", "v" } },
@@ -31,6 +31,7 @@ return {
             ["<leader>s"] = { name = "+Search" },
             ["<leader>t"] = { name = "+ToggleTerm" },
             ["<leader>u"] = { name = "+UI" },
+            ["<leader>uc"] = { name = "+Color" },
             ["<leader>ug"] = { name = "+Git" },
         })
     end,

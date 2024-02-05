@@ -3,7 +3,7 @@
 -- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
 -- vim.keymap.set("n", "<leader>lm", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 -- vim.keymap.set("n", "<leader>ll", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
--- K("n", "<Leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
+-- K("n", "<leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
 -- K("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Previous diagnostic" })
 -- K("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
 -- K("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })

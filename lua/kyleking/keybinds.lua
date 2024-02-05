@@ -31,11 +31,11 @@ K("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, desc = "M
 K("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, desc = "Move cursor down" })
 
 -- Standard Operations
-K("n", "<Leader>w", "<Cmd>update<CR>", { desc = "Save if modified" })
-K("n", "<Leader>W", "<Cmd>wall<CR>", { desc = "Save all" })
-K("n", "<Leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
-K("n", "<Leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
-K("n", "<Leader>n", "<Cmd>enew<CR>", { desc = "New File" })
+K("n", "<leader>w", "<Cmd>update<CR>", { desc = "Save if modified" })
+K("n", "<leader>W", "<Cmd>wall<CR>", { desc = "Save all" })
+K("n", "<leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
+K("n", "<leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
+K("n", "<leader>n", "<Cmd>enew<CR>", { desc = "New File" })
 K("n", "<C-s>", "<Cmd>w!<CR>", { desc = "Force write" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 
@@ -46,7 +46,7 @@ K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
 K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
 -- -- Plugin Manager
--- PLANNED: K("n", "<Leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
+-- PLANNED: K("n", "<leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
 
 -- Managing Splits
 K("n", "|", "<Cmd>vsplit<CR>", { desc = "Vertical Split" })
@@ -67,15 +67,15 @@ K("v", "<Tab>", ">gv", { desc = "Indent line" })
 -- PLANNED: review these additional keybinds
 
 -- -- Custom menu for modification of the user experience
--- K("n", "<Leader>ug", function() require("astrocore.toggles").signcolumn() end, { desc = "Toggle signcolumn" })
--- K("n", "<Leader>uh", function() require("astrocore.toggles").foldcolumn() end, { desc = "Toggle foldcolumn" })
--- K("n", "<Leader>ui", function() require("astrocore.toggles").indent() end, { desc = "Change indent setting" })
--- K("n", "<Leader>ul", function() require("astrocore.toggles").statusline() end, { desc = "Toggle statusline" })
--- K("n", "<Leader>un", function() require("astrocore.toggles").number() end, { desc = "Change line numbering" })
--- K("n", "<Leader>uN", function() require("astrocore.toggles").notifications() end, { desc = "Toggle Notifications" })
--- K("n", "<Leader>up", function() require("astrocore.toggles").paste() end, { desc = "Toggle paste mode" })
--- K("n", "<Leader>us", function() require("astrocore.toggles").spell() end, { desc = "Toggle spellcheck" })
--- K("n", "<Leader>uS", function() require("astrocore.toggles").conceal() end, { desc = "Toggle conceal" })
--- K("n", "<Leader>uu", function() require("astrocore.toggles").url_match() end, { desc = "Toggle URL highlight" })
--- K("n", "<Leader>uw", function() require("astrocore.toggles").wrap() end, { desc = "Toggle wrap" })
--- K("n", "<Leader>uy", function() require("astrocore.toggles").buffer_syntax() end, { desc = "Toggle syntax highlight" })
+-- K("n", "<leader>ug", function() require("astrocore.toggles").signcolumn() end, { desc = "Toggle signcolumn" })
+-- K("n", "<leader>uh", function() require("astrocore.toggles").foldcolumn() end, { desc = "Toggle foldcolumn" })
+-- K("n", "<leader>ui", function() require("astrocore.toggles").indent() end, { desc = "Change indent setting" })
+-- K("n", "<leader>ul", function() require("astrocore.toggles").statusline() end, { desc = "Toggle statusline" })
+-- K("n", "<leader>un", function() require("astrocore.toggles").number() end, { desc = "Change line numbering" })
+-- K("n", "<leader>uN", function() require("astrocore.toggles").notifications() end, { desc = "Toggle Notifications" })
+-- K("n", "<leader>up", function() require("astrocore.toggles").paste() end, { desc = "Toggle paste mode" })
+-- K("n", "<leader>us", function() require("astrocore.toggles").spell() end, { desc = "Toggle spellcheck" })
+-- K("n", "<leader>uS", function() require("astrocore.toggles").conceal() end, { desc = "Toggle conceal" })
+-- K("n", "<leader>uu", function() require("astrocore.toggles").url_match() end, { desc = "Toggle URL highlight" })
+-- K("n", "<leader>uw", function() require("astrocore.toggles").wrap() end, { desc = "Toggle wrap" })
+-- K("n", "<leader>uy", function() require("astrocore.toggles").buffer_syntax() end, { desc = "Toggle syntax highlight" })

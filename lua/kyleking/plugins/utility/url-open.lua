@@ -4,6 +4,6 @@ return {
     cmd = "URLOpenUnderCursor",
     opts = {},
     keys = {
-        { "<Leader>uu", "<esc>:URLOpenUnderCursor<cr>", desc = "Open URL" },
+        { "<leader>uu", "<esc>:URLOpenUnderCursor<cr>", desc = "Open URL" },
     },
 }
