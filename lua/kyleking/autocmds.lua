@@ -13,3 +13,11 @@ create_autocmd({ "BufEnter", "FocusGained" }, {
     group = augroup,
     command = "silent! !",
 })
+
+-- Automatically close tab when closing the last buffer
+vim.cmd([[
+  augroup auto_tab_close
+    autocmd!
+    autocmd BufEnter * if tabpagenr('$') > 1 && winnr('$') == 1 && buflisted(bufnr('')) == 1 | q | endif
+  augroup END
+]])
