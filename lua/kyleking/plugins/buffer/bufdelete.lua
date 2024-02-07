@@ -4,7 +4,7 @@ return {
     keys = {
         -- Close keeps the buffer index (for <C-^> toggling), while wipeout renumbers all buffers
         -- https://stackoverflow.com/a/60732165/3219667
-        { "<leader>bc", ":Bdelete<CR>", desc = "Close current buffer" },
+        -- { "<leader>bc", ":Bdelete<CR>", desc = "Close current buffer" },
         { "<leader>bw", ":Bwipeout<CR>", desc = "Wipeout buffer (including marks)" },
 
         -- From: https://stackoverflow.com/a/42071865/3219667
