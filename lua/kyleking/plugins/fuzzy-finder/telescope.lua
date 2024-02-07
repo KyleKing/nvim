@@ -1,3 +1,5 @@
+local icons = require("kyleking.utils.icons")
+
 return {
     "nvim-telescope/telescope.nvim",
     dependencies = {
@@ -11,6 +13,8 @@ return {
         local actions = require("telescope.actions")
         return {
             defaults = {
+                prompt_prefix = icons.get_icon("Selected", 1),
+                selection_caret = icons.get_icon("Selected", 1),
                 file_ignore_patterns = { "\\.git/", "node_modules/", ".venv/" },
                 path_display = { "truncate" },
                 sorting_strategy = "ascending",
