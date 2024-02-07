@@ -1,6 +1,5 @@
 -- Key (re)mapping that doesn't involve plugins.
---  Plugin keybinds should go into their own file.
---  Other files that have keybinds: [ setup-plugins.lua, plugins/*.lua ]
+--  Plugin keymaps should go into their own file (setup-plugins.lua, plugins/*.lua, etc.)
 
 -- See `:help mapleader`
 vim.g.mapleader = " " -- Set <space> as the leader key
