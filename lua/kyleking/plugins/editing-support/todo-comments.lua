@@ -4,9 +4,8 @@ return {
     cmd = { "TodoTrouble", "TodoTelescope", "TodoLocList", "TodoQuickFix" },
     dependencies = { "nvim-telescope/telescope.nvim" },
     keys = {
-        { "<leader>st", "<Cmd>TodoTelescope<CR>", { desc = "Search TODOs" } },
-        -- PLANNED: Integrate with trouble
-        -- { "<leader>sT", "<Cmd>TodoTrouble<CR>", { desc = "TODOs (Trouble)" } },
+        { "<leader>ft", "<Cmd>TodoTelescope<CR>", { desc = "Find in TODOs" } },
+        { "<leader>uT", "<Cmd>TodoTrouble<CR>", { desc = "Show TODOs with Trouble" } },
     },
     opts = {
         keywords = {

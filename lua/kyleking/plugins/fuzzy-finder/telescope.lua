@@ -125,7 +125,7 @@ return {
             desc = "Find word in lsp_workspace_symbols",
         },
         -- Leader-f
-        { "<leader>fT", require("telescope.builtin").builtin, desc = "Find in Telescope builtins" },
+        { "<leader>fB", require("telescope.builtin").builtin, desc = "Find in Telescope builtins" },
         { "<leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
         {
             "<leader>fN",
@@ -140,14 +140,14 @@ return {
         },
         {
             "<leader>f*",
-            function() require("telescope").extensions.grep_word_under_cursor() end,
+            function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor() end,
             desc = "Find word under cursor",
             mode = { "n" },
         },
         {
             "<leader>f*",
-            function() require("telescope").extensions.grep_visual_selection() end,
-            desc = "Find word under cursor",
+            function() require("telescope-live-grep-args.shortcuts").grep_visual_selection() end,
+            desc = "Find word form visual",
             mode = { "v" },
         },
         { "<leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
