@@ -101,28 +101,29 @@ return {
             desc = "Find in Git Files",
         },
         -- Leader-l
-        { "<leader>ld", require("telescope.builtin").diagnostics, desc = "[S]earch [D]iagnostics" },
-        { "<leader>ls", require("telescope.builtin").lsp_document_symbols, desc = "Search symbols" },
-        --     local maps = opts.mappings
-        --     maps.n["<leader>lD"] =
-        --       { require("telescope.builtin").diagnostics, desc = "Search diagnostics" }
-        --     if maps.n.gd then maps.n.gd[1] = require("telescope.builtin").lsp_definitions() end end
-        --     if maps.n.gI then maps.n.gI[1] = require("telescope.builtin").lsp_implementations() end end
-        --     if maps.n.gr then maps.n.gr[1] = require("telescope.builtin").lsp_references() end end
-        --     if maps.n["<leader>lR"] then
-        --       maps.n["<leader>lR"][1] = require("telescope.builtin").lsp_references() end
-        --     end
-        --     if maps.n.gT then maps.n.gT[1] = require("telescope.builtin").lsp_type_definitions() end end
-        --     if maps.n["<leader>lG"] then
-        --       maps.n["<leader>lG"][1] = function()
-        --         vim.ui.input({ prompt = "Symbol Query: (leave empty for word under cursor)" }, function(query)
-        --           if query then
-        --             -- word under cursor if given query is empty
-        --             if query == "" then query = vim.fn.expand "<cword>" end
-        --             require("telescope.builtin").lsp_workspace_symbols {
-        --               query = query,
-        --               prompt_title = ("Find word (%s)"):format(query),
-        --             }
+        { "<leader>ld", require("telescope.builtin").diagnostics, desc = "Find in Diagnostics" },
+        { "<leader>ls", require("telescope.builtin").lsp_document_symbols, desc = "Find in symbols" },
+        -- PLANNED: investigate these go-to mappings
+        { "<leader>lgd", require("telescope.builtin").lsp_definitions, desc = "lsp_definitions" },
+        { "<leader>lgi", require("telescope.builtin").lsp_implementations, desc = "lsp_implementations" },
+        { "<leader>lgr", require("telescope.builtin").lsp_references, desc = "lsp_references" },
+        { "<leader>lgt", require("telescope.builtin").lsp_type_definitions, desc = "lsp_type_definitions" },
+        {
+            "<leader>lG",
+            function()
+                vim.ui.input({ prompt = "Symbol Query (leave empty for word under cursor): " }, function(query)
+                    if query then
+                        -- word under cursor if given query is empty
+                        if query == "" then query = vim.fn.expand("<cword>") end
+                        require("telescope.builtin").lsp_workspace_symbols({
+                            query = query,
+                            prompt_title = ("Find word (%s)"):format(query),
+                        })
+                    end
+                end)
+            end,
+            desc = "Find word in lsp_workspace_symbols",
+        },
         -- Leader-f
         { "<leader>fT", require("telescope.builtin").builtin, desc = "Find in Telescope builtins" },
         { "<leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
@@ -137,7 +138,18 @@ return {
             end,
             desc = "Find in nvim config files",
         },
-        { "<leader>f*", require("telescope.builtin").grep_string, desc = "Find word under cursor", mode = { "v" } },
+        {
+            "<leader>f*",
+            function()
+                local word = vim.fn.expand("<cword>")
+                require("telescope.builtin").grep_string({
+                    search = word,
+                    prompt_title = ("Find word (%s)"):format(word),
+                })
+            end,
+            desc = "Find word under cursor",
+            mode = { "n", "v" },
+        },
         { "<leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
         {
             "<leader>ff",
