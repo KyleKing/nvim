@@ -166,22 +166,13 @@ return {
         { "<leader>fn", function() require("telescope").extensions.notify.notify() end, desc = "Find notifications" },
         { "<leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
         {
-            "<leader>fw",
-            function()
-                require("telescope.builtin").live_grep({
-                    additional_args = function(args) return vim.list_extend(args, { "--hidden" }) end,
-                })
-            end,
-            desc = "Find word in files",
-        },
-        {
-            "<leader>fW", -- Example: '--no-ignore foo'
+            "<leader>fw", -- Example: '--no-ignore foo' or '-w exact-word'
             function()
                 require("telescope").extensions.live_grep_args.live_grep_args({
                     additional_args = function(args) return vim.list_extend(args, { "--hidden" }) end,
                 })
             end,
-            desc = "Live Grep Args",
+            desc = "Find word in files",
         },
     },
 }
