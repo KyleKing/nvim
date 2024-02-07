@@ -29,7 +29,6 @@ return {
             ["<leader>m"] = { name = "+Move", mode = { "n", "v" } },
             ["<leader>p"] = { name = "+Plugins" },
             ["<leader>r"] = { name = "+Register" },
-            ["<leader>s"] = { name = "+Search" },
             ["<leader>t"] = { name = "+ToggleTerm" },
             ["<leader>u"] = { name = "+UI" },
             ["<leader>uc"] = { name = "+Color" },
