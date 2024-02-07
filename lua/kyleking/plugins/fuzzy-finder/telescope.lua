@@ -140,15 +140,15 @@ return {
         },
         {
             "<leader>f*",
-            function()
-                local word = vim.fn.expand("<cword>")
-                require("telescope.builtin").grep_string({
-                    search = word,
-                    prompt_title = ("Find word (%s)"):format(word),
-                })
-            end,
+            function() require("telescope").extensions.grep_word_under_cursor() end,
             desc = "Find word under cursor",
-            mode = { "n", "v" },
+            mode = { "n" },
+        },
+        {
+            "<leader>f*",
+            function() require("telescope").extensions.grep_visual_selection() end,
+            desc = "Find word under cursor",
+            mode = { "v" },
         },
         { "<leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
         {
