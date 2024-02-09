@@ -23,6 +23,9 @@ local function config_typescript()
 end
 
 local function config()
+    -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
+    require("neodev").setup()
+
     -- See logs with `:LspInfo` and `:LspLog`
     -- vim.lsp.set_log_level("debug")
 
@@ -124,7 +127,10 @@ return {
         { "j-hui/fidget.nvim", opts = {} },
 
         -- Additional lua configuration, makes nvim stuff amazing!
-        { "folke/neodev.nvim", lazy = true, opts = {} },
+        {
+            "folke/neodev.nvim",
+            config = false, -- Defer setup to config script
+        },
     },
     init = function()
         -- Source: https://vi.stackexchange.com/a/39075/44707

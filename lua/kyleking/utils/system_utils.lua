@@ -16,23 +16,19 @@ function M.get_python_path()
     -- Use activated virtualenv
     if vim.env.VIRTUAL_ENV then return M.path_join({ vim.env.VIRTUAL_ENV, "bin", "python" }) end
 
-    -- Adapted from: https://github.com/dlvhdr/dotfiles/blob/89246142aa3b78a7c9ce8262a6dc0a04d1cbb724/.config/nvim/lua/dlvhdr/plugins/lsp/servers/pyright.lua#L3-L18
-    local root_dir = vim.fn.getcwd()
-    -- local util = require("lspconfig.util")
-    -- local root_files = { "pyproject.toml", ".venv", ".tox" }
-    -- local root_dir = util.root_pattern(unpack(root_files))(fname)
-    -- vim.notify(root_dir)
-
     -- If poetry is configured, use the root_dir's poetry virtual environment
-    local pyproject_match = vim.fn.glob(M.path_join({ root_dir, "pyproject.toml" }))
+    local pyproject_match = vim.fn.glob(M.path_join({ vim.fn.getcwd(), "pyproject.toml" }))
     if pyproject_match ~= "" then
         local venv = vim.fn.trim(vim.fn.system("poetry env info -p"))
         local poetry_python_path = M.path_join({ venv, "bin", "python" })
         if M.path_exists(poetry_python_path) then return poetry_python_path end
     end
 
+    -- Load the manually configured path
+    -- TODO: load JSON, see if key is present (key is basename of current directory, e.g. mdformat-mkdocs), and check for pythonPath
+
     -- Try falling back to tox (mdformat, etc.)
-    local tox_python_path = vim.fn.glob(M.path_join({ root_dir, ".tox", "*", "bin", "python" }))
+    local tox_python_path = vim.fn.glob(M.path_join({ vim.fn.getcwd(), ".tox", "*", "bin", "python" }))
     if tox_python_path ~= "" then return tox_python_path end
 
     -- Fallback to system Python.

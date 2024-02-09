@@ -1,3 +1,5 @@
+-- TODO: Implement mason as described below in the LSP plugin file
+
 -- -- Diagnostic keymaps
 -- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
 -- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
@@ -12,15 +14,8 @@ return function(_)
     -- [[ Configure LSP ]]
     --  This function gets run when an LSP connects to a particular buffer.
     local on_attach = function(_, bufnr)
-        -- NOTE: Remember that lua is a real programming language, and as such it is possible
-        -- to define small helper and utility functions so you don't have to repeat yourself
-        -- many times.
-        --
-        -- In this case, we create a function that lets us more easily define mappings specific
-        -- for LSP related items. It sets the mode, buffer and description for us each time.
         local nmap = function(keys, func, desc)
             if desc then desc = "LSP: " .. desc end
-
             vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
         end
 
@@ -38,15 +33,7 @@ return function(_)
         nmap("K", vim.lsp.buf.hover, "Hover Documentation")
         nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 
-        -- Lesser used LSP functionality
         nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-        nmap("<leader>lwa", vim.lsp.buf.add_workspace_folder, "[W]orkspace [A]dd Folder")
-        nmap("<leader>lwr", vim.lsp.buf.remove_workspace_folder, "[W]orkspace [R]emove Folder")
-        nmap(
-            "<leader>lwl",
-            function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
-            "[W]orkspace [L]ist Folders"
-        )
 
         -- Create a command `:Format` local to the LSP buffer
         vim.api.nvim_buf_create_user_command(
@@ -57,34 +44,12 @@ return function(_)
         )
     end
 
-    -- -- document existing key chains
-    -- require("which-key").register({
-    --    ["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-    --    ["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-    --    ["<leader>g"] = { name = "[G]it", _ = "which_key_ignore" },
-    --    ["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
-    --    ["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-    --    ["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-    --    ["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-    --    ["<leader>lw"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-    -- })
-    -- -- register which-key VISUAL mode
-    -- -- required for visual <leader>hs (hunk stage) to work
-    -- require("which-key").register({
-    --    ["<leader>"] = { name = "VISUAL <leader>" },
-    --    ["<leader>h"] = { "Git [H]unk" },
-    -- }, { mode = "v" })
-
-    -- mason-lspconfig requires that these setup functions are called in this order
-    -- before setting up the servers.
+    -- mason-lspconfig requires that these setup functions are called in this order before setting up the servers.
     require("mason").setup()
     require("mason-lspconfig").setup()
 
-    -- Enable the following language servers
-    --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
-    --
     --  Add any additional override configuration in the following tables. They will be passed to
-    --  the `settings` field of the server config. You must look up that documentation yourself.
+    --  the `settings` field of the server config
     --
     --  If you want to override the default filetypes that your language server will attach to you can
     --  define the property 'filetypes' to the map in question.
@@ -95,19 +60,7 @@ return function(_)
         -- rust_analyzer = {},
         -- tsserver = {},
         -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
-        lua_ls = {
-            Lua = {
-                workspace = { checkThirdParty = false },
-                telemetry = { enable = false },
-                -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                -- diagnostics = { disable = { 'missing-fields' } },
-            },
-        },
     }
-
-    -- Setup neovim lua configuration
-    require("neodev").setup()
 
     -- nvim-cmp supports additional completion capabilities, so broadcast that to servers
     local capabilities = vim.lsp.protocol.make_client_capabilities()
