@@ -41,8 +41,18 @@ return {
     opts = function()
         return {
             -- Add languages to be installed here that you want installed for treesitter
-            -- PLANNED: 'rust', 'tsx', 'javascript', 'typescript', 'html', 'css', 'json', 'toml'
-            ensure_installed = { "lua", "python", "vimdoc", "vim", "bash" },
+            -- PLANNED: 'rust', 'tsx', 'javascript', 'typescript', 'html', 'css'
+            ensure_installed = {
+                "bash",
+                "json",
+                "lua",
+                "markdown",
+                "markdown_inline",
+                "python",
+                "toml",
+                "vim",
+                "vimdoc",
+            },
 
             -- Autoinstall languages that are not installed
             auto_install = false,
