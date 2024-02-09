@@ -14,6 +14,7 @@ return {
                 "Trouble",
                 -- Custom
                 "toggleterm",
+                -- PLANNED: what is the filetype for the noice pop-up?
             },
             cursorcolumn = {},
         },

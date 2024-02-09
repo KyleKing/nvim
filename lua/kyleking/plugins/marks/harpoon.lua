@@ -9,32 +9,32 @@ return {
     keys = {
         {
             "<leader>ha",
-            function() require('harpoon.mark').add_file() end,
+            function() require("harpoon.mark").add_file() end,
             desc = "Mark file with Harpoon",
         },
         {
             "<leader>he",
-            function() require('harpoon.ui').toggle_quick_menu(require('harpoon'):list()) end,
+            function() require("harpoon.ui").toggle_quick_menu(require("harpoon"):list()) end,
             desc = "Toggle Harpoon menu",
         },
         {
             "<leader>h1",
-            function() require('harpoon.ui').nav_file(1) end,
+            function() require("harpoon.ui").nav_file(1) end,
             desc = "Harpoon mark 1",
         },
         {
             "<leader>h2",
-            function() require('harpoon.ui').nav_file(2) end,
+            function() require("harpoon.ui").nav_file(2) end,
             desc = "Harpoon mark 2",
         },
         {
             "<leader>h3",
-            function() require('harpoon.ui').nav_file(3) end,
+            function() require("harpoon.ui").nav_file(3) end,
             desc = "Harpoon mark 3",
         },
         {
             "<leader>h4",
-            function() require('harpoon.ui').nav_file(4) end,
+            function() require("harpoon.ui").nav_file(4) end,
             desc = "Harpoon mark 4",
         },
         {
