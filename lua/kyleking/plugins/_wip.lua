@@ -42,4 +42,6 @@ return {
         cmd = "Spectre",
         opts = { open_cmd = "noswapfile vnew" },
     },
+
+    -- Take a look at better noice, zen mode, pencil, and others: https://youtu.be/oLpGahrsSGQ?si=h85LAUfCXN6kiJBN
 }

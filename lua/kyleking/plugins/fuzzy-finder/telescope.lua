@@ -7,6 +7,8 @@ return {
         { "nvim-telescope/telescope-fzf-native.nvim", enabled = vim.fn.executable("make") == 1, build = "make" },
         { "nvim-telescope/telescope-live-grep-args.nvim" },
         { "nvim-telescope/telescope-media-files.nvim" }, -- FYI: requires 'brew install chafa'
+        { "folke/noice.nvim" },
+        { "rcarriga/nvim-notify" },
     },
     cmd = "Telescope",
     opts = function()
@@ -55,6 +57,7 @@ return {
         telescope.load_extension("fzf")
         telescope.load_extension("live_grep_args")
         telescope.load_extension("media_files")
+        telescope.load_extension("noice")
         telescope.load_extension("notify")
     end,
     keys = {
