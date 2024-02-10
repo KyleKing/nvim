@@ -142,7 +142,7 @@ local function config()
             map({ "n", "v" }, "<leader>lc", vim.lsp.buf.code_action, { desc = "Code Action" })
             map("n", "gr", vim.lsp.buf.references, { desc = "Buffer References" })
             -- Uses 'server_capabilities.documentFormattingProvider'
-            map("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, { desc = "Format" })
+            map("n", "<leader>lF", function() vim.lsp.buf.format({ async = true }) end, { desc = "(Old) LSP Format" })
         end,
     })
 end
