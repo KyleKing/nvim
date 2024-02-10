@@ -55,7 +55,6 @@ end
 
 return {
     "hrsh7th/nvim-cmp",
-    enabled = false, -- PLANNED: this configuration didn't work out-of-the-box and will need to revisit after configuring lsp
     dependencies = {
         -- Snippet Engine & its associated nvim-cmp source
         "L3MON4D3/LuaSnip",
@@ -67,6 +66,13 @@ return {
 
         -- -- Adds a number of user-friendly snippets
         -- "rafamadriz/friendly-snippets",
+
+        -- From: https://github.com/jdhao/nvim-config/blob/01bc4b40d3916d8f48f14b1be242379e1c806c41/lua/plugin_specs.lua#L28C1-L39C9
+        "onsails/lspkind-nvim",
+        "hrsh7th/cmp-buffer",
+        -- "hrsh7th/cmp-omni",
+        -- "hrsh7th/cmp-emoji",
+        -- "quangnguyen30192/cmp-nvim-ultisnips",
     },
     config = config,
 }

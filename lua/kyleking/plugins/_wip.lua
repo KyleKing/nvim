@@ -44,4 +44,5 @@ return {
     },
 
     -- Take a look at better noice, zen mode, pencil, and others: https://youtu.be/oLpGahrsSGQ?si=h85LAUfCXN6kiJBN
+    --  And see another zen mode config: https://github.com/jdhao/nvim-config/blob/01bc4b40d3916d8f48f14b1be242379e1c806c41/lua/config/zen-mode.lua
 }

@@ -1,9 +1,51 @@
 -- Minimal configuration from: https://github.com/neovim/nvim-lspconfig?tab=readme-ov-file#suggested-configuration
 -- PLANNED: see project-local guidance: https://github.com/neovim/nvim-lspconfig/wiki/Project-local-settings
 
+local function config_bash()
+    local lspconfig = require("lspconfig")
+    lspconfig.bashls.setup({})
+end
+
 local function config_lua()
     local lspconfig = require("lspconfig")
     lspconfig.lua_ls.setup({})
+end
+
+local function config_pylsp(python_path)
+    local lspconfig = require("lspconfig")
+    local capabilities = require("cmp_nvim_lsp").default_capabilities()
+    lspconfig.pylsp.setup({
+        settings = {
+            pylsp = {
+                plugins = {
+                    -- formatter options
+                    black = { enabled = false },
+                    autopep8 = { enabled = false },
+                    yapf = { enabled = false },
+                    -- linter options
+                    pylint = { enabled = false, executable = "pylint" },
+                    ruff = { enabled = false },
+                    pyflakes = { enabled = false },
+                    pycodestyle = { enabled = false },
+                    -- type checker
+                    pylsp_mypy = {
+                        enabled = true,
+                        overrides = { "--python-executable", python_path, true },
+                        report_progress = true,
+                        live_mode = false,
+                    },
+                    -- auto-completion options
+                    jedi_completion = { fuzzy = false },
+                    -- import sorting
+                    isort = { enabled = false },
+                },
+            },
+        },
+        flags = {
+            debounce_text_changes = 200,
+        },
+        capabilities = capabilities,
+    })
 end
 
 local function config_pyright(python_path)
@@ -22,6 +64,22 @@ local function config_typescript()
     lspconfig.tsserver.setup({})
 end
 
+local function customize_lsp_ui()
+    local icons = require("kyleking.utils.icons")
+    local signs = {
+        { name = "DiagnosticSignError", text = icons.get_icon("DiagnosticError"), texthl = "DiagnosticSignError" },
+        { name = "DiagnosticSignWarn", text = icons.get_icon("DiagnosticWarn"), texthl = "DiagnosticSignWarn" },
+        { name = "DiagnosticSignHint", text = icons.get_icon("DiagnosticHint"), texthl = "DiagnosticSignHint" },
+        { name = "DiagnosticSignInfo", text = icons.get_icon("DiagnosticInfo"), texthl = "DiagnosticSignInfo" },
+    }
+    for _, sign in ipairs(signs) do
+        vim.fn.sign_define(sign.name, sign)
+    end
+
+    -- Change border of documentation hover window, See https://github.com/neovim/neovim/pull/13998
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+end
+
 local function config()
     -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
     require("neodev").setup()
@@ -31,9 +89,13 @@ local function config()
 
     local python_path = require("kyleking.utils.system_utils").get_python_path()
 
+    config_bash()
     config_lua()
+    config_pylsp(python_path)
     config_pyright(python_path)
     config_typescript()
+
+    customize_lsp_ui()
 
     -- Global mappings.
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -50,51 +112,34 @@ local function config()
             -- Enable completion triggered by <c-x><c-o>
             vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
 
+            local function map(mode, lhs, rhs, opts)
+                opts = opts or {}
+                opts.silent = true
+                opts.buffer = ev.buf
+                vim.keymap.set(mode, lhs, rhs, opts)
+            end
+
             -- Buffer local mappings.
             -- See `:help vim.lsp.*` for documentation on any of the below functions
-            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = ev.buf, desc = "Go to Declaration" })
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = ev.buf, desc = "Go to Defintion" })
-            vim.keymap.set("n", "<leader>lK", vim.lsp.buf.hover, { buffer = ev.buf, desc = "Hover" })
-            vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = ev.buf, desc = "Go to Implementation" })
-            vim.keymap.set("n", "<leader>lH", vim.lsp.buf.signature_help, { buffer = ev.buf, desc = "Signature Help" })
-            vim.keymap.set(
-                "n",
-                "<leader>lwa",
-                vim.lsp.buf.add_workspace_folder,
-                { buffer = ev.buf, desc = "Add Folder" }
-            )
-            vim.keymap.set(
-                "n",
-                "<leader>lwr",
-                vim.lsp.buf.remove_workspace_folder,
-                { buffer = ev.buf, desc = "Remove Folder" }
-            )
-            vim.keymap.set(
+            map("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
+            map("n", "gd", vim.lsp.buf.definition, { desc = "Go to Defintion" })
+            map("n", "<leader>lK", vim.lsp.buf.hover, { desc = "Hover" })
+            map("n", "gi", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
+            map("n", "<leader>lH", vim.lsp.buf.signature_help, { desc = "Signature Help" })
+            map("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, { desc = "Add Folder" })
+            map("n", "<leader>lwr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove Folder" })
+            map(
                 "n",
                 "<leader>lwl",
                 function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
-                { buffer = ev.buf, desc = "Show Folders" }
+                { desc = "Show Folders" }
             )
-            vim.keymap.set(
-                "n",
-                "<leader>lD",
-                vim.lsp.buf.type_definition,
-                { buffer = ev.buf, desc = "Type Definition" }
-            )
-            vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, { buffer = ev.buf, desc = "LSP Rename" })
-            vim.keymap.set(
-                { "n", "v" },
-                "<leader>lc",
-                vim.lsp.buf.code_action,
-                { buffer = ev.buf, desc = "Code Action" }
-            )
-            vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = ev.buf, desc = "Buffer References" })
-            vim.keymap.set(
-                "n",
-                "<leader>lf",
-                function() vim.lsp.buf.format({ async = true }) end,
-                { buffer = ev.buf, desc = "Format" }
-            )
+            map("n", "<leader>lD", vim.lsp.buf.type_definition, { desc = "Type Definition" })
+            map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
+            map({ "n", "v" }, "<leader>lc", vim.lsp.buf.code_action, { desc = "Code Action" })
+            map("n", "gr", vim.lsp.buf.references, { desc = "Buffer References" })
+            -- Uses 'server_capabilities.documentFormattingProvider'
+            map("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, { desc = "Format" })
         end,
     })
 end
