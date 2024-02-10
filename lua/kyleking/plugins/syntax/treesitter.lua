@@ -4,7 +4,6 @@ return {
     main = "nvim-treesitter.configs",
     dependencies = {
         { "nvim-treesitter/nvim-treesitter-textobjects" },
-        { "lukas-reineke/indent-blankline.nvim" },
     },
     cmd = {
         "TSBufDisable",

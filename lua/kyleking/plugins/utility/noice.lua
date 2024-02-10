@@ -1,6 +1,8 @@
 -- PLANNED: Look into completions configuration from: https://www.youtube.com/watch?v=upM6FOtdLeU&list=WL&index=5
 return {
     "folke/noice.nvim",
+    -- Will revisit, but I want to see output of 'Git push' in real-time and '/' counter conflicts with another plugin
+    enabled = false,
     event = "UIEnter",
     dependencies = {
         "MunifTanjim/nui.nvim",
@@ -24,7 +26,7 @@ return {
         },
         lsp = {
             signature = {
-                enabled = false, -- PLANNED: this is currently in conflict with my LSP setup
+                enabled = false, -- FYI: this is currently in conflict with my LSP setup
             },
         },
     },
