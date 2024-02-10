@@ -1,5 +1,4 @@
 -- Minimal configuration from: https://github.com/neovim/nvim-lspconfig?tab=readme-ov-file#suggested-configuration
--- PLANNED: see project-local guidance: https://github.com/neovim/nvim-lspconfig/wiki/Project-local-settings
 
 local function config_bash()
     local lspconfig = require("lspconfig")
@@ -8,7 +7,11 @@ end
 
 local function config_lua()
     local lspconfig = require("lspconfig")
-    lspconfig.lua_ls.setup({})
+    local capabilities = require("cmp_nvim_lsp").default_capabilities()
+    lspconfig.lua_ls.setup({
+        format = { enable = false }, -- The builtin formatter is CppCXY/EmmyLuaCodeStyle (https://luals.github.io/wiki/formatter)
+        capabilities = capabilities,
+    })
 end
 
 local function config_pylsp(python_path)
@@ -90,9 +93,9 @@ local function config()
     local python_path = require("kyleking.utils.system_utils").get_python_path()
 
     config_bash()
-    config_lua()
-    config_pylsp(python_path)
-    config_pyright(python_path)
+    config_lua() -- Requires 'brew install lua-language-server'
+    config_pylsp(python_path) -- Requires 'pipx install python-lsp-server'
+    config_pyright(python_path) -- Requires 'pipx install pyright'
     config_typescript()
 
     customize_lsp_ui()
