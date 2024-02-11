@@ -1,5 +1,6 @@
 -- Key (re)mapping that doesn't involve plugins.
 --  Plugin keymaps should go into their own file (setup-plugins.lua, plugins/*.lua, etc.)
+-- Debug keyamps with `:help K` (or the Telescope extension)
 
 -- See `:help mapleader`
 vim.g.mapleader = " " -- Set <space> as the leader key

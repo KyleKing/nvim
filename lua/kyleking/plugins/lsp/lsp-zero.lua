@@ -22,11 +22,11 @@ local function config_lsp()
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions
     local K = vim.keymap.set
     -- Diagnostics are not exclusive to lsp servers, so they can be global
-    K("n", "<leader>lq", vim.diagnostic.setloclist, { desc = "Set LSP Loc List" })
     -- -- These are set by lsp-zero automatically
     -- K("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to Previous" })
     -- K("n", "]d", vim.diagnostic.goto_next, { desc = "Go to Next" })
-    K("n", "gl", vim.diagnostic.open_float, { desc = "Open LSP diagnostic float" })
+    K("n", "gl", vim.diagnostic.open_float, { desc = "Open LSP hover diagnostics" })
+    K("n", "<leader>lq", vim.diagnostic.setloclist, { desc = "Open LSP diagnostics list" })
 
     -- Otherwise, limit mappings to attached buffer
     -- See `:help vim.lsp.*` for documentation on any of the below functions
@@ -74,6 +74,17 @@ local function config_lsp()
             { desc = "Show Folders" }
         )
     end)
+end
+
+local function config_telescope()
+    local K = vim.keymap.set
+    local tele = require("telescope.builtin")
+    K("n", "<leader>lzd", tele.lsp_definitions, { desc = "Telescope LSP Definintions" })
+    K("n", "<leader>lzr", tele.lsp_references, { desc = "Telescope References" })
+    K("n", "<leader>lzI", tele.lsp_implementations, { desc = "Telescope Implementations" })
+    K("n", "<leader>lzD", tele.lsp_type_definitions, { desc = "Telescope Type Definition" })
+    K("n", "<leader>lzs", tele.lsp_document_symbols, { desc = "Telescope Document Symbols" })
+    K("n", "<leader>lzw", tele.lsp_dynamic_workspace_symbols, { desc = "Telescope Workspace Symbols" })
 end
 
 local function config_mason()
@@ -230,6 +241,7 @@ return {
         { "j-hui/fidget.nvim", opts = {} }, -- Useful status updates for LSP
         { "folke/neodev.nvim", opts = {} }, -- Additional lua configuration
         { "onsails/lspkind.nvim" }, -- For symbols
+        { "nvim-telescope/telescope.nvim" },
         -- PLANNED: consider https://github.com/quangnguyen30192/cmp-nvim-ultisnips
     },
     config = function()
@@ -237,44 +249,8 @@ return {
         -- vim.lsp.set_log_level("debug")
         customize_lsp_ui()
         config_lsp()
+        config_telescope()
         config_mason()
         config_cmp()
     end,
 }
-
--- -- TODO: Finish merging the LSP config
---
--- -- -- Diagnostic keymaps
--- -- vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous diagnostic message" })
--- -- vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next diagnostic message" })
--- -- vim.keymap.set("n", "<leader>lm", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
--- -- vim.keymap.set("n", "<leader>ll", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
--- -- K("n", "<leader>ld", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
--- -- K("n", "[d", function() vim.diagnostic.goto_prev() end, { desc = "Previous diagnostic" })
--- -- K("n", "]d", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
--- -- K("n", "gl", function() vim.diagnostic.open_float() end, { desc = "Hover diagnostics" })
---
--- return function(_)
---     -- [[ Configure LSP ]]
---     --  This function gets run when an LSP connects to a particular buffer.
---     local on_attach = function(_, bufnr)
---         local nmap = function(keys, func, desc)
---             if desc then desc = "LSP: " .. desc end
---             vim.keymap.set("n", keys, func, { buffer = bufnr, desc = desc })
---         end
---
---         nmap("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
---         nmap("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
---
---         nmap("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
---         nmap("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
---         nmap("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
---         nmap("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
---         nmap("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
---         nmap("<leader>lws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
---
---         -- See `:help K` for why this keymap
---         nmap("K", vim.lsp.buf.hover, "Hover Documentation")
---         nmap("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
---         nmap("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
---
