@@ -4,7 +4,6 @@ return {
     { import = "kyleking.plugins.buffer" },
     { import = "kyleking.plugins.color" },
     { import = "kyleking.plugins.colorscheme" },
-    { import = "kyleking.plugins.completion" },
     { import = "kyleking.plugins.editing-support" },
     { import = "kyleking.plugins.formatting" },
     { import = "kyleking.plugins.fuzzy-finder" },
