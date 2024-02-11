@@ -21,6 +21,7 @@ return {
         sections = {
             lualine_a = { { "buffers" } },
             lualine_c = { rel_filename },
+            lualine_x = { {} },
         },
         extensions = {
             "fugitive",
