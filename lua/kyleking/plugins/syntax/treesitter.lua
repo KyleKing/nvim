@@ -40,20 +40,28 @@ return {
     opts = function()
         return {
             -- Add languages to be installed here that you want installed for treesitter
-            -- PLANNED: 'rust', 'tsx', 'javascript', 'typescript', 'html', 'css'
+            -- PLANNED:
             ensure_installed = {
                 "bash",
+                "css",
+                "html",
+                "javascript",
+                "jsdoc",
                 "json",
                 "lua",
                 "markdown",
                 "markdown_inline",
                 "python",
+                "rust",
                 "toml",
+                "tsx",
+                "typescript",
                 "vim",
                 "vimdoc",
             },
 
-            -- Autoinstall languages that are not installed
+            -- Automatically install missing parsers when entering buffer
+            -- Recommendation: set to false if you don"t have `tree-sitter` CLI installed locally
             auto_install = false,
             -- Install languages synchronously (only applied to `ensure_installed`)
             sync_install = false,

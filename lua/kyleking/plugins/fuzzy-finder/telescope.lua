@@ -112,7 +112,7 @@ return {
         { "<leader>lgr", require("telescope.builtin").lsp_references, desc = "lsp_references" },
         { "<leader>lgt", require("telescope.builtin").lsp_type_definitions, desc = "lsp_type_definitions" },
         {
-            "<leader>lG",
+            "<leader>lgw",
             function()
                 vim.ui.input({ prompt = "Symbol Query (leave empty for word under cursor): " }, function(query)
                     if query then
