@@ -22,7 +22,10 @@ return {
             scss = { { "prettierd", "prettier" } },
         },
     },
-    keys = { { "<leader>lf", function()
+    keys = {
+        {
+            "<leader>lf",
+            function()
                 require("conform").format({
                     lsp_fallback = true,
                     async = false,
