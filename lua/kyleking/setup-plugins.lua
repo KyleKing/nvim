@@ -1,6 +1,7 @@
 -- [[ Install `lazy.nvim` plugin manager ]]
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+local uv = vim.uv or vim.loop
+if not uv.fs_stat(lazypath) then
     vim.fn.system({
         "git",
         "clone",
@@ -11,6 +12,7 @@ if not vim.loop.fs_stat(lazypath) then
     })
 end
 vim.opt.rtp:prepend(lazypath)
+-- Which can be verified with: `:echo stdpath('data') . '/lazy/lazy.nvim'`
 
 -- Loads all files in `plugins/*.lua`
 -- Organized into subdirectories based on tags from NeovimCraft
