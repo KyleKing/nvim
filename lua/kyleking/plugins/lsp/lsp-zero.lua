@@ -232,16 +232,6 @@ return {
         { "onsails/lspkind.nvim" }, -- For symbols
         -- PLANNED: consider https://github.com/quangnguyen30192/cmp-nvim-ultisnips
     },
-    -- PLANNED: how does this compare to the 'border' setting?
-    -- init = function()
-    --     -- Source: https://vi.stackexchange.com/a/39075/44707
-    --     local border = "single"
-    --     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = border })
-    --     vim.lsp.handlers["textDocument/signatureHelp"] =
-    --         vim.lsp.with(vim.lsp.handlers.signature_help, { border = border })
-    --     vim.diagnostic.config({ float = { border = border } })
-    --     require("lspconfig.ui.windows").default_options = { border = border }
-    -- end,
     config = function()
         -- See logs with `:LspInfo` and `:LspLog`
         -- vim.lsp.set_log_level("debug")
