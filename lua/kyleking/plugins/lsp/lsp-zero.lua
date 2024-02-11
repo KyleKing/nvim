@@ -1,53 +1,3 @@
-local function config_pylsp(python_path)
-    local lspconfig = require("lspconfig")
-    local capabilities = require("cmp_nvim_lsp").default_capabilities()
-    lspconfig.pylsp.setup({
-        settings = {
-            pylsp = {
-                plugins = {
-                    -- formatter options
-                    black = { enabled = false },
-                    autopep8 = { enabled = false },
-                    yapf = { enabled = false },
-                    -- linter options
-                    pylint = { enabled = false, executable = "pylint" },
-                    ruff = { enabled = false },
-                    pyflakes = { enabled = false },
-                    pycodestyle = { enabled = false },
-                    -- type checker
-                    pylsp_mypy = {
-                        enabled = true,
-                        overrides = { "--python-executable", python_path, true },
-                        report_progress = true,
-                        live_mode = false,
-                    },
-                    -- auto-completion options
-                    jedi_completion = { fuzzy = false },
-                    -- import sorting
-                    isort = { enabled = false },
-                },
-            },
-        },
-        flags = {
-            debounce_text_changes = 200,
-        },
-        capabilities = capabilities,
-    })
-end
-
-local function config_pyright(python_path)
-    local lspconfig = require("lspconfig")
-    local capabilities = require("cmp_nvim_lsp").default_capabilities()
-    lspconfig.pyright.setup({
-        settings = {
-            python = {
-                pythonPath = python_path,
-            },
-        },
-        capabilities = capabilities,
-    })
-end
-
 local function customize_lsp_ui()
     local icons = require("kyleking.utils.icons")
     local signs = {
@@ -64,28 +14,20 @@ local function customize_lsp_ui()
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
 end
 
-local function config()
-    -- See logs with `:LspInfo` and `:LspLog`
-    -- vim.lsp.set_log_level("debug")
-
-    local python_path = require("kyleking.utils.system_utils").get_python_path()
-
-    customize_lsp_ui()
-
+local function config_lsp()
     local lsp_zero = require("lsp-zero")
-    config_pylsp(python_path) -- Requires 'pipx install python-lsp-server'
-    config_pyright(python_path) -- Requires 'pipx install pyright'
 
     -- Full list of keymaps added from default:
     --   https://github.com/VonHeikemen/lsp-zero.nvim?tab=readme-ov-file#keybindings
     -- See `:help vim.diagnostic.*` for documentation on any of the below functions
     local K = vim.keymap.set
     -- Diagnostics are not exclusive to lsp servers, so they can be global
-    K("n", "gl", vim.diagnostic.open_float, { desc = "Open LSP diagnostic float" })
-    -- These are set by lsp-zero automatically
+    K("n", "<leader>lq", vim.diagnostic.setloclist, { desc = "Set LSP Loc List" })
+    -- -- These are set by lsp-zero automatically
     -- K("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to Previous" })
     -- K("n", "]d", vim.diagnostic.goto_next, { desc = "Go to Next" })
-    K("n", "<leader>lq", vim.diagnostic.setloclist, { desc = "Set LSP Loc List" })
+    K("n", "gl", vim.diagnostic.open_float, { desc = "Open LSP diagnostic float" })
+
     -- Otherwise, limit mappings to attached buffer
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     ---@diagnostic disable-next-line: unused-local
@@ -132,7 +74,10 @@ local function config()
             { desc = "Show Folders" }
         )
     end)
+end
 
+local function config_mason()
+    local python_path = require("kyleking.utils.system_utils").get_python_path()
     local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
     require("mason-lspconfig").setup({
@@ -143,17 +88,56 @@ local function config()
             "tsserver",
         },
         handlers = {
-            lsp_zero.default_setup,
+            require("lsp-zero").default_setup,
             lua_ls = function()
                 require("lspconfig").lua_ls.setup({
                     capabilities = lsp_capabilities,
                     format = { enable = false }, -- The builtin formatter is CppCXY/EmmyLuaCodeStyle (https://luals.github.io/wiki/formatter)
                 })
             end,
+            pylsp = function()
+                require("lspconfig").pylsp.setup({
+                    settings = {
+                        pylsp = {
+                            plugins = {
+                                -- formatter options
+                                black = { enabled = false },
+                                autopep8 = { enabled = false },
+                                yapf = { enabled = false },
+                                -- linter options
+                                pylint = { enabled = false, executable = "pylint" },
+                                ruff = { enabled = false },
+                                pyflakes = { enabled = false },
+                                pycodestyle = { enabled = false },
+                                -- type checker
+                                pylsp_mypy = {
+                                    enabled = true,
+                                    overrides = { "--python-executable", python_path, true },
+                                    report_progress = true,
+                                    live_mode = false,
+                                },
+                                -- auto-completion options
+                                jedi_completion = { fuzzy = false },
+                                -- import sorting
+                                isort = { enabled = false },
+                            },
+                        },
+                    },
+                    flags = { debounce_text_changes = 200 },
+                    capabilities = lsp_capabilities,
+                })
+            end,
+            pyright = function()
+                require("lspconfig").pyright.setup({
+                    settings = { python = { pythonPath = python_path } },
+                    capabilities = lsp_capabilities,
+                })
+            end,
         },
     })
+end
 
-    -- Configure completions
+local function config_cmp()
     local cmp = require("cmp")
     local cmp_action = require("lsp-zero").cmp_action()
     local cmp_format = require("lsp-zero").cmp_format() -- Configure snippets. Based on: https://lsp-zero.netlify.app/v3.x/autocomplete.html#add-an-external-collection-of-snippets
@@ -258,7 +242,14 @@ return {
     --     vim.diagnostic.config({ float = { border = border } })
     --     require("lspconfig.ui.windows").default_options = { border = border }
     -- end,
-    config = config,
+    config = function()
+        -- See logs with `:LspInfo` and `:LspLog`
+        -- vim.lsp.set_log_level("debug")
+        customize_lsp_ui()
+        config_lsp()
+        config_mason()
+        config_cmp()
+    end,
 }
 
 -- -- TODO: Finish merging the LSP config
