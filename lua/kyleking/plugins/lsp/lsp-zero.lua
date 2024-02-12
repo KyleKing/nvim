@@ -31,7 +31,7 @@ local function config_lsp()
     -- Otherwise, limit mappings to attached buffer
     -- See `:help vim.lsp.*` for documentation on any of the below functions
     ---@diagnostic disable-next-line: unused-local
-    lsp_zero.on_attach(function(client, bufnr)
+    lsp_zero.on_attach(function(_client, bufnr)
         -- -- PLANNED: (Investigate) Enable completion triggered by <c-x><c-o> (note: lsp-zero has some logic for this internally that this may duplicate)
         -- vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
 

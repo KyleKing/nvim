@@ -9,10 +9,11 @@ return {
 
         lint.linters_by_ft = {
             javascript = { "eslint_d" },
-            typescript = { "eslint_d" },
             javascriptreact = { "eslint_d" },
-            typescriptreact = { "eslint_d" },
+            lua = { "selene", "luacheck" },
             terraform = { "tflint" },
+            typescript = { "eslint_d" },
+            typescriptreact = { "eslint_d" },
             -- PLANNED: configure additional linters: https://github.com/mfussenegger/nvim-lint?tab=readme-ov-file#available-linters
         }
 
