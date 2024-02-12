@@ -64,15 +64,16 @@ local function config_lsp()
             function() vim.lsp.buf.format({ async = true }) end,
             { desc = "(Old) LSP Format" }
         )
-        -- Worwkspace
-        map("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, { desc = "Add Folder" })
-        map("n", "<leader>lwr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove Folder" })
-        map(
-            "n",
-            "<leader>lwl",
-            function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
-            { desc = "Show Folders" }
-        )
+        -- -- Workspace
+        -- -- PLANNED: consider using the LSP-Zero variants (LspZeroWorkspaceRemove, etc.)
+        -- map("n", "<leader>lwa", vim.lsp.buf.add_workspace_folder, { desc = "Add Folder" })
+        -- map("n", "<leader>lwr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove Folder" })
+        -- map(
+        --     "n",
+        --     "<leader>lwl",
+        --     function() print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end,
+        --     { desc = "Show Folders" }
+        -- )
     end)
 
     local icons = require("kyleking.utils.icons")
@@ -97,7 +98,7 @@ end
 
 local function config_mason()
     local python_path = require("kyleking.utils.system_utils").get_python_path()
-    local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
+    local lsp_capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
     require("mason").setup({})
     require("mason-lspconfig").setup({
         ensure_installed = {
@@ -193,7 +194,12 @@ end
 local function config_cmp()
     local cmp = require("cmp")
     local cmp_action = require("lsp-zero").cmp_action()
-    local cmp_format = require("lsp-zero").cmp_format() -- Configure snippets. Based on: https://lsp-zero.netlify.app/v3.x/autocomplete.html#add-an-external-collection-of-snippets
+    local cmp_format = require("lspkind").cmp_format({
+        mode = "symbol", -- show only symbol annotations
+        maxwidth = 50, -- prevent the popup from showing more than provided characters
+        ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead
+        show_labelDetails = true, -- show labelDetails in menu. Disabled by default
+    })
     require("luasnip.loaders.from_vscode").lazy_load()
     cmp.setup({
         -- Default snippet completion
@@ -201,7 +207,10 @@ local function config_cmp()
             expand = function(args) require("luasnip").lsp_expand(args.body) end,
         },
         -- Configure snippet sources
-        sources = {
+        sources = cmp.config.sources({
+            -- PLANNED: consider additional sources: https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
+            -- In particular: treesitter, etc.
+            -- and revisit: https://github.com/hrsh7th/nvim-cmp?tab=readme-ov-file#recommended-configuration
             { name = "nvim_lsp" },
             { name = "nvim_lsp_signature_help" },
             { name = "nvim_lua" },
@@ -211,13 +220,14 @@ local function config_cmp()
             -- },
             { name = "luasnip" },
             { name = "path" },
-            -- { name = "buffer", keyword_length = 3 }, -- Reduce false positives
-        },
+        }, {
+            { name = "buffer", keyword_length = 3 }, -- Reduce false positives
+        }),
         completion = {
             autocomplete = { "InsertEnter", "TextChanged" },
         },
         -- Customize mappings
-        mapping = cmp.mapping.preset.insert({
+        mapping = cmp.mapping.preset.insert({ -- Preset: ^n, ^p, ^y, ^e, you know the drill..
             -- Navigate completion options
             ["<C-j>"] = cmp.mapping.select_next_item(),
             ["<C-k>"] = cmp.mapping.select_prev_item(),
@@ -247,15 +257,11 @@ local function config_cmp()
             documentation = cmp.config.window.bordered(),
         },
         --- (Optional) Show source name in completion menu
-        formatting = vim.tbl_deep_extend("force", cmp_format, {
+        formatting = {
+            expandable_indicator = true,
             fields = { "abbr", "kind", "menu" },
-            format = require("lspkind").cmp_format({
-                mode = "symbol", -- show only symbol annotations
-                maxwidth = 50, -- prevent the popup from showing more than provided characters
-                ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead
-                show_labelDetails = true, -- show labelDetails in menu. Disabled by default
-            }),
-        }),
+            format = cmp_format,
+        },
     })
     -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
     cmp.setup.cmdline({ "/", "?" }, {
@@ -293,7 +299,7 @@ return {
                 { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
                 { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
                 -- { "hrsh7th/cmp-omni" }, -- PLANNED: Source: omni (and see both commented snippets above)
-                { "hrsh7th/cmp-path" }, -- Source: path
+                { "hrsh7th/cmp-path" }, -- Source: path (PLANNED: use async_path instead from: https://github.com/FelipeLema/cmp-async-path)
                 { "rafamadriz/friendly-snippets" }, -- Loaded automatically
                 { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
             },
