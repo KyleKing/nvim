@@ -1,7 +1,7 @@
 local M = {}
 
 -- From: https://github.com/AstroNvim/AstroNvim/blob/67d6925bac883b7828e9783a2151a30b14d5593f/lua/astronvim/icons/nerd_font.lua
-local icons = {
+M.icons = {
     ActiveLSP = "",
     ActiveTS = "",
     ArrowLeft = "",
@@ -62,7 +62,7 @@ local icons = {
 ---@return string icon
 function M.get_icon(kind, rpad, no_fallback)
     if not vim.g.icons_enabled and no_fallback then return "" end
-    local icon = assert(icons[kind], "No icon '" .. kind .. "'")
+    local icon = assert(M.icons[kind], "No icon '" .. kind .. "'")
     return icon .. (" "):rep(rpad or 0)
 end
 

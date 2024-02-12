@@ -74,6 +74,14 @@ local function config_lsp()
             { desc = "Show Folders" }
         )
     end)
+
+    local icons = require("kyleking.utils.icons")
+    lsp_zero.set_sign_icons({
+        error = icons.icons["DiagnosticError"],
+        warn = icons.icons["DiagnosticWarn"],
+        hint = icons.icons["DiagnosticHint"],
+        info = icons.icons["DiagnosticInfo"],
+    })
 end
 
 local function config_telescope()
@@ -94,8 +102,18 @@ local function config_mason()
     require("mason-lspconfig").setup({
         ensure_installed = {
             "bashls",
+            -- "docker_compose_language_service",
+            -- "dockerls",
+            -- "jedi_language_server",
+            "jsonls",
             "lua_ls",
+            -- "marksman",
+            -- "ruff_lsp",
+            -- "tailwindcss",
+            -- "taplo",
+            "terraformls",
             "tsserver",
+            "yamlls",
         },
         handlers = {
             require("lsp-zero").default_setup,
@@ -103,6 +121,35 @@ local function config_mason()
                 require("lspconfig").lua_ls.setup({
                     capabilities = lsp_capabilities,
                     format = { enable = false }, -- The builtin formatter is CppCXY/EmmyLuaCodeStyle (https://luals.github.io/wiki/formatter)
+                })
+            end,
+            jsonls = function()
+                require("lspconfig").jsonls.setup({
+                    settings = {
+                        json = {
+                            schemas = require("schemastore").json.schemas(),
+                            validate = { enable = true }, -- See: https://github.com/b0o/SchemaStore.nvim/issues/8
+                        },
+                    },
+                })
+            end,
+            yamlls = function()
+                require("lspconfig").yamlls.setup({
+                    capabilities = lsp_capabilities,
+                    settings = {
+                        yaml = {
+                            schemaStore = {
+                                -- You must disable built-in schemaStore support if you want to use
+                                --  schemastore and its advanced options like `ignore`.
+                                enable = false,
+                                url = "", -- Avoids a TypeError: Cannot read properties of undefined (reading 'length')
+                            },
+                            schemas = require("schemastore").yaml.schemas(),
+                            -- schemas = {
+                            --     ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+                            -- },
+                        },
+                    },
                 })
             end,
             pylsp = function()
@@ -168,9 +215,7 @@ local function config_cmp()
             -- },
             { name = "luasnip" },
             { name = "path" },
-        },
-        {
-            { name = "buffer", keyword_length = 3 }, -- Reduce false positives
+            -- { name = "buffer", keyword_length = 3 }, -- Reduce false positives
         },
         completion = {
             autocomplete = { "InsertEnter", "TextChanged" },
@@ -257,6 +302,7 @@ return {
                 { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
             },
         },
+        { "b0o/schemastore.nvim" }, -- JSON and Yaml Schemas
         { "j-hui/fidget.nvim", opts = {} }, -- Useful status updates for LSP
         { "folke/neodev.nvim", opts = {} }, -- Additional lua configuration
         { "onsails/lspkind.nvim" }, -- For symbols
