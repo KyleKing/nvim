@@ -1,6 +1,6 @@
+-- PLANNED: Configure keymaps and settings: https://github.com/ray-x/lsp_signature.nvim?tab=readme-ov-file#keymap
 return {
     "ray-x/lsp_signature.nvim",
-    enabled = false, -- PLANNED: I'm not sure if I need this plugin
     event = "BufRead",
     opts = {},
 }

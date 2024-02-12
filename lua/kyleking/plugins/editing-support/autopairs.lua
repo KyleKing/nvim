@@ -9,6 +9,8 @@ return {
         --  Alternatively, consider tabout or more complicated logic
         --  https://github.com/windwp/nvim-autopairs/issues/383
         --  https://github.com/windwp/nvim-autopairs/issues/167#issuecomment-1317652644
+        -- TODO: can this be done without leaving Insert mode?
+        -- PLANNED: is there a Vim map for a single character insert (to complement <x>)?
         { "<C-l>", "<esc>:exe 'norm! l%%'<CR>a", silent = true, mode = { "i" }, desc = "Accept pair" },
     },
     config = function()

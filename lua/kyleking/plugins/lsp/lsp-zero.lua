@@ -125,6 +125,7 @@ local function config_mason()
             end,
             jsonls = function()
                 require("lspconfig").jsonls.setup({
+                    capabilities = lsp_capabilities,
                     settings = {
                         json = {
                             schemas = require("schemastore").json.schemas(),
@@ -139,21 +140,17 @@ local function config_mason()
                     settings = {
                         yaml = {
                             schemaStore = {
-                                -- You must disable built-in schemaStore support if you want to use
-                                --  schemastore and its advanced options like `ignore`.
-                                enable = false,
+                                enable = false, -- You must disable built-in schemaStore support if you want to use schemastore and its advanced options like `ignore`.
                                 url = "", -- Avoids a TypeError: Cannot read properties of undefined (reading 'length')
                             },
                             schemas = require("schemastore").yaml.schemas(),
-                            -- schemas = {
-                            --     ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
-                            -- },
                         },
                     },
                 })
             end,
             pylsp = function()
                 require("lspconfig").pylsp.setup({
+                    capabilities = lsp_capabilities,
                     settings = {
                         pylsp = {
                             plugins = {
@@ -181,13 +178,12 @@ local function config_mason()
                         },
                     },
                     flags = { debounce_text_changes = 200 },
-                    capabilities = lsp_capabilities,
                 })
             end,
             pyright = function()
                 require("lspconfig").pyright.setup({
-                    settings = { python = { pythonPath = python_path } },
                     capabilities = lsp_capabilities,
+                    settings = { python = { pythonPath = python_path } },
                 })
             end,
         },
