@@ -9,7 +9,10 @@ cache = true
 -- Don't report unused self arguments of methods
 self = false
 
+-- Full reference: https://luacheck.readthedocs.io/en/stable/warnings.html
 ignore = {
-  "631", -- max_line_length
-  "212/_.*", -- unused argument for vars with "_" prefix
+    "111", -- ignore non-standard global variables (only applicable to .luacheckrc, but excluded_files isn't implemented)
+    "211/_.*", -- unused variabels with "_" prefix
+    "212/_.*", -- unused argument with "_" prefix
+    "631", -- max_line_length
 }
