@@ -95,7 +95,6 @@ local function config_mason()
         ensure_installed = {
             "bashls",
             "lua_ls",
-            "rust_analyzer",
             "tsserver",
         },
         handlers = {
@@ -154,45 +153,46 @@ local function config_cmp()
     local cmp_format = require("lsp-zero").cmp_format() -- Configure snippets. Based on: https://lsp-zero.netlify.app/v3.x/autocomplete.html#add-an-external-collection-of-snippets
     require("luasnip.loaders.from_vscode").lazy_load()
     cmp.setup({
+        -- Default snippet completion
+        snippet = {
+            expand = function(args) require("luasnip").lsp_expand(args.body) end,
+        },
         -- Configure snippet sources
         sources = {
             { name = "nvim_lsp" },
-            { name = "luasnip" },
+            { name = "nvim_lsp_signature_help" },
+            { name = "nvim_lua" },
             -- {
             --     name = "omni",
             --     option = { disable_omnifuncs = { "v:lua.vim.lsp.omnifunc" } },
             -- },
+            { name = "luasnip" },
             { name = "path" },
-            { name = "buffer" }, -- Sometimes too many false positives
         },
-        -- Pre-select the first item
-        preselect = "item",
+        {
+            { name = "buffer", keyword_length = 3 }, -- Reduce false positives
+        },
         completion = {
             autocomplete = { "InsertEnter", "TextChanged" },
-            completeopt = "menu,menuone,noinsert",
         },
         -- Customize mappings
         mapping = cmp.mapping.preset.insert({
-            ["<C-n>"] = cmp.mapping.select_next_item(),
-            ["<C-p>"] = cmp.mapping.select_prev_item(),
-            ["<C-j>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-            ["<C-k>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-            -- `Enter` key to confirm completion
-            ["<CR>"] = cmp.mapping.confirm({
-                select = true,
-                behavior = cmp.ConfirmBehavior.Insert,
-            }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-            ["<S-CR>"] = cmp.mapping.confirm({
-                behavior = cmp.ConfirmBehavior.Replace,
-                select = true,
-            }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-            ["<C-CR>"] = function(fallback)
-                cmp.abort()
-                fallback()
-            end,
+            -- Navigate completion options
+            ["<C-j>"] = cmp.mapping.select_next_item(),
+            ["<C-k>"] = cmp.mapping.select_prev_item(),
+            -- Powerful tabbing (https://github.com/VonHeikemen/lsp-zero.nvim/blob/v3.x/doc/md/autocomplete.md#enable-super-tab)
+            --  If the completion menu is visible it will navigate to the next item in the list
+            --  If the cursor is on top of a "snippet trigger" it'll expand it
+            --  If the cursor can jump to a snippet placeholder, it moves to it
+            --  If the cursor is in the middle of a word it displays the completion menu
+            --  Else, it acts like a regular Tab key.
+            ["<Tab>"] = cmp_action.luasnip_supertab(),
+            ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
+            -- `Ctrl-Enter` key to confirm completion. Set `select` to `false` to only confirm explicitly selected items
+            ["<C-CR>"] = cmp.mapping.confirm({ select = true }),
             -- Ctrl+Space to trigger completion menu
             ["<C-Space>"] = cmp.mapping.complete(),
-            ["<C-e>"] = cmp.mapping.abort(),
+            ["<CR>"] = cmp.mapping.abort(),
             -- Scroll up and down in the completion documentation
             ["<C-u>"] = cmp.mapping.scroll_docs(-4),
             ["<C-d>"] = cmp.mapping.scroll_docs(4),
@@ -238,7 +238,7 @@ end
 -- Based on: https://lsp-zero.netlify.app/v3.x/blog/you-might-not-need-lsp-zero.html
 return {
     "VonHeikemen/lsp-zero.nvim",
-    event = "BufRead",
+    event = { "BufRead", "InsertEnter", "CmdlineEnter" },
     dependencies = {
         { "williamboman/mason-lspconfig.nvim", dependencies = { "williamboman/mason.nvim" } },
         { "hrsh7th/nvim-cmp" },
@@ -249,10 +249,12 @@ return {
             build = "make install_jsregexp", -- install jsregexp (optional!).
             dependencies = {
                 { "hrsh7th/cmp-buffer" }, -- Source: buffer
+                { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
+                { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
                 -- { "hrsh7th/cmp-omni" }, -- PLANNED: Source: omni (and see both commented snippets above)
                 { "hrsh7th/cmp-path" }, -- Source: path
-                { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
                 { "rafamadriz/friendly-snippets" }, -- Loaded automatically
+                { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
             },
         },
         { "j-hui/fidget.nvim", opts = {} }, -- Useful status updates for LSP
