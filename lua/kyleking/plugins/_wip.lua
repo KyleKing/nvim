@@ -5,9 +5,6 @@ return {
     -- Glow preview inside neovim
     { "ellisonleao/glow.nvim", branch = "main", enabled = false },
 
-    -- Autopairs, integrates with both cmp and treesitter
-    { "windwp/nvim-autopairs", enabled = false },
-
     {
         "Wansmer/treesj",
         enabled = false,
