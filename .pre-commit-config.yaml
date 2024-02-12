@@ -43,7 +43,7 @@ repos:
     hooks:
       - id: stylua-system
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.0
+    rev: v3.14.1
     hooks:
       - id: commitizen
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -74,12 +74,6 @@ repos:
         name: Selene
         description: Lints Lua files using Selene (install with homebrew)
         entry: selene
-        language: system
-        types: [lua]
-      - id: luacheck
-        name: Luacheck
-        description: Lints Lua files using Luacheck (install with homebrew)
-        entry: luacheck
         language: system
         types: [lua]
       - id: tags
