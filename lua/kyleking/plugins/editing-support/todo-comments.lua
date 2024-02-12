@@ -1,3 +1,4 @@
+-- PLANNED: Consider using the TS comment grammar instead: https://github.com/stsewd/tree-sitter-comment
 return {
     "folke/todo-comments.nvim",
     event = "BufRead",
