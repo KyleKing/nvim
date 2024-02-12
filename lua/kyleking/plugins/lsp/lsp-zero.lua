@@ -56,7 +56,12 @@ local function config_lsp()
         map("n", "<leader>lr", vim.lsp.buf.references, { desc = "Buffer References" })
         map("n", "<leader>ls", vim.lsp.buf.signature_help, { desc = "Signature Help" })
         map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
-        map({ "n", "v" }, "<leader>la", vim.lsp.buf.code_action, { desc = "Code Action" })
+        map(
+            { "n", "v" },
+            "<leader>la",
+            function() vim.lsp.buf.code_action({ context = { only = { "quickfix", "refactor", "source" } } }) end,
+            { desc = "Code Action" }
+        )
         -- Uses 'server_capabilities.documentFormattingProvider'
         map(
             { "n", "x" },
@@ -98,7 +103,7 @@ end
 
 local function config_mason()
     local python_path = require("kyleking.utils.system_utils").get_python_path()
-    local lsp_capabilities = require("cmp_nvim_lsp").update_capabilities(vim.lsp.protocol.make_client_capabilities())
+    local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
     require("mason-lspconfig").setup({
         ensure_installed = {
