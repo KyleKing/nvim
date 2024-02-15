@@ -1,3 +1,4 @@
+-- FIXME: support python!
 return {
     "mfussenegger/nvim-lint",
     event = {

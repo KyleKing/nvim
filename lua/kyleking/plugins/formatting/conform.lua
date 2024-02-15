@@ -1,3 +1,4 @@
+-- FIXME: support python!
 return {
     "stevearc/conform.nvim",
     event = { "BufRead", "BufNewFile" },
