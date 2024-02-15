@@ -60,8 +60,9 @@ return {
     end,
     keys = {
         { "<leader><CR>", require("telescope.builtin").resume, desc = "Resume last Telescope session" },
+        -- Leader-; (for quicker launch)
+        { "<leader>;", require("telescope.builtin").buffers, desc = "Find in open buffers" },
         -- Leader-b
-        { "<leader>bf", require("telescope.builtin").buffers, desc = "Find in open [b]uffers" },
         { "<leader>br", require("telescope.builtin").oldfiles, desc = "Find [r]ecently opened files" },
         { "<leader>bb", require("telescope.builtin").current_buffer_fuzzy_find, desc = "Find word in current buffer" },
         {

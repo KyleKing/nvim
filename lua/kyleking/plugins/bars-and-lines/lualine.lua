@@ -18,9 +18,8 @@ return {
             theme = "nightfly",
         },
         sections = {
-            lualine_a = { { "buffers" } },
             lualine_c = { rel_filename },
-            lualine_x = { {} },
+            lualine_x = { {} }, -- Remove filetype, etc.
         },
         extensions = {
             "fugitive",

@@ -318,6 +318,7 @@ return {
         -- PLANNED: consider https://github.com/quangnguyen30192/cmp-nvim-ultisnips
     },
     config = function()
+        -- FIXME: Split these back up into separate files
         -- See logs with `:LspInfo` and `:LspLog`
         -- vim.lsp.set_log_level("debug")
         customize_lsp_ui()
