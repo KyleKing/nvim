@@ -13,6 +13,7 @@ return {
     { import = "kyleking.plugins.marks" },
     { import = "kyleking.plugins.mini" },
     { import = "kyleking.plugins.motion" },
+    { import = "kyleking.plugins.programming-languages-support" },
     { import = "kyleking.plugins.search" },
     { import = "kyleking.plugins.session" },
     { import = "kyleking.plugins.split-and-window" },
