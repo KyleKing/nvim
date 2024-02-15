@@ -36,6 +36,4 @@ return {
         cmd = "Spectre",
         opts = { open_cmd = "noswapfile vnew" },
     },
-
-    -- Take a look at better noice, pencil, and others: https://youtu.be/oLpGahrsSGQ?si=h85LAUfCXN6kiJBN
 }

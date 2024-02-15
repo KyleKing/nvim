@@ -10,7 +10,6 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = {
         "nvim-tree/nvim-web-devicons",
-        "folke/noice.nvim",
     },
     event = "UIEnter",
     opts = {
