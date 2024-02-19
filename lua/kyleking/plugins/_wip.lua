@@ -36,4 +36,18 @@ return {
         cmd = "Spectre",
         opts = { open_cmd = "noswapfile vnew" },
     },
+
+    {
+        -- Requires oatmeal install (brew install dustinblackman/tap/oatmeal)
+        "dustinblackman/oatmeal.nvim",
+        enabled = false,
+        cmd = { "Oatmeal" },
+        keys = {
+            { "<leader>om", mode = "n", desc = "Start Oatmeal session" },
+        },
+        opts = {
+            backend = "ollama",
+            model = "codellama:latest",
+        },
+    },
 }
