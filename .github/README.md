@@ -7,7 +7,10 @@ My personal `nvim` configuration. Based on:
 - [LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
 - [tomodachi94/dotfiles](https://github.com/tomodachi94/dotfiles/tree/main/nvim)
 
-My preference is for opinionated plugins that require minimal configuration. Accordingly, I've tried and removed [noice](https://github.com/KyleKing/nvim/commit/8a30f4d03c8271756ecd1659e241013e78788834), [barbar](https://github.com/KyleKing/nvim/commit/186b25c#diff-a08294f302313640d70006877f8111d54587c50a998ceb770b56c704c90fb77a), and [structlog](https://github.com/KyleKing/nvim/commit/9e10e13). I've replaced [reticle](https://github.com/KyleKing/nvim/commit/3297142) with `colorful-winsep`, [indent-blankline](https://github.com/KyleKing/nvim/commit/3e823707087166c1718dc3e0a815a43d472e40a9) with `hlchunk`, [luacheck](https://github.com/KyleKing/nvim/commit/a76ebc1) with `selene`, and [hlargs](https://github.com/KyleKing/nvim/commit/9ce2a1c) with default color scheme.
+My preference is for opinionated plugins that require minimal configuration.
+
+- Accordingly, I've tried and removed [noice](https://github.com/KyleKing/nvim/commit/8a30f4d03c8271756ecd1659e241013e78788834), [barbar](https://github.com/KyleKing/nvim/commit/186b25c#diff-a08294f302313640d70006877f8111d54587c50a998ceb770b56c704c90fb77a), [autopairs](https://github.com/KyleKing/nvim/commit/7e106f21d6645454b088b3089c3a3f2d067ffc7c), and [structlog](https://github.com/KyleKing/nvim/commit/9e10e13)
+- I've replaced [reticle](https://github.com/KyleKing/nvim/commit/3297142) with `colorful-winsep`, [indent-blankline](https://github.com/KyleKing/nvim/commit/3e823707087166c1718dc3e0a815a43d472e40a9) with `hlchunk`, [luacheck](https://github.com/KyleKing/nvim/commit/a76ebc1) with `selene`, and [hlargs](https://github.com/KyleKing/nvim/commit/9ce2a1c) with the behavior of my chosen color scheme
 
 ## MacOS (and Linux) Install
 
