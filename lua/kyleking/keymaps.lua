@@ -66,11 +66,11 @@ K("v", "<Tab>", ">gv", { desc = "Indent line" })
 
 -- PLANNED: review these additional keybinds
 
--- -- Custom menu for modification of the user experience
+-- Custom menu for modification of the user experience
+K("n", "<leader>us", "<Cmd>setlocal spell!<CR>", { desc = "Toggle spellcheck" })
 -- K("n", "<leader>ug", function() require("astrocore.toggles").signcolumn() end, { desc = "Toggle signcolumn" })
 -- K("n", "<leader>uh", function() require("astrocore.toggles").foldcolumn() end, { desc = "Toggle foldcolumn" })
 -- K("n", "<leader>up", function() require("astrocore.toggles").paste() end, { desc = "Toggle paste mode" })
--- K("n", "<leader>us", function() require("astrocore.toggles").spell() end, { desc = "Toggle spellcheck" })
 -- K("n", "<leader>uS", function() require("astrocore.toggles").conceal() end, { desc = "Toggle conceal" })
 -- K("n", "<leader>uu", function() require("astrocore.toggles").url_match() end, { desc = "Toggle URL highlight" })
 -- K("n", "<leader>uw", function() require("astrocore.toggles").wrap() end, { desc = "Toggle wrap" })
