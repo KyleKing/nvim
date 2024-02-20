@@ -1,10 +1,10 @@
 local function customize_lsp_ui()
-    local icons = require("kyleking.utils.icons")
+    -- PLANNED: this is redundant to the lsp-zero config
     local signs = {
-        { name = "DiagnosticSignError", text = icons.get_icon("DiagnosticError"), texthl = "DiagnosticSignError" },
-        { name = "DiagnosticSignWarn", text = icons.get_icon("DiagnosticWarn"), texthl = "DiagnosticSignWarn" },
-        { name = "DiagnosticSignHint", text = icons.get_icon("DiagnosticHint"), texthl = "DiagnosticSignHint" },
-        { name = "DiagnosticSignInfo", text = icons.get_icon("DiagnosticInfo"), texthl = "DiagnosticSignInfo" },
+        { name = "DiagnosticSignError", text = "", texthl = "DiagnosticSignError" },
+        { name = "DiagnosticSignWarn", text = "", texthl = "DiagnosticSignWarn" },
+        { name = "DiagnosticSignHint", text = "󰌵", texthl = "DiagnosticSignHint" },
+        { name = "DiagnosticSignInfo", text = "󰋼", texthl = "DiagnosticSignInfo" },
     }
     for _, sign in ipairs(signs) do
         vim.fn.sign_define(sign.name, sign)
@@ -81,13 +81,7 @@ local function config_lsp()
         -- )
     end)
 
-    local icons = require("kyleking.utils.icons")
-    lsp_zero.set_sign_icons({
-        error = icons.icons["DiagnosticError"],
-        warn = icons.icons["DiagnosticWarn"],
-        hint = icons.icons["DiagnosticHint"],
-        info = icons.icons["DiagnosticInfo"],
-    })
+    lsp_zero.set_sign_icons({ error = "", warn = "", hint = "󰌵", info = "󰋼" })
 end
 
 local function config_telescope()
