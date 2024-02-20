@@ -301,6 +301,7 @@ return {
             "L3MON4D3/LuaSnip",
             build = "make install_jsregexp", -- install jsregexp (optional!).
             dependencies = {
+                -- PLANNED: consider https://github.com/f3fora/cmp-spell
                 { "hrsh7th/cmp-buffer" }, -- Source: buffer
                 { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
                 { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua

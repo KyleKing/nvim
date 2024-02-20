@@ -42,7 +42,7 @@ vim.opt.writebackup = false -- disable making a backup before overwriting a file
 -- vim.opt.colorcolumn = "80,120" -- highlighted screen columns (switched to smartcolumn plugin instead)
 vim.opt.scrolloff = 16 -- Number of screen lines to keep above and below the cursor
 vim.opt.wildmode = "full:lastused" -- complete the first full match immediately <https://stackoverflow.com/a/76471693/3219667>
-vim.opt.spelllang = 'en_us' -- Use the US dictionary (and any associated custom dictionaries)
+vim.opt.spelllang = "en_us" -- Use the US dictionary (and any associated custom dictionaries)
 vim.opt.spell = true -- Always on spell checking
 
 -- Default indentation (unless overridden by editorconfig)
