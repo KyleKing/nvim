@@ -17,25 +17,25 @@ return {
                 bash = { "beautysh" },
                 css = { { "prettierd", "prettier" } },
                 graphql = { { "prettierd", "prettier" } },
-                html = { "htmlbeautifier" }, -- Probably prettier instead?
+                -- html = { "htmlbeautifier" }, -- Probably prettier instead?
                 javascript = { { "prettierd", "prettier" } },
                 javascriptreact = { { "prettierd", "prettier" } },
                 json = { { "prettierd", "prettier" } },
                 lua = { "stylua" },
-                markdown = { "mdformat" }, -- PLANNED: use local mdformat if present
-                proto = { "buf" },
-                python = { "black" },
-                rust = { "rustfmt" },
+                -- markdown = { "mdformat" }, -- PLANNED: use local mdformat if present
+                -- proto = { "buf" },
+                python = { "black" }, -- PLANNED: replace with ruff format
+                -- rust = { "rustfmt" },
                 scss = { { "prettierd", "prettier" } },
                 sh = { "shfmt" },
-                sql = { "sql_formatter" },
+                -- sql = { "sql_formatter" },
                 svelte = { { "prettierd", "prettier" } },
                 toml = { "taplo" },
                 typescript = { { "prettierd", "prettier" } },
                 typescriptreact = { { "prettierd", "prettier" } },
-                xml = { "xmllint" },
-                yaml = { "yamlfix" },
-                ["*"] = { "injected" },
+                -- xml = { "xmllint" },
+                -- yaml = { "yamlfix" },
+                -- ["*"] = { "injected" },
             },
             -- LazyVim will merge the options you set here with builtin formatters.
             -- You can also define any custom formatters here.
