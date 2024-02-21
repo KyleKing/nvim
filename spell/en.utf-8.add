@@ -643,3 +643,6 @@ yscrollcommand
 yticklabels
 yticks
 zsplit
+lsp
+cmp
+async
