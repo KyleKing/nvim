@@ -20,6 +20,7 @@ return {
         sections = {
             lualine_c = { rel_filename },
             lualine_x = { {} }, -- Remove filetype, etc.
+            -- FYI: example displaying status of spell: https://github.com/nvim-lualine/lualine.nvim/issues/487#issuecomment-1345625242
         },
         extensions = {
             "fugitive",
