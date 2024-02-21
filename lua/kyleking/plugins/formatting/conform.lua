@@ -22,23 +22,28 @@ return {
                 javascriptreact = { { "prettierd", "prettier" } },
                 json = { { "prettierd", "prettier" } },
                 lua = { "stylua" },
-                markdown = { { "prettierd", "prettier" } },
+                markdown = { "mdformat" }, -- PLANNED: use local mdformat if present
                 proto = { "buf" },
                 python = { "black" },
                 rust = { "rustfmt" },
                 scss = { { "prettierd", "prettier" } },
                 sh = { "shfmt" },
+                sql = { "sql_formatter" },
                 svelte = { { "prettierd", "prettier" } },
                 toml = { "taplo" },
                 typescript = { { "prettierd", "prettier" } },
                 typescriptreact = { { "prettierd", "prettier" } },
+                xml = { "xmllint" },
                 yaml = { "yamlfix" },
+                ["*"] = { "injected" },
             },
             -- LazyVim will merge the options you set here with builtin formatters.
             -- You can also define any custom formatters here.
             ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
             formatters = {
-                injected = { options = { ignore_errors = true } },
+                -- PLANNED: should injected errors be ignored?
+                -- injected = { options = { ignore_errors = true } },
+
                 -- # Example of using dprint only when a dprint.json file is present
                 -- dprint = {
                 --   condition = function(ctx)
@@ -63,6 +68,7 @@ return {
                     stdin = false,
                 },
                 -- PLANNED: replace pint and dprint examples with project-specific eslint formatting from node_modules closest to file
+                --  or override only specific arguments: https://github.com/magnuslarsen/dotfiles/blob/3a77e44653a47071a6788ac27606c2a6f7d0d67f/dot_config/nvim/lua/plugins/lsp.lua#L274C1-L276C5
             },
         }
         return opts
