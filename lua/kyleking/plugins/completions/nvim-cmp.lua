@@ -23,7 +23,6 @@ local function config_cmp()
             { name = "nvim_lua" },
             { name = "luasnip" },
             { name = "async_path" },
-            { name = "cmp_yanky" },
         }, {
             -- Reduce false positives by placing these in the secondary completions category
             { name = "buffer", keyword_length = 3 },
@@ -97,7 +96,6 @@ return {
         { "hrsh7th/cmp-buffer" }, -- Source: buffer
         { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
-        { "chrisgrieser/cmp_yanky" }, -- Source: cmp_yanky
         {
             -- "hrsh7th/cmp-path", -- Source: path
             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
