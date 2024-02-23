@@ -67,22 +67,14 @@ local function config_cmp()
         mapping = cmp.mapping.preset.cmdline(),
         sources = {
             { name = "buffer" },
-            { name = "cmdline_history" },
         },
     })
     cmp.setup.cmdline(":", {
         mapping = cmp.mapping.preset.cmdline(),
         sources = cmp.config.sources({
             { name = "cmdline" },
-            { name = "cmdline_history" },
         }, {
             { name = "async_path" },
-        }),
-    })
-    cmp.setup.cmdline("@", {
-        mapping = cmp.mapping.preset.cmdline(),
-        sources = cmp.config.sources({
-            { name = "cmdline_history" },
         }),
     })
 end
@@ -98,7 +90,6 @@ return {
         { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
         { "ray-x/cmp-treesitter" }, -- Source: treesitter
         { "hrsh7th/cmp-cmdline" }, -- Source: cmdline
-        { "dmitmel/cmp-cmdline-history" }, -- Source cmdline_history
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
         {
             -- "hrsh7th/cmp-path", -- Source: path
