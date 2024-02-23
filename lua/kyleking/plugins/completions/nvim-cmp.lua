@@ -8,6 +8,7 @@ local function config_cmp()
         show_labelDetails = true, -- show labelDetails in menu. Disabled by default
     })
     require("luasnip.loaders.from_vscode").lazy_load()
+    -- Adapted from: https://github.com/hrsh7th/nvim-cmp?tab=readme-ov-file#recommended-configuration
     cmp.setup({
         -- Default snippet completion
         snippet = {
@@ -15,21 +16,16 @@ local function config_cmp()
         },
         -- Configure snippet sources
         sources = cmp.config.sources({
-            -- PLANNED: consider additional sources: https://github.com/hrsh7th/nvim-cmp/wiki/List-of-sources
-            -- In particular: treesitter, etc.
-            -- and revisit: https://github.com/hrsh7th/nvim-cmp?tab=readme-ov-file#recommended-configuration
             { name = "nvim_lsp" },
             { name = "nvim_lsp_signature_help" },
             { name = "nvim_lua" },
-            { name = "luasnip" },
-            { name = "async_path" },
+            { name = "treesitter" },
+            { name = "luasnip" }, -- Snippets
         }, {
             -- Reduce false positives by placing these in the secondary completions category
+            { name = "async_path" },
             { name = "buffer", keyword_length = 3 },
         }),
-        completion = {
-            autocomplete = { "InsertEnter", "TextChanged" },
-        },
         -- Customize mappings
         mapping = cmp.mapping.preset.insert({ -- Preset: ^n, ^p, ^y, ^e, you know the drill..
             -- Navigate completion options
@@ -74,16 +70,15 @@ local function config_cmp()
             { name = "buffer" },
         },
     })
-    -- PLANNED: revisit completions for commands
-    -- -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-    -- cmp.setup.cmdline(":", {
-    --     mapping = cmp.mapping.preset.cmdline(),
-    --     sources = cmp.config.sources({
-    --         { name = "path" },
-    --     }, {
-    --         { name = "cmdline" },
-    --     }),
-    -- })
+    -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+    cmp.setup.cmdline(":", {
+        mapping = cmp.mapping.preset.cmdline(),
+        sources = cmp.config.sources({
+            { name = "cmdline" },
+        }, {
+            { name = "async_path" },
+        }),
+    })
 end
 
 return {
@@ -95,13 +90,15 @@ return {
         { "hrsh7th/cmp-nvim-lsp" }, -- Source: nvim_lsp
         { "hrsh7th/cmp-buffer" }, -- Source: buffer
         { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
+        { "ray-x/cmp-treesitter" }, -- Source: treesitter
+        { "hrsh7th/cmp-cmdline" }, -- Source: cmdline
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
         {
             -- "hrsh7th/cmp-path", -- Source: path
             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
         },
         {
-            "L3MON4D3/LuaSnip",
+            "L3MON4D3/LuaSnip", -- There is an an alternative 'ultisnips'
             build = "make install_jsregexp", -- install jsregexp (optional!).
             dependencies = {
                 { "rafamadriz/friendly-snippets" }, -- Loaded automatically
