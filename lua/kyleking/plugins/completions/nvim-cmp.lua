@@ -26,16 +26,6 @@ local function config_cmp()
             { name = "cmp_yanky" },
         }, {
             -- Reduce false positives by placing these in the secondary completions category
-            -- {
-            --     name = "omni",
-            --     option = { disable_omnifuncs = { "v:lua.vim.lsp.omnifunc" } },
-            -- },
-            {
-                name = "spell",
-                option = {
-                    enable_in_context = function() return require("cmp.config.context").in_treesitter_capture("spell") end,
-                },
-            },
             { name = "buffer", keyword_length = 3 },
         }),
         completion = {
@@ -104,12 +94,10 @@ return {
         { "VonHeikemen/lsp-zero.nvim" }, -- Configured in plugins.lsp.lsp-zero
         -- Sources
         { "hrsh7th/cmp-nvim-lsp" }, -- Source: nvim_lsp
-        { "f3fora/cmp-spell" }, -- Source: spell
         { "hrsh7th/cmp-buffer" }, -- Source: buffer
         { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
         { "chrisgrieser/cmp_yanky" }, -- Source: cmp_yanky
-        -- { "hrsh7th/cmp-omni" }, -- PLANNED: Source: omni (and see both commented snippets above)
         {
             -- "hrsh7th/cmp-path", -- Source: path
             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
