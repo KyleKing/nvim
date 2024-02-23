@@ -107,6 +107,7 @@ conftest
 cookiecutter
 coolors
 ctime
+Ctrl
 ctypes
 cwd
 cyclomatic
@@ -242,6 +243,7 @@ histfunc
 hlim
 hookimpl
 href
+hrsh7th
 hstack
 html
 htmlcov
@@ -578,6 +580,7 @@ tomlkit
 tomodachi94
 tqdm
 traceback
+treesitter
 truthy
 tupperware
 txt
@@ -586,6 +589,7 @@ ubyte
 uint
 uint16
 uint8
+ultisnips
 unint
 unint8
 unlicense

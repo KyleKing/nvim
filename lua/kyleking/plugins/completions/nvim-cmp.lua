@@ -98,7 +98,7 @@ return {
             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
         },
         {
-            "L3MON4D3/LuaSnip", -- There is an an alternative 'ultisnips'
+            "L3MON4D3/LuaSnip", -- There is an alternative 'ultisnips'
             build = "make install_jsregexp", -- install jsregexp (optional!).
             dependencies = {
                 { "rafamadriz/friendly-snippets" }, -- Loaded automatically
