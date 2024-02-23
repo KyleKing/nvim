@@ -21,14 +21,22 @@ local function config_cmp()
             { name = "nvim_lsp" },
             { name = "nvim_lsp_signature_help" },
             { name = "nvim_lua" },
+            { name = "luasnip" },
+            { name = "async_path" },
+            { name = "cmp_yanky" },
+        }, {
+            -- Reduce false positives by placing these in the secondary completions category
             -- {
             --     name = "omni",
             --     option = { disable_omnifuncs = { "v:lua.vim.lsp.omnifunc" } },
             -- },
-            { name = "luasnip" },
-            { name = "path" },
-        }, {
-            { name = "buffer", keyword_length = 3 }, -- Reduce false positives
+            {
+                name = "spell",
+                option = {
+                    enable_in_context = function() return require("cmp.config.context").in_treesitter_capture("spell") end,
+                },
+            },
+            { name = "buffer", keyword_length = 3 },
         }),
         completion = {
             autocomplete = { "InsertEnter", "TextChanged" },
@@ -94,13 +102,18 @@ return {
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
         { "VonHeikemen/lsp-zero.nvim" }, -- Configured in plugins.lsp.lsp-zero
+        -- Sources
         { "hrsh7th/cmp-nvim-lsp" }, -- Source: nvim_lsp
-        -- PLANNED: consider https://github.com/f3fora/cmp-spell
+        { "f3fora/cmp-spell" }, -- Source: spell
         { "hrsh7th/cmp-buffer" }, -- Source: buffer
         { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
+        { "chrisgrieser/cmp_yanky" }, -- Source: cmp_yanky
         -- { "hrsh7th/cmp-omni" }, -- PLANNED: Source: omni (and see both commented snippets above)
-        { "hrsh7th/cmp-path" }, -- Source: path (PLANNED: use async_path instead from: https://github.com/FelipeLema/cmp-async-path)
+        {
+            -- "hrsh7th/cmp-path", -- Source: path
+            "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
+        },
         {
             "L3MON4D3/LuaSnip",
             build = "make install_jsregexp", -- install jsregexp (optional!).
@@ -109,7 +122,6 @@ return {
                 { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
             },
         },
-        -- PLANNED: consider https://github.com/quangnguyen30192/cmp-nvim-ultisnips
     },
     config = config_cmp,
 }
