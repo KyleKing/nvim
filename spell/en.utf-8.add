@@ -330,6 +330,7 @@ linting
 LOCALSTACK
 loguru
 lsp
+lspconfig
 lua
 lunr
 luxon
@@ -435,6 +436,7 @@ plantuml
 plantumlcli
 playlist
 playlists
+PLC0415
 plone
 plotly
 plotlyjs
@@ -453,6 +455,7 @@ popts
 posix
 PPLMS
 pptx
+pragma
 prepend
 presigned
 printf
@@ -497,6 +500,7 @@ pyproject
 pypyodbc
 pyrate
 pyreverse
+pyright
 pyroma
 pyscript
 pyspec
@@ -526,6 +530,8 @@ rpartition
 rsync
 ruamel
 runas
+runtime
+Schemas
 scipy
 scons
 screenshot
