@@ -108,6 +108,8 @@ configurability
 conftest
 cookiecutter
 coolors
+css
+csv
 ctime
 Ctrl
 ctypes
@@ -152,6 +154,7 @@ difflib
 digitalio
 disp
 dlint
+dockerfile
 dockerized
 dockerls
 docstrings
@@ -241,6 +244,7 @@ groupdict
 grpc
 grpcio
 guids
+haskell
 helpdesk
 HHMMSS
 highlightjs
@@ -301,10 +305,14 @@ itertools
 itertuples
 iwrite
 izip
+javascript
 jedi_language_server
 Jenkinsfile
 jenoptik
 jmespath
+jq
+json
+jsonc
 jsonify
 jsonl
 jsonlines
@@ -555,6 +563,7 @@ sklearn
 smartcolumn
 specificity
 spyder
+sql
 sqlalchemy
 SQLite
 squidfunk
@@ -602,6 +611,7 @@ tqdm
 traceback
 treesitter
 truthy
+tsx
 tupperware
 txt
 typer
@@ -623,6 +633,7 @@ uuidv4
 vectorizer
 venv
 vgap
+vhs
 vim.bo
 virtualenv
 vmax
@@ -649,11 +660,13 @@ xlim
 xlrd
 xlsm
 xlsx
+xml
 xmlformat
 xmltodict
 xticklabels
 xticks
 xtree
+yaml
 yamllint
 yaxes
 yaxis

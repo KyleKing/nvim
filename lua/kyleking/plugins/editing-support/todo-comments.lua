@@ -10,7 +10,7 @@ return {
     },
     opts = {
         keywords = {
-            FYI = { icon = " ", color = "#9FA4C4" },
+            NOTE = { icon = " ", color = "#9FA4C4", alt = { "INFO", "FYI" } }, -- Overrides default for NOTE
             PLANNED = { icon = " ", color = "#FCD7AD" },
         },
     },
