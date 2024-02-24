@@ -35,7 +35,7 @@ local function config_lsp()
         -- -- PLANNED: (Investigate) Enable completion triggered by <c-x><c-o> (note: lsp-zero has some logic for this internally that this may duplicate)
         -- vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
 
-        -- FYI: I'm not using the default keybindings becayse they don't have desc for Which-Key
+        -- FYI: I'm not using the default keybindings because they don't have desc for Which-Key
         --  and I prefer to namespace them in '<leader>l'
         --
         -- -- To learn the available actions see :help lsp-zero-keybindings
@@ -96,7 +96,7 @@ local function config_telescope()
 end
 
 local function config_mason()
-    local python_path = require("kyleking.utils.system_utils").get_python_path()
+    local python_path = require("kyleking.utils.fs_utils").get_python_path()
     local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
     -- FIXME: support python!

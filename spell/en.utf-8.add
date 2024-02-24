@@ -61,6 +61,8 @@ botocore
 br
 breakat
 btns
+buf
+bufnr
 builtins
 byref
 cacert
@@ -139,6 +141,7 @@ deepsource
 delim
 denormalized
 deps
+desc
 Deserialization
 detectparams
 devpi
@@ -150,6 +153,7 @@ digitalio
 disp
 dlint
 dockerized
+dockerls
 docstrings
 doctest
 docx
@@ -194,6 +198,7 @@ finditer
 firstname
 firstnamelastname
 fixedrange
+FIXME
 fixmes
 flasgger
 flatdict
@@ -296,6 +301,7 @@ itertools
 itertuples
 iwrite
 izip
+jedi_language_server
 Jenkinsfile
 jenoptik
 jmespath
@@ -305,6 +311,7 @@ jsonlines
 jupyter
 jupytext
 kanopy
+keymaps
 kickstart
 kking
 knexfile
@@ -395,6 +402,7 @@ oauth
 objs
 odbc
 ogrid
+omnifunc
 onchange
 onecmd
 opencv
@@ -560,6 +568,8 @@ symlink
 symlinks
 sysinfo
 tabline
+tailwindcss
+taplo
 tasklist
 Teigen
 tempfile
@@ -603,6 +613,7 @@ uuidv4
 vectorizer
 venv
 vgap
+vim.bo
 virtualenv
 vmax
 webex

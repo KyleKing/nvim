@@ -92,6 +92,7 @@ return {
         { "hrsh7th/cmp-cmdline" }, -- Source: cmdline
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
         {
+            -- Two options for path completions:
             -- "hrsh7th/cmp-path", -- Source: path
             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
         },
