@@ -1,15 +1,4 @@
 local function customize_lsp_ui()
-    -- PLANNED: this is redundant to the lsp-zero config
-    local signs = {
-        { name = "DiagnosticSignError", text = "", texthl = "DiagnosticSignError" },
-        { name = "DiagnosticSignWarn", text = "", texthl = "DiagnosticSignWarn" },
-        { name = "DiagnosticSignHint", text = "󰌵", texthl = "DiagnosticSignHint" },
-        { name = "DiagnosticSignInfo", text = "󰋼", texthl = "DiagnosticSignInfo" },
-    }
-    for _, sign in ipairs(signs) do
-        vim.fn.sign_define(sign.name, sign)
-    end
-
     -- Change border of documentation hover window, See https://github.com/neovim/neovim/pull/13998
     vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
 end
@@ -37,7 +26,6 @@ local function config_lsp()
 
         -- FYI: I'm not using the default keybindings because they don't have desc for Which-Key
         --  and I prefer to namespace them in '<leader>l'
-        --
         -- -- To learn the available actions see :help lsp-zero-keybindings
         -- lsp_zero.default_keymaps({ buffer = bufnr })
 
@@ -84,7 +72,7 @@ local function config_lsp()
     lsp_zero.set_sign_icons({ error = "", warn = "", hint = "󰌵", info = "󰋼" })
 end
 
-local function config_telescope()
+local function config_telescope_integrations()
     local K = vim.keymap.set
     local tele = require("telescope.builtin")
     K("n", "<leader>lzd", tele.lsp_definitions, { desc = "Telescope LSP Definintions" })
@@ -95,123 +83,23 @@ local function config_telescope()
     K("n", "<leader>lzw", tele.lsp_dynamic_workspace_symbols, { desc = "Telescope Workspace Symbols" })
 end
 
--- FIXME: extract to mason configuration file
-local function config_mason()
-    local python_path = require("kyleking.utils.fs_utils").get_python_path()
-    local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
-    require("mason").setup({})
-    require("mason-lspconfig").setup({
-        -- FYI: See mapping of server names here: https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
-        ensure_installed = {
-            -- FYI: ruff, pyright, and others should be installed globally with pipx
-            "bashls",
-            -- "docker_compose_language_service",
-            -- "dockerls",
-            "jsonls",
-            "lua_ls",
-            -- "marksman",
-            "pylsp", -- Or: jedi_language_server
-            -- "tailwindcss",
-            "taplo",
-            "terraformls",
-            "tsserver",
-            "yamlls",
-        },
-        handlers = {
-            require("lsp-zero").default_setup,
-            lua_ls = function()
-                require("lspconfig").lua_ls.setup({
-                    capabilities = lsp_capabilities,
-                    format = { enable = false }, -- The builtin formatter is CppCXY/EmmyLuaCodeStyle (https://luals.github.io/wiki/formatter)
-                })
-            end,
-            jsonls = function()
-                require("lspconfig").jsonls.setup({
-                    capabilities = lsp_capabilities,
-                    settings = {
-                        json = {
-                            schemas = require("schemastore").json.schemas(),
-                            validate = { enable = true }, -- See: https://github.com/b0o/SchemaStore.nvim/issues/8
-                        },
-                    },
-                })
-            end,
-            yamlls = function()
-                require("lspconfig").yamlls.setup({
-                    capabilities = lsp_capabilities,
-                    settings = {
-                        yaml = {
-                            schemaStore = {
-                                enable = false, -- You must disable built-in schemaStore support if you want to use schemastore and its advanced options like `ignore`.
-                                url = "", -- Avoids a TypeError: Cannot read properties of undefined (reading 'length')
-                            },
-                            schemas = require("schemastore").yaml.schemas(),
-                        },
-                    },
-                })
-            end,
-            pylsp = function()
-                require("lspconfig").pylsp.setup({
-                    capabilities = lsp_capabilities,
-                    settings = {
-                        pylsp = {
-                            plugins = {
-                                -- formatter options
-                                black = { enabled = false },
-                                autopep8 = { enabled = false },
-                                yapf = { enabled = false },
-                                -- linter options
-                                pylint = { enabled = false, executable = "pylint" },
-                                ruff = { enabled = false },
-                                pyflakes = { enabled = false },
-                                pycodestyle = { enabled = false },
-                                -- type checker
-                                pylsp_mypy = {
-                                    enabled = true,
-                                    overrides = { "--python-executable", python_path, true },
-                                    report_progress = true,
-                                    live_mode = false,
-                                },
-                                -- auto-completion options
-                                jedi_completion = { fuzzy = false },
-                                -- import sorting
-                                isort = { enabled = false },
-                            },
-                        },
-                    },
-                    flags = { debounce_text_changes = 200 },
-                })
-            end,
-            pyright = function()
-                require("lspconfig").pyright.setup({
-                    capabilities = lsp_capabilities,
-                    settings = { python = { pythonPath = python_path } },
-                })
-            end,
-        },
-    })
-end
-
 -- Based on: https://lsp-zero.netlify.app/v3.x/blog/you-might-not-need-lsp-zero.html
 return {
     "VonHeikemen/lsp-zero.nvim",
     event = { "BufRead", "InsertEnter", "CmdlineEnter" },
     dependencies = {
-        { "williamboman/mason-lspconfig.nvim", dependencies = { "williamboman/mason.nvim" } }, -- PLANNED: see configuration in mason.lua
-        { "neovim/nvim-lspconfig" },
-        { "b0o/schemastore.nvim" }, -- JSON and Yaml Schemas
+        { "williamboman/mason-lspconfig.nvim" }, -- Configured in plugins.lsp.mason-lspconfig
+        { "b0o/schemastore.nvim" }, -- JSON and YAML Schemas
         { "j-hui/fidget.nvim", opts = {} }, -- Useful status updates for LSP
         { "folke/neodev.nvim", opts = {} }, -- Additional lua configuration
         { "onsails/lspkind.nvim" }, -- For symbols
         { "nvim-telescope/telescope.nvim" },
     },
     config = function()
-        -- FIXME: Split these back up into separate files
         -- See logs with `:LspInfo` and `:LspLog`
         -- vim.lsp.set_log_level("debug")
         customize_lsp_ui()
         config_lsp()
-        config_telescope()
-        config_mason()
+        config_telescope_integrations()
     end,
 }
