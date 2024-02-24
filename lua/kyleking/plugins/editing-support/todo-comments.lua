@@ -1,4 +1,4 @@
--- PLANNED: Consider using the TS comment grammar instead: https://github.com/stsewd/tree-sitter-comment
+-- FYI: alternatively could use: https://github.com/stsewd/tree-sitter-comment
 return {
     "folke/todo-comments.nvim",
     event = "BufRead",
@@ -10,7 +10,8 @@ return {
     },
     opts = {
         keywords = {
-            PLANNED = { icon = " ", color = "hint", alt = { "FYI" } },
+            FYI = { icon = " ", color = "#9FA4C4" },
+            PLANNED = { icon = " ", color = "#FCD7AD" },
         },
     },
 }
