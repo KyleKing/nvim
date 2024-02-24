@@ -345,6 +345,7 @@ materialx
 mathjax
 maxnpending
 maxsize
+md
 mdate
 MesoScale
 metabase
@@ -438,6 +439,8 @@ plone
 plotly
 plotlyjs
 plpgsql
+PLR0913
+PLR0917
 plugin
 plugins
 plyr
@@ -583,6 +586,7 @@ timestamp
 tk
 tkchild
 tkinter
+TODO
 todos
 tomcatmanager
 toml

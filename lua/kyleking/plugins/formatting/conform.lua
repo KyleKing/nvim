@@ -17,12 +17,12 @@ return {
                 bash = { "beautysh" },
                 css = { { "prettierd", "prettier" } },
                 graphql = { { "prettierd", "prettier" } },
-                -- html = { "htmlbeautifier" }, -- Probably prettier instead?
+                html = { { "prettierd", "prettier" } },
                 javascript = { { "prettierd", "prettier" } },
                 javascriptreact = { { "prettierd", "prettier" } },
                 json = { { "prettierd", "prettier" } },
                 lua = { "stylua" },
-                -- markdown = { "mdformat" }, -- PLANNED: use local mdformat if present
+                markdown = { "mdformat" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
                 -- proto = { "buf" },
                 python = { "black" }, -- PLANNED: replace with ruff format
                 -- rust = { "rustfmt" },
@@ -30,11 +30,10 @@ return {
                 sh = { "shfmt" },
                 -- sql = { "sql_formatter" },
                 svelte = { { "prettierd", "prettier" } },
-                toml = { "taplo" },
+                toml = { "taplo" }, -- toml-sort instead?
                 typescript = { { "prettierd", "prettier" } },
                 typescriptreact = { { "prettierd", "prettier" } },
-                -- xml = { "xmllint" },
-                -- yaml = { "yamlfix" },
+                yaml = { { "prettierd", "prettier" } },
                 -- ["*"] = { "injected" },
             },
             -- LazyVim will merge the options you set here with builtin formatters.

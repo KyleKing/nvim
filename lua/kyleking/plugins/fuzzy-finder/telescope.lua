@@ -102,7 +102,7 @@ return {
         },
         -- Leader-l
         { "<leader>ld", require("telescope.builtin").diagnostics, desc = "Find in Diagnostics" },
-        { "<leader>ls", require("telescope.builtin").lsp_document_symbols, desc = "Find in symbols" },
+        { "<leader>lgs", require("telescope.builtin").lsp_document_symbols, desc = "Find in symbols" },
         -- PLANNED: investigate these go-to mappings
         { "<leader>lgd", require("telescope.builtin").lsp_definitions, desc = "lsp_definitions" },
         { "<leader>lgi", require("telescope.builtin").lsp_implementations, desc = "lsp_implementations" },

@@ -1,7 +1,10 @@
 return {
     "williamboman/mason.nvim",
     cmd = "Mason",
-    keys = { { "<leader>cm", "<cmd>Mason<cr>", desc = "Mason" } },
+    keys = {
+        { "<leader>lmo", "<cmd>Mason<cr>", desc = "Open Mason" },
+        { "<leader>lmu", "<cmd>MasonUpdate<cr>", desc = "Update Mason" },
+    },
     -- build = ":MasonUpdate",
     -- opts = {
     --     ensure_installed = {

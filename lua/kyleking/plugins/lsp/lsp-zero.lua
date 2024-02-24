@@ -95,23 +95,24 @@ local function config_telescope()
     K("n", "<leader>lzw", tele.lsp_dynamic_workspace_symbols, { desc = "Telescope Workspace Symbols" })
 end
 
+-- FIXME: extract to mason configuration file
 local function config_mason()
     local python_path = require("kyleking.utils.fs_utils").get_python_path()
     local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
-    -- FIXME: support python!
     require("mason-lspconfig").setup({
+        -- FYI: See mapping of server names here: https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
         ensure_installed = {
+            -- FYI: ruff, pyright, and others should be installed globally with pipx
             "bashls",
             -- "docker_compose_language_service",
             -- "dockerls",
-            -- "jedi_language_server",
             "jsonls",
             "lua_ls",
             -- "marksman",
-            -- "ruff_lsp",
+            "pylsp", -- Or: jedi_language_server
             -- "tailwindcss",
-            -- "taplo",
+            "taplo",
             "terraformls",
             "tsserver",
             "yamlls",
