@@ -65,8 +65,8 @@ local function config_mason()
                                 autopep8 = { enabled = false },
                                 yapf = { enabled = false },
                                 -- linter options
-                                pylint = { enabled = false, executable = "pylint" },
-                                ruff = { enabled = false },
+                                pylint = { enabled = true, executable = "pylint" },
+                                ruff = { enabled = true },
                                 pyflakes = { enabled = false },
                                 pycodestyle = { enabled = false },
                                 -- type checker
@@ -77,7 +77,7 @@ local function config_mason()
                                     live_mode = false,
                                 },
                                 -- auto-completion options
-                                jedi_completion = { fuzzy = false },
+                                jedi_completion = { fuzzy = true },
                                 -- import sorting
                                 isort = { enabled = false },
                             },

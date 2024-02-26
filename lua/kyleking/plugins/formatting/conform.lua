@@ -1,4 +1,3 @@
--- FIXME: support python!
 return {
     "stevearc/conform.nvim",
     event = { "BufRead", "BufNewFile" },
@@ -24,7 +23,7 @@ return {
                 lua = { "stylua" },
                 markdown = { "mdformat" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
                 -- proto = { "buf" },
-                python = { "black" }, -- PLANNED: replace with ruff format
+                python = { "ruff" }, -- PLANNED: replace with ruff format
                 -- rust = { "rustfmt" },
                 scss = { { "prettierd", "prettier" } },
                 sh = { "shfmt" },
