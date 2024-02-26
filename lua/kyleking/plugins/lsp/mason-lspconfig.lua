@@ -1,4 +1,6 @@
 local function config_mason()
+    require("neodev").setup({}) -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
+
     local python_path = require("kyleking.utils.fs_utils").get_python_path()
     local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
@@ -101,6 +103,7 @@ return {
     dependencies = {
         { "williamboman/mason.nvim" },
         { "neovim/nvim-lspconfig" },
+        { "folke/neodev.nvim" }, -- Additional lua configuration
     },
     keys = {
         { "<leader>lmo", "<cmd>Mason<cr>", desc = "Open Mason" },

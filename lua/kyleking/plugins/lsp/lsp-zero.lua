@@ -91,7 +91,6 @@ return {
         { "williamboman/mason-lspconfig.nvim" }, -- Configured in plugins.lsp.mason-lspconfig
         { "b0o/schemastore.nvim" }, -- JSON and YAML Schemas
         { "j-hui/fidget.nvim", opts = {} }, -- Useful status updates for LSP
-        { "folke/neodev.nvim", opts = {} }, -- Additional lua configuration
         { "onsails/lspkind.nvim" }, -- For symbols
         { "nvim-telescope/telescope.nvim" },
     },
