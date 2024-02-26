@@ -3,56 +3,42 @@ return {
     event = { "BufRead", "BufNewFile" },
     opts = function()
         local util = require("conform.util")
+        local prettier = { "prettierd", "prettier" }
+        local js_like = { prettier, "eslint" } -- Note: eslint is monorepo specific
         ---@class ConformOpts
         local opts = {
-            -- LazyVim will use these options when formatting with the conform.nvim formatter
             format = {
                 timeout_ms = 3000,
-                async = false, -- not recommended to change
-                quiet = false, -- not recommended to change
             },
             ---@type table<string, conform.FormatterUnit[]>
             formatters_by_ft = {
                 bash = { "beautysh" },
                 -- Use a sub-list to run only the first available formatter
-                css = { { "prettierd", "prettier" } },
-                graphql = { { "prettierd", "prettier" } },
-                html = { { "prettierd", "prettier" } },
-                javascript = { { "prettierd", "prettier" } },
-                javascriptreact = { { "prettierd", "prettier" } },
-                json = { { "prettierd", "prettier" } },
+                css = { prettier },
+                graphql = { prettier },
+                html = { prettier },
+                javascript = { js_like },
+                javascriptreact = { js_like },
+                json = { prettier },
                 lua = { "stylua" },
                 markdown = { "mdformat", "injected" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
-                -- proto = { "buf" },
                 python = { "ruff_format", "ruff_fix" },
                 -- rust = { "rustfmt" },
-                scss = { { "prettierd", "prettier" } },
+                scss = { prettier },
                 sh = { "shfmt" },
-                -- sql = { "sql_formatter" },
-                svelte = { { "prettierd", "prettier" } },
+                svelte = { js_like },
                 toml = { "taplo" }, -- toml-sort instead?
-                typescript = { { "prettierd", "prettier" } },
-                typescriptreact = { { "prettierd", "prettier" } },
-                yaml = { { "prettierd", "prettier" } },
+                typescript = { js_like },
+                typescriptreact = { js_like },
+                yaml = { prettier },
                 -- Use the "*" filetype to run formatters on all filetypes and "_" for those that do not have a linter configured
-                -- ["*"] = { "codespell" or "typos" }, -- Installed with: brew install typos-cli
+                ["*"] = { "typos" }, -- Installed with: brew install typos-cli
             },
             -- LazyVim will merge the options you set here with builtin formatters or add your own
             -- Defaults formatters are defined here: https://github.com/stevearc/conform.nvim/tree/192a6d2ddace343f1840a8f72efe2315bd392243/lua/conform/formatters
             ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
             formatters = {
-                -- PLANNED: should injected errors be ignored?
-                -- injected = { options = { ignore_errors = true } },
-
-                -- # Example of using dprint only when a dprint.json file is present
-                -- dprint = {
-                --   condition = function(ctx)
-                --     return vim.fs.find({ "dprint.json" }, { path = ctx.filename, upward = true })[1]
-                --   end,
-                -- },
-                -- PLANNED: use local eslint from node_modules
-                --  https://github.com/magnuslarsen/dotfiles/blob/3a77e44653a47071a6788ac27606c2a6f7d0d67f/dot_config/nvim/lua/plugins/lsp.lua#L274C1-L276C5
-                local_eslint = {
+                eslint = {
                     ---@param config conform.FormatterConfig
                     ---@param ctx conform.Context
                     command = function(config, ctx)
