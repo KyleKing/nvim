@@ -42,7 +42,7 @@ local function config_lsp()
         map("n", "<leader>li", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
         map("n", "<leader>lo", vim.lsp.buf.type_definition, { desc = "Type Definition" })
         map("n", "<leader>lr", vim.lsp.buf.references, { desc = "Buffer References" })
-        map("n", "<leader>ls", vim.lsp.buf.signature_help, { desc = "Signature Help" })
+        map("n", "<leader>lh", vim.lsp.buf.signature_help, { desc = "Signature Help" })
         map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
         map(
             { "n", "v" },

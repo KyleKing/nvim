@@ -58,17 +58,23 @@ local function config_mason()
                 require("lspconfig").pylsp.setup({
                     capabilities = lsp_capabilities,
                     settings = {
+                        -- Options: https://github.com/python-lsp/python-lsp-server/blob/ed00eac389e5bdd46816dd6ff4ffbb4db6766199/CONFIGURATION.md
                         pylsp = {
                             plugins = {
-                                -- formatter options
-                                black = { enabled = false },
+                                -- formatter options (*Update: using conform for formatting instead)
                                 autopep8 = { enabled = false },
+                                black = { enabled = false },
+                                flake8 = { enabled = false },
+                                isort = { enabled = false },
                                 yapf = { enabled = false },
-                                -- linter options
-                                pylint = { enabled = true, executable = "pylint" },
-                                ruff = { enabled = true },
-                                pyflakes = { enabled = false },
+                                -- linter options (*Update: using nvim-lint for these instead)
+                                mccabe = { enabled = false },
+                                preload = { enabled = false },
                                 pycodestyle = { enabled = false },
+                                pydocstyle = { enabled = false },
+                                pyflakes = { enabled = false },
+                                pylint = { enabled = false },
+                                ruff = { enabled = false },
                                 -- type checker
                                 pylsp_mypy = {
                                     enabled = true,
@@ -76,10 +82,10 @@ local function config_mason()
                                     report_progress = true,
                                     live_mode = false,
                                 },
-                                -- auto-completion options
+                                -- auto-completion customization
+                                rope_autoimport = { enabled = false },
+                                rope_completion = { enabled = true },
                                 jedi_completion = { fuzzy = true },
-                                -- import sorting
-                                isort = { enabled = false },
                             },
                         },
                     },
