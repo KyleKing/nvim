@@ -22,7 +22,7 @@ return {
                 javascriptreact = { { "prettierd", "prettier" } },
                 json = { { "prettierd", "prettier" } },
                 lua = { "stylua" },
-                markdown = { "mdformat" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
+                markdown = { "mdformat", "injected" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
                 -- proto = { "buf" },
                 python = { "ruff_format", "ruff_fix" },
                 -- rust = { "rustfmt" },
@@ -34,15 +34,11 @@ return {
                 typescript = { { "prettierd", "prettier" } },
                 typescriptreact = { { "prettierd", "prettier" } },
                 yaml = { { "prettierd", "prettier" } },
-                -- -- Use the "*" filetype to run formatters on all filetypes.
-                -- ["*"] = { "injected" }, (What is injected?)
-                -- ["*"] = { "codespell" },
-                -- -- Use the "_" filetype to run formatters on filetypes that don't
-                -- -- have other formatters configured.
-                -- ["_"] = { "trim_whitespace" },
+                -- Use the "*" filetype to run formatters on all filetypes and "_" for those that do not have a linter configured
+                -- ["*"] = { "codespell" or "typos" }, -- Installed with: brew install typos-cli
             },
-            -- LazyVim will merge the options you set here with builtin formatters.
-            -- You can also define any custom formatters here.
+            -- LazyVim will merge the options you set here with builtin formatters or add your own
+            -- Defaults formatters are defined here: https://github.com/stevearc/conform.nvim/tree/192a6d2ddace343f1840a8f72efe2315bd392243/lua/conform/formatters
             ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
             formatters = {
                 -- PLANNED: should injected errors be ignored?
@@ -54,17 +50,16 @@ return {
                 --     return vim.fs.find({ "dprint.json" }, { path = ctx.filename, upward = true })[1]
                 --   end,
                 -- },
-                --
-                -- # Example of using shfmt with extra args
-                -- shfmt = {
-                --   extra_args = { "-i", "2", "-ci" },
-                -- },
                 -- PLANNED: use local eslint from node_modules
                 --  https://github.com/magnuslarsen/dotfiles/blob/3a77e44653a47071a6788ac27606c2a6f7d0d67f/dot_config/nvim/lua/plugins/lsp.lua#L274C1-L276C5
                 local_eslint = {
-                    command = util.find_executable({
-                        require("conform.util").root_file({ "package-lock.json" }) .. "node_modules/bin/eslint",
-                    }, "eslint"),
+                    ---@param config conform.FormatterConfig
+                    ---@param ctx conform.Context
+                    command = function(config, ctx)
+                        local repo_dir = util.root_file({ "package-lock.json" })(config, ctx) or ""
+                        local paths = { repo_dir .. "node_modules/.bin/eslint" }
+                        return util.find_executable(paths, "eslint")(config, ctx)
+                    end,
                     -- -- A list of strings, or a function that returns a list of strings
                     -- -- Return a single string instead of a list to run the command in a shell
                     -- args = { "$FILENAME" },
@@ -77,7 +72,7 @@ return {
                     -- -- file is assumed to be modified in-place by the format command.
                     -- stdin = false,
                     -- A function that calculates the directory to run the command in
-                    cwd = require("conform.util").root_file({ "package-lock.json" }),
+                    cwd = util.root_file({ "package-lock.json" }),
                     -- When cwd is not found, don't run the formatter (default false)
                     require_cwd = true,
                     -- -- When returns false, the formatter will not be used

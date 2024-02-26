@@ -1,5 +1,7 @@
 local M = {}
 
+-- FYI: utilities from conform could be useful instead of rolling my own: https://github.com/stevearc/conform.nvim/blob/192a6d2ddace343f1840a8f72efe2315bd392243/lua/conform/util.lua#L3-L57
+
 -- Adapted from: https://github.com/nvim-neo-tree/neo-tree.nvim/blob/c2a9e81699021f4ccaac7c574cc42ca4211a499a/lua/neo-tree/utils/init.lua#L789C1-L789C23
 M.path_separator = "/"
 
