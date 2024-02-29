@@ -110,8 +110,10 @@ cookiecutter
 coolors
 css
 csv
+cte
 ctime
 Ctrl
+cts
 ctypes
 cwd
 cyclomatic
@@ -182,6 +184,7 @@ eslint
 eval
 everytime
 exe
+executables
 exifread
 exitfirst
 explorative
@@ -314,6 +317,7 @@ jedi_language_server
 Jenkinsfile
 jenoptik
 jmespath
+jpeg
 jq
 json
 jsonc
@@ -629,6 +633,7 @@ tsx
 tupperware
 txt
 typer
+TypeScript
 ubyte
 uint
 uint16
@@ -693,4 +698,5 @@ yref
 yscrollcommand
 yticklabels
 yticks
+zod
 zsplit
