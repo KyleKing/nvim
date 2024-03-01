@@ -36,12 +36,27 @@ local function mini_files()
     })
 end
 
+-- Use gc for toggling comments. Examples:
+--  gcip or gcc (line)
+--  or dgc (delete commented section using gc text-object)
+-- Additional configuration for nvim-ts-context-commentstring from  : https://github.com/JoosepAlviste/nvim-ts-context-commentstring/wiki/Integrations#minicomment
+-- And see: https://github.com/echasnovski/mini.comment/blob/67f00d3ebbeae15e84584d971d0c32aad4f4f3a4/doc/mini-comment.txt#L87-L101
+local function mini_comment()
+    require("mini.comment").setup({
+        custom_commentstring = function()
+            return require("ts_context_commentstring").calculate_commentstring() or vim.bo.commentstring
+        end,
+    })
+end
+
 return {
     "echasnovski/mini.nvim",
     dependencies = {
-        "nvim-tree/nvim-web-devicons",
+        { "nvim-tree/nvim-web-devicons" }, -- Required for mini.files
+        { "JoosepAlviste/nvim-ts-context-commentstring", opts = { enable_autocmd = false } }, -- For mini.comment
     },
     keys = {
+        -- Bindings for mini.files
         {
             "<leader>e",
             function()
@@ -61,5 +76,6 @@ return {
     config = function()
         mini_move()
         mini_files()
+        mini_comment()
     end,
 }

@@ -99,6 +99,7 @@ coinit
 colorcolumn
 colspan
 colwidth
+commentstring
 Commitizen
 composability
 conda
