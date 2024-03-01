@@ -1,3 +1,5 @@
+-- FIXME: revisit implementation of surround because it isn't working as expected
+
 local prefix = "gz"
 -- local icon = vim.g.icons_enabled and "󰑤 " or ""
 -- local maps = { n = {} }
