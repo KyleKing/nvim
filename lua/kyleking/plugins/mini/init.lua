@@ -85,6 +85,7 @@ return {
         },
     },
     config = function()
+        require("mini.animate").setup({})
         require("mini.bracketed").setup({})
         mini_comment()
         mini_files()
