@@ -4,6 +4,7 @@
 vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
 vim.opt.backspace:append({ "nostop" }) -- don't stop backspace at insert
 vim.opt.breakindent = true -- wrap indent to match  line start
+-- FIXME: use named registers rather than always copying to the clipboard
 vim.opt.clipboard = "unnamedplus" -- connection to the system clipboard
 vim.opt.cmdheight = 0 -- hide command line unless needed
 vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Options for insert mode completion
