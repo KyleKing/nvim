@@ -1,6 +1,7 @@
 abcdefghijklmnopqrstuvwxyz
 accum
 admin
+admon
 allowlist
 amax
 amin
@@ -49,6 +50,7 @@ barcodes
 bboxes
 bdist
 beartype
+beautysh
 beej
 bgcolor
 bhyaax
@@ -56,6 +58,7 @@ bidict
 binsize
 biscotti
 blankline
+blockquote
 boto
 botocore
 br
@@ -67,6 +70,8 @@ builtins
 byref
 cacert
 calcipy
+callout
+callouts
 camelize
 canola
 carshare
@@ -74,12 +79,14 @@ cartesian
 cc'd
 certifi
 cfgmgr
+Chana
 chdir
 cheatsheet
 checkbox
 checkboxes
 chmod
 chrissy
+ci
 CLI
 cmake
 cmap
@@ -101,6 +108,7 @@ colspan
 colwidth
 commentstring
 Commitizen
+CommonMark
 composability
 conda
 CONFIG
@@ -109,6 +117,7 @@ configurability
 conftest
 cookiecutter
 coolors
+cov
 css
 csv
 cte
@@ -151,6 +160,7 @@ Deserialization
 detectparams
 devpi
 devs
+dext
 dfshome
 dict
 difflib
@@ -160,6 +170,7 @@ dlint
 dockerfile
 dockerized
 dockerls
+docstring
 docstrings
 doctest
 docx
@@ -177,6 +188,7 @@ embase
 enduml
 enoent
 ensurepath
+env
 envops
 eplate
 errfmt
@@ -185,10 +197,12 @@ eslint
 eval
 everytime
 exe
+executablebooks
 executables
 exifread
 exitfirst
 explorative
+Extensibility
 extrema
 FaaS
 falsey
@@ -213,10 +227,12 @@ flake8
 flasgger
 flatdict
 fnmatch
+foldable
 fontawesome
 foregd
 formatter
 fout
+frontmatter
 fspath
 fstat
 FuboTV
@@ -224,6 +240,7 @@ functools
 fwpylib
 gantt
 gapminder
+garam
 gatech
 gauge
 genfromtxt
@@ -237,9 +254,11 @@ getuser
 gfclient
 gfcontext
 gfcrequest
+gfm
 gfserver
 gfstatus
 ggplot
+gh
 gitea
 github
 gitignore
@@ -294,6 +313,7 @@ inplace
 inputimeout
 instrument
 IntelliJ
+io
 ipconfig
 ipynb
 ipython
@@ -328,6 +348,7 @@ jsonlines
 jupyter
 jupytext
 kanopy
+karabiner
 keymaps
 kickstart
 kking
@@ -359,6 +380,7 @@ magick
 magiclink
 mainloop
 mako
+manpage
 markdownify
 masala
 materialx
@@ -368,6 +390,8 @@ maxsize
 md
 mdate
 mdformat
+mdit
+Mein
 MesoScale
 metabase
 mfussenegger
@@ -395,6 +419,7 @@ MULESOFT
 multithreading
 mutex
 mypy
+MyST
 n'th
 nargs
 nbsp
@@ -442,6 +467,7 @@ pandoc
 parallelization
 paretos
 Parexel
+parsers
 pathlib
 pattyrn
 pcov
@@ -497,6 +523,7 @@ pths
 pubtmp
 puml
 py
+py38
 pycache
 pycallgraph
 pydantic
@@ -511,6 +538,7 @@ pyjwt
 Pylance
 pylint
 pylintrc
+pymdown
 pymdownx
 pymongo
 pyodbc
@@ -542,6 +570,7 @@ pywintypes
 readme
 redmine
 repos
+reStructuredText
 reuseaddr
 rfind
 RGB
@@ -607,6 +636,7 @@ symlinks
 sysinfo
 tabline
 tailwindcss
+tamari
 taplo
 tasklist
 Teigen
@@ -627,6 +657,7 @@ tomcatmanager
 toml
 tomlkit
 tomodachi94
+tox
 tqdm
 traceback
 trailspace
@@ -651,6 +682,7 @@ upsert
 url
 username
 userprofile
+usr
 uuidv4
 vectorizer
 venv
@@ -663,6 +695,7 @@ webex
 webm
 webp
 werkzeug
+whitespace
 whois
 Wikipedia
 wkhtmltopdf
@@ -703,3 +736,4 @@ yticklabels
 yticks
 zod
 zsplit
+kmonad

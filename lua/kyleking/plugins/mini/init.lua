@@ -19,6 +19,7 @@ local function mini_files()
                 return entry.name ~= ".DS_Store"
                     and entry.name ~= ".git"
                     and entry.name ~= ".venv"
+                    and entry.name ~= "__pycache__"
                     and entry.name ~= "node_modules"
             end,
         },
@@ -55,6 +56,7 @@ return {
         { "JoosepAlviste/nvim-ts-context-commentstring", opts = { enable_autocmd = false } }, -- For mini.comment
         { "nvim-tree/nvim-web-devicons" }, -- Required for mini.files
     },
+    event = "UIEnter",
     keys = {
         -- Bindings for mini.bracketed
         { "[c", desc = "Jump to previous comment block" },
