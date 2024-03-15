@@ -352,6 +352,7 @@ karabiner
 keymaps
 kickstart
 kking
+kmonad
 knexfile
 ksize
 kubernetes
@@ -736,4 +737,4 @@ yticklabels
 yticks
 zod
 zsplit
-kmonad
+__init__
