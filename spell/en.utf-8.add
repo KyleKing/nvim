@@ -154,6 +154,7 @@ decompiled
 deepsource
 delim
 denormalized
+dependabot
 deps
 desc
 Deserialization
@@ -423,6 +424,7 @@ mypy
 MyST
 n'th
 nargs
+navi
 nbsp
 ncol
 ncolors
@@ -629,6 +631,7 @@ struct
 structlog
 styleguide
 subdir
+subdirectory
 subfolders
 submodule
 submodules
@@ -652,6 +655,7 @@ timestamp
 tk
 tkchild
 tkinter
+tldr
 TODO
 todos
 tomcatmanager
@@ -687,6 +691,7 @@ usr
 uuidv4
 vectorizer
 venv
+versioned
 vgap
 vhs
 vim.bo
