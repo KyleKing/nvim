@@ -76,6 +76,7 @@ camelize
 canola
 carshare
 cartesian
+catppuccin
 cc'd
 certifi
 cfgmgr
@@ -369,6 +370,7 @@ lingress
 linter
 linters
 linting
+localhost
 LOCALSTACK
 loguru
 lsp
@@ -663,6 +665,7 @@ toml
 tomlkit
 tomodachi94
 tox
+tpm
 tqdm
 traceback
 trailspace
