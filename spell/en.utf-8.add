@@ -20,6 +20,7 @@ asdict
 askokcancel
 asksaveasfilename
 askyesno
+assignee
 assistive
 astext
 astimezone
@@ -47,6 +48,7 @@ ayref
 backend
 barbar
 barcodes
+basmati
 bboxes
 bdist
 beartype
@@ -207,6 +209,7 @@ explorative
 Extensibility
 extrema
 FaaS
+facelessuser
 falsey
 fastcore
 fastjsonschema
@@ -339,6 +342,7 @@ javascript
 jedi_language_server
 Jenkinsfile
 jenoptik
+JIRA
 jmespath
 jpeg
 jq
@@ -507,6 +511,7 @@ Popen
 popt
 popts
 posix
+Postgres
 PPLMS
 pptx
 pragma
@@ -649,9 +654,11 @@ Teigen
 tempfile
 temporarydirectory
 tensorflow
+terraform
 testpypi
 textstat
 tickvals
+Tikka
 timeit
 timestamp
 tk
@@ -681,6 +688,7 @@ uint
 uint16
 uint8
 ultisnips
+Ultralytics
 unint
 unint8
 unlicense
@@ -700,6 +708,7 @@ vhs
 vim.bo
 virtualenv
 vmax
+washingtonpost
 webex
 webm
 webp
@@ -707,7 +716,9 @@ werkzeug
 whitespace
 whois
 Wikipedia
+WIP
 wkhtmltopdf
+www
 wx
 wxutil
 x86
