@@ -1,10 +1,12 @@
 abcdefghijklmnopqrstuvwxyz
 accum
 admin
+Adminer
 admon
 allowlist
 amax
 amin
+api
 app
 APPNAME
 arange
@@ -39,6 +41,7 @@ autoformat
 autogenerate
 autohide
 autoupdate
+AWS
 awslocal
 axhline
 axref
@@ -54,6 +57,7 @@ bdist
 beartype
 beautysh
 beej
+BeeKeeper
 bgcolor
 bhyaax
 bidict
@@ -147,6 +151,7 @@ datefmt
 datestamp
 datetime
 dateutil
+DBeaver
 DC
 ddict
 ddmmmyy
@@ -512,6 +517,8 @@ popt
 popts
 posix
 Postgres
+Postgres
+postgresql
 PPLMS
 pptx
 pragma
@@ -597,6 +604,7 @@ ruamel
 runas
 runtime
 rustfmt
+S3
 Schemas
 scipy
 scons
@@ -709,6 +717,7 @@ vim.bo
 virtualenv
 vmax
 washingtonpost
+VSCode
 webex
 webm
 webp
