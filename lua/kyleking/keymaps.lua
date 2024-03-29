@@ -60,10 +60,6 @@ K("n", "<C-Down>", "<Cmd>resize +2<CR>", { desc = "Resize split down" })
 K("n", "<C-Left>", "<Cmd>vertical resize -2<CR>", { desc = "Resize split left" })
 K("n", "<C-Right>", "<Cmd>vertical resize +2<CR>", { desc = "Resize split right" })
 
--- Adjust indent and stay in indent mode
-K("v", "<S-Tab>", "<gv", { desc = "Unindent line" })
-K("v", "<Tab>", ">gv", { desc = "Indent line" })
-
 -- PLANNED: review these additional keybinds
 
 -- Custom menu for modification of the user experience
