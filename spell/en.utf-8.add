@@ -66,6 +66,7 @@ biscotti
 blankline
 blockquote
 boto
+boto3
 botocore
 br
 breakat
@@ -91,6 +92,7 @@ chdir
 cheatsheet
 checkbox
 checkboxes
+chezmoi
 chmod
 chrissy
 ci
@@ -517,7 +519,6 @@ popt
 popts
 posix
 Postgres
-Postgres
 postgresql
 PPLMS
 pptx
@@ -605,6 +606,7 @@ runas
 runtime
 rustfmt
 S3
+sagemaker
 Schemas
 scipy
 scons
@@ -707,6 +709,7 @@ url
 username
 userprofile
 usr
+UUID
 uuidv4
 vectorizer
 venv
@@ -716,12 +719,13 @@ vhs
 vim.bo
 virtualenv
 vmax
-washingtonpost
 VSCode
+washingtonpost
 webex
 webm
 webp
 werkzeug
+Wezterm
 whitespace
 whois
 Wikipedia
@@ -759,6 +763,7 @@ ylabel
 ylim
 ymax
 ymin
+youtu.be
 yref
 yscrollcommand
 yticklabels
