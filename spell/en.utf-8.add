@@ -126,6 +126,7 @@ configurability
 conftest
 cookiecutter
 coolors
+corallium
 cov
 css
 csv
@@ -196,6 +197,7 @@ dtypes
 editorconfig
 eigenlite
 embase
+endif
 enduml
 enoent
 ensurepath
@@ -297,6 +299,7 @@ html
 htmlcov
 htsd
 https
+hukkin
 iconize
 ICSR
 iglob
@@ -349,6 +352,7 @@ javascript
 jedi_language_server
 Jenkinsfile
 jenoptik
+jinja
 JIRA
 jmespath
 jpeg
