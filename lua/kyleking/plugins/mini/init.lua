@@ -16,8 +16,14 @@ local function mini_files()
     require("mini.files").setup({
         content = {
             filter = function(entry)
+                -- FIXME: use a shared list of ignored files/directories with telescope
                 return entry.name ~= ".DS_Store"
+                    and entry.name ~= ".cover"
                     and entry.name ~= ".git"
+                    and entry.name ~= ".mypy_cache"
+                    and entry.name ~= ".pytest_cache"
+                    and entry.name ~= ".ropeproject"
+                    and entry.name ~= ".ruff_cache"
                     and entry.name ~= ".venv"
                     and entry.name ~= "__pycache__"
                     and entry.name ~= "node_modules"

@@ -14,7 +14,16 @@ return {
             defaults = {
                 prompt_prefix = "❯ ",
                 selection_caret = "❯ ",
-                file_ignore_patterns = { "\\.git/", "node_modules/", ".venv/" },
+                file_ignore_patterns = {
+                    "\\.cover/",
+                    "\\.git/",
+                    "\\.mypy_cache/",
+                    "\\.pytest_cache/",
+                    "\\.ropeproject/",
+                    "\\.ruff_cache/",
+                    "\\.venv/",
+                    "node_modules/",
+                },
                 path_display = { "truncate" },
                 sorting_strategy = "ascending",
                 layout_config = {
