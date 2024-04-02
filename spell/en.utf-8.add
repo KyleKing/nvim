@@ -35,6 +35,7 @@ asyncio
 atexit
 attribs
 auditability
+autocomplete
 autofix
 autoflake
 autoformat
@@ -446,6 +447,7 @@ nbsp
 ncol
 ncolors
 ndarray
+neovim
 nobackups
 noconfirm
 noice
@@ -651,6 +653,7 @@ strptime
 struct
 structlog
 styleguide
+stylua
 subdir
 subdirectory
 subfolders

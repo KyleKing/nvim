@@ -5,7 +5,6 @@
 # pre-commit run --all-files stylua
 # pre-commit run --all-files --hook-stage commit
 # pre-commit run --all-files --hook-stage push
-# poetry run calcipy lint.pre-commit --no-update
 #
 # See https://pre-commit.com for more information
 #  and https://pre-commit.com/hooks.html for more hooks
@@ -31,19 +30,22 @@ repos:
       - id: debug-statements
       - id: destroyed-symlinks
       - id: detect-private-key
-      - id: double-quote-string-fixer
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
+      - id: fix-encoding-pragma
+        args: [--remove]
       - id: forbid-new-submodules
       - id: mixed-line-ending
         args: [--fix=auto]
+      - id: pretty-format-json
+        args: [--autofix, --indent=4]
       - id: trailing-whitespace
   - repo: https://github.com/JohnnyMorganz/StyLua
     rev: v0.20.0
     hooks:
       - id: stylua-system
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.14.1
+    rev: v3.21.3
     hooks:
       - id: commitizen
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -54,13 +56,14 @@ repos:
           # Note: this version must be the same as the hook revision
           - "prettier@4.0.0-alpha.8"
           - "prettier-plugin-sh"
-        exclude: \.copier-answers\.yml|tests/.*/cassettes/.*\.yaml
         types_or: [html, javascript, json, shell, yaml]
   - repo: https://github.com/executablebooks/mdformat
     rev: 0.7.17
     hooks:
       - id: mdformat
-        additional_dependencies: ["mdformat-mkdocs[recommended]>=2.0.1"]
+        additional_dependencies:
+          - mdformat-mkdocs[recommended]>=2.0.6
+          - mdformat-gfm-alerts>=0.0.1
         args: [--wrap=no]
         exclude: CODE_TAG_SUMMARY\.md
   - repo: https://github.com/pappasam/toml-sort
