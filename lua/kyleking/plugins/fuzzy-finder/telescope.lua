@@ -15,6 +15,8 @@ return {
                 prompt_prefix = "❯ ",
                 selection_caret = "❯ ",
                 file_ignore_patterns = {
+                    -- TODO: This list isn't being applied for 'fw' or 'ff'
+                    ".+\\.min\\.[^.]+",
                     "\\.cover/",
                     "\\.git/",
                     "\\.mypy_cache/",
