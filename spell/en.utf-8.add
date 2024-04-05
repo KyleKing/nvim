@@ -136,6 +136,7 @@ ctime
 Ctrl
 cts
 ctypes
+cubiczirconia
 cwd
 cyclomatic
 Cython
@@ -451,6 +452,7 @@ ndarray
 neovim
 nobackups
 noconfirm
+NodeJS
 noice
 noopener
 noqa
@@ -547,6 +549,7 @@ psycopg2
 pths
 pubtmp
 puml
+pv
 py
 py38
 pycache
@@ -649,6 +652,7 @@ startswith
 startuml
 starz
 statusline
+str
 strftime
 strptime
 struct
@@ -668,6 +672,7 @@ tailwindcss
 tamari
 taplo
 tasklist
+TBD
 Teigen
 tempfile
 temporarydirectory
