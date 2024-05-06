@@ -49,6 +49,7 @@ axref
 axvline
 axvspan
 ayref
+babylon
 backend
 barbar
 barcodes
@@ -98,6 +99,7 @@ chmod
 chrissy
 ci
 CLI
+CloudWatch
 cmake
 cmap
 cmath
@@ -452,6 +454,7 @@ ncol
 ncolors
 ndarray
 neovim
+NLP
 nobackups
 noconfirm
 NodeJS
@@ -479,6 +482,7 @@ oauth
 objs
 odbc
 ogrid
+Okta
 omnifunc
 onchange
 onecmd
@@ -598,6 +602,7 @@ pywinauto
 pywinrm
 pywintypes
 readme
+realtime
 redmine
 repos
 reStructuredText
@@ -626,6 +631,7 @@ screenshot
 sdist
 SemVer
 serializable
+serverless
 setattr
 setenv
 setuptools
@@ -735,6 +741,8 @@ vhs
 vim.bo
 virtualenv
 vmax
+VPC
+VPCs
 VSCode
 washingtonpost
 webex
