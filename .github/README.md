@@ -14,8 +14,9 @@ My preference is for opinionated plugins that require minimal configuration.
     - Buffers: [early-retirement.nvim for auto-closing deleted buffers](https://github.com/KyleKing/nvim/commit/00898cdc3c721d5445a7186cd786fd3c5af7dd9f)
     - Editing Support: [autopairs](https://github.com/KyleKing/nvim/commit/7e106f21d6645454b088b3089c3a3f2d067ffc7c), [nvim-ts-autotag](https://github.com/KyleKing/nvim/commit/460d16f07eb9d2ae49c1f59971948ac3a48f1dde), [cmp-spell, omni, etc.](https://github.com/KyleKing/nvim/commit/f3e92a6586af3dbb3f3735c05e1539a9aeb663c0)
     - LSP: [lsp-saga](https://github.com/KyleKing/nvim/commit/da614ec7db07a1e7245744d6f64776c6d04622e9)
+    - Session: [auto-session](https://github.com/KyleKing/nvim/commit/7ae6899681355904b83a757f28f014295a0321d8)
     - Utility: [noice](https://github.com/KyleKing/nvim/commit/8a30f4d03c8271756ecd1659e241013e78788834), [structlog](https://github.com/KyleKing/nvim/commit/9e10e13)
-- I've replaced [reticle](https://github.com/KyleKing/nvim/commit/3297142) with `colorful-winsep`, [indent-blankline](https://github.com/KyleKing/nvim/commit/3e823707087166c1718dc3e0a815a43d472e40a9) with `hlchunk` ([which was later removed](https://github.com/KyleKing/nvim/commit/a9596bb11332a77d74111b4ddd1cdb36b18ba47f)), [luacheck](https://github.com/KyleKing/nvim/commit/a76ebc1) with `selene`, and [hlargs](https://github.com/KyleKing/nvim/commit/9ce2a1c) with the behavior of my chosen color scheme
+- I've replaced [reticle](https://github.com/KyleKing/nvim/commit/3297142) with `colorful-winsep`, [indent-blankline](https://github.com/KyleKing/nvim/commit/3e823707087166c1718dc3e0a815a43d472e40a9) with `hlchunk` ([which was later removed](https://github.com/KyleKing/nvim/commit/a9596bb11332a77d74111b4ddd1cdb36b18ba47f)), [luacheck](https://github.com/KyleKing/nvim/commit/a76ebc1) with `selene`, [buffer-manager](https://github.com/KyleKing/nvim/commit/3bf83abcba6d9e36a0313013ea34d2b3a931a81b) with `telescope`, and [hlargs](https://github.com/KyleKing/nvim/commit/9ce2a1c) with existing behavior from language LSPs
 
 ## MacOS (and Linux) Install
 
