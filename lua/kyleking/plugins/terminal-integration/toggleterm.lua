@@ -8,9 +8,9 @@ local function toggle_term_cmd(opts)
     local terms = user_terminals
     -- if a command string is provided, create a basic table for Terminal:new() options
     if type(opts) == "string" then opts = { cmd = opts, hidden = true } end
-    local num = vim.v.count > 0 and vim.v.count or 1
     -- if terminal doesn't exist yet, create it
     if not terms[opts.cmd] then terms[opts.cmd] = {} end
+    local num = vim.v.count > 0 and vim.v.count or 1
     if not terms[opts.cmd][num] then
         if not opts.count then opts.count = vim.tbl_count(terms) * 100 + num end
         if not opts.on_exit then opts.on_exit = function() terms[opts.cmd][num] = nil end end
@@ -57,7 +57,6 @@ return {
         { "<leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
         { "<leader>th", "<Cmd>ToggleTerm size=15 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
         { "<leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" },
-        -- PLANNED: Can this be toggled while in lazygit with 'gg'?
         { "<C-'>", "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal", mode = { "n", "t" } },
     },
 }
