@@ -198,6 +198,7 @@ dropna
 dtick
 dtype
 dtypes
+DynamoDB
 ECR
 editorconfig
 eigenlite

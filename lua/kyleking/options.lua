@@ -46,12 +46,6 @@ vim.opt.wildmode = "full:lastused" -- complete the first full match immediately 
 -- vim.opt.spelllang = "en_us" -- Use the US dictionary (and any associated custom dictionaries) -- *Update*: set by plugin dirty-talk
 vim.opt.spell = true -- Always on spell checking
 
--- PLANNED: indentation isn't working as expected
--- -- Default indentation (unless overridden by editorconfig)
--- vim.opt.expandtab = true -- enable the use of space in tab
--- vim.opt.shiftwidth = 4 -- number of space inserted for indentation
--- vim.opt.tabstop = 4 -- number of space in a tab
-
 -- Custom filetypes
 vim.filetype.add({
     extension = {
