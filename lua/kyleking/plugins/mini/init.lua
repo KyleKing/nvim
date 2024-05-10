@@ -11,6 +11,8 @@ local function mini_comment()
     })
 end
 
+-- PLANNED: take a look at oil.nvim: https://andrewcourter.substack.com/p/why-i-switched-from-netrw-to-oilnvim
+
 -- Adapted from: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/mini_files.lua
 local function mini_files()
     require("mini.files").setup({
