@@ -75,8 +75,8 @@ return {
         { "]d", desc = "Jump to next diagnostic" },
         { "[q", desc = "Jump to previous Quickfix list entry" },
         { "]q", desc = "Jump to next Quickfix list entry" },
-        { "[t", desc = "Jump to previous Treesitter node" },
-        { "]t", desc = "Jump to next Treesitter node" },
+        { "[n", desc = "Jump to previous Treesitter node" },
+        { "]n", desc = "Jump to next Treesitter node" },
         -- Bindings for mini.files
         {
             "<leader>e",

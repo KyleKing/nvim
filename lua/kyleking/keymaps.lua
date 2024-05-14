@@ -6,7 +6,7 @@
 vim.g.mapleader = " " -- Set <space> as the leader key
 vim.g.maplocalleader = "," -- set default local leader key
 -- Remove space mapping that moves cursor to the right
--- Refernce: https://vi.stackexchange.com/a/16393/44707
+-- Reference: https://vi.stackexchange.com/a/16393/44707
 vim.api.nvim_set_keymap("", "<Space>", "<Nop>", { noremap = true, silent = true })
 
 local K = vim.keymap.set
@@ -59,6 +59,12 @@ K("n", "<C-Up>", "<Cmd>resize -2<CR>", { desc = "Resize split up" })
 K("n", "<C-Down>", "<Cmd>resize +2<CR>", { desc = "Resize split down" })
 K("n", "<C-Left>", "<Cmd>vertical resize -2<CR>", { desc = "Resize split left" })
 K("n", "<C-Right>", "<Cmd>vertical resize +2<CR>", { desc = "Resize split right" })
+
+-- Manage tabs
+K("n", "]t", "<Cmd>tabnext<CR>", { desc = "Next tab" })
+K("n", "[t", "<Cmd>tabprevious<CR>", { desc = "Previous tab" })
+K("n", "<leader>ttn", "<Cmd>tabnew<CR>", { desc = "New tab" })
+K("n", "<leader>ttc", "<Cmd>tabclose<CR>", { desc = "Close tab" })
 
 -- PLANNED: review these additional keybinds
 
