@@ -96,13 +96,13 @@ return {
     },
     init = function()
         -- Hide trailing spaces in Lazy plugin buffer. Required for mini.trailspace
-        -- Tip: check FileType with `:set filetype?`
+        --  Tip: check FileType with `:set filetype?`
         vim.cmd(
             "autocmd FileType lazy lua vim.b.minitrailspace_disable = true; if MiniTrailspace then MiniTrailspace.unhighlight() end"
         )
     end,
     config = function()
-        require("mini.trailspace").setup({})
+        require("mini.trailspace").setup({}) -- Must be first
 
         require("mini.animate").setup({})
         require("mini.bracketed").setup({})
