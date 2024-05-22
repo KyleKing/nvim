@@ -106,7 +106,6 @@ return {
     config = function()
         require("mini.trailspace").setup({}) -- Must be first
 
-        require("mini.animate").setup({})
         require("mini.bracketed").setup({})
         mini_comment()
         mini_files()
