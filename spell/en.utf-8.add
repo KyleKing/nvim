@@ -42,6 +42,7 @@ autoformat
 autogenerate
 autohide
 autoupdate
+awaitable
 AWS
 awslocal
 axhline
@@ -608,6 +609,7 @@ realtime
 redmine
 repos
 reStructuredText
+retryable
 reuseaddr
 rfind
 RGB
