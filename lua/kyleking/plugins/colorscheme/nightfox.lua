@@ -2,7 +2,7 @@ return {
     "EdenEast/nightfox.nvim",
     opts = {
         options = {
-            dim_inactive = false, -- Non focused panes set to alternative background
+            dim_inactive = true, -- Non focused panes set to alternative background
             module_default = true, -- Default enable value for modules
             -- modules = {
             --   -- aerial = true,
