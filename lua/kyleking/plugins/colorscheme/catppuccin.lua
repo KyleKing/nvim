@@ -1,8 +1,8 @@
 return {
     {
-        "catppuccin/nvim",
+        "catppuccin",
         enabled = false, -- Currently unused
-        name = "catppuccin",
+        ---@type CatppuccinOptions
         opts = {
             integrations = {
                 mason = true,
