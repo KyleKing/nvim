@@ -1,4 +1,4 @@
--- From: https://andrewcourter.substack.com/p/which-is-better-flashnvim-or-leapnvim
+-- Adapted from: https://andrewcourter.substack.com/p/which-is-better-flashnvim-or-leapnvim
 return {
     {
         "folke/flash.nvim",
@@ -6,8 +6,13 @@ return {
         --@type Flash.Config
         opts = {},
         keys = {
-            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-            { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+            { "<a-s>", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            {
+                "<a-S>",
+                mode = { "n", "x", "o" },
+                function() require("flash").treesitter() end,
+                desc = "Flash Treesitter",
+            },
             { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
             {
                 "R",
