@@ -129,8 +129,33 @@ local function config_mason()
             --     })
             -- end,
             pyright = function()
+                -- -- NOTE: both are set when run with `poetry run nvim *`
+                -- print(vim.env.VIRTUAL_ENV)
+                -- print(vim.env.VIRTUAL_ENV)
                 require("lspconfig").pyright.setup({
                     capabilities = lsp_capabilities,
+                    -- settings = {
+                    --     pyright = {
+                    --         -- https://github.com/microsoft/pyright/blob/59b896368470bd7dcda4c4ad034756cc5f8fabcc/docs/configuration.md
+                    --         typeCheckingMode = "strict",
+                    --         diagnosticSeverityOverrides = {
+                    --             reportUnusedVariable = "off",
+                    --         },
+                    --     },
+                    -- },
+
+                    -- Neither works? Still reported missing imports
+                    -- -- Adapted from: https://www.reddit.com/r/neovim/comments/16ij4az/comment/k0jz32s
+                    -- settings = {
+                    --     python = {
+                    --         analysis = {
+                    --             diagnosticMode = "workspace",
+                    --             -- typeCheckingMode = "off",
+                    --         },
+                    --         -- PYENV_ROOT=/Users/kyleking/Developer/roaminsight/reviewer/reviewer-api/.venv nvim ...py
+                    --         venvPath = vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV or vim.env.PYENV_ROOT,
+                    --     },
+                    -- },
                     -- -- Adapted from: https://github.com/Kapocsi/dotfiles/blob/a197050297a359168bd3c7c636bf64317bf8a89a/dot-config/nvim/after/plugin/mason.lua#L41C1-L56C6
                     -- settings = {
                     --     pyright = {

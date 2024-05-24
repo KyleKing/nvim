@@ -29,11 +29,9 @@ return {
             lua = { "selene" },
             -- nix = { "nix" },
             -- protobuf = { "buf", "protolint" },
-            -- python = { "ruff" }, -- PLANNED: configure flake8/mypy/etc. (based on existence in .venv)
-            python = { "pylint", "ruff" }, -- HACK: temporary workaround to check for basic errors
+            python = { "ruff" }, -- PLANNED: implement full linting suite (flake8, etc.)
             -- python = { "mypy", "flake8", "pylint", "ruff" }, -- FYI: override pylint colors to be OFF!
             sh = { "shellcheck" },
-            sql = { "sqlfluff" },
             terraform = { "tflint" },
             typescript = { "eslint" },
             typescriptreact = { "eslint" },
