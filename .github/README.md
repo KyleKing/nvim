@@ -28,6 +28,7 @@ My preference is for opinionated plugins that require minimal configuration.
     - [hlargs](https://github.com/KyleKing/nvim/commit/9ce2a1c) with existing behavior from language LSPs
     - [leap.nvim and alternative motion plugins](https://github.com/KyleKing/nvim/commit/d93f43420229cf43fdc7cab12576d1af1f34b4e6) with `flash.nvim`
     - [quick-scope](https://github.com/KyleKing/nvim/commit/d93f43420229cf43fdc7cab12576d1af1f34b4e6) with `flash.nvim`
+    - [smart-splits](https://github.com/KyleKing/nvim/commit/c2ef609997d11df798b05f6a4b30c0fad42504e8) with `<c-w>` builtin
 
 ## MacOS (and Linux) Install
 
