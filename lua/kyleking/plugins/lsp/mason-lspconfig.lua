@@ -6,7 +6,7 @@ local function config_mason()
     require("mason").setup({})
     require("mason-lspconfig").setup({
         -- FYI: See mapping of server names here: https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
-        --  ruff, pyright, and others should be installed globally with pipx
+        --  ruff (ruff_lsp?), pyright, and others should be installed globally with pipx
         ensure_installed = {
             "bashls",
             -- "docker_compose_language_service",
@@ -14,7 +14,8 @@ local function config_mason()
             "jsonls",
             "lua_ls",
             -- "marksman",
-            "pylsp", -- Or: jedi_language_server
+            -- "pylsp", -- Or: jedi_language_server
+            "pylyzer", -- PLANNED: Experimenting with alternative LSP for Python
             -- "tailwindcss",
             "taplo",
             "terraformls",
@@ -54,42 +55,47 @@ local function config_mason()
                     },
                 })
             end,
-            pylsp = function()
-                require("lspconfig").pylsp.setup({
+            -- pylsp = function()
+            --     require("lspconfig").pylsp.setup({
+            --         capabilities = lsp_capabilities,
+            --         settings = {
+            --             -- Options: https://github.com/python-lsp/python-lsp-server/blob/ed00eac389e5bdd46816dd6ff4ffbb4db6766199/CONFIGURATION.md
+            --             pylsp = {
+            --                 plugins = {
+            --                     -- formatter options (*Update: using conform for formatting instead)
+            --                     autopep8 = { enabled = false },
+            --                     black = { enabled = false },
+            --                     flake8 = { enabled = false },
+            --                     isort = { enabled = false },
+            --                     yapf = { enabled = false },
+            --                     -- linter options (*Update: using nvim-lint for these instead)
+            --                     mccabe = { enabled = false },
+            --                     preload = { enabled = false },
+            --                     pycodestyle = { enabled = false },
+            --                     pydocstyle = { enabled = false },
+            --                     pyflakes = { enabled = false },
+            --                     pylint = { enabled = false },
+            --                     ruff = { enabled = false },
+            --                     -- type checker
+            --                     pylsp_mypy = {
+            --                         enabled = true,
+            --                         overrides = { "--python-executable", python_path, true },
+            --                         report_progress = true,
+            --                         live_mode = false,
+            --                     },
+            --                     -- auto-completion customization
+            --                     rope_autoimport = { enabled = false },
+            --                     rope_completion = { enabled = true },
+            --                     jedi_completion = { fuzzy = true },
+            --                 },
+            --             },
+            --         },
+            --         flags = { debounce_text_changes = 200 },
+            --     })
+            -- end,
+            pylyzer = function()
+                require("lspconfig").pylyzer.setup({
                     capabilities = lsp_capabilities,
-                    settings = {
-                        -- Options: https://github.com/python-lsp/python-lsp-server/blob/ed00eac389e5bdd46816dd6ff4ffbb4db6766199/CONFIGURATION.md
-                        pylsp = {
-                            plugins = {
-                                -- formatter options (*Update: using conform for formatting instead)
-                                autopep8 = { enabled = false },
-                                black = { enabled = false },
-                                flake8 = { enabled = false },
-                                isort = { enabled = false },
-                                yapf = { enabled = false },
-                                -- linter options (*Update: using nvim-lint for these instead)
-                                mccabe = { enabled = false },
-                                preload = { enabled = false },
-                                pycodestyle = { enabled = false },
-                                pydocstyle = { enabled = false },
-                                pyflakes = { enabled = false },
-                                pylint = { enabled = false },
-                                ruff = { enabled = false },
-                                -- type checker
-                                pylsp_mypy = {
-                                    enabled = true,
-                                    overrides = { "--python-executable", python_path, true },
-                                    report_progress = true,
-                                    live_mode = false,
-                                },
-                                -- auto-completion customization
-                                rope_autoimport = { enabled = false },
-                                rope_completion = { enabled = true },
-                                jedi_completion = { fuzzy = true },
-                            },
-                        },
-                    },
-                    flags = { debounce_text_changes = 200 },
                 })
             end,
             pyright = function()
