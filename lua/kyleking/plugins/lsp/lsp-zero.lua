@@ -44,12 +44,7 @@ local function config_lsp()
         map("n", "<leader>lr", vim.lsp.buf.references, { desc = "Buffer References" })
         map("n", "<leader>lh", vim.lsp.buf.signature_help, { desc = "Signature Help" })
         map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "LSP Rename" })
-        map(
-            { "n", "v" },
-            "<leader>la",
-            function() vim.lsp.buf.code_action({ context = { only = { "quickfix", "refactor", "source" } } }) end,
-            { desc = "Code Action" }
-        )
+        map({ "n", "v" }, "<leader>la", function() vim.lsp.buf.code_action() end, { desc = "Code Action" })
         -- Uses 'server_capabilities.documentFormattingProvider'
         map(
             { "n", "x" },

@@ -39,13 +39,15 @@ return {
             ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
             formatters = {
                 eslint = {
-                    ---@param config conform.FormatterConfig
-                    ---@param ctx conform.Context
-                    command = function(config, ctx)
-                        local repo_dir = util.root_file({ "package-lock.json" })(config, ctx) or ""
-                        local paths = { repo_dir .. "node_modules/.bin/eslint" }
-                        return util.find_executable(paths, "eslint")(config, ctx)
-                    end,
+                    -- FIXME: migrate to new signature with self: https://github.com/stevearc/conform.nvim/pull/233/files
+                    -- ---@param config conform.FormatterConfig
+                    -- ---@param ctx conform.Context
+                    -- command = function(config, ctx)
+                    --     local repo_dir = util.root_file({ "package-lock.json" })(config, ctx) or ""
+                    --     local paths = { repo_dir .. "node_modules/.bin/eslint" }
+                    --     return util.find_executable(paths, "eslint")(config, ctx)
+                    -- end,
+
                     -- -- A list of strings, or a function that returns a list of strings
                     -- -- Return a single string instead of a list to run the command in a shell
                     -- args = { "$FILENAME" },
