@@ -49,20 +49,10 @@ K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 -- PLANNED: K("n", "<leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
 
 -- Managing Splits
-K("n", "|", "<Cmd>vsplit<CR>", { desc = "Vertical Split" })
-K("n", "\\", "<Cmd>split<CR>", { desc = "Horizontal Split" })
-K("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
-K("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
-K("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
-K("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
-K("n", "<C-Up>", "<Cmd>resize -2<CR>", { desc = "Resize split up" })
-K("n", "<C-Down>", "<Cmd>resize +2<CR>", { desc = "Resize split down" })
-K("n", "<C-Left>", "<Cmd>vertical resize -2<CR>", { desc = "Resize split left" })
-K("n", "<C-Right>", "<Cmd>vertical resize +2<CR>", { desc = "Resize split right" })
+-- FYI: use <c-w> instead
 
 -- Manage tabs
-K("n", "]t", "<Cmd>tabnext<CR>", { desc = "Next tab" })
-K("n", "[t", "<Cmd>tabprevious<CR>", { desc = "Previous tab" })
+-- use nap.nvim plugin instead ([a and ]a, etc.)
 K("n", "<leader>ttn", "<Cmd>tabnew<CR>", { desc = "New tab" })
 K("n", "<leader>ttc", "<Cmd>tabclose<CR>", { desc = "Close tab" })
 
