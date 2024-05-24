@@ -37,7 +37,7 @@ local function config_lsp()
         end
 
         map("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
-        map("n", "gd", vim.lsp.buf.definition, { desc = "Go to Defintion" })
+        map("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
         map("n", "K", vim.lsp.buf.hover, { desc = "Hover" })
         map("n", "<leader>li", vim.lsp.buf.implementation, { desc = "Go to Implementation" })
         map("n", "<leader>lo", vim.lsp.buf.type_definition, { desc = "Type Definition" })

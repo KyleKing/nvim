@@ -39,6 +39,8 @@ function M.file_worktree(file)
     end
 end
 
+-- local python_path = require("kyleking.utils.fs_utils").get_python_path()
+-- print(python_path) -- ex: /Users/kyleking/.asdf/shims/python
 function M.get_python_path()
     -- Use activated virtualenv
     if vim.env.VIRTUAL_ENV then return M.path_join({ vim.env.VIRTUAL_ENV, "bin", "python" }) end

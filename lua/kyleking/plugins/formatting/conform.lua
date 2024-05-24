@@ -27,7 +27,7 @@ return {
                 scss = { prettier },
                 sh = { "shfmt" },
                 svelte = { js_like },
-                toml = { "taplo" }, -- toml-sort instead?
+                -- toml = { "taplo" }, -- PLANNED: consider toml-sort or alternative that doesn't conflict with pre-commit
                 typescript = { js_like },
                 typescriptreact = { js_like },
                 yaml = { prettier },

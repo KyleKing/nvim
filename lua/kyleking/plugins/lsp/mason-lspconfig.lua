@@ -1,7 +1,6 @@
 local function config_mason()
     require("neodev").setup({}) -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
 
-    local python_path = require("kyleking.utils.fs_utils").get_python_path()
     local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
     require("mason-lspconfig").setup({
@@ -14,16 +13,21 @@ local function config_mason()
             "jsonls",
             "lua_ls",
             -- "marksman",
-            -- "pylsp", -- Or: jedi_language_server
-            "pylyzer", -- PLANNED: Experimenting with alternative LSP for Python
-            -- "tailwindcss",
             "taplo",
             "terraformls",
             "tsserver",
             "yamlls",
+
+            -- Python
+            "pyright", -- Alternatives: pylsp, jedi_language_server, pylyzer, basedpyright, pyright
         },
         handlers = {
             require("lsp-zero").default_setup,
+            bashls = function()
+                require("lspconfig").bashls.setup({
+                    capabilities = lsp_capabilities,
+                })
+            end,
             lua_ls = function()
                 require("lspconfig").lua_ls.setup({
                     capabilities = lsp_capabilities,
@@ -41,6 +45,25 @@ local function config_mason()
                     },
                 })
             end,
+            taplo = function()
+                require("lspconfig").taplo.setup({
+                    capabilities = lsp_capabilities,
+                })
+            end,
+            terraformls = function()
+                require("lspconfig").terraformls.setup({
+                    capabilities = lsp_capabilities,
+                })
+            end,
+            tsserver = function()
+                require("lspconfig").tsserver.setup({
+                    capabilities = lsp_capabilities,
+                    -- PLANNED: use with typescript-tools or alternative (see below)
+                    --  Alt: https://github.com/yioneko/nvim-vtsls
+                    --   and see: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#vtsls
+                    -- on_attach = function() require("typescript-tools").setup({}) end,
+                })
+            end,
             yamlls = function()
                 require("lspconfig").yamlls.setup({
                     capabilities = lsp_capabilities,
@@ -55,6 +78,8 @@ local function config_mason()
                     },
                 })
             end,
+
+            -- Python
             -- pylsp = function()
             --     require("lspconfig").pylsp.setup({
             --         capabilities = lsp_capabilities,
@@ -93,15 +118,35 @@ local function config_mason()
             --         flags = { debounce_text_changes = 200 },
             --     })
             -- end,
-            pylyzer = function()
-                require("lspconfig").pylyzer.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
+            -- pylyzer = function()
+            --     require("lspconfig").pylyzer.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
+            -- basedpyright = function()
+            --     require("lspconfig").basedpyright.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
             pyright = function()
                 require("lspconfig").pyright.setup({
                     capabilities = lsp_capabilities,
-                    settings = { python = { pythonPath = python_path } },
+                    -- -- Adapted from: https://github.com/Kapocsi/dotfiles/blob/a197050297a359168bd3c7c636bf64317bf8a89a/dot-config/nvim/after/plugin/mason.lua#L41C1-L56C6
+                    -- settings = {
+                    --     pyright = {
+                    --         autoImportCompletion = true,
+                    --     },
+                    --     python = {
+                    --         analysis = {
+                    --             autoSearchPaths = true,
+                    --             diagnosticMode = "openFilesOnly",
+                    --             useLibraryCodeForTypes = true,
+                    --             typeCheckingMode = "off",
+                    --         },
+                    --         -- -- Does this need to be set?
+                    --         -- pythonPath = python_path,
+                    --     },
+                    -- },
                 })
             end,
         },
@@ -116,6 +161,11 @@ return {
         { "williamboman/mason.nvim" },
         { "neovim/nvim-lspconfig" },
         { "folke/neodev.nvim" }, -- Additional lua configuration
+        -- { -- See: https://github.com/jose-elias-alvarez/typescript.nvim/issues/80#issuecomment-1633216963
+        --     "pmizio/typescript-tools.nvim",
+        --     opts = {},
+        --     dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+        -- },
     },
     keys = {
         { "<leader>lmo", "<cmd>Mason<cr>", desc = "Open Mason" },
