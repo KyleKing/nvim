@@ -11,7 +11,6 @@ return {
     { import = "kyleking.plugins.git" },
     { import = "kyleking.plugins.keybinding" },
     { import = "kyleking.plugins.lsp" },
-    { import = "kyleking.plugins.marks" },
     { import = "kyleking.plugins.mini" },
     { import = "kyleking.plugins.motion" },
     { import = "kyleking.plugins.programming-languages-support" },
