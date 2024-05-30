@@ -627,7 +627,7 @@ runas
 runtime
 rustfmt
 S3
-sagemaker
+SageMaker
 Schemas
 scipy
 scons
