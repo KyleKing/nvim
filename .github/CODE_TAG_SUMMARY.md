@@ -2,8 +2,6 @@
 
 | Type    | Comment                                                                                                                             | Last Edit   | Source File                                                                                                                                                                                 |
 |---------|-------------------------------------------------------------------------------------------------------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| PLANNED | Convert this to Vim doc -->                                                                                                         | 2024-01-27  | [doc/notes.md:3](https://github.com/KyleKing/nvim/blame/f37f69e1594420b3ffe3ff4f1e738032a5df9df2/doc/notes.md#L3)                                                                           |
-| PLANNED | <https://dev.to/iggredible/using-buffers-windows-and-tabs-efficiently-in-vim-56jc>                                                  | 2024-01-28  | [doc/notes.md:13](https://github.com/KyleKing/nvim/blame/1b7ddd52a930cbe10e2e9a398817046b3ad05a09/doc/notes.md#L13)                                                                         |
 | PLANNED | use logic from AstroCore to identify project root directory                                                                         | 2024-02-02  | [lua/astro/rooter.lua:1](https://github.com/KyleKing/nvim/blame/2152dcee971ce67d6cab166f99cc094f8f1a74bc/lua/astro/rooter.lua#L1)                                                           |
 | TODO    | remove any unused logic and/or simplify what is kept                                                                                | 2024-01-28  | [lua/astro/utils.lua:11](https://github.com/KyleKing/nvim/blame/1b7ddd52a930cbe10e2e9a398817046b3ad05a09/lua/astro/utils.lua#L11)                                                           |
 | PLANNED | also consider 0p, but figure out how these can be useful first                                                                      | 2024-02-02  | [lua/kyleking/keymaps.lua:17](https://github.com/KyleKing/nvim/blame/8d001f9096ea0084121918861a97b859310cf59a/lua/kyleking/keybinds.lua#L14)                                                |
@@ -34,6 +32,6 @@
 | FIXME   | Add short-circuit logic                                                                                                             | 2024-02-29  | [lua/kyleking/utils/bin_discovery.lua:23](https://github.com/KyleKing/nvim/blame/7ad07fd17ca7f592d198770385a0beb7c80cfa49/lua/kyleking/utils/bin_discovery.lua#L23)                         |
 | TODO    | load JSON, see if key is present (key is basename of current directory, e.g. mdformat-mkdocs), and check for pythonPath             | 2024-02-09  | [lua/kyleking/utils/fs_utils.lua:57](https://github.com/KyleKing/nvim/blame/167332a44724e01be0b03794eeee3a0cd470c7de/lua/kyleking/utils/system_utils.lua#L28)                               |
 
-Found code tags for FIXME (5), TODO (6), PLANNED (20)
+Found code tags for FIXME (5), TODO (6), PLANNED (18)
 
 <!-- calcipy_skip_tags -->
