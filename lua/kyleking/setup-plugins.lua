@@ -28,9 +28,7 @@ require("lazy").setup("kyleking.plugins", {
 -- Configure key lazy.nvim bindings
 local K = vim.keymap.set
 K("n", "<leader>ph", require("lazy").home, { desc = "Plugins Home" })
-K("n", "<leader>pi", require("lazy").install, { desc = "Plugins Install" })
 K("n", "<leader>pS", require("lazy").sync, { desc = "Plugins Sync" })
-K("n", "<leader>pu", require("lazy").check, { desc = "Plugins Check Updates" })
 K("n", "<leader>pU", require("lazy").update, { desc = "Plugins Update" })
 K("n", "<leader>pl", require("lazy").update, { desc = "Plugins Log" })
 
