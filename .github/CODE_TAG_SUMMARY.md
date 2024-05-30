@@ -33,8 +33,7 @@
 | PLANNED | replace missing astrocore logic                                                                                                     | 2024-02-03  | [lua/kyleking/plugins/utility/nvim-notify.lua:15](https://github.com/KyleKing/nvim/blame/8081725ea6cc6920e739b712fdca72af1fef0be8/lua/kyleking/plugins/utility/nvim-notify.lua#L15)         |
 | FIXME   | Add short-circuit logic                                                                                                             | 2024-02-29  | [lua/kyleking/utils/bin_discovery.lua:23](https://github.com/KyleKing/nvim/blame/7ad07fd17ca7f592d198770385a0beb7c80cfa49/lua/kyleking/utils/bin_discovery.lua#L23)                         |
 | TODO    | load JSON, see if key is present (key is basename of current directory, e.g. mdformat-mkdocs), and check for pythonPath             | 2024-02-09  | [lua/kyleking/utils/fs_utils.lua:57](https://github.com/KyleKing/nvim/blame/167332a44724e01be0b03794eeee3a0cd470c7de/lua/kyleking/utils/system_utils.lua#L28)                               |
-| PLANNED | consider SemGrep rule for require() or not (e.g. the initial install will fail when telescope isn't available)                      | 2024-02-01  | [run-semgrep.sh:10](https://github.com/KyleKing/nvim/blame/30f6d29da1ecdcc7f9ede368241a121b843bf2b8/run-semgrep.sh#L10)                                                                     |
 
-Found code tags for FIXME (5), TODO (6), PLANNED (21)
+Found code tags for FIXME (5), TODO (6), PLANNED (20)
 
 <!-- calcipy_skip_tags -->
