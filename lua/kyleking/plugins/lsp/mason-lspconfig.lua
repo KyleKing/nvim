@@ -183,7 +183,7 @@ return {
     cmd = { "Mason", "MasonUpdate" },
     build = ":MasonUpdate",
     dependencies = {
-        { "williamboman/mason.nvim" },
+        { "williamboman/mason.nvim", dependencies = { { "zapling/mason-lock.nvim", opts = {} } } },
         { "neovim/nvim-lspconfig" },
         { "folke/neodev.nvim" }, -- Additional lua configuration
         -- { -- See: https://github.com/jose-elias-alvarez/typescript.nvim/issues/80#issuecomment-1633216963

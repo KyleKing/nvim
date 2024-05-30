@@ -1,0 +1,11 @@
+{
+  "bash-language-server": "5.1.2",
+  "json-lsp": "4.8.0",
+  "lua-language-server": "3.7.4",
+  "pyright": "1.1.364",
+  "python-lsp-server": "1.10.0",
+  "taplo": "0.8.1",
+  "terraform-ls": "v0.32.7",
+  "typescript-language-server": "4.3.3",
+  "yaml-language-server": "1.14.0"
+}

@@ -13,7 +13,7 @@
 # Pending rename of pre-push from: https://github.com/pre-commit/pre-commit/issues/2732
 default_install_hook_types: ["commit-msg", "pre-commit", "pre-push"]
 
-exclude: lazy-lock\.json|LICENSE\.md
+exclude: lazy-lock\.json|mason-lock\.json|LICENSE\.md
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
