@@ -17,10 +17,11 @@ local function config_cmp()
         -- Configure snippet sources
         sources = cmp.config.sources({
             { name = "nvim_lsp" },
-            { name = "nvim_lsp_signature_help" },
-            { name = "nvim_lua" },
+            { name = "lazydev" },
             { name = "treesitter" },
+            { name = "nvim_lua" },
             { name = "luasnip" }, -- Snippets
+            { name = "nvim_lsp_signature_help" },
         }, {
             -- Reduce false positives by placing these in the secondary completions category
             { name = "async_path" },
@@ -91,6 +92,7 @@ return {
         { "ray-x/cmp-treesitter" }, -- Source: treesitter
         { "hrsh7th/cmp-cmdline" }, -- Source: cmdline
         { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
+        { "folke/lazydev.nvim" }, -- Source lazydev. Replaces folke/neodev.nvim
         {
             -- Two options for path completions:
             -- "hrsh7th/cmp-path", -- Source: path

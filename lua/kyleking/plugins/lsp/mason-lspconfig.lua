@@ -1,6 +1,4 @@
 local function config_mason()
-    require("neodev").setup({}) -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
-
     local lsp_capabilities = require("cmp_nvim_lsp").default_capabilities()
     require("mason").setup({})
     require("mason-lspconfig").setup({
@@ -185,7 +183,18 @@ return {
     dependencies = {
         { "williamboman/mason.nvim", dependencies = { { "zapling/mason-lock.nvim", opts = {} } } },
         { "neovim/nvim-lspconfig" },
-        { "folke/neodev.nvim" }, -- Additional lua configuration
+        {
+            "folke/lazydev.nvim", -- Replaces folke/neodev.nvim
+            ft = "lua",
+            opts = {
+                library = {
+                    { path = "luvit-meta/library", words = { "vim%.uv" } },
+                },
+            },
+            dependencies = {
+                { "Bilal2453/luvit-meta", lazy = true }, -- optional `vim.uv` typings
+            },
+        },
         -- { -- See: https://github.com/jose-elias-alvarez/typescript.nvim/issues/80#issuecomment-1633216963
         --     "pmizio/typescript-tools.nvim",
         --     opts = {},
