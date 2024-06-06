@@ -1,17 +1,5 @@
--- Use gc for toggling comments. Examples:
---  gcip or gcc (line)
---  or dgc (delete commented section using gc text-object)
--- Additional configuration for nvim-ts-context-commentstring from  : https://github.com/JoosepAlviste/nvim-ts-context-commentstring/wiki/Integrations#minicomment
--- And see: https://github.com/echasnovski/mini.comment/blob/67f00d3ebbeae15e84584d971d0c32aad4f4f3a4/doc/mini-comment.txt#L87-L101
-local function mini_comment()
-    require("mini.comment").setup({
-        custom_commentstring = function()
-            return require("ts_context_commentstring").calculate_commentstring() or vim.bo.commentstring
-        end,
-    })
-end
-
 -- PLANNED: take a look at oil.nvim: https://andrewcourter.substack.com/p/why-i-switched-from-netrw-to-oilnvim
+--  and: https://andrewcourter.substack.com/p/the-best-oilnvim-configuration
 
 -- Adapted from: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/mini_files.lua
 local function mini_files()
@@ -61,7 +49,6 @@ end
 return {
     "echasnovski/mini.nvim",
     dependencies = {
-        { "JoosepAlviste/nvim-ts-context-commentstring", opts = { enable_autocmd = false } }, -- For mini.comment
         { "nvim-tree/nvim-web-devicons" }, -- Required for mini.files
     },
     event = "UIEnter",
@@ -109,7 +96,6 @@ return {
         -- See above unused bindings
         -- require("mini.bracketed").setup({})
 
-        mini_comment()
         mini_files()
         mini_move()
     end,

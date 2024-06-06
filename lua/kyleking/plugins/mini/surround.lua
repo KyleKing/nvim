@@ -6,6 +6,7 @@ local prefix = "gz"
 -- maps.n[prefix] = { desc = icon .. "Surround" }
 return {
     "echasnovski/mini.surround",
+    enabled = false,
     keys = function(plugin, keys)
         -- Populate the keys based on the user's options
         local mappings = {

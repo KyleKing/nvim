@@ -10,7 +10,6 @@ return {
     event = "VeryLazy",
     opts = {
         -- To enable all native operators, set the preset / operators plugin above
-        operators = { gc = "Comments" },
 
         -- Disable the WhichKey popup for certain buf types and file types.
         --  Disabled by default for Telescope
