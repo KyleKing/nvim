@@ -8,13 +8,7 @@
 return {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    opts = {
-        -- To enable all native operators, set the preset / operators plugin above
-
-        -- Disable the WhichKey popup for certain buf types and file types.
-        --  Disabled by default for Telescope
-        -- disable = { filetypes = { "TelescopePrompt" } },
-    },
+    opts = {},
     init = function()
         require("which-key").register({
             ["<leader>S"] = { name = "+Session" },
