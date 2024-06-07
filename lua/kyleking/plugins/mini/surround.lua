@@ -1,9 +1,11 @@
 -- FIXME: revisit implementation of surround because it isn't working as expected
+-- See: https://github.com/Allaman/nvim/blob/2cf258356eab479cdb30fa0f5a14aa78e222eff4/lua/core/plugins/mini.lua#L15C1-L42C5
 
 local prefix = "gz"
 -- local icon = vim.g.icons_enabled and "󰑤 " or ""
 -- local maps = { n = {} }
 -- maps.n[prefix] = { desc = icon .. "Surround" }
+
 ---@class LazyPluginSpec
 return {
     "echasnovski/mini.surround",
