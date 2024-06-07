@@ -20,6 +20,7 @@ local function toggle_term_cmd(opts)
     terms[opts.cmd][num]:toggle()
 end
 
+---@class LazyPluginSpec
 return {
     "akinsho/toggleterm.nvim",
     cmd = { "ToggleTerm", "TermExec" },

@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "machakann/vim-sandwich",
     enabled = false,

@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "uga-rosa/ccc.nvim",
     event = "BufRead",

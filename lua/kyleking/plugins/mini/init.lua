@@ -46,6 +46,7 @@ local function mini_move()
     })
 end
 
+---@class LazyPluginSpec
 return {
     "echasnovski/mini.nvim",
     dependencies = {

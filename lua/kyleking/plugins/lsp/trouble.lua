@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "folke/trouble.nvim",
     ---@class trouble.Config

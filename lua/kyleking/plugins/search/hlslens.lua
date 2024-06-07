@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "kevinhwang91/nvim-hlslens",
     opts = {

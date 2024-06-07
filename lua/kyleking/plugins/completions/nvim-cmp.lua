@@ -80,6 +80,7 @@ local function config_cmp()
     })
 end
 
+---@class LazyPluginSpec
 return {
     "hrsh7th/nvim-cmp",
     event = { "InsertEnter", "CmdlineEnter" },

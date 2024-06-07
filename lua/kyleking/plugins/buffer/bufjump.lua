@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "kwkarlwang/bufjump.nvim",
     opts = {

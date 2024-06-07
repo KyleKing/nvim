@@ -6,6 +6,7 @@ local rel_filename = {
     shorting_target = 40, -- Shortens path to leave 'n' spaces in the window
 }
 
+---@class LazyPluginSpec
 return {
     "nvim-lualine/lualine.nvim",
     dependencies = {

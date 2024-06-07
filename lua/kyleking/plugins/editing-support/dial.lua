@@ -1,4 +1,5 @@
 -- All options: https://github.com/monaqa/dial.nvim?tab=readme-ov-file#augend-alias
+---@class LazyPluginSpec
 return {
     "monaqa/dial.nvim",
     keys = {

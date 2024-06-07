@@ -3,7 +3,7 @@
 -- When pressing z=, select spelling suggestions
 -- Shows bindings on <c-w>, z, and g
 -- Scroll with "<c-d>" and "<c-u>"
--- PLANNED: type check all plugins
+
 ---@class LazyPluginSpec
 return {
     "folke/which-key.nvim",

@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "rcarriga/nvim-notify",
     event = "UIEnter",

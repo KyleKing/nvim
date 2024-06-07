@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "EdenEast/nightfox.nvim",
     opts = {

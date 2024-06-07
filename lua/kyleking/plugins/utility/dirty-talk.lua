@@ -1,4 +1,5 @@
 -- Extend vim spelling dictionary with dynamically generated one
+---@class LazyPluginSpec
 return {
     "psliwka/vim-dirtytalk",
     build = ":DirtytalkUpdate",

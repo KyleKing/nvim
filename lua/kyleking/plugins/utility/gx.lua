@@ -1,3 +1,4 @@
+---@class LazyPluginSpec
 return {
     "chrishrb/gx.nvim",
     keys = { { "gx", "<cmd>Browse<cr>", desc = "Open File", mode = { "n", "x" } } },

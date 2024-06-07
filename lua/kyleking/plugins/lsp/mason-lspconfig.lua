@@ -176,6 +176,7 @@ local function config_mason()
     })
 end
 
+---@class LazyPluginSpec
 return {
     "williamboman/mason-lspconfig.nvim",
     cmd = { "Mason", "MasonUpdate" },

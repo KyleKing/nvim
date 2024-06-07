@@ -4,6 +4,7 @@ local prefix = "gz"
 -- local icon = vim.g.icons_enabled and "󰑤 " or ""
 -- local maps = { n = {} }
 -- maps.n[prefix] = { desc = icon .. "Surround" }
+---@class LazyPluginSpec
 return {
     "echasnovski/mini.surround",
     enabled = false,

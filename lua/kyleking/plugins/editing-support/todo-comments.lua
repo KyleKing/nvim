@@ -1,4 +1,5 @@
 -- FYI: alternatively could use: https://github.com/stsewd/tree-sitter-comment
+---@class LazyPluginSpec
 return {
     "folke/todo-comments.nvim",
     event = "BufRead",

@@ -79,6 +79,7 @@ local function config_telescope_integrations()
 end
 
 -- Based on: https://lsp-zero.netlify.app/v3.x/blog/you-might-not-need-lsp-zero.html
+---@class LazyPluginSpec
 return {
     "VonHeikemen/lsp-zero.nvim",
     event = { "BufRead", "InsertEnter", "CmdlineEnter" },
