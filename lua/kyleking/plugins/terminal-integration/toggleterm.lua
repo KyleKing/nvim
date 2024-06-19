@@ -43,17 +43,23 @@ return {
             -- https://github.com/ClementTsang/bottom
             "<leader>tb",
             function() toggle_term_cmd("btm") end,
-            desc = "ToggleTerm 'bottom' Processes",
+            desc = "ToggleTerm 'bottom'",
         },
         {
             "<leader>tp",
             function() toggle_term_cmd("python") end,
-            desc = "ToggleTerm python",
+            desc = "ToggleTerm 'python'",
         },
         {
             "<leader>td",
             function() toggle_term_cmd("lazydocker") end,
-            desc = "ToggleTerm lazydocker",
+            desc = "ToggleTerm 'lazydocker'",
+        },
+        {
+            -- https://github.com/yorukot/superfile
+            "<leader>ts",
+            function() toggle_term_cmd("spf") end,
+            desc = "ToggleTerm 'superfile'",
         },
         { "<leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
         { "<leader>th", "<Cmd>ToggleTerm size=15 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
