@@ -40,17 +40,6 @@ return {
             desc = "ToggleTerm lazygit",
         },
         {
-            -- https://github.com/ClementTsang/bottom
-            "<leader>tb",
-            function() toggle_term_cmd("btm") end,
-            desc = "ToggleTerm 'bottom'",
-        },
-        {
-            "<leader>tp",
-            function() toggle_term_cmd("python") end,
-            desc = "ToggleTerm 'python'",
-        },
-        {
             "<leader>td",
             function() toggle_term_cmd("lazydocker") end,
             desc = "ToggleTerm 'lazydocker'",
