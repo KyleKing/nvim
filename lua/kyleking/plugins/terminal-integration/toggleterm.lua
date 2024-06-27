@@ -55,12 +55,6 @@ return {
             function() toggle_term_cmd("lazydocker") end,
             desc = "ToggleTerm 'lazydocker'",
         },
-        {
-            -- https://github.com/yorukot/superfile
-            "<leader>ts",
-            function() toggle_term_cmd("spf") end,
-            desc = "ToggleTerm 'superfile'",
-        },
         { "<leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
         { "<leader>th", "<Cmd>ToggleTerm size=15 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
         { "<leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" },
