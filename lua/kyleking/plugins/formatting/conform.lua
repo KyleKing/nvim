@@ -38,7 +38,7 @@ return {
             -- -- LazyVim will merge the options you set here with builtin formatters or add your own
             -- -- Defaults formatters are defined here: https://github.com/stevearc/conform.nvim/tree/192a6d2ddace343f1840a8f72efe2315bd392243/lua/conform/formatters
             -- ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
-            -- formatters = {
+            formatters = {},
             --     eslint = {
             --         -- FIXME: migrate to new signature with self: https://github.com/stevearc/conform.nvim/pull/233/files
             --         -- ---@param config conform.FormatterConfig

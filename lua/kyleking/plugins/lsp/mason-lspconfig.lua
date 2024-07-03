@@ -204,7 +204,7 @@ return {
     },
     keys = {
         { "<leader>lmo", "<cmd>Mason<cr>", desc = "Open Mason" },
-        { "<leader>lmu", "<cmd>MasonUpdate<cr>", desc = "Update Mason" },
+        { "<leader>lmU", "<cmd>MasonUpdate<cr>", desc = "Update Mason" },
     },
     config = config_mason,
 }
