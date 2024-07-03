@@ -2,7 +2,7 @@
   "bash-language-server": "5.4.0",
   "json-lsp": "4.10.0",
   "lua-language-server": "3.9.3",
-  "pyright": "1.1.369",
+  "pyright": "1.1.370",
   "taplo": "0.8.1",
   "terraform-ls": "v0.33.3",
   "typescript-language-server": "4.3.3",
