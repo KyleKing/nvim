@@ -8,23 +8,25 @@
 return {
     "folke/which-key.nvim",
     event = "VeryLazy",
-    opts = {},
-    init = function()
-        require("which-key").register({
-            ["<leader>S"] = { name = "+Session" },
-            ["<leader>b"] = { name = "+Buffer" },
-            ["<leader>bO"] = { name = "+Order" },
-            ["<leader>f"] = { name = "+Find" },
-            ["<leader>g"] = { name = "+Git" },
-            ["<leader>l"] = { name = "+LSP", mode = { "n", "v" } },
-            ["<leader>lw"] = { name = "+Workspace" },
-            ["<leader>m"] = { name = "+Move", mode = { "n", "v" } },
-            ["<leader>p"] = { name = "+Plugins" },
-            ["<leader>r"] = { name = "+Register" },
-            ["<leader>t"] = { name = "+ToggleTerm" },
-            ["<leader>u"] = { name = "+UI" },
-            ["<leader>uc"] = { name = "+Color" },
-            ["<leader>ug"] = { name = "+Git" },
-        })
-    end,
+    ---@class wk.Opts
+    opts = {
+        --- You can add any mappings here, or use `require('which-key').add()` later
+        ---@type wk.Spec
+        spec = {
+            { "<leader>S", group = "Session" },
+            { "<leader>b", group = "Buffer" },
+            { "<leader>bO", group = "Order" },
+            { "<leader>f", group = "Find" },
+            { "<leader>g", group = "Git" },
+            { "<leader>l", group = "LSP", mode = { "n", "v" } },
+            { "<leader>lw", group = "Workspace" },
+            { "<leader>m", group = "Move", mode = { "n", "v" } },
+            { "<leader>p", group = "Plugins" },
+            { "<leader>r", group = "Register" },
+            { "<leader>t", group = "ToggleTerm" },
+            { "<leader>u", group = "UI" },
+            { "<leader>uc", group = "Color" },
+            { "<leader>ug", group = "Git" },
+        },
+    },
 }
