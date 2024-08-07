@@ -8,6 +8,10 @@
 return {
     "folke/which-key.nvim",
     event = "VeryLazy",
+    dependencies = {
+        -- Or mini.icons
+        { "nvim-tree/nvim-web-devicons" },
+    },
     ---@class wk.Opts
     opts = {
         --- You can add any mappings here, or use `require('which-key').add()` later
