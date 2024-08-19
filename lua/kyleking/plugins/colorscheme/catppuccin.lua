@@ -5,6 +5,7 @@ return {
     ---@type CatppuccinOptions
     opts = {
         integrations = {
+            colorful_winsep = { enabled = true, color = "lavender" },
             mason = true,
             mini = true,
             -- notify = true,
