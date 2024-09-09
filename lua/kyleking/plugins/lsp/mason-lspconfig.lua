@@ -13,7 +13,7 @@ local function config_mason()
             -- "marksman",
             "taplo",
             "terraformls",
-            "tsserver",
+            "ts_ls",
             "yamlls",
 
             -- Python
@@ -53,8 +53,8 @@ local function config_mason()
                     capabilities = lsp_capabilities,
                 })
             end,
-            tsserver = function()
-                require("lspconfig").tsserver.setup({
+            ts_ls = function()
+                require("lspconfig").ts_ls.setup({
                     capabilities = lsp_capabilities,
                     -- PLANNED: use with typescript-tools or alternative (see below)
                     --  Alt: https://github.com/yioneko/nvim-vtsls
