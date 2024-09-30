@@ -1,8 +1,8 @@
 {
-  "bash-language-server": "5.4.0",
+  "bash-language-server": "5.4.2",
   "json-lsp": "4.10.0",
-  "lua-language-server": "3.10.5",
-  "pyright": "1.1.379",
+  "lua-language-server": "3.10.6",
+  "pyright": "1.1.382",
   "taplo": "0.9.3",
   "terraform-ls": "v0.34.3",
   "typescript-language-server": "4.3.3",
