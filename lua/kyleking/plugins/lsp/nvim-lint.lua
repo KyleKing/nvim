@@ -24,21 +24,17 @@ return {
 
         -- All available linters: https://github.com/mfussenegger/nvim-lint?tab=readme-ov-file#available-linters
         lint.linters_by_ft = {
-            -- go = { "golangcilint" },
+            go = { "golangcilint" },
             javascript = { "eslint" },
             javascriptreact = { "eslint" },
             lua = { "selene" },
-            -- nix = { "nix" },
-            -- protobuf = { "buf", "protolint" },
-            python = { "ruff" }, -- PLANNED: implement full linting suite (flake8, etc.)
-            -- python = { "mypy", "flake8", "pylint", "ruff" }, -- FYI: override pylint colors to be OFF!
+            python = { "ruff" },
             sh = { "shellcheck" },
             terraform = { "tflint" },
             typescript = { "eslint" },
             typescriptreact = { "eslint" },
             yaml = { "yamllint" },
             zsh = { "zsh" },
-            -- PLANNED: configure additional linters:
         }
 
         local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
