@@ -5,33 +5,31 @@ return {
     opts = function()
         -- local util = require("conform.util")
         local prettier = { "prettierd", "prettier" }
-        local js_like = { prettier, "eslint" } -- Note: eslint is monorepo specific
+        local js_like = prettier -- PLANNED: conditionally check for eslint or other tooling
         ---@class ConformOpts
         local opts = {
             format = {
                 timeout_ms = 3000,
             },
-            ---@type table<string, conform.FormatterUnit[]>
             formatters_by_ft = {
                 bash = { "beautysh" },
                 -- Use a sub-list to run only the first available formatter
-                css = { prettier },
-                graphql = { prettier },
-                html = { prettier },
-                javascript = { js_like },
-                javascriptreact = { js_like },
-                json = { prettier },
+                css = prettier,
+                graphql = prettier,
+                html = prettier,
+                javascript = js_like,
+                javascriptreact = js_like,
+                json = prettier,
                 lua = { "stylua" },
                 markdown = { "mdformat", "injected" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
                 python = { "ruff_format", "ruff_fix" },
                 -- rust = { "rustfmt" },
-                scss = { prettier },
+                scss = prettier,
                 sh = { "shfmt" },
-                svelte = { js_like },
                 -- toml = { "taplo" }, -- PLANNED: consider toml-sort or alternative that doesn't conflict with pre-commit
-                typescript = { js_like },
-                typescriptreact = { js_like },
-                yaml = { prettier },
+                typescript = js_like,
+                typescriptreact = js_like,
+                yaml = prettier,
                 -- Use the "*" filetype to run formatters on all filetypes and "_" for those that do not have a linter configured
                 ["*"] = { "typos" }, -- Installed with: brew install typos-cli
             },

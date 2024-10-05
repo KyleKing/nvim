@@ -25,14 +25,14 @@ return {
         -- All available linters: https://github.com/mfussenegger/nvim-lint?tab=readme-ov-file#available-linters
         lint.linters_by_ft = {
             go = { "golangcilint" },
-            javascript = { "eslint" },
-            javascriptreact = { "eslint" },
+            -- javascript = { "eslint" },
+            -- javascriptreact = { "eslint" },
             lua = { "selene" },
             python = { "ruff" },
             sh = { "shellcheck" },
             terraform = { "tflint" },
-            typescript = { "eslint" },
-            typescriptreact = { "eslint" },
+            -- typescript = { "eslint" },
+            -- typescriptreact = { "eslint" },
             yaml = { "yamllint" },
             zsh = { "zsh" },
         }
