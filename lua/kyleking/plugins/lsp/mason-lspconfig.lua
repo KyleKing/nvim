@@ -11,7 +11,7 @@ local function config_mason()
             "jsonls",
             "lua_ls",
             -- "marksman",
-            "taplo",
+            -- "taplo", -- Conflicts with pappasam/toml-sort
             "terraformls",
             "ts_ls",
             "yamlls",
@@ -43,11 +43,11 @@ local function config_mason()
                     },
                 })
             end,
-            taplo = function()
-                require("lspconfig").taplo.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
+            -- taplo = function()
+            --     require("lspconfig").taplo.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
             terraformls = function()
                 require("lspconfig").terraformls.setup({
                     capabilities = lsp_capabilities,
