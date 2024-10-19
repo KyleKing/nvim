@@ -179,6 +179,7 @@ end
 ---@class LazyPluginSpec
 return {
     "williamboman/mason-lspconfig.nvim",
+    enabled = false, -- TODO: broken without nvim-cmp
     cmd = { "Mason", "MasonUpdate" },
     build = ":MasonUpdate",
     dependencies = {

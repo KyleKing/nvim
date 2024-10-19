@@ -83,6 +83,7 @@ end
 ---@class LazyPluginSpec
 return {
     "hrsh7th/nvim-cmp",
+    enabled = false,
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
         { "VonHeikemen/lsp-zero.nvim" }, -- Configured in plugins.lsp.lsp-zero
