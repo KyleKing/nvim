@@ -13,7 +13,12 @@ vim.opt.cursorline = true -- highlight the text line of the cursor
 vim.opt.diffopt:append({ "algorithm:histogram", "linematch:60" }) -- enable linematch diff algorithm
 vim.opt.fileencoding = "utf-8" -- file content encoding for the buffer
 vim.opt.fillchars = { eob = " " } -- disable `~` on nonexistent lines
-vim.opt.foldlevelstart = 99 -- start with all code unfolded
+-- PLANNED: Configure ufo: https://github.com/kevinhwang91/nvim-ufo?tab=readme-ov-file#minimal-configuration
+vim.opt.foldcolumn = "1" -- '0' is not bad
+vim.opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
+vim.opt.foldmethod = "indent" -- See: https://youtu.be/pTVLA62CNqg?si=ZgEV2tkIYrGHOUag
 vim.opt.history = 100 -- number of commands to remember in a history table
 vim.opt.ignorecase = true -- case insensitive searching
 vim.opt.infercase = true -- infer cases in keyword completion

@@ -8,6 +8,8 @@
 | PLANNED | K("n", "<leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })                     | 2024-02-05 | [lua/kyleking/keymaps.lua:49](https://github.com/KyleKing/nvim/blame/3fd0d95ef92eff615863f857b0195fa26a1d66e9/lua/kyleking/keybinds.lua#L49)                                                      |
 | PLANNED | review these additional keybinds                                                                                                    | 2024-02-01 | [lua/kyleking/keymaps.lua:59](https://github.com/KyleKing/nvim/blame/e25faf56d74fed989793595dded50559262bfbd6/lua/kyleking/keybinds.lua#L57)                                                      |
 | FIXME   | use named registers rather than always copying to the clipboard                                                                     | 2024-03-01 | [lua/kyleking/options.lua:7](https://github.com/KyleKing/nvim/blame/c0f4e7e77b8b9fbe08a2cdb1eb68bad24255a9e5/lua/kyleking/options.lua#L7)                                                         |
+| PLANNED | Configure ufo: https://github.com/kevinhwang91/nvim-ufo?tab=readme-ov-file#minimal-configuration                                    | 2024-10-22 | [lua/kyleking/options.lua:16](https://github.com/KyleKing/nvim/blame/main
+/lua/kyleking/options.lua#L16)                                                                                          |
 | PLANNED | consider reading line length from pyproject.toml and caching result                                                                 | 2024-09-27 | [lua/kyleking/plugins/bars-and-lines/multicolumn.lua:13](https://github.com/KyleKing/nvim/blame/697cf622110a7bc8e616379e7960450f66ece2e9/lua/kyleking/plugins/bars-and-lines/multicolumn.lua#L13) |
 | PLANNED | conditionally check for eslint or other tooling                                                                                     | 2024-10-05 | [lua/kyleking/plugins/formatting/conform.lua:8](https://github.com/KyleKing/nvim/blame/a6084780099e2a0626f7ef0947bde5e4bad2128f/lua/kyleking/plugins/formatting/conform.lua#L8)                   |
 | PLANNED | consider toml-sort or alternative that doesn't conflict with pre-commit                                                             | 2024-05-24 | [lua/kyleking/plugins/formatting/conform.lua:29](https://github.com/KyleKing/nvim/blame/96f0b7d67f2314bc71f9282e3ea9fe588c76f43b/lua/kyleking/plugins/formatting/conform.lua#L30)                 |
@@ -31,6 +33,6 @@
 | FIXME   | Add short-circuit logic                                                                                                             | 2024-02-29 | [lua/kyleking/utils/bin_discovery.lua:23](https://github.com/KyleKing/nvim/blame/7ad07fd17ca7f592d198770385a0beb7c80cfa49/lua/kyleking/utils/bin_discovery.lua#L23)                               |
 | TODO    | load JSON, see if key is present (key is basename of current directory, e.g. mdformat-mkdocs), and check for pythonPath             | 2024-02-09 | [lua/kyleking/utils/fs_utils.lua:57](https://github.com/KyleKing/nvim/blame/167332a44724e01be0b03794eeee3a0cd470c7de/lua/kyleking/utils/system_utils.lua#L28)                                     |
 
-Found code tags for FIXME (5), TODO (6), PLANNED (17)
+Found code tags for FIXME (5), TODO (6), PLANNED (18)
 
 <!-- calcipy_skip_tags -->
