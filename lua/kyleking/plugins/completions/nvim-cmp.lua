@@ -83,7 +83,7 @@ end
 ---@class LazyPluginSpec
 return {
     "hrsh7th/nvim-cmp",
-    enabled = false,
+    -- enabled = false,  -- PLANNED: revisit experimenting with blink-cmp
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
         { "VonHeikemen/lsp-zero.nvim" }, -- Configured in plugins.lsp.lsp-zero
