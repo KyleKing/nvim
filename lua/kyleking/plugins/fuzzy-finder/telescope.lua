@@ -5,7 +5,6 @@ return {
         { "nvim-lua/plenary.nvim" },
         { "nvim-telescope/telescope-fzf-native.nvim", enabled = vim.fn.executable("make") == 1, build = "make" },
         { "nvim-telescope/telescope-live-grep-args.nvim" },
-        { "rcarriga/nvim-notify" },
     },
     cmd = "Telescope",
     opts = function()
@@ -64,7 +63,6 @@ return {
         local telescope = require("telescope")
         telescope.load_extension("fzf")
         telescope.load_extension("live_grep_args")
-        telescope.load_extension("notify")
     end,
     keys = {
         { "<leader><CR>", require("telescope.builtin").resume, desc = "Resume last Telescope session" },
@@ -173,7 +171,6 @@ return {
         { "<leader>fh", require("telescope.builtin").help_tags, desc = "Find in nvim help" },
         { "<leader>fk", require("telescope.builtin").keymaps, desc = "Find keymaps" },
         { "<leader>fm", require("telescope.builtin").man_pages, desc = "Find man" },
-        { "<leader>fn", function() require("telescope").extensions.notify.notify() end, desc = "Find notifications" },
         { "<leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
         {
             "<leader>fw", -- Example: '--no-ignore foo' or '-w exact-word'

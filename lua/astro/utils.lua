@@ -43,14 +43,6 @@ function M.list_insert_unique(lst, ...)
     return lst
 end
 
---- Serve a notification with a title of AstroNvim
----@param msg string The notification body
----@param type integer|nil The type of the notification (:help vim.log.levels)
----@param opts? table The nvim-notify options to use (:help notify-options)
-function M.notify(msg, type, opts)
-    vim.schedule(function() vim.notify(msg, type, M.extend_tbl({ title = "AstroNvim" }, opts)) end)
-end
-
 --- Open a URL under the cursor with the current operating system
 ---@param path string The path of the file to open with the system opener
 function M.system_open(path)
