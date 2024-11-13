@@ -43,7 +43,7 @@ repos:
     hooks:
       - id: stylua-system
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.29.1
+    rev: v3.30.1
     hooks:
       - id: commitizen
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -69,6 +69,11 @@ repos:
     hooks:
       - id: toml-sort-fix
         args: [--in-place, --all, --trailing-comma-inline-array]
+  - repo: https://github.com/KyleKing/calcipy
+    rev: 5.0.0
+    hooks:
+      - id: tags
+        entry: calcipy-tags tags --doc-sub-dir=.github --filename=CODE_TAG_SUMMARY.md
   - repo: local
     hooks:
       - id: selene
@@ -77,10 +82,3 @@ repos:
         entry: selene
         language: system
         types: [lua]
-      - id: tags
-        description: "Create a `CODE_TAG_SUMMARY.md` with a table for TODO- and FIXME-style code comments"
-        entry: calcipy-tags tags --doc-sub-dir=.github --filename=CODE_TAG_SUMMARY.md
-        language: system
-        name: Tags
-        pass_filenames: false
-        require_serial: true
