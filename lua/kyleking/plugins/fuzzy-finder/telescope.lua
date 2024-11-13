@@ -11,20 +11,9 @@ return {
         local actions = require("telescope.actions")
         return {
             defaults = {
-                prompt_prefix = "❯ ",
-                selection_caret = "❯ ",
-                file_ignore_patterns = {
-                    -- TODO: This list isn't being applied for 'fw' or 'ff'
-                    ".+\\.min\\.[^.]+",
-                    "\\.cover/",
-                    "\\.git/",
-                    "\\.mypy_cache/",
-                    "\\.pytest_cache/",
-                    "\\.ropeproject/",
-                    "\\.ruff_cache/",
-                    "\\.venv/",
-                    "node_modules/",
-                },
+                -- Instead of file_ignore_patterns, because telescope uses ripgrep,
+                --  use .gitignore. See rg docs:
+                --   https://github.com/BurntSushi/ripgrep/blob/79cbe89deb1151e703f4d91b19af9cdcc128b765/GUIDE.md#automatic-filtering
                 path_display = { "truncate" },
                 sorting_strategy = "ascending",
                 layout_config = {
@@ -54,7 +43,7 @@ return {
             },
             extensions = {
                 live_grep_args = {
-                    auto_quoting = true, -- If the prompt value does not begin with ', " or - the entire prompt is treated as a single argument
+                    auto_quoting = true, -- If the prompt value does not begin with ', ", or - the entire prompt is treated as a single argument
                 },
             },
         }
@@ -71,37 +60,7 @@ return {
         -- Leader-b
         { "<leader>br", require("telescope.builtin").oldfiles, desc = "Find [r]ecently opened files" },
         { "<leader>bb", require("telescope.builtin").current_buffer_fuzzy_find, desc = "Find word in current buffer" },
-        {
-            "<leader>bB",
-            function()
-                require("telescope.builtin").live_grep({
-                    grep_open_files = true,
-                    prompt_title = "Live Grep in Open Buffers",
-                })
-            end,
-            desc = "Find word in open buffers",
-        },
         -- Leader-g
-        {
-            "<leader>gb",
-            function() require("telescope.builtin").git_branches({ use_file_path = true }) end,
-            desc = "Git branches",
-        },
-        {
-            "<leader>gc",
-            function() require("telescope.builtin").git_commits({ use_file_path = true }) end,
-            desc = "Git commits (repository)",
-        },
-        {
-            "<leader>gC",
-            function() require("telescope.builtin").git_bcommits({ use_file_path = true }) end,
-            desc = "Git commits (current buffer)",
-        },
-        {
-            "<leader>gs",
-            function() require("telescope.builtin").git_status({ use_file_path = true }) end,
-            desc = "Git status",
-        },
         {
             -- FYI: Identifies files in parent git directory, but fails if not within a git directory
             "<leader>gf",
@@ -110,48 +69,16 @@ return {
         },
         -- Leader-l
         { "<leader>ld", require("telescope.builtin").diagnostics, desc = "Find in Diagnostics" },
-        { "<leader>lgs", require("telescope.builtin").lsp_document_symbols, desc = "Find in symbols" },
         -- PLANNED: investigate these go-to mappings
+        { "<leader>lgs", require("telescope.builtin").lsp_document_symbols, desc = "Find in symbols" },
         { "<leader>lgd", require("telescope.builtin").lsp_definitions, desc = "lsp_definitions" },
         { "<leader>lgi", require("telescope.builtin").lsp_implementations, desc = "lsp_implementations" },
         { "<leader>lgr", require("telescope.builtin").lsp_references, desc = "lsp_references" },
         { "<leader>lgt", require("telescope.builtin").lsp_type_definitions, desc = "lsp_type_definitions" },
-        {
-            "<leader>lgw",
-            function()
-                vim.ui.input({ prompt = "Symbol Query (leave empty for word under cursor): " }, function(query)
-                    if query then
-                        -- word under cursor if given query is empty
-                        if query == "" then query = vim.fn.expand("<cword>") end
-                        require("telescope.builtin").lsp_workspace_symbols({
-                            query = query,
-                            prompt_title = ("Find word (%s)"):format(query),
-                        })
-                    end
-                end)
-            end,
-            desc = "Find word in lsp_workspace_symbols",
-        },
         -- Leader-f
+        -- PLANNED: maybe quickfix or search history would be good additions?
         { "<leader>fB", require("telescope.builtin").builtin, desc = "Find in Telescope builtins" },
         { "<leader>f'", require("telescope.builtin").marks, desc = "Find marks" },
-        {
-            "<leader>fN",
-            function()
-                require("telescope.builtin").find_files({
-                    prompt_title = "nvim Config Files",
-                    cwd = vim.fn.stdpath("config"),
-                    follow = true,
-                })
-            end,
-            desc = "Find in nvim config files",
-        },
-        {
-            "<leader>f*",
-            function() require("telescope-live-grep-args.shortcuts").grep_word_under_cursor() end,
-            desc = "Find word under cursor",
-            mode = { "n" },
-        },
         {
             "<leader>f*",
             function() require("telescope-live-grep-args.shortcuts").grep_visual_selection() end,
@@ -160,6 +87,7 @@ return {
         },
         { "<leader>fC", require("telescope.builtin").commands, desc = "Find commands" },
         {
+            -- FIXME: This is finding in .git
             "<leader>ff",
             function()
                 require("telescope.builtin").find_files({
@@ -170,7 +98,6 @@ return {
         },
         { "<leader>fh", require("telescope.builtin").help_tags, desc = "Find in nvim help" },
         { "<leader>fk", require("telescope.builtin").keymaps, desc = "Find keymaps" },
-        { "<leader>fm", require("telescope.builtin").man_pages, desc = "Find man" },
         { "<leader>fr", require("telescope.builtin").registers, desc = "Find registers" },
         {
             "<leader>fw", -- Example: '--no-ignore foo' or '-w exact-word'
