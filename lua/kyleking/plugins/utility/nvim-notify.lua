@@ -27,7 +27,6 @@ return {
         --     vim.wo[win].spell = false
         -- end,
     },
-    -- -- FYI: this is only necessary if structlog/log.lua is removed
     -- config = function(opts)
     --     local notify = require("notify")
     --     notify.setup(opts)
