@@ -1,7 +1,10 @@
+-- Use with: vim.cmd.colorscheme "catppuccin"
 ---@class LazyPluginSpec
 return {
-    "catppuccin",
+    "catppuccin/nvim",
     enabled = false, -- Currently unused
+    name = "catppuccin",
+    priority = 1000,
     ---@type CatppuccinOptions
     opts = {
         integrations = {
