@@ -8,6 +8,7 @@ local function config_mason()
             "bashls",
             -- "docker_compose_language_service",
             -- "dockerls",
+            "helm_ls",
             "jsonls",
             "lua_ls",
             -- "marksman",
