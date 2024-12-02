@@ -2,9 +2,9 @@
   "bash-language-server": "5.4.2",
   "helm-ls": "v0.1.0",
   "json-lsp": "4.10.0",
-  "lua-language-server": "3.13.0",
+  "lua-language-server": "3.13.2",
   "pyright": "1.1.389",
-  "terraform-ls": "v0.35.0",
+  "terraform-ls": "v0.36.0",
   "typescript-language-server": "4.3.3",
   "yaml-language-server": "1.15.0"
 }
