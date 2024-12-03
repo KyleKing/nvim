@@ -2,7 +2,7 @@
 return {
     "Saghen/blink.cmp",
     lazy = false, -- lazy loading handled internally
-    enabled = false, -- PLANNED: experiment with blink.cmp
+    enabled = false, -- PLANNED: experiment with blink.cmp (pending v2 changes)
 
     -- use a release tag to download pre-built binaries
     version = "v0.*",
