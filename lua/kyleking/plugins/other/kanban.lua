@@ -6,7 +6,9 @@ return {
     event = "UIEnter",
     opts = {},
     keys = {
-        { "<leader>kc", "<cmd>KanbanCreate kanban.md<CR>", mode = { "n" }, desc = "Create the default Kanban board" },
+        { "<leader>kO", "<cmd>KanbanCreate kanban.md<CR>", mode = { "n" }, desc = "Initialize default Kanban board" },
+        { "<leader>kc", "<cmd>KanbanClose<CR>", mode = { "n" }, desc = "Close the Kanban Board" },
         { "<leader>ko", "<cmd>KanbanOpen kanban.md<CR>", mode = { "n" }, desc = "Open the default Kanban board" },
+        { "<leader>ks", "<cmd>KanbanSave<CR>", mode = { "n" }, desc = "Save the Kanban Board" },
     },
 }
