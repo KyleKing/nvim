@@ -1,8 +1,9 @@
 ---@class LazyPluginSpec
 return {
     "arakkkkk/kanban.nvim",
-    -- Only load for a specific directory. Based on: https://github.com/LazyVim/LazyVim/discussions/2600#discussioncomment-8572894
-    cond = vim.fn.getcwd() == vim.fn.expand("~/Developer/kyleking/task_vault"),
+    -- Only load for matching directory. Based on: https://github.com/LazyVim/LazyVim/discussions/2600#discussioncomment-8572894
+    cond = string.match(vim.fn.getcwd(), "/obsidian%-kyleking%-vault") ~= nil,
+    event = "UIEnter",
     opts = {},
     keys = {
         { "<leader>kc", "<cmd>KanbanCreate kanban.md<CR>", mode = { "n" }, desc = "Create the default Kanban board" },
