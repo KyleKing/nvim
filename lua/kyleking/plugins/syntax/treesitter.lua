@@ -47,6 +47,7 @@ return {
                 "css",
                 "csv",
                 "diff",
+                "djot",
                 "dockerfile",
                 "git_config",
                 "git_rebase",
