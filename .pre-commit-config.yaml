@@ -69,11 +69,12 @@ repos:
     hooks:
       - id: toml-sort-fix
         args: [--in-place, --all, --trailing-comma-inline-array]
-  - repo: https://github.com/KyleKing/calcipy
-    rev: 5.0.0
-    hooks:
-      - id: tags
-        entry: calcipy-tags tags --doc-sub-dir=.github --filename=CODE_TAG_SUMMARY.md
+  # TODO: broken until uv migration is complete
+  # - repo: https://github.com/KyleKing/calcipy
+  #   rev: 5.0.0
+  #   hooks:
+  #     - id: tags
+  #       entry: calcipy-tags tags --doc-sub-dir=.github --filename=CODE_TAG_SUMMARY.md
   - repo: local
     hooks:
       - id: selene
