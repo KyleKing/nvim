@@ -5,6 +5,7 @@ return {
     main = "nvim-treesitter.configs",
     dependencies = {
         { "nvim-treesitter/nvim-treesitter-textobjects" },
+        { "apple/pkl-neovim" },
     },
     cmd = {
         "TSBufDisable",
@@ -71,9 +72,10 @@ return {
                 "markdown",
                 "markdown_inline", -- needed for full highlighting
                 "nix",
-                "requirements", -- pip requirements.txt
+                "pkl",
                 "python",
                 "regex",
+                "requirements", -- pip requirements.txt
                 "rst",
                 "rust",
                 "sql",
