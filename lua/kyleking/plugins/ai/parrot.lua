@@ -6,6 +6,7 @@
 return {
     "frankroeder/parrot.nvim",
     -- lazy = "VeryLazy",
+    enabled = false, -- PLANNED: revisit
     dependencies = { "ibhagwan/fzf-lua", "nvim-lua/plenary.nvim" },
     opts = {
         providers = {

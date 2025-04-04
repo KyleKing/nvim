@@ -108,6 +108,22 @@ return {
                 { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
             },
         },
+        { -- Sourced from: https://github.com/DanielFGray/dotfiles/blob/d5919fcbf60c5987d9adee65668aa117232c8be5/nvim.lua#L183C7-L196C9
+            "https://github.com/zbirenbaum/copilot-cmp",
+            dependencies = {
+                "https://github.com/zbirenbaum/copilot.lua",
+                cmd = "Copilot",
+                event = "InsertEnter",
+                opts = {
+                    -- suggestion = { enabled = false },
+                    panel = {
+                        enabled = true,
+                        auto_refresh = true,
+                    },
+                },
+            },
+            opts = true,
+        },
     },
     config = config_cmp,
 }
