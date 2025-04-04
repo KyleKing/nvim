@@ -30,7 +30,7 @@ return {
             lua = { "selene" },
             python = { "ruff" },
             sh = { "shellcheck" },
-            terraform = { "tflint" },
+            -- terraform = { "tflint" }, -- TODO: this is using up CPU
             -- typescript = { "eslint" },
             -- typescriptreact = { "eslint" },
             yaml = { "yamllint" },
