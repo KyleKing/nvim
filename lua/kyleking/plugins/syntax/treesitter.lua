@@ -42,7 +42,6 @@ return {
     opts = function()
         return {
             -- Add languages to be installed here that you want installed for treesitter
-            -- PLANNED:
             ensure_installed = {
                 "bash",
                 "css",

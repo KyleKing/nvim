@@ -40,6 +40,11 @@ return {
             desc = "ToggleTerm lazygit",
         },
         {
+            "<leader>gj",
+            function() toggle_term_cmd("lazyjj") end,
+            desc = "ToggleTerm lazyjj",
+        },
+        {
             "<leader>td",
             function() toggle_term_cmd("lazydocker") end,
             desc = "ToggleTerm 'lazydocker'",

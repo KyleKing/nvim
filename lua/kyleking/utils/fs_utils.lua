@@ -33,6 +33,7 @@ function M.file_worktree(file)
                 "--error-unmatch",
                 file,
             }, false)
+            -- Consider using `jj workspace root` when no local git directory
         then
             return worktree
         end
