@@ -115,6 +115,8 @@ return {
                     "zbirenbaum/copilot.lua",
                     dependencies = {
                         "folke/snacks.nvim",
+                        lazy = false,
+                        priority = 1000,
                         ---@type snacks.Config
                         opts = {},
                     },
