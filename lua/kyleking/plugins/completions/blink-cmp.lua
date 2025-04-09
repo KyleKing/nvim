@@ -3,6 +3,7 @@ return {
     "Saghen/blink.cmp",
     lazy = false, -- lazy loading handled internally
     enabled = false, -- PLANNED: experiment with blink.cmp (pending v2 changes)
+    -- See: https://github.com/samyakbardiya/nvim/blob/bf0bc659991074cade7a63c6af0af9c322e1d7fa/lua/plugins/blink.lua
 
     -- use a release tag to download pre-built binaries
     version = "v0.*",

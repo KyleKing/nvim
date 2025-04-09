@@ -108,18 +108,41 @@ return {
                 { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
             },
         },
-        { -- Sourced from: https://github.com/DanielFGray/dotfiles/blob/d5919fcbf60c5987d9adee65668aa117232c8be5/nvim.lua#L183C7-L196C9
-            "https://github.com/zbirenbaum/copilot-cmp",
+        {
+            "zbirenbaum/copilot-cmp",
             dependencies = {
-                "https://github.com/zbirenbaum/copilot.lua",
-                cmd = "Copilot",
-                event = "InsertEnter",
-                opts = {
-                    -- suggestion = { enabled = false },
-                    panel = {
-                        enabled = true,
-                        auto_refresh = true,
-                    },
+                {
+                    "folke/snacks.nvim",
+                    ---@type snacks.Config
+                    opts = {},
+                },
+                {
+                    "zbirenbaum/copilot.lua",
+                    cmd = "Copilot",
+                    build = ":Copilot auth",
+                    event = "InsertEnter",
+                    config = function()
+                        -- Toggle Copilot from: https://github.com/zbirenbaum/copilot.lua/issues/302#issuecomment-2773096356
+                        Snacks.toggle({
+                            name = "Github Copilot",
+                            get = function()
+                                if not vim.g.copilot_enabled then -- HACK: since it's disabled by default the below will throw error
+                                    return false
+                                end
+                                return not require("copilot.client").is_disabled()
+                            end,
+                            set = function(state)
+                                if state then
+                                    require("copilot").setup() -- setting up for the very first time
+                                    require("copilot.command").enable()
+                                    vim.g.copilot_enabled = true
+                                else
+                                    require("copilot.command").disable()
+                                    vim.g.copilot_enabled = false
+                                end
+                            end,
+                        }):map("<leader>ux")
+                    end,
                 },
             },
             opts = true,
