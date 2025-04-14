@@ -75,6 +75,7 @@ end
 
 -- Based on: https://lsp-zero.netlify.app/v3.x/blog/you-might-not-need-lsp-zero.html
 -- TODO: Switch to nvim 0.11 built-in LSP: https://lsp-zero.netlify.app/blog/lsp-config-overview.html
+--  https://gpanders.com/blog/whats-new-in-neovim-0-11
 ---@class LazyPluginSpec
 return {
     "VonHeikemen/lsp-zero.nvim",

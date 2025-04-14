@@ -20,7 +20,7 @@ return {
                 html = prettier,
                 javascript = js_like,
                 javascriptreact = js_like,
-                json = prettier,
+                json = prettier, -- Or jq
                 lua = { "stylua" },
                 markdown = { "mdformat", "injected" }, -- Installed globally with: pipx inject mdformat 'mdformat-mkdocs[recommended]' 'mdformat-wikilink'
                 python = { "ruff_format", "ruff_fix" },
