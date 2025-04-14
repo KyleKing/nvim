@@ -15,6 +15,7 @@ return {
                 bash = { "beautysh" },
                 -- Use a sub-list to run only the first available formatter
                 css = prettier,
+                go = { "golangci-lint", "golines" },
                 graphql = prettier,
                 html = prettier,
                 javascript = js_like,
@@ -31,7 +32,7 @@ return {
                 typescriptreact = js_like,
                 yaml = prettier,
                 -- Use the "*" filetype to run formatters on all filetypes and "_" for those that do not have a linter configured
-                ["*"] = { "typos" }, -- Installed with: brew install typos-cli
+                ["*"] = { "typos" }, -- Installed with `brew install typos-cli` (but may be occasionally causing warnings)
             },
             -- -- LazyVim will merge the options you set here with builtin formatters or add your own
             -- -- Defaults formatters are defined here: https://github.com/stevearc/conform.nvim/tree/192a6d2ddace343f1840a8f72efe2315bd392243/lua/conform/formatters
