@@ -1,8 +1,3 @@
-local function customize_lsp_ui()
-    -- Change border of documentation hover window, See https://github.com/neovim/neovim/pull/13998
-    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-end
-
 local function config_lsp()
     local lsp_zero = require("lsp-zero")
 
@@ -79,6 +74,7 @@ local function config_telescope_integrations()
 end
 
 -- Based on: https://lsp-zero.netlify.app/v3.x/blog/you-might-not-need-lsp-zero.html
+-- TODO: Switch to nvim 0.11 built-in LSP: https://lsp-zero.netlify.app/blog/lsp-config-overview.html
 ---@class LazyPluginSpec
 return {
     "VonHeikemen/lsp-zero.nvim",
@@ -93,8 +89,9 @@ return {
     config = function()
         -- See logs with `:LspInfo` and `:LspLog`
         -- vim.lsp.set_log_level("debug")
-        customize_lsp_ui()
-        config_lsp()
-        config_telescope_integrations()
+        if vim.version() == "0.10.0" then
+            config_lsp()
+            config_telescope_integrations()
+        end
     end,
 }
