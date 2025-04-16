@@ -1,5 +1,5 @@
 {
-  "bash-language-server": "5.6.0",
+  "bash-language-server": "5.4.3",
   "gopls": "v0.18.1",
   "helm-ls": "v0.2.0",
   "json-lsp": "4.10.0",
