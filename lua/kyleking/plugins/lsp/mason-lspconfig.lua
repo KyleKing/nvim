@@ -8,10 +8,11 @@ local function config_mason()
             "bashls",
             -- "docker_compose_language_service",
             -- "dockerls",
-            "gopls",
-            "golangci-lint-langserver",
-            "helm_ls",
-            "htmx-lsp",
+            -- PLANNED: These were raising errors when running NVIM as a pager
+            -- "gopls",
+            -- "golangci-lint-langserver",
+            -- "helm_ls",
+            -- "htmx-lsp",
             "jsonls",
             "lua_ls",
             -- "marksman",
@@ -30,26 +31,26 @@ local function config_mason()
                     capabilities = lsp_capabilities,
                 })
             end,
-            gopls = function()
-                require("lspconfig").gopls.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
-            golangci_lint_langserver = function()
-                require("lspconfig").golangci_lint_langserver.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
-            helm_lsp = function()
-                require("lspconfig").helm_lsp.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
-            htmx_lsp = function()
-                require("lspconfig").htmx_lsp.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
+            -- gopls = function()
+            --     require("lspconfig").gopls.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
+            -- golangci_lint_langserver = function()
+            --     require("lspconfig").golangci_lint_langserver.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
+            -- helm_lsp = function()
+            --     require("lspconfig").helm_lsp.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
+            -- htmx_lsp = function()
+            --     require("lspconfig").htmx_lsp.setup({
+            --         capabilities = lsp_capabilities,
+            --     })
+            -- end,
             jsonls = function()
                 require("lspconfig").jsonls.setup({
                     capabilities = lsp_capabilities,
