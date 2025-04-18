@@ -17,7 +17,6 @@ return {
         ".git",
     },
     filetypes = { "lua" },
-    on_init = require("util").lua_ls_on_init,
     -- PLANNED: validating this schema should be possible. See:
     -- https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
     settings = {

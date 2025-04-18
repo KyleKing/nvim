@@ -5,7 +5,6 @@ local function config_mason()
         -- FYI: See mapping of server names here: https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
         --  ruff (ruff_lsp?), pyright, and others should be installed globally with pipx
         ensure_installed = {
-            "bashls",
             -- "docker_compose_language_service",
             -- "dockerls",
             -- PLANNED: These were raising errors when running NVIM as a pager
@@ -25,11 +24,6 @@ local function config_mason()
         },
         handlers = {
             require("lsp-zero").default_setup,
-            bashls = function()
-                require("lspconfig").bashls.setup({
-                    capabilities = lsp_capabilities,
-                })
-            end,
             -- gopls = function()
             --     require("lspconfig").gopls.setup({
             --         capabilities = lsp_capabilities,
