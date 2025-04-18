@@ -14,7 +14,6 @@ local function config_mason()
             -- "helm_ls",
             -- "htmx-lsp",
             "jsonls",
-            "lua_ls",
             -- "marksman",
             -- "taplo", -- Conflicts with pappasam/toml-sort
             "terraformls",
@@ -60,12 +59,6 @@ local function config_mason()
                             validate = { enable = true }, -- See: https://github.com/b0o/SchemaStore.nvim/issues/8
                         },
                     },
-                })
-            end,
-            lua_ls = function()
-                require("lspconfig").lua_ls.setup({
-                    capabilities = lsp_capabilities,
-                    format = { enable = false }, -- The builtin formatter is CppCXY/EmmyLuaCodeStyle (https://luals.github.io/wiki/formatter)
                 })
             end,
             -- taplo = function()
