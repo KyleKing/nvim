@@ -3,6 +3,21 @@
 -- And `:h lsp-quickstart`
 -- Also consider 'emmylua_ls' from https://github.com/neovim/nvim-lspconfig/pull/3745
 
+local function lua_ls_on_init(client)
+    if not vim.tbl_get(client, "workspace_folders", 1, "name") then return end
+
+    client.settings = vim.tbl_deep_extend("force", client.settings, {
+        Lua = {
+            runtime = { version = "LuaJIT" },
+            workspace = {
+                -- Make the server aware of Neovim runtime files
+                checkThirdParty = false,
+                library = { vim.env.VIMRUNTIME },
+            },
+        },
+    })
+end
+
 ---@type vim.lsp.Config
 return {
     cmd = { "lua-language-server" },
@@ -17,6 +32,7 @@ return {
         ".git",
     },
     filetypes = { "lua" },
+    on_init = lua_ls_on_init,
     -- PLANNED: validating this schema should be possible. See:
     -- https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
     settings = {
