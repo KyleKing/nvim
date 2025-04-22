@@ -13,6 +13,7 @@ Plugins are organized according to category from [NeovimCraft](https://neovimcra
 My preference is for opinionated plugins that require minimal configuration.
 
 - Accordingly, I've tried and removed:
+    - AI: [parrot, avante, copilot](https://github.com/KyleKing/nvim/commit/8595a11da8866f6db5ebaa324a94db05d04cd2bb)
     - Bars and lines: [barbar](https://github.com/KyleKing/nvim/commit/186b25c#diff-a08294f302313640d70006877f8111d54587c50a998ceb770b56c704c90fb77a)
     - Buffers: [early-retirement.nvim for auto-closing deleted buffers](https://github.com/KyleKing/nvim/commit/00898cdc3c721d5445a7186cd786fd3c5af7dd9f)
     - Editing Support: [autopairs](https://github.com/KyleKing/nvim/commit/7e106f21d6645454b088b3089c3a3f2d067ffc7c), [nvim-ts-autotag](https://github.com/KyleKing/nvim/commit/460d16f07eb9d2ae49c1f59971948ac3a48f1dde), [cmp-spell, omni, etc.](https://github.com/KyleKing/nvim/commit/f3e92a6586af3dbb3f3735c05e1539a9aeb663c0), [Obsidian](https://github.com/KyleKing/nvim/commit/a60d7317b99ef60fa0677466a778958cf0d950fd)
