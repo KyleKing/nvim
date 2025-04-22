@@ -3,7 +3,7 @@ return {
     "nvim-telescope/telescope.nvim",
     dependencies = {
         { "nvim-lua/plenary.nvim" },
-        { "nvim-telescope/telescope-fzf-native.nvim", enabled = vim.fn.executable("make") == 1, build = "make" },
+        { "natecraddock/telescope-zf-native.nvim" },
         { "nvim-telescope/telescope-live-grep-args.nvim" },
     },
     cmd = "Telescope",
@@ -50,7 +50,7 @@ return {
     end,
     init = function()
         local telescope = require("telescope")
-        telescope.load_extension("fzf")
+        telescope.load_extension("zf-native")
         telescope.load_extension("live_grep_args")
     end,
     keys = {
