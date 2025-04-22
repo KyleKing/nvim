@@ -79,6 +79,7 @@ end
 ---@class LazyPluginSpec
 return {
     "VonHeikemen/lsp-zero.nvim",
+    enabled = false,
     event = { "BufRead", "InsertEnter", "CmdlineEnter" },
     dependencies = {
         { "williamboman/mason-lspconfig.nvim" }, -- Configured in plugins.lsp.mason-lspconfig

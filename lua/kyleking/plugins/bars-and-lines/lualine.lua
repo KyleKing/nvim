@@ -25,10 +25,7 @@ return {
         },
         extensions = {
             "fugitive",
-            "fzf",
-            "lazy",
             "man",
-            "mason",
             "quickfix",
             "toggleterm",
             "trouble",
