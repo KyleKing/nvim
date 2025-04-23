@@ -40,6 +40,7 @@ return {
             addon_manager = { enable = false },
             format = { enable = false },
             hint = { enable = true },
+            signatureHelp = { enabled = true },
             telemetry = { enable = true },
         },
     },

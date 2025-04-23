@@ -7,10 +7,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 -- enable configuration from lsp/*.lua files
-local languages = {
+vim.lsp.enable({
     "bash",
     "lua",
-}
-for _, language in ipairs(languages) do
-    vim.lsp.enable(language)
-end
+})
