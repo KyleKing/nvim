@@ -23,6 +23,8 @@ require("lazy").setup("kyleking.plugins", {
         enabled = false,
         notify = false, -- get a notification when changes are found
     },
+    -- Required for zf-native: https://github.com/natecraddock/telescope-zf-native.nvim/issues/21
+    rocks = { enabled = false },
 })
 
 -- Configure key lazy.nvim bindings
