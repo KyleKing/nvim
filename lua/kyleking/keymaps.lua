@@ -45,9 +45,6 @@ K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
 K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
--- -- Plugin Manager
--- PLANNED: K("n", "<leader>pa", function() require("astrocore").update_packages() end, { desc = "Update Lazy and Mason" })
-
 -- Managing Splits
 -- FYI: use <c-w> instead
 
