@@ -3,7 +3,6 @@ local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 local function config_cmp()
     local cmp = require("cmp")
-    local cmp_action = require("lsp-zero").cmp_action()
     local cmp_format = require("lspkind").cmp_format({
         mode = "symbol", -- show only symbol annotations
         maxwidth = 50, -- prevent the popup from showing more than provided characters
@@ -40,9 +39,6 @@ local function config_cmp()
             --  If the cursor is on top of a "snippet trigger" it'll expand it
             --  If the cursor can jump to a snippet placeholder, it moves to it
             --  If the cursor is in the middle of a word it displays the completion menu
-            --  Else, it acts like a regular Tab key.
-            ["<Tab>"] = cmp_action.luasnip_supertab(),
-            ["<S-Tab>"] = cmp_action.luasnip_shift_supertab(),
             -- `Ctrl-Enter` key to confirm completion. Set `select` to `false` to only confirm explicitly selected items
             ["<C-CR>"] = cmp.mapping.confirm({ select = true }),
             -- Ctrl+Space to trigger completion menu
@@ -51,9 +47,6 @@ local function config_cmp()
             -- Scroll up and down in the completion documentation
             ["<C-u>"] = cmp.mapping.scroll_docs(-4),
             ["<C-d>"] = cmp.mapping.scroll_docs(4),
-            -- Navigate between snippet placeholder
-            ["<C-f>"] = cmp_action.luasnip_jump_forward(),
-            ["<C-b>"] = cmp_action.luasnip_jump_backward(),
         }),
         -- Add borders to menu
         window = {
@@ -87,8 +80,6 @@ later(function()
     add({
         source = "hrsh7th/nvim-cmp",
         dependencies = {
-            "VonHeikemen/lsp-zero.nvim", -- Configured in plugins.lsp.lsp-zero
-            -- Sources
             "hrsh7th/cmp-nvim-lsp", -- Source: nvim_lsp
             "hrsh7th/cmp-buffer", -- Source: buffer
             "hrsh7th/cmp-nvim-lsp-signature-help", -- Source: nvim_lsp_signature_help

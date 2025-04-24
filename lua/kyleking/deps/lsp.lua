@@ -3,6 +3,7 @@ local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 -- PLANNED: See how TS/LSP mappings have changed:
 --  https://gpanders.com/blog/whats-new-in-neovim-0-11/#more-default-mappings
+--  https://lsp-zero.netlify.app/blog/lsp-config-overview.html#profit
 
 later(function()
     add("neovim/nvim-lspconfig")
