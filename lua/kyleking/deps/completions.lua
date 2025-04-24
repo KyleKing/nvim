@@ -1,3 +1,6 @@
+local MiniDeps = require("mini.deps")
+local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+
 local function config_cmp()
     local cmp = require("cmp")
     local cmp_action = require("lsp-zero").cmp_action()
@@ -80,34 +83,34 @@ local function config_cmp()
     })
 end
 
----@class LazyPluginSpec
-return {
-    "hrsh7th/nvim-cmp",
-    enabled = false,
-    event = { "InsertEnter", "CmdlineEnter" },
-    dependencies = {
-        { "VonHeikemen/lsp-zero.nvim" }, -- Configured in plugins.lsp.lsp-zero
-        -- Sources
-        { "hrsh7th/cmp-nvim-lsp" }, -- Source: nvim_lsp
-        { "hrsh7th/cmp-buffer" }, -- Source: buffer
-        { "hrsh7th/cmp-nvim-lsp-signature-help" }, -- Source: nvim_lsp_signature_help
-        { "ray-x/cmp-treesitter" }, -- Source: treesitter
-        { "hrsh7th/cmp-cmdline" }, -- Source: cmdline
-        { "hrsh7th/cmp-nvim-lua" }, -- Source nvim_lua
-        { "folke/lazydev.nvim" }, -- Source lazydev. Replaces folke/neodev.nvim
-        {
+later(function()
+    add({
+        source = "hrsh7th/nvim-cmp",
+        dependencies = {
+            "VonHeikemen/lsp-zero.nvim", -- Configured in plugins.lsp.lsp-zero
+            -- Sources
+            "hrsh7th/cmp-nvim-lsp", -- Source: nvim_lsp
+            "hrsh7th/cmp-buffer", -- Source: buffer
+            "hrsh7th/cmp-nvim-lsp-signature-help", -- Source: nvim_lsp_signature_help
+            "ray-x/cmp-treesitter", -- Source: treesitter
+            "hrsh7th/cmp-cmdline", -- Source: cmdline
+            "hrsh7th/cmp-nvim-lua", -- Source nvim_lua
+            "folke/lazydev.nvim", -- Source lazydev. Replaces folke/neodev.nvim
             -- Two options for path completions:
             -- "hrsh7th/cmp-path", -- Source: path
             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
+
+            -- PLANNED: migrate to mini.deps or replace
+            -- {
+            --     "L3MON4D3/LuaSnip", -- There is an alternative 'ultisnips'
+            --     build = "make install_jsregexp", -- install jsregexp (optional!).
+            --     dependencies = {
+            --         { "rafamadriz/friendly-snippets" }, -- Loaded automatically
+            --         { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
+            --     },
+            -- },
         },
-        {
-            "L3MON4D3/LuaSnip", -- There is an alternative 'ultisnips'
-            build = "make install_jsregexp", -- install jsregexp (optional!).
-            dependencies = {
-                { "rafamadriz/friendly-snippets" }, -- Loaded automatically
-                { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
-            },
-        },
-    },
-    config = config_cmp,
-}
+    })
+
+    config_cmp()
+end)

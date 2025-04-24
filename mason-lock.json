@@ -1,9 +1,0 @@
-{
-  "gopls": "v0.18.1",
-  "helm-ls": "v0.2.0",
-  "json-lsp": "4.10.0",
-  "pyright": "1.1.399",
-  "terraform-ls": "v0.36.4",
-  "typescript-language-server": "4.3.4",
-  "yaml-language-server": "1.17.0"
-}

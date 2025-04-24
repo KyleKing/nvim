@@ -1,3 +1,6 @@
+local MiniDeps = require("mini.deps")
+local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+
 --- A table to manage ToggleTerm terminals created by the user, indexed by the command run and then the instance number
 ---@type table<string,table<integer,table>>
 local user_terminals = {}
@@ -21,37 +24,24 @@ local function toggle_term_cmd(opts)
 end
 
 ---@class LazyPluginSpec
-return {
-    "akinsho/toggleterm.nvim",
-    cmd = { "ToggleTerm", "TermExec" },
-    opts = {
+later(function()
+    add("akinsho/toggleterm.nvim")
+
+    require("toggleterm").setup({
         shading_factor = 4,
         direction = "float",
-    },
-    keys = {
-        {
-            "<leader>gg",
-            function()
-                local worktree = require("kyleking.utils.fs_utils").file_worktree()
-                local flags = worktree and ("--work-tree=%s --git-dir=%s"):format(worktree.toplevel, worktree.gitdir)
-                    or ""
-                toggle_term_cmd("lazygit " .. flags)
-            end,
-            desc = "ToggleTerm lazygit",
-        },
-        {
-            "<leader>gj",
-            function() toggle_term_cmd("lazyjj") end,
-            desc = "ToggleTerm lazyjj",
-        },
-        {
-            "<leader>td",
-            function() toggle_term_cmd("lazydocker") end,
-            desc = "ToggleTerm 'lazydocker'",
-        },
-        { "<leader>tf", "<Cmd>ToggleTerm direction=float<CR>", desc = "ToggleTerm float" },
-        { "<leader>th", "<Cmd>ToggleTerm size=15 direction=horizontal<CR>", desc = "ToggleTerm horizontal split" },
-        { "<leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", desc = "ToggleTerm vertical split" },
-        { "<C-'>", "<Cmd>ToggleTerm<CR>", desc = "Toggle terminal", mode = { "n", "t" } },
-    },
-}
+    })
+
+    local K = vim.keymap.set
+    K("n", "<leader>gg", function()
+        local worktree = require("kyleking.utils.fs_utils").file_worktree()
+        local flags = worktree and ("--work-tree=%s --git-dir=%s"):format(worktree.toplevel, worktree.gitdir) or ""
+        toggle_term_cmd("lazygit " .. flags)
+    end, { desc = "ToggleTerm lazygit" })
+    K("n", "<leader>gj", function() toggle_term_cmd("lazyjj") end, { desc = "ToggleTerm lazyjj" })
+    K("n", "<leader>td", function() toggle_term_cmd("lazydocker") end, { desc = "ToggleTerm 'lazydocker'" })
+    K("n", "<leader>tf", "<Cmd>ToggleTerm direction=float<CR>", { desc = "ToggleTerm float" })
+    K("n", "<leader>th", "<Cmd>ToggleTerm size=15 direction=horizontal<CR>", { desc = "ToggleTerm horizontal split" })
+    K("n", "<leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", { desc = "ToggleTerm vertical split" })
+    K({ "n", "t" }, "<C-'>", "<Cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
+end)
