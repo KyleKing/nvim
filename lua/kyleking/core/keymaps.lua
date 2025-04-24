@@ -35,7 +35,7 @@ K("n", "<leader>w", "<Cmd>update<CR>", { desc = "Save if modified" })
 K("n", "<leader>W", "<Cmd>wall<CR>", { desc = "Save all" })
 K("n", "<leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
 K("n", "<leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
-K("n", "<leader>n", "<Cmd>enew<CR>", { desc = "New File" })
+K("n", "<leader>n", "<Cmd>new<CR>", { desc = "New File" })
 K("n", "<C-s>", "<Cmd>w!<CR>", { desc = "Force write" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 
@@ -45,10 +45,19 @@ K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
 K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
+-- Manage Buffers
+-- Close keeps the buffer index (for <C-^> toggling), while wipeout renumbers all buffers
+-- https://stackoverflow.com/a/60732165/3219667
+-- K("n", "<leader>bc", ":bdelete<CR>", { desc = "Close current buffer" })
+K("n", "<leader>bw", ":bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
+-- From: https://stackoverflow.com/a/42071865/3219667
+-- K("n", "<leader>bCA", ":%bdelete<CR>", { desc = "Close all buffers" })
+K("n", "<leader>bW", ":%bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
+
 -- Managing Splits
 -- FYI: use <c-w> instead
 
--- Manage tabs
+-- Manage Tabs
 -- use nap.nvim plugin instead ([a and ]a, etc.)
 K("n", "<leader>ttn", "<Cmd>tabnew<CR>", { desc = "New tab" })
 K("n", "<leader>ttc", "<Cmd>tabclose<CR>", { desc = "Close tab" })
