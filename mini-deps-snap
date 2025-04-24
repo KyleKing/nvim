@@ -1,5 +1,4 @@
 return {
-  ["bufdelete.nvim"] = "f6bcea78afb3060b198125256f897040538bcb81",
   ["bufjump.nvim"] = "ae2728a77defbd27e9e5ef64c854fb0813ffba01",
   ["ccc.nvim"] = "af2cf5a963f401aad868c065222ee13d4bbc9050",
   ["mini.nvim"] = "05975f387906211745d0aaf996eb7ad3c91b193d",

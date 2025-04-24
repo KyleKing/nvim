@@ -2,19 +2,19 @@ local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 later(function()
-    add("famiu/bufdelete.nvim")
-    require("bufdelete").setup()
+    -- FYI: with neovim 0.11, this plugin is no longer necessary
+    -- add("famiu/bufdelete.nvim")
 
     local K = vim.keymap.set
 
     -- Close keeps the buffer index (for <C-^> toggling), while wipeout renumbers all buffers
     -- https://stackoverflow.com/a/60732165/3219667
-    -- { "<leader>bc", ":Bdelete<CR>", desc = "Close current buffer" },
-    K("n", "<leader>bw", ":Bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
+    -- { "<leader>bc", ":bdelete<CR>", desc = "Close current buffer" },
+    K("n", "<leader>bw", ":bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
 
     -- From: https://stackoverflow.com/a/42071865/3219667
-    -- { "<leader>bCA", ":%Bdelete<CR>", {desc = "Close all buffers" },
-    K("n", "<leader>bW", ":%Bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
+    -- { "<leader>bCA", ":%bdelete<CR>", {desc = "Close all buffers" },
+    K("n", "<leader>bW", ":%bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
 end)
 
 later(function()
