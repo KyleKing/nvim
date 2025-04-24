@@ -17,6 +17,7 @@ end
 
 require("mini.deps").setup()
 
+require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
 require("kyleking.deps.color")
 require("kyleking.deps.colorscheme")
