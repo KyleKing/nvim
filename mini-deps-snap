@@ -1,7 +1,10 @@
 return {
   ["bufjump.nvim"] = "ae2728a77defbd27e9e5ef64c854fb0813ffba01",
   ["ccc.nvim"] = "af2cf5a963f401aad868c065222ee13d4bbc9050",
+  ["conform.nvim"] = "372fc521f8421b7830ea6db4d6ea3bae1c77548c",
   ["dial.nvim"] = "2c7e2750372918f072a20f3cf754d845e143d7c9",
+  ["diffview.nvim"] = "4516612fe98ff56ae0415a259ff6361a89419b0a",
+  ["gitsigns.nvim"] = "ee7e50dfbdf49e3acfa416fd3ad3abbdb658582c",
   ["highlight-undo.nvim"] = "a5e2e2d43f6d131bf526619baeeeec32397b0789",
   ["lualine.nvim"] = "15884cee63a8c205334ab13ab1c891cd4d27101a",
   ["mini.nvim"] = "05975f387906211745d0aaf996eb7ad3c91b193d",
