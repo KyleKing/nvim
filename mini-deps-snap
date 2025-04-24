@@ -1,0 +1,3 @@
+return {
+  ["nvim-lspconfig"] = "8b0f47d851ee5343d38fe194a06ad16b9b9bd086"
+}

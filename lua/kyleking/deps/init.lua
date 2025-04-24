@@ -1,5 +1,5 @@
--- local MiniDeps = require("mini.deps")
--- local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local MiniDeps = require("mini.deps")
+local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 -- now(function()
 --     require("mini.notify").setup()
@@ -26,3 +26,10 @@ require("kyleking.deps.lsp")
 --         highlight = { enable = true },
 --     })
 -- end)
+
+later(function()
+    -- Save Mini.Deps snapshot when run from config directory
+    if vim.fn.getcwd() == vim.fn.stdpath("config") then
+        vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
+    end
+end)
