@@ -1,30 +1,45 @@
 -- See `:help vim.opt`
 --  Or for `vim.opt.clipboard`, see `:help 'clipboard'` for documentation
 
-vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
+-- PLANNED: See how to use vim.surround: https://youtu.be/pTVLA62CNqg?si=ZgEV2tkIYrGHOUag (<ysiw"> <csaw"> <ysiw)>)
+
+-- Custom filetypes
+vim.filetype.add({
+    extension = {
+        conf = "conf",
+        mdx = "markdown",
+    },
+    pattern = {
+        [".*%.env.*"] = "sh",
+        ["ignore$"] = "conf",
+    },
+    filename = {},
+})
+
+vim.opt.completeopt = "menu,menuone,popup,fuzzy" -- modern completion menu
+-- vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Options for insert mode completion
+
+-- vim.opt.foldcolumn = "1" -- '0' is not bad
+vim.opt.foldenable = true -- enable fold
+vim.opt.foldlevel = 99 -- start editing with all folds opened
+vim.opt.foldmethod = "expr" -- use tree-sitter for folding method (next-best is indent)
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+
 vim.opt.backspace:append({ "nostop" }) -- don't stop backspace at insert
 vim.opt.breakindent = true -- wrap indent to match  line start
 -- FIXME: use named registers rather than always copying to the clipboard
 vim.opt.clipboard = "unnamedplus" -- connection to the system clipboard
 vim.opt.cmdheight = 0 -- hide command line unless needed
-vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Options for insert mode completion
 vim.opt.copyindent = true -- copy the previous indentation on auto-indenting
 vim.opt.cursorline = true -- highlight the text line of the cursor
 vim.opt.diffopt:append({ "algorithm:histogram", "linematch:60" }) -- enable linematch diff algorithm
 vim.opt.fileencoding = "utf-8" -- file content encoding for the buffer
 vim.opt.fillchars = { eob = " " } -- disable `~` on nonexistent lines
--- PLANNED: Configure ufo: https://github.com/kevinhwang91/nvim-ufo?tab=readme-ov-file#minimal-configuration
-vim.opt.foldcolumn = "1" -- '0' is not bad
-vim.opt.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
-vim.opt.foldlevelstart = 99
-vim.opt.foldenable = true
-vim.opt.foldmethod = "indent" -- See: https://youtu.be/pTVLA62CNqg?si=ZgEV2tkIYrGHOUag
 vim.opt.history = 100 -- number of commands to remember in a history table
 vim.opt.ignorecase = true -- case insensitive searching
 vim.opt.infercase = true -- infer cases in keyword completion
 vim.opt.laststatus = 3 -- global statusline
 vim.opt.linebreak = true -- wrap lines at 'breakat'
-vim.opt.mouse = "a" -- enable mouse support
 vim.opt.number = true -- show numberline
 vim.opt.preserveindent = true -- preserve indent structure as much as possible
 vim.opt.pumheight = 15 -- height of the pop up menu
@@ -49,15 +64,5 @@ vim.opt.wildmode = "full:lastused" -- complete the first full match immediately 
 -- vim.opt.spelllang = "en_us" -- Use the US dictionary (and any associated custom dictionaries) -- *Update*: set by plugin dirty-talk
 vim.opt.spell = true -- Always on spell checking
 
--- Custom filetypes
-vim.filetype.add({
-    extension = {
-        conf = "conf",
-        mdx = "markdown",
-    },
-    pattern = {
-        [".*%.env.*"] = "sh",
-        ["ignore$"] = "conf",
-    },
-    filename = {},
-})
+vim.opt.mouse = "a" -- enable mouse support
+vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
