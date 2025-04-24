@@ -1,7 +1,7 @@
 local MiniDeps = require("mini.deps")
-local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local _add, _now, _later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
-local function config_cmp()
+local function _config_cmp()
     local cmp = require("cmp")
     local cmp_format = require("lspkind").cmp_format({
         mode = "symbol", -- show only symbol annotations
@@ -76,32 +76,33 @@ local function config_cmp()
     })
 end
 
-later(function()
-    add({
-        source = "hrsh7th/nvim-cmp",
-        dependencies = {
-            "hrsh7th/cmp-nvim-lsp", -- Source: nvim_lsp
-            "hrsh7th/cmp-buffer", -- Source: buffer
-            "hrsh7th/cmp-nvim-lsp-signature-help", -- Source: nvim_lsp_signature_help
-            "ray-x/cmp-treesitter", -- Source: treesitter
-            "hrsh7th/cmp-cmdline", -- Source: cmdline
-            "hrsh7th/cmp-nvim-lua", -- Source nvim_lua
-            "folke/lazydev.nvim", -- Source lazydev. Replaces folke/neodev.nvim
-            -- Two options for path completions:
-            -- "hrsh7th/cmp-path", -- Source: path
-            "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
-
-            -- PLANNED: migrate to mini.deps or replace
-            -- {
-            --     "L3MON4D3/LuaSnip", -- There is an alternative 'ultisnips'
-            --     build = "make install_jsregexp", -- install jsregexp (optional!).
-            --     dependencies = {
-            --         { "rafamadriz/friendly-snippets" }, -- Loaded automatically
-            --         { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
-            --     },
-            -- },
-        },
-    })
-
-    config_cmp()
-end)
+-- TODO: nvim-cmp is not being installed. Consider mini.completion
+-- later(function()
+--     add({
+--         source = "hrsh7th/nvim-cmp",
+--         depends = {
+--             "hrsh7th/cmp-nvim-lsp", -- Source: nvim_lsp
+--             "hrsh7th/cmp-buffer", -- Source: buffer
+--             "hrsh7th/cmp-nvim-lsp-signature-help", -- Source: nvim_lsp_signature_help
+--             "ray-x/cmp-treesitter", -- Source: treesitter
+--             "hrsh7th/cmp-cmdline", -- Source: cmdline
+--             "hrsh7th/cmp-nvim-lua", -- Source nvim_lua
+--             "folke/lazydev.nvim", -- Source lazydev. Replaces folke/neodev.nvim
+--             -- Two options for path completions:
+--             -- "hrsh7th/cmp-path", -- Source: path
+--             "https://codeberg.org/FelipeLema/cmp-async-path", -- Source: async_path
+--
+--             -- PLANNED: migrate to mini.deps or replace
+--             -- {
+--             --     "L3MON4D3/LuaSnip", -- There is an alternative 'ultisnips'
+--             --     build = "make install_jsregexp", -- install jsregexp (optional!).
+--             --     dependencies = {
+--             --         { "rafamadriz/friendly-snippets" }, -- Loaded automatically
+--             --         { "saadparwaiz1/cmp_luasnip" }, -- Source: luasnip
+--             --     },
+--             -- },
+--         },
+--     })
+--
+--     config_cmp()
+-- end)

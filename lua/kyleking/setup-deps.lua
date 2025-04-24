@@ -26,6 +26,7 @@ require("kyleking.deps.file-explorer")
 require("kyleking.deps.fuzzy-finder")
 require("kyleking.deps.keybinding")
 require("kyleking.deps.lsp")
+require("kyleking.deps.syntax")
 require("kyleking.deps.terminal-integration")
 
 local MiniDeps = require("mini.deps")
