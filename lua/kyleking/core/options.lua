@@ -64,8 +64,6 @@ vim.opt.wildmode = "full:lastused" -- complete the first full match immediately 
 -- vim.opt.spelllang = "en_us" -- Use the US dictionary (and any associated custom dictionaries) -- *Update*: set by plugin dirty-talk
 vim.opt.spell = true -- Always on spell checking
 
-vim.opt.winborder = "rounded" -- Adds rounded edges to hover, like 'K'
-
 vim.opt.mouse = "a" -- enable mouse support
 vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
 
