@@ -24,6 +24,8 @@ My preference is for opinionated plugins that require minimal configuration.
     - Programming Language Support: [markdown-preview](https://github.com/KyleKing/nvim/commit/3a3b0c667e1b755f26443e5968168db08b460ff3)
     - Session: [auto-session](https://github.com/KyleKing/nvim/commit/7ae6899681355904b83a757f28f014295a0321d8)
     - Utility: [noice](https://github.com/KyleKing/nvim/commit/8a30f4d03c8271756ecd1659e241013e78788834), [structlog](https://github.com/KyleKing/nvim/commit/9e10e13), [dressing](https://github.com/KyleKing/nvim/commit/a58d2e9c71c25ac584cd1581295b8b68d0c516e9)
+- Removed, but would revisit
+    - [kanban.nvim](https://github.com/KyleKing/nvim/commit/fba8b07ecd6b19495ba297a4e8a10f481eb0c939): removed while migrating to Mini.Deps and appeared to require `nvim-cmp`
 - I've replaced:
     - [reticle](https://github.com/KyleKing/nvim/commit/3297142) with `colorful-winsep`
     - [indent-blankline](https://github.com/KyleKing/nvim/commit/3e823707087166c1718dc3e0a815a43d472e40a9) with `hlchunk` ([which was later removed](https://github.com/KyleKing/nvim/commit/a9596bb11332a77d74111b4ddd1cdb36b18ba47f))
@@ -33,6 +35,7 @@ My preference is for opinionated plugins that require minimal configuration.
     - [leap.nvim and alternative motion plugins](https://github.com/KyleKing/nvim/commit/d93f43420229cf43fdc7cab12576d1af1f34b4e6) with `flash.nvim`
     - [quick-scope](https://github.com/KyleKing/nvim/commit/d93f43420229cf43fdc7cab12576d1af1f34b4e6) with `flash.nvim`
     - [smart-splits](https://github.com/KyleKing/nvim/commit/c2ef609997d11df798b05f6a4b30c0fad42504e8) with `<c-w>` builtin
+- And migrated from `Lazy.nvim` to `Mini.Deps` between <https://github.com/KyleKing/nvim/commit/97a2460d0d1090118908fee387eb68a1caae7665> and <https://github.com/KyleKing/nvim/commit/58d2cd4a18b0d5edd6c3091ffae95552faf9091f>
 
 ## MacOS (and Linux) Install
 
