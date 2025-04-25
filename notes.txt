@@ -1,7 +1,0 @@
-
-vim.cmd.<command-name>() in lieu of "<cmd>Alpha<CR>"
-vim.keymap.set("n", "<leader>ch", ":nohl<CR>")
-
-https://gitlab.com/spatoon/nvim-config
-https://lsp-zero.netlify.app/blog/you-might-not-need-lsp-zero.html
-https://www.reddit.com/r/neovim/comments/1fgw7pv/for_people_using_python_with_neovim_and_having/
