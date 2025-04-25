@@ -21,7 +21,7 @@ later(function()
     K({ "n", "x", "o" }, "<a-s>", require("flash").jump, { desc = "Flash" })
     K("n", "<a-S>", require("flash").treesitter, { desc = "Flash Treesitter" })
     -- K({ "o" }, "r", require("flash").remote, { desc = "Remote Flash" })
-    -- K({ "o", "x" }, "R", function() require("flash").treesitter_search() end, { desc = "Treesitter Search" })
+    -- K({ "o", "x" }, "R", require("flash").treesitter_search, { desc = "Treesitter Search" })
     K({ "c" }, "<c-s>", require("flash").toggle, { desc = "Toggle Flash Search" })
 end)
 

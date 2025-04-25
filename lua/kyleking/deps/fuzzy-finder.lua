@@ -90,7 +90,7 @@ later(function()
     K(
         { "v" },
         "<leader>f*",
-        function() require("telescope-live-grep-args.shortcuts").grep_visual_selection() end,
+        require("telescope-live-grep-args.shortcuts").grep_visual_selection,
         { desc = "Find word from visual" }
     )
     K("n", "<leader>fC", require("telescope.builtin").commands, { desc = "Find commands" })

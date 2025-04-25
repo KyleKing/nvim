@@ -4,11 +4,7 @@ local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 later(function()
     add("uga-rosa/ccc.nvim")
     require("ccc").setup({
-        default_color = "#40BFBF", -- FYI: just used for manually testing on changes
-        highlighter = {
-            auto_enable = true,
-            lsp = true,
-        },
+        default_color = "#40BFBF", -- FYI: just used for manually testing that this string is highlighted
     })
 
     local K = vim.keymap.set
@@ -22,12 +18,12 @@ later(function()
     -- FYI: pressing 'v' while in visual-line mode triggers highlight enable
     vim.api.nvim_create_autocmd("ModeChanged", {
         pattern = "*:[vV\\x16]*",
-        callback = function() vim.cmd.CccHighlighterDisable() end,
+        callback = function() vim.cmd("CccHighlighterDisable") end,
         desc = "Disable Color Highlight when entering visual mode",
     })
     vim.api.nvim_create_autocmd("ModeChanged", {
         pattern = "[vV\\x16]*:*",
-        callback = function() vim.cmd.CccHighlighterEnable() end,
+        callback = function() vim.cmd("CccHighlighterEnable") end,
         desc = "Enable Color Highlight when leaving visual mode",
     })
 end)

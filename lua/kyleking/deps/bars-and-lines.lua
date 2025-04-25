@@ -12,13 +12,8 @@ later(function()
     local K = vim.keymap.set
     K("n", "]r", function() require("illuminate")["goto_next_reference"](false) end, { desc = "Next reference" })
     K("n", "]r", function() require("illuminate")["goto_prev_reference"](false) end, { desc = "Previous reference" })
-    K("n", "<leader>ur", function() require("illuminate").toggle() end, { desc = "Toggle reference highlighting" })
-    K(
-        "n",
-        "<leader>uR",
-        function() require("illuminate").toggle_buf() end,
-        { desc = "Toggle reference highlighting (buffer)" }
-    )
+    K("n", "<leader>ur", require("illuminate").toggle, { desc = "Toggle reference highlighting" })
+    K("n", "<leader>uR", require("illuminate").toggle_buf, { desc = "Toggle reference highlighting (buffer)" })
 end)
 
 later(function()

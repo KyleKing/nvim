@@ -9,9 +9,7 @@ end)
 later(function()
     add({
         source = "nvim-treesitter/nvim-treesitter",
-        hooks = {
-            post_checkout = function() vim.cmd.TSUpdate() end,
-        },
+        hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
     })
     add("apple/pkl-neovim") -- Required for pkl
     add("nvim-treesitter/nvim-treesitter-textobjects")
