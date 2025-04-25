@@ -12,12 +12,12 @@ later(function()
 end)
 
 later(function()
-    add( "mfussenegger/nvim-lint")
+    add("mfussenegger/nvim-lint")
     local lint = require("lint")
 
     -- All available linters: https://github.com/mfussenegger/nvim-lint?tab=readme-ov-file#available-linters
     lint.linters_by_ft = {
-        css = {"stylelint"},
+        css = { "stylelint" },
         go = { "golangcilint" },
         javascript = { "oxlint" },
         javascriptreact = { "oxlint" },
@@ -31,12 +31,17 @@ later(function()
         zsh = { "zsh" },
     }
 
-    -- FIXME: Appears to be failing on toggleterm buffer?
-    -- local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
-    -- vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
-    --     group = lint_augroup,
-    --     callback = require("lint").try_lint,
-    -- })
+    local lint_augroup = vim.api.nvim_create_augroup("lint", { clear = true })
+    vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+        group = lint_augroup,
+        callback = function()
+            local filetype = vim.bo.filetype
+            if lint.linters_by_ft[filetype] then require("lint").try_lint() end
+        end,
+    })
+
+    -- PLANNED: track which linters are being run with:
+    --  https://github.com/mfussenegger/nvim-lint#get-the-current-running-linters-for-your-buffer
 
     vim.keymap.set("n", "<leader>ll", require("lint").try_lint, { desc = "Trigger linting for current file" })
 end)
