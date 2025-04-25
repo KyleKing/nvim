@@ -27,11 +27,15 @@ require("kyleking.deps.file-explorer")
 require("kyleking.deps.formatting")
 require("kyleking.deps.fuzzy-finder")
 require("kyleking.deps.git")
-require("kyleking.deps.motion")
+require("kyleking.deps.kanban")
 require("kyleking.deps.keybinding")
 require("kyleking.deps.lsp")
+require("kyleking.deps.motion")
+require("kyleking.deps.search")
+require("kyleking.deps.split-and-window")
 require("kyleking.deps.syntax")
 require("kyleking.deps.terminal-integration")
+require("kyleking.deps.utility")
 
 local MiniDeps = require("mini.deps")
 local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
@@ -47,17 +51,6 @@ local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 -- later(function() require("mini.ai").setup() end)
 -- later(function() require("mini.comment").setup() end)
 -- later(function() require("mini.pick").setup() end)
-
--- later(function()
---     add({
---         source = "nvim-treesitter/nvim-treesitter",
---         hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
---     })
---     require("nvim-treesitter.configs").setup({
---         ensure_installed = { "lua", "vimdoc" },
---         highlight = { enable = true },
---     })
--- end)
 
 -- Save Mini.Deps snapshot when run from config directory
 later(function()
