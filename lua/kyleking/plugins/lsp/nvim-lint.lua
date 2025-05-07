@@ -28,7 +28,7 @@ return {
             -- javascript = { "eslint" },
             -- javascriptreact = { "eslint" },
             lua = { "selene" },
-            python = { "ruff" },
+            -- python = { "ruff" },
             sh = { "shellcheck" },
             -- terraform = { "tflint" }, -- TODO: this is using up CPU
             -- typescript = { "eslint" },
