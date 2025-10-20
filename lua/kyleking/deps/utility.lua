@@ -41,21 +41,22 @@ later(function()
     -- Adapted from: https://github.com/ariefra/ar.nvim/blob/1444607e70a6639c68271e38603008f06859c5ae/lua/base/preview.lua
     -- and: https://github.com/cristianrgreco/nvim/blob/252d8a7c5996444d7194240ed1e3d2e4df33a6e6/lua/plugins/preview.nvim.lua
     -- and: https://gitlab.com/itaranto/preview.nvim/-/issues/4#note_2203787288
-    require("preview").setup({
-        previewers_by_ft = {
-            plantuml = {
-                name = "plantuml_png",
-                renderer = { type = "command", opts = { cmd = { "open", "-a", "Preview" } } },
-                -- renderer = { type = "command", opts = { cmd = { "open" } } },
-            },
-        },
-        previewers = {
-            plantuml_png = {
-                args = { "-pipe", "-tpng" },
-            },
-        },
-        render_on_write = true,
-    })
+    -- FIXME: preview not found on new laptop
+    -- require("preview").setup({
+    --     previewers_by_ft = {
+    --         plantuml = {
+    --             name = "plantuml_png",
+    --             renderer = { type = "command", opts = { cmd = { "open", "-a", "Preview" } } },
+    --             -- renderer = { type = "command", opts = { cmd = { "open" } } },
+    --         },
+    --     },
+    --     previewers = {
+    --         plantuml_png = {
+    --             args = { "-pipe", "-tpng" },
+    --         },
+    --     },
+    --     render_on_write = true,
+    -- })
 end)
 
 later(function() add("micarmst/vim-spellsync") end)
