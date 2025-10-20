@@ -16,8 +16,8 @@ vim.filetype.add({
     filename = {},
 })
 
-vim.opt.completeopt = "menu,menuone,popup,fuzzy" -- modern completion menu
--- vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Options for insert mode completion
+-- vim.opt.completeopt = "menu,menuone,popup,fuzzy" -- modern completion menu
+vim.opt.completeopt = { "menu", "menuone", "noselect" } -- Options for insert mode completion
 
 -- vim.opt.foldcolumn = "1" -- '0' is not bad
 vim.opt.foldenable = true -- enable fold

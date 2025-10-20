@@ -54,6 +54,7 @@ later(function()
         "toml",
         "tsx",
         "typescript",
+        "vento",
         "vhs",
         "vim",
         "vimdoc",

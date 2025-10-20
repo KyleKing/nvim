@@ -6,7 +6,9 @@ My personal `nvim` configuration. Based on:
 - [AstroNvim/AstroNvim](https://github.com/AstroNvim/AstroNvim) and [AstroNvim/astrocommunity](https://github.com/AstroNvim/astrocommunity)
 - [LazyVim/LazyVim](https://github.com/LazyVim/LazyVim)
 - [tomodachi94/dotfiles](https://github.com/tomodachi94/dotfiles/tree/8dc76a30ae9ddcdb4c9b277209408cd2201b63d3/home/common/nvim)
-- and more recently [NativeVim](https://github.com/boltlessengineer/NativeVim) to utilize native NVIM builtins over plugins
+- [NativeVim](https://github.com/boltlessengineer/NativeVim) to explore NVIM builtins over plugins
+- [Shared Mini.nvim setups](https://github.com/echasnovski/mini.nvim/discussions/36)
+- [echasnovski/nvim](https://github.com/echasnovski/nvim)
 
 Plugins are organized according to category from [NeovimCraft](https://neovimcraft.com) like [astro-community](https://github.com/AstroNvim/astrocommunity/blob/59df499a5730504d1cad22073d9cd4a06ca03e0f/CONTRIBUTING.md)
 
