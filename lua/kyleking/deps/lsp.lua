@@ -66,9 +66,7 @@ later(function()
             -- end
             -- if type(cmd) == "table" then cmd = cmd[1] end
 
-            if type(cmd) ~= "string" or cmd_is_executable(cmd) then
-                table.insert(available, linter_name)
-            end
+            if type(cmd) ~= "string" or cmd_is_executable(cmd) then table.insert(available, linter_name) end
         end
 
         return available
@@ -84,15 +82,15 @@ later(function()
         end,
     })
 
+    -- PLANNED: track which linters are being run with:
+    --  https://github.com/mfussenegger/nvim-lint#get-the-current-running-linters-for-your-buffer
     local function lint_progress()
         local running = lint.get_running()
         if #running == 0 then return "󰦕" end
         return "󱉶 " .. table.concat(running, ", ")
     end
 
-    function _G.kyleking_lint_progress()
-        return lint_progress()
-    end
+    function _G.kyleking_lint_progress() return lint_progress() end
     -- PLANNED: Integrate with mini.statusline once enabled or as modal
     -- local statusline = require("mini.statusline")
     -- statusline.setup({
