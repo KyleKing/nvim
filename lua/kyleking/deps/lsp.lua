@@ -54,17 +54,17 @@ later(function()
         for _, linter_name in ipairs(configured) do
             local linter = lint.linters[linter_name]
 
-            -- if type(linter) == "function" then
-            --     local ok, resolved = pcall(linter)
-            --     linter = ok and resolved or nil
-            -- end
+            if type(linter) == "function" then
+                local ok, resolved = pcall(linter)
+                linter = ok and resolved or nil
+            end
 
             local cmd = type(linter) == "table" and linter.cmd or nil
-            -- if type(cmd) == "function" then
-            --     local ok, resolved_cmd = pcall(cmd)
-            --     cmd = ok and resolved_cmd or nil
-            -- end
-            -- if type(cmd) == "table" then cmd = cmd[1] end
+            if type(cmd) == "function" then
+                local ok, resolved_cmd = pcall(cmd)
+                cmd = ok and resolved_cmd or nil
+            end
+            if type(cmd) == "table" then cmd = cmd[1] end
 
             if type(cmd) ~= "string" or cmd_is_executable(cmd) then table.insert(available, linter_name) end
         end

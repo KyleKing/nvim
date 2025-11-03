@@ -6,7 +6,10 @@ local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 later(function()
     add({
         source = "psliwka/vim-dirtytalk",
-        hooks = { post_checkout = function() vim.cmd("DirtytalkUpdate") end },
+        hooks = {
+            post_checkout = function() vim.cmd("DirtytalkUpdate") end,
+            post_install = function() vim.cmd("DirtytalkUpdate") end,
+        },
     })
     vim.opt.spelllang = { "en_us", "programming" }
     vim.keymap.set(
