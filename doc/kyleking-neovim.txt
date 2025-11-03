@@ -1,0 +1,214 @@
+*kyleking-neovim.txt*  KyleKing's Neovim Configuration
+
+                     KyleKing's Neovim Configuration
+
+===============================================================================
+CONTENTS                                              *kyleking-neovim-contents*
+
+    1. Introduction .......................... |kyleking-neovim-introduction|
+    2. Key Mappings .......................... |kyleking-neovim-keymaps|
+       2.1 General Mappings .................. |kyleking-keymaps-general|
+       2.2 Leader Mappings ................... |kyleking-keymaps-leader|
+       2.3 Telescope Mappings ................ |kyleking-keymaps-telescope|
+       2.4 LSP Mappings ...................... |kyleking-keymaps-lsp|
+       2.5 Buffer Mappings ................... |kyleking-keymaps-buffer|
+       2.6 Testing Mappings .................. |kyleking-keymaps-testing|
+    3. Plugins .............................. |kyleking-neovim-plugins|
+       3.1 mini.nvim ........................ |kyleking-plugins-mini|
+       3.2 Fuzzy Finding (Telescope) ........ |kyleking-plugins-telescope|
+       3.3 LSP Support ...................... |kyleking-plugins-lsp|
+       3.4 Colorscheme & UI ................. |kyleking-plugins-ui|
+       3.5 File Explorer .................... |kyleking-plugins-explorer|
+       3.6 Git Integration .................. |kyleking-plugins-git|
+       3.7 Terminal Integration ............. |kyleking-plugins-terminal|
+    4. Custom Commands ...................... |kyleking-neovim-commands|
+    5. Testing Framework .................... |kyleking-neovim-testing|
+
+===============================================================================
+1. INTRODUCTION                                    *kyleking-neovim-introduction*
+
+This is the documentation for KyleKing's Neovim configuration.
+
+The configuration is organized in a modular structure:
+- Core settings in |lua/kyleking/core/|
+- Plugins managed by mini.deps in |lua/kyleking/deps/|
+- LSP configurations in |lua/kyleking/plugins/lsp/|
+- Utility functions in |lua/kyleking/utils/|
+
+Leader key is mapped to <Space> and local leader key is mapped to comma (",").
+
+===============================================================================
+2. KEY MAPPINGS                                        *kyleking-neovim-keymaps*
+
+This section documents all key mappings configured in the setup.
+
+-------------------------------------------------------------------------------
+2.1 General Mappings                                  *kyleking-keymaps-general*
+
+<Esc>           Clear search highlighting
+<C-s>           Force write the current buffer
+<C-q>           Force quit
+k / j           Smart movement with word wrap
+
+Special text objects:
+  A             Select whole buffer (e.g., dA, yA)
+
+-------------------------------------------------------------------------------
+2.2 Leader Mappings                                   *kyleking-keymaps-leader*
+
+<leader>w       Save if modified
+<leader>W       Save all
+<leader>q       Confirm quit
+<leader>Q       Confirm quit all
+<leader>n       New file
+
+Register operations:
+<leader>ry      Yank to * register
+<leader>rp      Paste from * register
+<leader>rY      Yank to + register
+<leader>rP      Paste from + register
+
+UI toggles:
+<leader>us      Toggle spell check
+<leader>uw      Toggle line wrapping
+
+Tab operations:
+<leader>ttn     New tab
+<leader>ttc     Close tab
+
+-------------------------------------------------------------------------------
+2.3 Telescope Mappings                             *kyleking-keymaps-telescope*
+
+<leader><CR>    Resume last Telescope session
+<leader>;       Find in open buffers
+
+Buffer related:
+<leader>br      Find recently opened files
+<leader>bb      Fuzzy find in current buffer
+
+File operations:
+<leader>ff      Find files (including hidden)
+<leader>fw      Find word in files (live grep)
+<leader>f*      Find word from visual selection
+
+Git operations:
+<leader>gf      Find in git files
+
+Other Telescope:
+<leader>fB      Find in Telescope builtins
+<leader>f'      Find marks
+<leader>fC      Find commands
+<leader>fh      Find in Neovim help
+<leader>fk      Find keymaps
+<leader>fr      Find registers
+
+-------------------------------------------------------------------------------
+2.4 LSP Mappings                                       *kyleking-keymaps-lsp*
+
+<leader>ld      Find in diagnostics
+<leader>lgs     Find document symbols
+<leader>lgd     Go to definition
+<leader>lgi     Go to implementation
+<leader>lgr     Find references
+<leader>lgt     Go to type definition
+
+-------------------------------------------------------------------------------
+2.5 Buffer Mappings                                  *kyleking-keymaps-buffer*
+
+<leader>bw      Wipeout buffer (including marks)
+<leader>bW      Wipeout all buffers (including marks)
+
+-------------------------------------------------------------------------------
+2.6 Testing Mappings                                *kyleking-keymaps-testing*
+
+<leader>ta      Run all tests
+<leader>tf      Run failed tests
+
+===============================================================================
+3. PLUGINS                                            *kyleking-neovim-plugins*
+
+This section documents the plugins and their configurations.
+
+-------------------------------------------------------------------------------
+3.1 mini.nvim                                          *kyleking-plugins-mini*
+
+The configuration uses mini.nvim as a plugin manager through mini.deps. The
+core plugins are installed and managed automatically.
+
+-------------------------------------------------------------------------------
+3.2 Fuzzy Finding (Telescope)                      *kyleking-plugins-telescope*
+
+Telescope is configured for fuzzy finding files, text, and various Neovim
+entities. See |kyleking-keymaps-telescope| for key mappings.
+
+Telescope extensions:
+- zf-native: For faster performance
+- live-grep-args: For advanced grep capabilities with arguments
+
+Telescope configuration highlights:
+- Prompt at top with ascending sort
+- Custom layout with optimized preview width
+- Custom key mappings in insert mode
+- Auto quoting in live grep args
+
+-------------------------------------------------------------------------------
+3.3 LSP Support                                        *kyleking-plugins-lsp*
+
+LSP (Language Server Protocol) support is provided through Mason and
+related plugins. See |kyleking-keymaps-lsp| for LSP-related key mappings.
+
+-------------------------------------------------------------------------------
+3.4 Colorscheme & UI                                     *kyleking-plugins-ui*
+
+The configuration uses nightfox colorscheme with custom highlights for line
+numbers.
+
+UI features:
+- Dim inactive windows
+- Custom line number styling with nord-inspired colors
+
+-------------------------------------------------------------------------------
+3.5 File Explorer                                  *kyleking-plugins-explorer*
+
+File explorer functionality is available for browsing and managing the file
+system.
+
+-------------------------------------------------------------------------------
+3.6 Git Integration                                    *kyleking-plugins-git*
+
+Git integration provides tools for working with Git repositories directly
+from Neovim.
+
+-------------------------------------------------------------------------------
+3.7 Terminal Integration                           *kyleking-plugins-terminal*
+
+Terminal integration allows for using terminal features within Neovim.
+
+===============================================================================
+4. CUSTOM COMMANDS                                  *kyleking-neovim-commands*
+
+:RunAllTests    Run all Mini.test test files
+:RunFailedTests Run only failed tests from last run
+
+===============================================================================
+5. TESTING FRAMEWORK                                 *kyleking-neovim-testing*
+
+The configuration includes a Mini.test framework for running tests. This is
+primarily used when the current working directory matches the Neovim config
+directory.
+
+Test configuration highlights:
+- Baseline directory at ~/.config/nvim/mini-deps-snap
+- Case timing in verbose mode
+- Stop on first error in summary
+
+Key mappings for testing:
+<leader>ta      Run all tests
+<leader>tf      Run failed tests
+
+Commands for testing:
+:RunAllTests    Run all Mini.test test files
+:RunFailedTests Run only failed tests from last run
+
+===============================================================================
+vim:tw=78:ts=8:ft=help:norl:
