@@ -12,6 +12,26 @@ later(function()
         hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
     })
     add("apple/pkl-neovim") -- Required for pkl
+    do
+        local function resolve(cmd) return vim.fn.exepath(cmd) end
+        local lsp_bin = resolve("pkl-lsp")
+        if lsp_bin ~= "" then
+            local config = vim.g.pkl_neovim or {}
+            config.start_command = { lsp_bin }
+            local cli_bin = resolve("pkl")
+            if cli_bin ~= "" then config.pkl_cli_path = cli_bin end
+            vim.g.pkl_neovim = config
+        else
+            vim.schedule(
+                function()
+                    vim.notify_once(
+                        "pkl-neovim: `pkl-lsp` executable not found; install it to enable LSP features.",
+                        vim.log.levels.WARN
+                    )
+                end
+            )
+        end
+    end
     add("nvim-treesitter/nvim-treesitter-textobjects")
 
     local ensure_installed = {
