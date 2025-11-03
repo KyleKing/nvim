@@ -45,3 +45,9 @@ later(function()
     K("n", "<leader>tv", "<Cmd>ToggleTerm size=80 direction=vertical<CR>", { desc = "ToggleTerm vertical split" })
     K({ "n", "t" }, "<C-'>", "<Cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
 end)
+
+-- Export the module with testing utilities
+return {
+    toggle_term_cmd = toggle_term_cmd,
+    user_terminals = user_terminals,
+}
