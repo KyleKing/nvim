@@ -1,6 +1,11 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
+-- Enable mini.ai for better text objects (works with and without treesitter)
+later(function()
+    require("mini.ai").setup()
+end)
+
 later(function()
     add("monaqa/dial.nvim")
 
@@ -89,13 +94,13 @@ later(function()
     })
 
     local K = vim.keymap.set
-    K("n", "<leader>ft", "<Cmd>TodoTelescope<CR>", { desc = "Find in TODOs" })
+    K("n", "<leader>ft", "<Cmd>TodoTrouble<CR>", { desc = "Find in TODOs" })
     K("n", "<leader>uT", "<Cmd>TodoTrouble<CR>", { desc = "Show TODOs with Trouble" })
 end)
 
 later(function()
-    add("folke/ts-comments.nvim")
-    require("ts-comments").setup()
+    -- Use mini.comment instead of ts-comments for simpler, lighter commenting
+    require("mini.comment").setup()
 end)
 
 later(function()

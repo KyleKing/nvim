@@ -90,35 +90,19 @@ later(function()
         return "󱉶 " .. table.concat(running, ", ")
     end
 
+    -- Expose lint progress for mini.statusline integration
     function _G.kyleking_lint_progress() return lint_progress() end
-    -- PLANNED: Integrate with mini.statusline once enabled or as modal
-    -- local statusline = require("mini.statusline")
-    -- statusline.setup({
-    --     content = {
-    --         active = function()
-    --             local mode = statusline.section_mode({ trunc_width = 999 })
-    --             local git = statusline.section_git()
-    --             local diagnostics = statusline.section_diagnostics()
-    --             local filename = statusline.section_filename({ trunc_width = 140 })
-    --             local fileinfo = statusline.section_fileinfo()
-    --             local lint_info = lint_progress()
-    --             return statusline.combine_groups({
-    --                 { hl = mode.hl, strings = { mode.string } },
-    --                 { hl = "MiniStatuslineDevinfo", strings = { git, diagnostics, lint_info } },
-    --                 "%<",
-    --                 { hl = "MiniStatuslineFilename", strings = { filename } },
-    --                 "%=",
-    --                 { hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
-    --             })
-    --         end,
-    --     },
-    -- })
 
     vim.keymap.set("n", "<leader>ll", require("lint").try_lint, { desc = "Trigger linting for current file" })
 end)
 
 later(function()
     add("neovim/nvim-lspconfig")
+
+    -- Configure global root markers for all LSP servers (nvim 0.11+)
+    vim.lsp.config('*', {
+        root_markers = { '.git', '.hg', '.svn' }
+    })
 
     -- FYI: see `:help lspconfig-all` or https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#angularls
     -- FYI: See mapping of server names here: https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
@@ -129,6 +113,16 @@ later(function()
         "ts_ls",
     })
 
+    -- Note: Neovim 0.11+ includes default LSP mappings (see :h lsp-defaults):
+    --   K - hover documentation
+    --   gra - code actions (equivalent to <leader>ca below)
+    --   grr - show references (equivalent to <leader>cR below)
+    --   grn - rename symbol (equivalent to <leader>cr below)
+    --   gO - document symbols
+    --   Ctrl+W gd - definition in split
+    --   Ctrl+X Ctrl+O - completion (enabled via vim.lsp.completion.enable)
+    -- You can use these defaults or the custom <leader>c* mappings below
+
     local keymap_group = vim.api.nvim_create_augroup("kyleking_lsp_keymaps", { clear = true })
     vim.api.nvim_create_autocmd("LspAttach", {
         group = keymap_group,
@@ -137,6 +131,7 @@ later(function()
                 vim.keymap.set(mode, lhs, rhs, { buffer = event.buf, silent = true, desc = desc })
             end
 
+            -- Custom mappings (alternatives to nvim 0.11+ defaults)
             map("n", "<leader>ca", vim.lsp.buf.code_action, "LSP code actions")
             map("n", "<leader>cR", vim.lsp.buf.references, "LSP references")
             map("n", "<leader>cr", vim.lsp.buf.rename, "LSP rename symbol")
