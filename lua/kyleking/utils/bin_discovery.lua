@@ -1,4 +1,6 @@
 -- Globally discovery of bin directories for local executables like flake8 and eslint
+-- NOTE: This module is now supplemented by workspace_detection.lua which provides
+-- comprehensive monorepo support with configurable depth and multiple marker types
 
 local M = {}
 
