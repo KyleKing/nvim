@@ -21,7 +21,6 @@ require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
 require("kyleking.deps.color")
 require("kyleking.deps.colorscheme")
-require("kyleking.deps.completions")
 require("kyleking.deps.editing-support")
 require("kyleking.deps.file-explorer")
 require("kyleking.deps.formatting")
@@ -249,11 +248,11 @@ end)
 -- end)
 -- now(function() require("mini.icons").setup() end)
 -- now(function() require("mini.tabline").setup() end)
--- now(function() require("mini.statusline").setup() end)
-
--- later(function() require("mini.ai").setup() end)
--- later(function() require("mini.comment").setup() end)
--- later(function() require("mini.pick").setup() end)
+-- mini.statusline is configured in deps/bars-and-lines.lua
+-- mini.ai is configured in deps/editing-support.lua
+-- mini.comment is configured in deps/editing-support.lua
+-- mini.pick is configured in deps/fuzzy-finder.lua
+-- mini.icons is configured in deps/bars-and-lines.lua
 
 -- Save Mini.Deps snapshot when run from config directory
 later(function()
