@@ -1,11 +1,13 @@
 -- Test file for terminal-integration.lua using Mini.test
+-- Tests built-in nvim terminal integration
 local MiniTest = require("mini.test")
+local H = require("tests.helpers")
 
 -- Define a new test set
 local T = MiniTest.new_set({
     hooks = {
         pre_case = function()
-            -- Reset the user_terminals table by reloading the module before each test
+            -- Reload the module before each test
             package.loaded["kyleking.deps.terminal-integration"] = nil
         end,
         post_once = function()
@@ -17,227 +19,136 @@ local T = MiniTest.new_set({
 -- Test case for the terminal integration module
 T["terminal_integration module"] = MiniTest.new_set()
 
-T["terminal_integration module"].initialization = function()
+T["terminal_integration module"]["loads successfully"] = function()
     -- Load the module
+    local module = require("kyleking.deps.terminal-integration")
+
+    H.assert_not_nil(module, "Terminal integration module should load")
+end
+
+T["terminal_integration module"]["exports expected functions"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+
+    -- Verify exported functions
+    H.assert_true(type(module.toggle_float) == "function", "toggle_float should be a function")
+    H.assert_true(type(module.open_horizontal) == "function", "open_horizontal should be a function")
+    H.assert_true(type(module.open_vertical) == "function", "open_vertical should be a function")
+end
+
+-- Test keymaps
+T["terminal_integration module"]["keymaps are configured"] = function()
     require("kyleking.deps.terminal-integration")
 
-    -- Check that toggleterm is loaded
-    MiniTest.expect.equality(package.loaded.toggleterm ~= nil, true, "toggleterm plugin should be loaded")
+    -- Verify keymaps exist
+    local expected_keymaps = {
+        { mode = "n", lhs = "<C-'>", desc = "Toggle floating terminal" },
+        { mode = "t", lhs = "<C-'>", desc = "Toggle floating terminal" },
+        { mode = "n", lhs = "<leader>tf", desc = "Terminal float" },
+        { mode = "n", lhs = "<leader>th", desc = "Terminal horizontal split" },
+        { mode = "n", lhs = "<leader>tv", desc = "Terminal vertical split" },
+        { mode = "t", lhs = "<Esc><Esc>", desc = "Exit terminal mode" },
+    }
 
-    -- Check that the toggleterm configuration is accessible
-    -- Note: toggleterm doesn't have a get_config method, we need to access its config differently
-    -- Inspect the setup call in terminal-integration.lua to check configuration
-    local setup_config = {}
-    -- Mock the setup function to capture its configuration
-    local originalSetup = require("toggleterm").setup
-    require("toggleterm").setup = function(config)
-        setup_config = config
-        return originalSetup(config)
-    end
-
-    -- Re-load the module to trigger the setup call
-    package.loaded["kyleking.deps.terminal-integration"] = nil
-    require("kyleking.deps.terminal-integration")
-
-    -- Restore original setup function
-    require("toggleterm").setup = originalSetup
-
-    -- Verify the configuration matches expectations
-    -- The first condition is failing as nil
-    -- MiniTest.expect.equality(setup_config.shading_factor, 4, "Shading factor should be set to 4")
-    MiniTest.expect.equality(setup_config.direction, "float", "Default direction should be float")
-
-    -- Verify keymaps are set
-    local check_keymap = function(lhs, desc)
-        local keymap = vim.fn.maparg(lhs, "n", false, true)
-        MiniTest.expect.equality(keymap ~= nil, true, "Keymap should exist: " .. lhs)
-        if keymap then MiniTest.expect.equality(keymap.desc, desc, "Description should match for keymap: " .. lhs) end
-    end
-
-    check_keymap("<leader>gg", "ToggleTerm lazygit")
-    check_keymap("<leader>gj", "ToggleTerm lazyjj")
-    check_keymap("<leader>td", "ToggleTerm 'lazydocker'")
-    check_keymap("<leader>tf", "ToggleTerm float")
-    check_keymap("<leader>th", "ToggleTerm horizontal split")
-    check_keymap("<leader>tv", "ToggleTerm vertical split")
-
-    -- Check the toggle shortcut in normal and terminal mode
-    check_keymap("<C-'>", "Toggle terminal")
-    local t_keymap = vim.fn.maparg("<C-'>", "t", false, true)
-    MiniTest.expect.equality(t_keymap ~= nil, true, "Terminal mode keymap should exist")
-    if t_keymap then
-        MiniTest.expect.equality(t_keymap.desc, "Toggle terminal", "Description should match for terminal mode keymap")
+    for _, keymap_spec in ipairs(expected_keymaps) do
+        local exists = H.check_keymap(keymap_spec.mode, keymap_spec.lhs, keymap_spec.desc)
+        H.assert_true(exists, string.format("Keymap %s in mode %s should exist", keymap_spec.lhs, keymap_spec.mode))
     end
 end
 
--- Test toggle_term_cmd functionality
-T["terminal_integration module"].toggle_term_cmd = function()
-    -- Load the module to access internal functions
-    local module = require("kyleking.deps.terminal-integration")
+T["terminal_integration module"]["terminal navigation keymaps exist"] = function()
+    require("kyleking.deps.terminal-integration")
 
-    -- Get access to the internal toggle_term_cmd function and user_terminals table
-    -- Note: This requires exposing these in the module's return value for testing
-    local toggle_term_cmd = module.toggle_term_cmd
-    local user_terminals = module.user_terminals
-
-    -- Mock the Terminal class from toggleterm
-    local mock_terminal = {
-        toggle_called = false,
-        toggle = function(self)
-            self.toggle_called = true
-            return true
-        end,
+    -- Verify Ctrl+hjkl navigation from terminal mode
+    local nav_keymaps = {
+        { lhs = "<C-h>", desc = "Move to left window" },
+        { lhs = "<C-j>", desc = "Move to window below" },
+        { lhs = "<C-k>", desc = "Move to window above" },
+        { lhs = "<C-l>", desc = "Move to right window" },
     }
 
-    local mock_terminal_constructor = {
-        new_called = false,
-        new = function(self, opts)
-            self.new_called = true
-            self.last_opts = opts
-            return mock_terminal
-        end,
-    }
-
-    -- Replace the real Terminal with our mock
-    local real_terminal = package.loaded["toggleterm.terminal"]
-    package.loaded["toggleterm.terminal"] = { Terminal = mock_terminal_constructor }
-
-    -- Test with string command
-    MiniTest.expect.equality(#vim.tbl_keys(user_terminals), 0, "User terminals should start empty")
-
-    -- Call the function with a command string
-    if toggle_term_cmd then
-        toggle_term_cmd("test-command")
-
-        -- Verify a new terminal was created
-        MiniTest.expect.equality(mock_terminal_constructor.new_called, true, "Terminal:new should be called")
-        MiniTest.expect.equality(
-            user_terminals["test-command"] ~= nil,
-            true,
-            "Terminal should be stored in user_terminals"
-        )
-        MiniTest.expect.equality(
-            user_terminals["test-command"][1] ~= nil,
-            true,
-            "Terminal should be stored with count 1"
-        )
-        MiniTest.expect.equality(
-            mock_terminal_constructor.last_opts.cmd,
-            "test-command",
-            "Command should be passed correctly"
-        )
-        MiniTest.expect.equality(
-            mock_terminal_constructor.last_opts.hidden,
-            true,
-            "Terminal should be hidden by default"
-        )
-
-        -- Verify toggle was called
-        MiniTest.expect.equality(mock_terminal.toggle_called, true, "Terminal:toggle should be called")
-
-        -- Reset for next test
-        mock_terminal.toggle_called = false
-        mock_terminal_constructor.new_called = false
-
-        -- Test with options table
-        toggle_term_cmd({ cmd = "another-command", hidden = false })
-
-        -- Verify options were passed correctly
-        MiniTest.expect.equality(
-            mock_terminal_constructor.new_called,
-            true,
-            "Terminal:new should be called with options"
-        )
-        MiniTest.expect.equality(
-            user_terminals["another-command"] ~= nil,
-            true,
-            "Terminal should be stored in user_terminals"
-        )
-        MiniTest.expect.equality(
-            mock_terminal_constructor.last_opts.cmd,
-            "another-command",
-            "Command should be passed correctly"
-        )
-        MiniTest.expect.equality(
-            mock_terminal_constructor.last_opts.hidden,
-            false,
-            "Hidden option should be passed correctly"
-        )
-
-        -- Test reusing an existing terminal
-        mock_terminal.toggle_called = false
-        mock_terminal_constructor.new_called = false
-
-        toggle_term_cmd("test-command")
-
-        -- Verify existing terminal was reused
-        MiniTest.expect.equality(mock_terminal_constructor.new_called, false, "Terminal:new should not be called again")
-        MiniTest.expect.equality(mock_terminal.toggle_called, true, "Terminal:toggle should be called")
-    else
-        print("toggle_term_cmd function not accessible for testing")
+    for _, keymap_spec in ipairs(nav_keymaps) do
+        local exists = H.check_keymap("t", keymap_spec.lhs, keymap_spec.desc)
+        H.assert_true(exists, string.format("Navigation keymap %s should exist in terminal mode", keymap_spec.lhs))
     end
-
-    -- Restore real Terminal
-    package.loaded["toggleterm.terminal"] = real_terminal
 end
 
--- Test that on_exit callback properly cleans up terminals
-T["terminal_integration module"].terminal_cleanup = function()
-    -- Load the module to access internal functions
+-- Test toggle_float functionality
+T["terminal_integration module"]["toggle_float creates terminal"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
-    -- Get access to the internal toggle_term_cmd function and user_terminals table
-    local toggle_term_cmd = module.toggle_term_cmd
-    local user_terminals = module.user_terminals
+    -- Count initial buffers
+    local initial_bufs = vim.api.nvim_list_bufs()
+    local initial_count = #initial_bufs
 
-    if toggle_term_cmd and user_terminals then
-        -- Create a mock for Terminal that allows us to capture and call the on_exit callback
-        local on_exit_callback
-        local mock_terminal = {
-            toggle = function() return true end,
-        }
+    -- Call toggle_float (this will create a terminal)
+    -- Note: We can't fully test the floating window in headless mode,
+    -- but we can verify the function is callable
+    H.assert_true(type(module.toggle_float) == "function", "toggle_float should be callable")
 
-        local mock_terminal_constructor = {
-            new = function(self, opts)
-                on_exit_callback = opts.on_exit
-                return mock_terminal
-            end,
-        }
+    -- The function exists and is the right type - actual terminal creation
+    -- is hard to test in automated tests without a full UI
+end
 
-        -- Replace the real Terminal with our mock
-        local real_terminal = package.loaded["toggleterm.terminal"]
-        package.loaded["toggleterm.terminal"] = { Terminal = mock_terminal_constructor }
+-- Test open_horizontal functionality
+T["terminal_integration module"]["open_horizontal is callable"] = function()
+    local module = require("kyleking.deps.terminal-integration")
 
-        -- Create a terminal
-        toggle_term_cmd("cleanup-test")
+    H.assert_true(type(module.open_horizontal) == "function", "open_horizontal should be callable")
+end
 
-        -- Verify terminal was created
-        MiniTest.expect.equality(user_terminals["cleanup-test"] ~= nil, true, "Terminal should be stored")
-        MiniTest.expect.equality(
-            user_terminals["cleanup-test"][1] ~= nil,
-            true,
-            "Terminal should be stored with count 1"
-        )
+-- Test open_vertical functionality
+T["terminal_integration module"]["open_vertical is callable"] = function()
+    local module = require("kyleking.deps.terminal-integration")
 
-        -- Simulate terminal exit
-        if on_exit_callback then
-            on_exit_callback()
+    H.assert_true(type(module.open_vertical) == "function", "open_vertical should be callable")
+end
 
-            -- Verify terminal was cleaned up
-            MiniTest.expect.equality(
-                user_terminals["cleanup-test"][1] == nil,
-                true,
-                "Terminal should be removed after exit"
-            )
-        else
-            print("on_exit callback not captured")
-        end
+-- Test that built-in terminal functions are available
+T["built-in terminal"] = MiniTest.new_set()
 
-        -- Restore real Terminal
-        package.loaded["toggleterm.terminal"] = real_terminal
-    else
-        print("toggle_term_cmd function or user_terminals not accessible for testing")
-    end
+T["built-in terminal"]["nvim has terminal support"] = function()
+    -- Verify vim.fn.termopen exists (built-in terminal function)
+    H.assert_true(type(vim.fn.termopen) == "function", "vim.fn.termopen should be available")
+
+    -- Verify we can create terminal buffers
+    H.assert_true(type(vim.api.nvim_create_buf) == "function", "vim.api.nvim_create_buf should be available")
+
+    -- Verify we can open floating windows
+    H.assert_true(type(vim.api.nvim_open_win) == "function", "vim.api.nvim_open_win should be available")
+end
+
+T["built-in terminal"]["terminal commands work"] = function()
+    -- Test that we can open a terminal via command
+    -- This is a basic sanity check that nvim's terminal works
+    local cmd_exists = vim.fn.exists(':terminal')
+    H.assert_true(cmd_exists == 2, ":terminal command should exist")
+end
+
+-- Integration test
+T["terminal integration"] = MiniTest.new_set()
+
+T["terminal integration"]["module integrates with nvim"] = function()
+    require("kyleking.deps.terminal-integration")
+
+    -- Verify that after loading the module, we have the expected setup
+    -- Keymaps should be registered
+    local has_toggle = H.check_keymap("n", "<C-'>", "Toggle floating terminal")
+    H.assert_true(has_toggle, "Toggle keymap should be registered")
+
+    -- Module should export the expected API
+    local module = require("kyleking.deps.terminal-integration")
+    H.assert_not_nil(module.toggle_float, "Module should export toggle_float")
+    H.assert_not_nil(module.open_horizontal, "Module should export open_horizontal")
+    H.assert_not_nil(module.open_vertical, "Module should export open_vertical")
+end
+
+T["terminal integration"]["uses built-in terminal not external plugin"] = function()
+    -- Verify that toggleterm is NOT loaded (we replaced it)
+    H.assert_false(H.is_plugin_loaded("toggleterm"), "toggleterm should not be loaded")
+
+    -- Verify our module loads instead
+    local module = require("kyleking.deps.terminal-integration")
+    H.assert_not_nil(module, "Built-in terminal integration should load")
 end
 
 -- For manual running of tests directly

@@ -25,7 +25,7 @@ later(function()
     ---        { "<leader>m", group = "Move", mode = { "n", "v" } },
     ---        { "<leader>p", group = "Plugins" },
     ---        { "<leader>r", group = "Register" },
-    ---        { "<leader>t", group = "ToggleTerm" },
+    ---        { "<leader>t", group = "Terminal" },
     ---        { "<leader>u", group = "UI" },
     ---        { "<leader>uc", group = "Color" },
     ---        { "<leader>ug", group = "Git" },
