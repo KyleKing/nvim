@@ -6,6 +6,109 @@ later(function()
     require("mini.ai").setup()
 end)
 
+-- mini.hipatterns - Highlight patterns (hex colors, TODOs, etc.)
+later(function()
+    local hipatterns = require("mini.hipatterns")
+    hipatterns.setup({
+        highlighters = {
+            -- Highlight hex color strings (#rrggbb, #rgb) in their own color
+            hex_color = hipatterns.gen_highlighter.hex_color(),
+
+            -- Highlight TODO/FIXME/NOTE/HACK/PERF
+            fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
+            hack  = { pattern = '%f[%w]()HACK()%f[%W]',  group = 'MiniHipatternsHack'  },
+            todo  = { pattern = '%f[%w]()TODO()%f[%W]',  group = 'MiniHipatternsTodo'  },
+            note  = { pattern = '%f[%w]()NOTE()%f[%W]',  group = 'MiniHipatternsNote'  },
+            perf  = { pattern = '%f[%w]()PERF()%f[%W]',  group = 'MiniHipatternsNote'  },
+        },
+    })
+end)
+
+-- mini.indentscope - Visualize and operate on indent scope
+later(function()
+    require("mini.indentscope").setup({
+        -- Draw options
+        draw = {
+            delay = 50,
+            animation = function() return 0 end, -- No animation for performance
+        },
+        -- Module mappings
+        mappings = {
+            -- Textobjects
+            object_scope = 'ii',
+            object_scope_with_border = 'ai',
+            -- Motions (jump to borders)
+            goto_top = '[i',
+            goto_bottom = ']i',
+        },
+        -- Options for scope computation
+        options = {
+            border = 'both',
+            indent_at_cursor = true,
+            try_as_border = true,
+        },
+        -- Which character to use for drawing scope indicator
+        symbol = '│',
+    })
+
+    -- Disable for certain filetypes
+    vim.api.nvim_create_autocmd('FileType', {
+        pattern = {
+            'help', 'dashboard', 'neo-tree', 'Trouble', 'trouble',
+            'lazy', 'mason', 'notify', 'toggleterm', 'lazyterm',
+        },
+        callback = function()
+            vim.b.miniindentscope_disable = true
+        end,
+    })
+end)
+
+-- mini.cursorword - Highlight word under cursor
+later(function()
+    require("mini.cursorword").setup({
+        delay = 100, -- Delay before highlighting (ms)
+    })
+
+    -- Disable in certain filetypes
+    vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'help', 'dashboard', 'neo-tree', 'Trouble', 'lazy', 'mason', 'notify' },
+        callback = function()
+            vim.b.minicursorword_disable = true
+        end,
+    })
+end)
+
+-- mini.operators - Additional text edit operators
+later(function()
+    require("mini.operators").setup({
+        -- Evaluate text and replace with output
+        evaluate = {
+            prefix = 'g=',
+            func = nil, -- Use default evaluation
+        },
+        -- Exchange text regions
+        exchange = {
+            prefix = 'gx',
+            reindent_linewise = true,
+        },
+        -- Multiply (duplicate) text
+        multiply = {
+            prefix = 'gm',
+            func = nil,
+        },
+        -- Replace text with register
+        replace = {
+            prefix = 'gr',
+            reindent_linewise = true,
+        },
+        -- Sort text
+        sort = {
+            prefix = 'gs',
+            func = nil,
+        },
+    })
+end)
+
 later(function()
     add("monaqa/dial.nvim")
 

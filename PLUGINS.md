@@ -14,15 +14,20 @@ Quick reference for all configured plugins.
 | **mini.bufremove** | Delete buffers gracefully | `<leader>bc`, `<leader>bw` | `:h mini.bufremove` |
 | **mini.clue** | Show next key clues | Auto on `<leader>`, `g`, etc. | `:h mini.clue` |
 | **mini.comment** | Toggle comments | `gcc`, `gc` (visual) | `:h mini.comment` |
+| **mini.cursorword** | Highlight word under cursor | Auto | `:h mini.cursorword` |
 | **mini.diff** | Git diff hunks in gutter | `]h`, `[h`, `gh`, `gH` | `:h mini.diff` |
 | **mini.extra** | Sorting, extra pickers | `<leader>ss` (visual sort) | `:h mini.extra` |
 | **mini.files** | File explorer | TBD | `:h mini.files` |
 | **mini.git** | Git integration | `<leader>gc` | `:h mini.git` |
+| **mini.hipatterns** | Highlight patterns | Auto (colors, TODOs) | `:h mini.hipatterns` |
 | **mini.icons** | Icon provider | N/A (auto) | `:h mini.icons` |
+| **mini.indentscope** | Indent scope visual | `ii`, `ai`, `[i`, `]i` | `:h mini.indentscope` |
 | **mini.move** | Move lines/selections | `<leader>m{h,j,k,l}` | `:h mini.move` |
 | **mini.notify** | Notifications | `<leader>un`, `<leader>uN` | `:h mini.notify` |
+| **mini.operators** | Text operators | `g=`, `gx`, `gm`, `gr`, `gs` | `:h mini.operators` |
 | **mini.pairs** | Auto-pair brackets/quotes | Auto in insert mode | `:h mini.pairs` |
 | **mini.pick** | Fuzzy finder | `<leader>ff`, `<leader>fw` | `:h mini.pick` |
+| **mini.sessions** | Session management | `<leader>S{s,r,d,l,w}` | `:h mini.sessions` |
 | **mini.splitjoin** | Split/join arguments | `gS` | `:h mini.splitjoin` |
 | **mini.statusline** | Statusline | N/A (auto) | `:h mini.statusline` |
 | **mini.surround** | Surround text | `sa`, `sd`, `sr`, `sf`, `sh` | `:h mini.surround` |
@@ -119,6 +124,83 @@ Quickfix:    [q ]q  [Q ]Q
 Windows:     [w ]w  [W ]W
 And more: comments, indent, treesitter, undo, yank
 ```
+
+### 🎨 mini.hipatterns - Highlight Patterns
+
+Automatically highlights:
+- **Hex colors**: `#ff0000`, `#f00` (shown in their actual color!)
+- **TODO keywords**: TODO, FIXME, HACK, NOTE, PERF
+- Can add custom patterns for your workflow
+
+No keymaps needed - works automatically as you type!
+
+### 📐 mini.indentscope - Indent Scope Visualization
+
+Visual guide for current indent scope:
+
+```
+Text objects:
+  ii  - Inside indent scope (current indentation level)
+  ai  - Around indent scope (includes borders)
+
+Motions:
+  [i  - Jump to top of indent scope
+  ]i  - Jump to bottom of indent scope
+```
+
+Perfect for Python, Lua, YAML, and any indent-based code!
+
+### 💡 mini.cursorword - Auto-highlight Current Word
+
+Automatically highlights all instances of the word under cursor.
+
+No configuration needed - just move your cursor!
+
+### 🔧 mini.operators - Text Edit Operators
+
+Five powerful text operators with the `g` prefix:
+
+```
+g={motion}  - Evaluate text as Lua/Vim expression and replace
+              Example: g=ip on "2 + 2" → "4"
+
+gx{motion}  - Exchange two text regions
+              Example: gxiw on first word, then gxiw on second word
+              Swaps the two words!
+
+gm{motion}  - Multiply (duplicate) text
+              Example: 3gmiw duplicates word 3 times
+
+gr{motion}  - Replace text with register content
+              Example: yank word, then griw on another word
+
+gs{motion}  - Sort text lines/items
+              Example: gsip sorts lines in paragraph
+```
+
+### 💾 mini.sessions - Session Management
+
+Save and restore your workspace state:
+
+```
+<leader>Ss  - Save session (prompts for name)
+<leader>Sr  - Read/restore session (shows picker)
+<leader>Sd  - Delete session (shows picker)
+<leader>Sl  - Load latest session
+<leader>Sw  - Write to current session
+<leader>SL  - Load local session (.nvim-session in cwd)
+<leader>SW  - Write local session (.nvim-session in cwd)
+```
+
+**Session storage**:
+- Global sessions: `~/.local/share/nvim/sessions/`
+- Local sessions: `.nvim-session` in project root
+- Auto-saves on exit if a session is active
+
+**Use cases**:
+- Save different project states
+- Quick workspace switching
+- Team-shared sessions (commit `.nvim-session` to git)
 
 ## LSP & Completion
 
@@ -345,10 +427,13 @@ See [PERFORMANCE.md](./PERFORMANCE.md) for detailed documentation.
 - Removed: vim-sandwich, which-key, gitsigns, nap.nvim, bufjump.nvim (5 plugins)
 - Still external: conform, nvim-lint, trouble, treesitter, flash, etc. (22 plugins)
 
-**Mini.nvim Modules**: 21 (up from 14)
-- Core: deps, ai, comment, files, icons, pick, statusline, test, trailspace
-- New Phase 1-4: bracketed, bufremove, clue, diff, extra, git, move, notify, pairs, splitjoin, surround, visits
-- All modules: ai, bracketed, bufremove, clue, comment, deps, diff, extra, files, git, icons, move, notify, pairs, pick, splitjoin, statusline, surround, test, trailspace, visits
+**Mini.nvim Modules**: 26 (up from 14)
+- **Core** (9): deps, ai, comment, files, icons, pick, statusline, test, trailspace
+- **Phase 1-4** (12): bracketed, bufremove, clue, diff, extra, git, move, notify, pairs, splitjoin, surround, visits
+- **New Additions** (5): cursorword, hipatterns, indentscope, operators, sessions
+
+**All 26 Modules**:
+ai, bracketed, bufremove, clue, comment, cursorword, deps, diff, extra, files, git, hipatterns, icons, indentscope, move, notify, operators, pairs, pick, sessions, splitjoin, statusline, surround, test, trailspace, visits
 
 **Categories:**
 - LSP & Completion: 3
@@ -356,11 +441,11 @@ See [PERFORMANCE.md](./PERFORMANCE.md) for detailed documentation.
 - Git: 2 (mini.diff, mini.git)
 - Diagnostics: 1
 - Syntax: 2
-- Editing & Motion: 4 (removed nap, bufjump)
+- Editing & Motion: 5 (operators, indentscope, cursorword, hipatterns)
 - UI & Appearance: 6
-- Utilities: 5
+- Utilities: 6 (added sessions)
 - Language-Specific: 3
-- Performance: 1 (new!)
+- Performance: 1
 
 ## Quick Start
 
@@ -403,9 +488,25 @@ Editing:
   gS         - Split/join arguments
   <leader>ss - Sort lines (visual)
 
+Text Operators (mini.operators):
+  g={motion} - Evaluate expression
+  gx{motion} - Exchange regions (press twice)
+  gm{motion} - Multiply/duplicate
+  gr{motion} - Replace with register
+  gs{motion} - Sort
+
+Indent Scope:
+  ii / ai    - Inside/around indent scope
+  [i ]i      - Jump to scope borders
+
 Buffers:
   <leader>bc - Close buffer (keep window)
   <leader>bw - Wipeout buffer (keep window)
+
+Sessions:
+  <leader>Ss - Save session
+  <leader>Sr - Restore session
+  <leader>Sl - Load latest session
 
 Notifications & Performance:
   <leader>un - Show notification history

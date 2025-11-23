@@ -171,23 +171,28 @@ local perf = require('mini.misc').setup_auto_root()
 - Performance test suite
 - Comprehensive documentation
 
-## Mini.nvim Modules Now Using (21 total)
+## Mini.nvim Modules Now Using (26 total)
 
 ✅ mini.ai - Enhanced text objects
 ✅ mini.bracketed - Unified [] navigation
 ✅ mini.bufremove - Better buffer deletion
 ✅ mini.clue - Key clues (replaced which-key)
 ✅ mini.comment - Toggle comments
+✅ mini.cursorword - Highlight word under cursor (NEW!)
 ✅ mini.deps - Package manager
 ✅ mini.diff - Git diff hunks (replaced gitsigns)
 ✅ mini.extra - Sorting and extra pickers
 ✅ mini.files - File explorer
 ✅ mini.git - Git integration
+✅ mini.hipatterns - Highlight hex colors, TODOs, patterns (NEW!)
 ✅ mini.icons - Icon provider
+✅ mini.indentscope - Indent scope visualization (NEW!)
 ✅ mini.move - Move lines/selections
 ✅ mini.notify - Notifications
+✅ mini.operators - Text edit operators (NEW!)
 ✅ mini.pairs - Auto-pairs
 ✅ mini.pick - Fuzzy finder
+✅ mini.sessions - Session management (NEW!)
 ✅ mini.splitjoin - Split/join arguments
 ✅ mini.statusline - Statusline
 ✅ mini.surround - Surround text (replaced vim-sandwich)
@@ -199,16 +204,20 @@ local perf = require('mini.misc').setup_auto_root()
 
 **Before**: ~35 plugins total
 
-**After All Phases**:
+**After All Phases + New Additions**:
 - **External plugins**: 22 (down from ~35)
-- **Mini modules**: 21 (up from 14)
-- **Total**: 43 plugins (but mini modules are lighter and more integrated)
+- **Mini modules**: 26 (up from 14)
+- **Total**: 48 plugins (but mini modules are lighter and more integrated)
 
 **Net Change**:
 - Removed 5 external dependencies
-- Added 7 mini modules (10 total with mini.extra, mini.pairs, mini.surround enabled)
+- Added 12 mini modules total (Phases 1-4 + 5 new additions)
 - Added custom performance infrastructure
-- Result: Lighter, more integrated, better documented configuration
+- Result: Lighter, more integrated, feature-rich, better documented configuration
+
+**New Mini Modules Added**:
+- **Phase 1-4** (7): clue, diff, git, bracketed, bufremove, notify, visits, splitjoin, extra, pairs, surround
+- **Latest Additions** (5): cursorword, hipatterns, indentscope, operators, sessions
 
 ## Notes
 
