@@ -66,6 +66,28 @@ later(function()
     })
 end)
 
+-- mini.splitjoin - Split and join arguments/items
+later(function()
+    require("mini.splitjoin").setup({
+        -- Customize split/join behavior
+        mappings = {
+            toggle = 'gS', -- Toggle between split and join
+            split = '',    -- Disabled - use toggle instead
+            join = '',     -- Disabled - use toggle instead
+        },
+        -- Detect split/join based on language
+        detect = {
+            brackets = nil, -- Use default bracket detection
+            separator = ',', -- Default separator
+            exclude_regions = nil, -- Use default exclusions (strings, comments)
+        },
+    })
+
+    -- Additional keymaps for specific split/join operations
+    local K = vim.keymap.set
+    K({ 'n', 'x' }, 'gS', '<Cmd>lua MiniSplitjoin.toggle()<CR>', { desc = 'Split/join arguments' })
+end)
+
 later(function()
     -- mini.surround for surrounding text objects
     -- Uses 'sa' (add), 'sd' (delete), 'sr' (replace), 'sf'/'sF' (find), 'sh' (highlight)

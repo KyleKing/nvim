@@ -51,3 +51,43 @@ later(function()
         require("mini.bufremove").wipeout(0, true)
     end, { desc = "Force wipeout buffer (keep window)" })
 end)
+
+-- mini.visits - Track and navigate file visits
+later(function()
+    require("mini.visits").setup({
+        -- Track visits automatically
+        list = {
+            -- Customize filtering if needed
+            filter = nil,
+            sort = nil,
+        },
+        -- Store configuration
+        store = {
+            autowrite = true, -- Automatically write to store
+            normalize = nil,  -- Use default normalization
+            path = vim.fn.stdpath('data') .. '/mini-visits', -- Store location
+        },
+        -- Silence notification on read/write error
+        silent = false,
+    })
+
+    local K = vim.keymap.set
+    -- Navigate to most/least recently visited files
+    K("n", "<leader>fv", function()
+        require("mini.extra").pickers.visit_paths({ cwd = '' })
+    end, { desc = "Visit paths (all)" })
+
+    K("n", "<leader>fV", function()
+        require("mini.extra").pickers.visit_paths()
+    end, { desc = "Visit paths (cwd)" })
+
+    -- Quick access to recent visits
+    K("n", "<leader>fr", function()
+        local visits = require("mini.visits")
+        local sort = visits.gen_sort.default({ recency_weight = 1 })
+        local paths = visits.list_paths(nil, { filter = 'core', sort = sort })
+        if #paths > 0 then
+            vim.cmd('edit ' .. paths[1])
+        end
+    end, { desc = "Recent file (most visited)" })
+end)
