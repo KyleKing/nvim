@@ -10,18 +10,25 @@ Quick reference for all configured plugins.
 |--------|---------|--------------|-----|
 | **mini.deps** | Package manager | N/A | `:h mini.deps` |
 | **mini.ai** | Enhanced text objects (a/i) | `via(`, `di"`, etc. | `:h mini.ai` |
+| **mini.bracketed** | Navigate with [] | `[b` `]b`, `[d` `]d`, etc. | `:h mini.bracketed` |
+| **mini.bufremove** | Delete buffers gracefully | `<leader>bc`, `<leader>bw` | `:h mini.bufremove` |
 | **mini.clue** | Show next key clues | Auto on `<leader>`, `g`, etc. | `:h mini.clue` |
 | **mini.comment** | Toggle comments | `gcc`, `gc` (visual) | `:h mini.comment` |
+| **mini.diff** | Git diff hunks in gutter | `]h`, `[h`, `gh`, `gH` | `:h mini.diff` |
 | **mini.extra** | Sorting, extra pickers | `<leader>ss` (visual sort) | `:h mini.extra` |
 | **mini.files** | File explorer | TBD | `:h mini.files` |
+| **mini.git** | Git integration | `<leader>gc` | `:h mini.git` |
 | **mini.icons** | Icon provider | N/A (auto) | `:h mini.icons` |
-| **mini.move** | Move lines/selections | TBD | `:h mini.move` |
+| **mini.move** | Move lines/selections | `<leader>m{h,j,k,l}` | `:h mini.move` |
+| **mini.notify** | Notifications | `<leader>un`, `<leader>uN` | `:h mini.notify` |
 | **mini.pairs** | Auto-pair brackets/quotes | Auto in insert mode | `:h mini.pairs` |
 | **mini.pick** | Fuzzy finder | `<leader>ff`, `<leader>fw` | `:h mini.pick` |
+| **mini.splitjoin** | Split/join arguments | `gS` | `:h mini.splitjoin` |
 | **mini.statusline** | Statusline | N/A (auto) | `:h mini.statusline` |
 | **mini.surround** | Surround text | `sa`, `sd`, `sr`, `sf`, `sh` | `:h mini.surround` |
 | **mini.trailspace** | Trailing whitespace | Auto | `:h mini.trailspace` |
-| **mini.test** | Testing framework | TBD | `:h mini.test` |
+| **mini.test** | Testing framework | `<leader>ta`, `<leader>tf` | `:h mini.test` |
+| **mini.visits** | Track file visits | `<leader>fv`, `<leader>fr` | `:h mini.visits` |
 
 ### 🎯 mini.surround Usage
 
@@ -55,6 +62,62 @@ sh<char>           - Highlight surrounding
 ```
 Visual mode: Select lines
 <leader>ss - Sort selected lines
+```
+
+### 🔔 mini.notify - Notifications
+
+```
+<leader>un - Show notification history
+<leader>uN - Clear notifications
+```
+
+Automatically shows:
+- LSP progress notifications
+- Plugin messages
+- Command outputs
+
+### 📂 mini.visits - File Visit Tracking
+
+Smart file navigation based on visit patterns:
+
+```
+<leader>fv  - Visit paths (all tracked files)
+<leader>fV  - Visit paths (current directory only)
+<leader>fr  - Jump to most recently visited file
+```
+
+Automatically tracks:
+- File visit frequency
+- Visit recency
+- Directory context
+
+### 🔀 mini.diff & mini.git - Git Integration
+
+```
+]h, [h     - Navigate hunks
+]H, [H     - Jump to first/last hunk
+gh         - Apply hunk (stage changes)
+gH         - Reset hunk (discard changes)
+<leader>ugd - Toggle diff overlay (inline diff view)
+<leader>gc  - Show git info at cursor (blame, commit info)
+```
+
+### ⬜ mini.bracketed - Unified Navigation
+
+One navigation pattern for everything with `[` and `]`:
+
+```
+Capital letters = first/last
+Lowercase = next/previous
+
+Buffers:     [b ]b  [B ]B
+Diagnostics: [d ]d  [D ]D
+Files:       [f ]f  [F ]F
+Git hunks:   [h ]h  [H ]H (via mini.diff)
+Jumps:       [j ]j  [J ]J
+Quickfix:    [q ]q  [Q ]Q
+Windows:     [w ]w  [W ]W
+And more: comments, indent, treesitter, undo, yank
 ```
 
 ## LSP & Completion
@@ -110,8 +173,22 @@ gD         - Go to declaration
 
 | Plugin | Purpose | Keymaps | Doc |
 |--------|---------|---------|-----|
-| **gitsigns.nvim** | Git signs in gutter | `<leader>ugd` | `:h gitsigns` |
+| **mini.diff** | Git diff hunks in gutter | `]h`, `[h`, `gh`, `gH`, `<leader>ugd` | `:h mini.diff` |
+| **mini.git** | Git integration | `<leader>gc` | `:h mini.git` |
 | **diffview.nvim** | Git diff viewer | TBD | `:h diffview` |
+
+### Git Keymaps (mini.diff + mini.git)
+
+```
+]h  - Next hunk
+[h  - Previous hunk
+]H  - Last hunk
+[H  - First hunk
+gh  - Apply hunk (stage)
+gH  - Reset hunk (discard)
+<leader>ugd - Toggle diff overlay
+<leader>gc  - Show git info at cursor
+```
 
 ## Diagnostics & Navigation
 
@@ -139,12 +216,54 @@ gD         - Go to declaration
 
 | Plugin | Purpose | Keymaps | Doc |
 |--------|---------|---------|-----|
-| **flash.nvim** | Enhanced motion | TBD | `:h flash` |
+| **flash.nvim** | Enhanced motion | `<a-s>`, `<a-S>` | `:h flash` |
 | **dial.nvim** | Enhanced increment/decrement | `<C-a>`, `<C-x>` | [GitHub](https://github.com/monaqa/dial.nvim) |
 | **highlight-undo.nvim** | Highlight undo regions | Auto on undo | [GitHub](https://github.com/tzachar/highlight-undo.nvim) |
 | **text-case.nvim** | Case conversion | TBD | [GitHub](https://github.com/johmsalas/text-case.nvim) |
-| **nap.nvim** | Buffer/tab navigation | TBD | [GitHub](https://github.com/liangxianzhe/nap.nvim) |
-| **bufjump.nvim** | Jump between buffers | TBD | [GitHub](https://github.com/kwkarlwang/bufjump.nvim) |
+
+### Navigation with mini.bracketed
+
+All bracket navigation (replaces nap.nvim and bufjump.nvim):
+
+```
+[b ]b - Buffers
+[c ]c - Comments
+[d ]d - Diagnostics
+[f ]f - Files
+[h ]h - Git hunks (via mini.diff)
+[i ]i - Indent scope
+[j ]j - Jumps
+[l ]l - Location list
+[o ]o - Oldfiles
+[q ]q - Quickfix
+[t ]t - Treesitter
+[u ]u - Undo
+[w ]w - Windows
+[y ]y - Yank history
+```
+
+### Buffer Management with mini.bufremove
+
+Better buffer deletion (preserves window layout):
+
+```
+<leader>bc  - Close buffer
+<leader>bC  - Force close buffer
+<leader>bw  - Wipeout buffer
+<leader>bW  - Force wipeout buffer
+<leader>bWA - Wipeout all buffers
+```
+
+### Split/Join with mini.splitjoin
+
+```
+gS - Toggle between split and joined arguments
+```
+
+Examples:
+- Function calls: `foo(a, b, c)` ↔ `foo(\n  a,\n  b,\n  c\n)`
+- Arrays: `[1, 2, 3]` ↔ `[\n  1,\n  2,\n  3\n]`
+- Objects: Language-aware formatting
 
 ## UI & Appearance
 
@@ -198,23 +317,50 @@ Terminal mode navigation:
 | **plantuml-syntax** | PlantUML syntax | Auto | [GitHub](https://github.com/aklt/plantuml-syntax) |
 | **mkdx** | Markdown extras | TBD | [GitHub](https://github.com/SidOfc/mkdx) |
 
+## Performance Tracking
+
+Built-in Prometheus-style metrics for monitoring Neovim performance.
+
+### Commands
+
+```
+:PerfMetrics  - Show performance summary
+:PerfExport   - Export metrics as JSON
+:PerfReset    - Reset runtime metrics
+<leader>up    - Show performance metrics
+```
+
+### Tracked Metrics
+
+- **Startup time**: Total initialization time
+- **Plugin load times**: Individual plugin loading duration
+- **Operation counts**: Buffer reads/writes, LSP attachments
+- **Operation durations**: Avg, Min, Max, P95 statistics
+
+See [PERFORMANCE.md](./PERFORMANCE.md) for detailed documentation.
+
 ## Plugin Counts
 
-**Total External Plugins**: ~25 (down from ~35)
+**Total External Plugins**: ~22 (down from ~35)
+- Removed: vim-sandwich, which-key, gitsigns, nap.nvim, bufjump.nvim (5 plugins)
+- Still external: conform, nvim-lint, trouble, treesitter, flash, etc. (22 plugins)
 
-**Mini.nvim Modules**: 14
-- deps, ai, clue, comment, extra, files, icons, move, pairs, pick, statusline, surround, trailspace, test
+**Mini.nvim Modules**: 21 (up from 14)
+- Core: deps, ai, comment, files, icons, pick, statusline, test, trailspace
+- New Phase 1-4: bracketed, bufremove, clue, diff, extra, git, move, notify, pairs, splitjoin, surround, visits
+- All modules: ai, bracketed, bufremove, clue, comment, deps, diff, extra, files, git, icons, move, notify, pairs, pick, splitjoin, statusline, surround, test, trailspace, visits
 
 **Categories:**
 - LSP & Completion: 3
 - Formatting & Linting: 2
-- Git: 2
+- Git: 2 (mini.diff, mini.git)
 - Diagnostics: 1
 - Syntax: 2
-- Editing & Motion: 6
-- UI & Appearance: 7
+- Editing & Motion: 4 (removed nap, bufjump)
+- UI & Appearance: 6
 - Utilities: 5
 - Language-Specific: 3
+- Performance: 1 (new!)
 
 ## Quick Start
 
@@ -225,6 +371,13 @@ Fuzzy Finding:
   <leader>ff - Find files
   <leader>fw - Search in files
   <leader>;  - Switch buffers
+  <leader>fv - Visit paths (smart file navigation)
+
+Navigation ([] pattern):
+  [b ]b      - Next/previous buffer
+  [d ]d      - Next/previous diagnostic
+  [h ]h      - Next/previous git hunk
+  [j ]j      - Next/previous jump
 
 LSP:
   K          - Hover docs
@@ -233,16 +386,30 @@ LSP:
   <leader>cr - Rename
 
 Git:
-  <leader>ugd - Toggle git deleted lines
+  ]h [h      - Navigate hunks
+  gh         - Apply hunk
+  gH         - Reset hunk
+  <leader>ugd - Toggle diff overlay
+  <leader>gc  - Show git info
 
 Terminal:
-  <C-'>       - Toggle terminal
+  <C-'>      - Toggle terminal
 
 Editing:
-  sa          - Add surrounding
-  sd          - Delete surrounding
-  gcc         - Toggle comment
-  <leader>ss  - Sort lines (visual)
+  sa         - Add surrounding
+  sd         - Delete surrounding
+  sr         - Replace surrounding
+  gcc        - Toggle comment
+  gS         - Split/join arguments
+  <leader>ss - Sort lines (visual)
+
+Buffers:
+  <leader>bc - Close buffer (keep window)
+  <leader>bw - Wipeout buffer (keep window)
+
+Notifications & Performance:
+  <leader>un - Show notification history
+  <leader>up - Show performance metrics
 ```
 
 ### Getting Help
