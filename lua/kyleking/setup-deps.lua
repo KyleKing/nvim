@@ -260,3 +260,9 @@ later(function()
         vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
     end
 end)
+
+-- Finish startup performance tracking
+vim.defer_fn(function()
+    local perf = require("kyleking.core.performance")
+    perf.finish_startup()
+end, 100) -- Wait 100ms for everything to settle
