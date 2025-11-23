@@ -1,5 +1,4 @@
 return {
-  ["bufjump.nvim"] = "ae2728a77defbd27e9e5ef64c854fb0813ffba01",
   ["ccc.nvim"] = "9d1a256e006decc574789dfc7d628ca11644d4c2",
   ["colorful-winsep.nvim"] = "e555611c8f39918e30d033a97ea1a5af457ce75e",
   ["conform.nvim"] = "cde4da5c1083d3527776fee69536107d98dae6c9",
@@ -12,7 +11,6 @@ return {
   ["mini.nvim"] = "68d4478920c7afdfa21c13706464e275d9ce3255",
   mkdx = "ee667cad506954b706c3fa972fbaaad46b1bf028",
   ["multicolumn.nvim"] = "a363bdfd422abf26256f343dac4df183031f8e94",
-  ["nap.nvim"] = "98037cff509a12412cf8f32d1b12a9fdcad558ad",
   ["nightfox.nvim"] = "ba47d4b4c5ec308718641ba7402c143836f35aa9",
   ["nvim-hlslens"] = "6d42444785ea0d41555d033485910c5e78916f3b",
   ["nvim-lint"] = "8b349e822a36e9480aed96c6dd2f757f80524a35",
