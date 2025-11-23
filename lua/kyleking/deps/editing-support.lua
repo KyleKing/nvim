@@ -67,9 +67,21 @@ later(function()
 end)
 
 later(function()
-    -- PLANNED: Fix implementation of mini.surround
-    require("mini.surround").setup()
-    vim.keymap.set({ "n", "x" }, "s", "<Nop>") -- Disable `s` shortcut and use `cl`
+    -- mini.surround for surrounding text objects
+    -- Uses 'sa' (add), 'sd' (delete), 'sr' (replace), 'sf'/'sF' (find), 'sh' (highlight)
+    -- Native 's' is substitute (equivalent to 'cl'), which is still accessible
+    require("mini.surround").setup({
+        -- Customize mappings if needed
+        mappings = {
+            add = 'sa', -- Add surrounding in Normal and Visual modes
+            delete = 'sd', -- Delete surrounding
+            find = 'sf', -- Find surrounding (to the right)
+            find_left = 'sF', -- Find surrounding (to the left)
+            highlight = 'sh', -- Highlight surrounding
+            replace = 'sr', -- Replace surrounding
+            update_n_lines = 'sn', -- Update `n_lines`
+        },
+    })
 end)
 
 later(function() require("mini.trailspace").setup() end)
@@ -103,22 +115,29 @@ later(function()
     require("mini.comment").setup()
 end)
 
-later(function()
-    add("machakann/vim-sandwich")
-    vim.fn["operator#sandwich#set"]("add", "char", "skip_space", 1)
-    vim.g.operator_sandwich_no_default_key_mappings = true
-    vim.g.textobj_sandwich_no_default_key_mappings = true
+-- vim-sandwich removed - using mini.surround instead
 
+-- mini.extra for additional functionality (sorting, pickers, text objects)
+later(function()
+    require("mini.extra").setup()
+
+    -- Add sorting keymaps
     local K = vim.keymap.set
-    -- Operator
-    K({ "n", "x", "o" }, "sa", "<Plug>(sandwich-add)")
-    K({ "n", "x" }, "sd", "<Plug>(sandwich-delete)")
-    K({ "n" }, "sdb", "<Plug>(sandwich-delete-auto)")
-    K({ "n", "x" }, "sr", "<Plug>(sandwich-replace)")
-    K({ "n" }, "srb", "<Plug>(sandwich-replace-auto)")
-    -- Textobject
-    K({ "x", "o" }, "ib", "<Plug>(textobj-sandwich-auto-i)")
-    K({ "x", "o" }, "ab", "<Plug>(textobj-sandwich-auto-a)")
-    K({ "x", "o" }, "is", "<Plug>(textobj-query-auto-i)")
-    K({ "x", "o" }, "as", "<Plug>(textobj-query-auto-a)")
+    -- Sort lines in visual mode
+    K('x', '<leader>ss', function()
+        require('mini.extra').pickers.list({
+            items = vim.fn.getline("'<", "'>"),
+            choose = function(items)
+                vim.api.nvim_buf_set_lines(0, vim.fn.line("'<") - 1, vim.fn.line("'>"), false, items)
+            end,
+        })
+    end, { desc = 'Sort selected lines' })
+end)
+
+-- mini.pairs for auto-pairing brackets, quotes, etc.
+later(function()
+    require("mini.pairs").setup({
+        -- Customize which pairs to auto-complete
+        modes = { insert = true, command = false, terminal = false },
+    })
 end)

@@ -21,6 +21,7 @@ later(function()
     )
 end)
 
+-- gx.nvim - Enhanced URL/file opening (replaces both url-open and enhances built-in gx)
 later(function()
     add({
         source = "chrishrb/gx.nvim",
@@ -33,7 +34,8 @@ later(function()
         },
     })
     vim.g.netrw_nogx = 1 -- disable netrw gx
-    vim.keymap.set({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open File" })
+    vim.keymap.set({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open URL/file under cursor" })
+    vim.keymap.set("n", "<leader>uu", "<cmd>Browse<cr>", { desc = "Open URL/file under cursor" })
 end)
 
 later(function()
@@ -63,9 +65,3 @@ later(function()
 end)
 
 later(function() add("micarmst/vim-spellsync") end)
-
-later(function()
-    add("sontungexpt/url-open")
-    require("url-open").setup()
-    vim.keymap.set("n", "<leader>uu", "<esc>:URLOpenUnderCursor<cr>", { desc = "Open URL" })
-end)

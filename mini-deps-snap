@@ -26,10 +26,7 @@ return {
   ["text-case.nvim"] = "e898cfd46fa6cde0e83abb624a16e67d2ffc6457",
   ["todo-comments.nvim"] = "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
   ["trouble.nvim"] = "bd67efe408d4816e25e8491cc5ad4088e708a69a",
-  ["url-open"] = "dce2a9bc51e4885ea80ca03da5b4d0f719aaf820",
   ["vim-dirtytalk"] = "aa57ba902b04341a04ff97214360f56856493583",
   ["vim-illuminate"] = "0d1e93684da00ab7c057410fecfc24f434698898",
-  ["vim-sandwich"] = "74cf93d58ccc567d8e2310a69860f1b93af19403",
-  ["vim-spellsync"] = "ea9f431483ceb40ede8bd5b126a03eccd49b1bc0",
-  ["which-key.nvim"] = "3aab2147e74890957785941f0c1ad87d0a44c15a"
+  ["vim-spellsync"] = "ea9f431483ceb40ede8bd5b126a03eccd49b1bc0"
 }
