@@ -25,7 +25,5 @@ later(function()
     K({ "c" }, "<c-s>", require("flash").toggle, { desc = "Toggle Flash Search" })
 end)
 
-later(function()
-    add("liangxianzhe/nap.nvim")
-    require("nap").setup()
-end)
+-- Removed nap.nvim - replaced by mini.bracketed (see buffer.lua)
+-- mini.bracketed provides comprehensive [] navigation for buffers, diagnostics, etc.

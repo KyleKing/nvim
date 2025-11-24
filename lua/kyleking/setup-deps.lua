@@ -30,6 +30,7 @@ require("kyleking.deps.keybinding")
 require("kyleking.deps.lsp")
 require("kyleking.deps.motion")
 require("kyleking.deps.search")
+require("kyleking.deps.session")
 require("kyleking.deps.split-and-window")
 require("kyleking.deps.syntax")
 require("kyleking.deps.terminal-integration")
@@ -260,3 +261,9 @@ later(function()
         vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
     end
 end)
+
+-- Finish startup performance tracking
+vim.defer_fn(function()
+    local perf = require("kyleking.core.performance")
+    perf.finish_startup()
+end, 100) -- Wait 100ms for everything to settle

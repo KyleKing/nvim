@@ -1,13 +1,47 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
-later(function() add({ source = "sindrets/diffview.nvim", depends = { "nvim-tree/nvim-web-devicons" } }) end)
+later(function() add({ source = "sindrets/diffview.nvim" }) end)
 
+-- mini.diff - Git diff hunks in gutter (replaces gitsigns)
 later(function()
-    -- Adds git related signs to the gutter, as well as utilities for managing changes,
-    --  but I've removed most utilities from lack of use
-    add("lewis6991/gitsigns.nvim")
-    require("gitsigns").setup()
+    require("mini.diff").setup({
+        view = {
+            style = 'sign', -- Show diff as signs in sign column
+            signs = {
+                add = '▎',
+                change = '▎',
+                delete = '▁',
+            },
+        },
+        mappings = {
+            -- Apply hunks
+            apply = 'gh', -- Apply hunk under cursor
+            reset = 'gH', -- Reset hunk under cursor
+            -- Navigate hunks
+            goto_first = '[H',
+            goto_prev = '[h',
+            goto_next = ']h',
+            goto_last = ']H',
+        },
+    })
 
-    vim.keymap.set("n", "<leader>ugd", require("gitsigns").toggle_deleted, { desc = "toggle git show deleted" })
+    -- Additional keymaps
+    local K = vim.keymap.set
+    K("n", "<leader>ugd", function()
+        require("mini.diff").toggle_overlay()
+    end, { desc = "Toggle git diff overlay" })
+end)
+
+-- mini.git - Git integration
+later(function()
+    require("mini.git").setup({
+        -- No special configuration needed for basic usage
+    })
+
+    local K = vim.keymap.set
+    -- Git command integration
+    K("n", "<leader>gc", function()
+        require("mini.git").show_at_cursor()
+    end, { desc = "Show git info at cursor" })
 end)

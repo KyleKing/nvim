@@ -1,6 +1,42 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
+-- mini.notify - Better notification system
+later(function()
+    require("mini.notify").setup({
+        -- Content configuration
+        content = {
+            format = nil, -- Use default formatting
+            sort = nil,   -- Use default sorting
+        },
+        -- Notification window configuration
+        lsp_progress = {
+            enable = true,
+            duration_last = 1000, -- Duration to show last LSP progress message
+        },
+        window = {
+            config = {
+                border = 'rounded',
+            },
+            max_width_share = 0.382, -- Golden ratio
+            winblend = 25,
+        },
+    })
+
+    -- Override vim.notify to use mini.notify
+    vim.notify = require('mini.notify').make_notify()
+
+    -- Keymaps for notification history
+    local K = vim.keymap.set
+    K("n", "<leader>un", function()
+        require("mini.notify").show_history()
+    end, { desc = "Show notification history" })
+
+    K("n", "<leader>uN", function()
+        require("mini.notify").clear()
+    end, { desc = "Clear notifications" })
+end)
+
 -- Extend vim spelling dictionary with dynamically generated one
 ---@class LazyPluginSpec
 later(function()
@@ -21,6 +57,7 @@ later(function()
     )
 end)
 
+-- gx.nvim - Enhanced URL/file opening (replaces both url-open and enhances built-in gx)
 later(function()
     add({
         source = "chrishrb/gx.nvim",
@@ -33,7 +70,8 @@ later(function()
         },
     })
     vim.g.netrw_nogx = 1 -- disable netrw gx
-    vim.keymap.set({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open File" })
+    vim.keymap.set({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open URL/file under cursor" })
+    vim.keymap.set("n", "<leader>uu", "<cmd>Browse<cr>", { desc = "Open URL/file under cursor" })
 end)
 
 later(function()
@@ -63,9 +101,3 @@ later(function()
 end)
 
 later(function() add("micarmst/vim-spellsync") end)
-
-later(function()
-    add("sontungexpt/url-open")
-    require("url-open").setup()
-    vim.keymap.set("n", "<leader>uu", "<esc>:URLOpenUnderCursor<cr>", { desc = "Open URL" })
-end)

@@ -46,19 +46,17 @@ K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
 K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
 -- Manage Buffers
--- Close keeps the buffer index (for <C-^> toggling), while wipeout renumbers all buffers
--- https://stackoverflow.com/a/60732165/3219667
--- K("n", "<leader>bc", ":bdelete<CR>", { desc = "Close current buffer" })
-K("n", "<leader>bw", ":bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
--- From: https://stackoverflow.com/a/42071865/3219667
--- K("n", "<leader>bCA", ":%bdelete<CR>", { desc = "Close all buffers" })
-K("n", "<leader>bW", ":%bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
+-- Single buffer deletion handled by mini.bufremove (see deps/buffer.lua)
+-- <leader>bc - delete buffer (keep window)
+-- <leader>bw - wipeout buffer (keep window)
+-- Keep the "all buffers" functionality here:
+K("n", "<leader>bWA", ":%bwipeout<CR>", { desc = "Wipeout all buffers" })
 
 -- Managing Splits
 -- FYI: use <c-w> instead
 
 -- Manage Tabs
--- use nap.nvim plugin instead ([a and ]a, etc.)
+-- Use mini.bracketed for navigation ([b ]b for buffers, [w ]w for windows, etc.)
 K("n", "<leader>ttn", "<Cmd>tabnew<CR>", { desc = "New tab" })
 K("n", "<leader>ttc", "<Cmd>tabclose<CR>", { desc = "Close tab" })
 

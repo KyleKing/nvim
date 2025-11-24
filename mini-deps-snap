@@ -1,19 +1,16 @@
 return {
-  ["bufjump.nvim"] = "ae2728a77defbd27e9e5ef64c854fb0813ffba01",
   ["ccc.nvim"] = "9d1a256e006decc574789dfc7d628ca11644d4c2",
   ["colorful-winsep.nvim"] = "e555611c8f39918e30d033a97ea1a5af457ce75e",
   ["conform.nvim"] = "cde4da5c1083d3527776fee69536107d98dae6c9",
   ["dial.nvim"] = "f0404ec1f83a03f2c3457e60087c6331d1cbb83f",
   ["diffview.nvim"] = "4516612fe98ff56ae0415a259ff6361a89419b0a",
   ["flash.nvim"] = "fcea7ff883235d9024dc41e638f164a450c14ca2",
-  ["gitsigns.nvim"] = "20ad4419564d6e22b189f6738116b38871082332",
   ["gx.nvim"] = "ba9c408fc0130fc4548760c3933a81b58fc50de8",
   ["highlight-undo.nvim"] = "ee32e12693d70e66f954d09a504a7371d110fc27",
   ["lsp_signature.nvim"] = "1e56259e00c70959a1b3fba908b8583722fb96bf",
   ["mini.nvim"] = "68d4478920c7afdfa21c13706464e275d9ce3255",
   mkdx = "ee667cad506954b706c3fa972fbaaad46b1bf028",
   ["multicolumn.nvim"] = "a363bdfd422abf26256f343dac4df183031f8e94",
-  ["nap.nvim"] = "98037cff509a12412cf8f32d1b12a9fdcad558ad",
   ["nightfox.nvim"] = "ba47d4b4c5ec308718641ba7402c143836f35aa9",
   ["nvim-hlslens"] = "6d42444785ea0d41555d033485910c5e78916f3b",
   ["nvim-lint"] = "8b349e822a36e9480aed96c6dd2f757f80524a35",
@@ -26,10 +23,7 @@ return {
   ["text-case.nvim"] = "e898cfd46fa6cde0e83abb624a16e67d2ffc6457",
   ["todo-comments.nvim"] = "31e3c38ce9b29781e4422fc0322eb0a21f4e8668",
   ["trouble.nvim"] = "bd67efe408d4816e25e8491cc5ad4088e708a69a",
-  ["url-open"] = "dce2a9bc51e4885ea80ca03da5b4d0f719aaf820",
   ["vim-dirtytalk"] = "aa57ba902b04341a04ff97214360f56856493583",
   ["vim-illuminate"] = "0d1e93684da00ab7c057410fecfc24f434698898",
-  ["vim-sandwich"] = "74cf93d58ccc567d8e2310a69860f1b93af19403",
-  ["vim-spellsync"] = "ea9f431483ceb40ede8bd5b126a03eccd49b1bc0",
-  ["which-key.nvim"] = "3aab2147e74890957785941f0c1ad87d0a44c15a"
+  ["vim-spellsync"] = "ea9f431483ceb40ede8bd5b126a03eccd49b1bc0"
 }
