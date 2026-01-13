@@ -90,7 +90,13 @@ later(function()
         return "󱉶 " .. table.concat(running, ", ")
     end
 
+    -- Expose lint progress and workspace info for statusline integration
     function _G.kyleking_lint_progress() return lint_progress() end
+
+    function _G.kyleking_workspace_root()
+        local workspace = require("kyleking.utils.workspace_detection")
+        return workspace.get_workspace_display()
+    end
     -- PLANNED: Integrate with mini.statusline once enabled or as modal
     -- local statusline = require("mini.statusline")
     -- statusline.setup({
@@ -102,9 +108,10 @@ later(function()
     --             local filename = statusline.section_filename({ trunc_width = 140 })
     --             local fileinfo = statusline.section_fileinfo()
     --             local lint_info = lint_progress()
+    --             local workspace_info = _G.kyleking_workspace_root()
     --             return statusline.combine_groups({
     --                 { hl = mode.hl, strings = { mode.string } },
-    --                 { hl = "MiniStatuslineDevinfo", strings = { git, diagnostics, lint_info } },
+    --                 { hl = "MiniStatuslineDevinfo", strings = { git, diagnostics, lint_info, workspace_info } },
     --                 "%<",
     --                 { hl = "MiniStatuslineFilename", strings = { filename } },
     --                 "%=",
@@ -120,13 +127,41 @@ end)
 later(function()
     add("neovim/nvim-lspconfig")
 
+    -- Load workspace detection for monorepo support
+    local workspace = require("kyleking.utils.workspace_detection")
+
     -- FYI: see `:help lspconfig-all` or https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#angularls
     -- FYI: See mapping of server names here: https://github.com/williamboman/mason-lspconfig.nvim/blob/main/doc/server-mapping.md
-    vim.lsp.enable({
-        "gopls",
-        "lua_ls",
-        "pyright",
-        "ts_ls",
+
+    -- Configure LSP servers with workspace-aware root_dir
+    local lspconfig = require("lspconfig")
+
+    -- Python LSP with workspace detection
+    lspconfig.pyright.setup({
+        root_dir = function(fname)
+            return workspace.find_workspace_root(fname) or lspconfig.util.root_pattern(".git")(fname)
+        end,
+    })
+
+    -- TypeScript/JavaScript LSP with workspace detection
+    lspconfig.ts_ls.setup({
+        root_dir = function(fname)
+            return workspace.find_workspace_root(fname) or lspconfig.util.root_pattern(".git")(fname)
+        end,
+    })
+
+    -- Go LSP with workspace detection
+    lspconfig.gopls.setup({
+        root_dir = function(fname)
+            return workspace.find_workspace_root(fname) or lspconfig.util.root_pattern(".git")(fname)
+        end,
+    })
+
+    -- Lua LSP with workspace detection
+    lspconfig.lua_ls.setup({
+        root_dir = function(fname)
+            return workspace.find_workspace_root(fname) or lspconfig.util.root_pattern(".git")(fname)
+        end,
     })
 
     local keymap_group = vim.api.nvim_create_augroup("kyleking_lsp_keymaps", { clear = true })
