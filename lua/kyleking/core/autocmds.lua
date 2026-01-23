@@ -47,10 +47,6 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
         end
 
         if is_temp_session then
-            -- Disable lualine if present so native statusline works
-            local ok, lualine = pcall(require, "lualine")
-            if ok then lualine.hide() end
-
             -- Store original cmdheight to restore later
             if not vim.g.original_cmdheight then vim.g.original_cmdheight = vim.opt.cmdheight:get() end
 
