@@ -47,6 +47,10 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
         end
 
         if is_temp_session then
+            -- Disable lualine if present so native statusline works
+            local ok, lualine = pcall(require, "lualine")
+            if ok then lualine.hide() end
+
             -- Store original cmdheight to restore later
             if not vim.g.original_cmdheight then vim.g.original_cmdheight = vim.opt.cmdheight:get() end
 
@@ -55,19 +59,6 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
 
             -- Set statusline with prominent indicator
             vim.opt.statusline = "%#" .. highlight_group .. "# " .. session_type .. " - Save and quit with :wq %* %f %m"
-
-            -- Show reminder message
-            vim.defer_fn(
-                function()
-                    vim.api.nvim_echo({
-                        { "[" .. session_type .. "] ", highlight_group },
-                        { "Temporary editing session - use ", "Normal" },
-                        { ":wq", "Title" },
-                        { " to save and exit", "Normal" },
-                    }, false, {})
-                end,
-                100
-            )
 
             -- Add easy quit mapping
             vim.keymap.set("n", "<leader>q", ":wq<CR>", { buffer = true, desc = "Save and quit" })

@@ -18,6 +18,7 @@ end)
 
 later(function()
     add({
+        -- PLANNED: Switch to mini.statusline
         source = "nvim-lualine/lualine.nvim",
 
         depends = {

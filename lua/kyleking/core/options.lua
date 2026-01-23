@@ -29,7 +29,7 @@ vim.opt.backspace:append({ "nostop" }) -- don't stop backspace at insert
 vim.opt.breakindent = true -- wrap indent to match  line start
 -- FIXME: use named registers rather than always copying to the clipboard
 vim.opt.clipboard = "unnamedplus" -- connection to the system clipboard
-vim.opt.cmdheight = 0 -- hide command line unless needed
+vim.opt.cmdheight = 1 -- show command line for messages
 vim.opt.copyindent = true -- copy the previous indentation on auto-indenting
 vim.opt.cursorline = true -- highlight the text line of the cursor
 vim.opt.diffopt:append({ "algorithm:histogram", "linematch:60" }) -- enable linematch diff algorithm

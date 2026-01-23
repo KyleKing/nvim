@@ -15,7 +15,9 @@ if not vim.loop.fs_stat(mini_path) then
     vim.cmd('echo "Installed `mini.nvim`" | redraw')
 end
 
-require("mini.deps").setup()
+require("mini.deps").setup({
+    silent = true, -- Only show ERROR and WARN messages, suppress INFO (snapshots, etc.)
+})
 
 require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
