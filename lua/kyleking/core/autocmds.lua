@@ -11,5 +11,5 @@ create_autocmd("TextYankPost", {
 -- Reload buffer on enter or focus.
 create_autocmd({ "BufEnter", "FocusGained" }, {
     group = augroup,
-    command = "silent! !",
+    command = "silent! checktime",
 })
