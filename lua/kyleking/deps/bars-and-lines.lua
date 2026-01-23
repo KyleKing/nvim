@@ -16,47 +16,48 @@ later(function()
     K("n", "<leader>uR", require("illuminate").toggle_buf, { desc = "Toggle reference highlighting (buffer)" })
 end)
 
-later(function()
-    -- Skip lualine for temporary sessions (Claude Code, git commits, etc.)
-    local utils = require("kyleking.utils")
-    local is_temp_session = utils.detect_temp_session()
-    if is_temp_session then return end
+-- Check for temp session BEFORE scheduling later()
+local utils = require("kyleking.utils")
+local is_temp_session = utils.detect_temp_session()
 
-    add({
-        -- PLANNED: Switch to mini.statusline
-        source = "nvim-lualine/lualine.nvim",
+if not is_temp_session then
+    later(function()
+        add({
+            -- PLANNED: Switch to mini.statusline
+            source = "nvim-lualine/lualine.nvim",
 
-        depends = {
-            "nvim-tree/nvim-web-devicons",
-        },
-    })
+            depends = {
+                "nvim-tree/nvim-web-devicons",
+            },
+        })
 
-    local rel_filename = {
-        "filename",
-        file_status = true,
-        new_file_status = true,
-        path = 1, -- 0: Filename, 1: Relative path, 2: Absolute path
-        shorting_target = 40, -- Shortens path to leave 'n' spaces in the window
-    }
-    require("lualine").setup({
-        options = {
-            -- https://github.com/nvim-lualine/lualine.nvim/blob/master/THEMES.md
-            theme = "nightfly",
-        },
-        sections = {
-            lualine_c = { rel_filename },
-            lualine_x = { {} }, -- Remove filetype, etc.
-            -- FYI: example displaying status of spell: https://github.com/nvim-lualine/lualine.nvim/issues/487#issuecomment-1345625242
-        },
-        extensions = {
-            "fugitive",
-            "man",
-            "quickfix",
-            "toggleterm",
-            "trouble",
-        },
-    })
-end)
+        local rel_filename = {
+            "filename",
+            file_status = true,
+            new_file_status = true,
+            path = 1, -- 0: Filename, 1: Relative path, 2: Absolute path
+            shorting_target = 40, -- Shortens path to leave 'n' spaces in the window
+        }
+        require("lualine").setup({
+            options = {
+                -- https://github.com/nvim-lualine/lualine.nvim/blob/master/THEMES.md
+                theme = "nightfly",
+            },
+            sections = {
+                lualine_c = { rel_filename },
+                lualine_x = { {} }, -- Remove filetype, etc.
+                -- FYI: example displaying status of spell: https://github.com/nvim-lualine/lualine.nvim/issues/487#issuecomment-1345625242
+            },
+            extensions = {
+                "fugitive",
+                "man",
+                "quickfix",
+                "toggleterm",
+                "trouble",
+            },
+        })
+    end)
+end
 
 later(function()
     add("fmbarina/multicolumn.nvim")

@@ -257,9 +257,15 @@ end)
 -- later(function() require("mini.comment").setup() end)
 -- later(function() require("mini.pick").setup() end)
 
--- Save Mini.Deps snapshot when run from config directory
+-- Save Mini.Deps snapshot when run from config directory (but not for temp sessions)
 later(function()
     if vim.fn.getcwd() == vim.fn.stdpath("config") then
-        vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
+        -- Don't save snapshot for temp sessions (would exclude lualine)
+        local utils = require("kyleking.utils")
+        local is_temp_session = utils.detect_temp_session()
+
+        if not is_temp_session then
+            vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
+        end
     end
 end)
