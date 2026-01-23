@@ -27,29 +27,15 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
             local hl_config = highlight_groups[highlight_group]
             if hl_config then vim.api.nvim_set_hl(0, highlight_group, hl_config) end
 
-            -- Store original cmdheight to restore later
-            if not vim.g.original_cmdheight then vim.g.original_cmdheight = vim.opt.cmdheight:get() end
-
-            -- Set cmdheight to show message
-            vim.opt.cmdheight = 1
-
             -- Set statusline with prominent indicator (dynamically truncated filename)
             vim.opt.statusline = "%#"
                 .. highlight_group
                 .. "# "
                 .. session_type
-                .. " (:wq) %* %{v:lua.require('kyleking.utils').get_truncated_filename()} %m"
+                .. " %* %{v:lua.require('kyleking.utils').get_truncated_filename()} %m"
 
             -- Add easy quit mapping
             vim.keymap.set("n", "<leader>q", ":wq<CR>", { buffer = true, desc = "Save and quit" })
         end
-    end,
-})
-
--- Restore cmdheight when leaving temp session
-create_autocmd("VimLeavePre", {
-    group = augroup,
-    callback = function()
-        if vim.g.original_cmdheight then vim.opt.cmdheight = vim.g.original_cmdheight end
     end,
 })
