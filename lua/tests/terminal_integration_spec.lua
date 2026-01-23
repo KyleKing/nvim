@@ -198,7 +198,7 @@ T["terminal_integration module"].terminal_cleanup = function()
         }
 
         local mock_terminal_constructor = {
-            new = function(self, opts)
+            new = function(_self, opts)
                 on_exit_callback = opts.on_exit
                 return mock_terminal
             end,

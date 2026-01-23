@@ -17,7 +17,7 @@ exclude: lazy-lock\.json|mason-lock\.json|LICENSE\.md
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-added-large-files
       - id: check-executables-have-shebangs
@@ -39,11 +39,11 @@ repos:
         args: [--autofix, --indent=4]
       - id: trailing-whitespace
   - repo: https://github.com/JohnnyMorganz/StyLua
-    rev: v2.0.1
+    rev: v2.3.1
     hooks:
       - id: stylua-system
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.0.0
+    rev: v4.12.1
     hooks:
       - id: commitizen
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -56,7 +56,7 @@ repos:
           - "prettier-plugin-sh"
         types_or: [html, javascript, json, shell, yaml]
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.19
+    rev: 1.0.0
     hooks:
       - id: mdformat
         additional_dependencies:
@@ -65,7 +65,7 @@ repos:
         args: [--wrap=no]
         exclude: CODE_TAG_SUMMARY\.md
   - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.2
+    rev: v0.24.3
     hooks:
       - id: toml-sort-fix
         args: [--in-place, --all, --trailing-comma-inline-array]

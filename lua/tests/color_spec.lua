@@ -91,7 +91,7 @@ T["color module"].highlighting = function()
 
     local has_highlights = false
     if ns then
-        for _, extmark in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, {})) do
+        for _ in ipairs(vim.api.nvim_buf_get_extmarks(bufnr, ns, 0, -1, {})) do
             has_highlights = true
             break
         end
