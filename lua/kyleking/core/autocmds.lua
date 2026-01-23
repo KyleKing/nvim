@@ -18,35 +18,16 @@ create_autocmd({ "BufEnter", "FocusGained" }, {
 create_autocmd({ "VimEnter", "BufEnter" }, {
     group = augroup,
     callback = function()
-        local is_temp_session = false
-        local session_type = ""
-        local highlight_group = ""
-
-        -- Check for Claude Code external editor
-        if vim.env.CLAUDECODE == "1" then
-            is_temp_session = true
-            session_type = "CLAUDE CODE EDITOR"
-            highlight_group = "TempSessionClaude"
-            -- Define orange highlight for Claude Code
-            vim.api.nvim_set_hl(0, "TempSessionClaude", { fg = "#000000", bg = "#f59e0b", bold = true })
-        end
-
-        -- Check for git commit/rebase/merge files
-        local filename = vim.fn.expand("%:t")
-        if
-            filename:match("^COMMIT_EDITMSG$")
-            or filename:match("^MERGE_MSG$")
-            or filename:match("^git%-rebase%-todo$")
-            or filename:match("^%.git/")
-        then
-            is_temp_session = true
-            session_type = "GIT COMMIT"
-            highlight_group = "TempSessionGit"
-            -- Define green highlight for git
-            vim.api.nvim_set_hl(0, "TempSessionGit", { fg = "#000000", bg = "#10b981", bold = true })
-        end
+        local utils = require("kyleking.utils")
+        local is_temp_session, session_type, highlight_group = utils.detect_temp_session()
 
         if is_temp_session then
+            -- Define highlight groups
+            if highlight_group == "TempSessionClaude" then
+                vim.api.nvim_set_hl(0, "TempSessionClaude", { fg = "#000000", bg = "#f59e0b", bold = true })
+            elseif highlight_group == "TempSessionGit" then
+                vim.api.nvim_set_hl(0, "TempSessionGit", { fg = "#000000", bg = "#10b981", bold = true })
+            end
             -- Store original cmdheight to restore later
             if not vim.g.original_cmdheight then vim.g.original_cmdheight = vim.opt.cmdheight:get() end
 

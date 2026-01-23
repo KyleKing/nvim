@@ -18,15 +18,8 @@ end)
 
 later(function()
     -- Skip lualine for temporary sessions (Claude Code, git commits, etc.)
-    local is_temp_session = vim.env.CLAUDECODE == "1"
-    if not is_temp_session then
-        local filename = vim.fn.expand("%:t")
-        is_temp_session = filename:match("^COMMIT_EDITMSG$")
-            or filename:match("^MERGE_MSG$")
-            or filename:match("^git%-rebase%-todo$")
-            or filename:match("^%.git/")
-    end
-
+    local utils = require("kyleking.utils")
+    local is_temp_session = utils.detect_temp_session()
     if is_temp_session then return end
 
     add({
