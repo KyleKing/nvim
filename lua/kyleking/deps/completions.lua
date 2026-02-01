@@ -1,5 +1,5 @@
 local MiniDeps = require("mini.deps")
-local _add, _now, _later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 local function _config_cmp()
     local cmp = require("cmp")
@@ -106,3 +106,64 @@ end
 --
 --     config_cmp()
 -- end)
+
+later(function()
+    -- -- Configuración para mini.completion
+    -- require("mini.completion").setup({
+    --     -- Opciones de ventana para completado
+    --     window = {
+    --         info = { height = 25, width = 80 },
+    --         signature = { height = 25, width = 80 },
+    --     },
+    --
+    --     -- Configuración de fuentes para completado
+    --     lsp = {
+    --         -- Permitir completado automático desde LSP
+    --         autocomplete = true,
+    --         -- Usar documentación de LSP
+    --         use_hover = true,
+    --         -- Usar firma de funciones
+    --         use_signature = true,
+    --     },
+    --
+    --     -- Configuración de los disparadores
+    --     triggers = {
+    --         -- Completado cuando se escribe algo
+    --         function_call = {
+    --             -- Después de abrir paréntesis
+    --             "(",
+    --         },
+    --     },
+    --
+    --     -- Mapeo de teclas
+    --     mappings = {
+    --         -- Mostrar completados
+    --         force = "<C-Space>",
+    --         -- Cancelar completado
+    --         cancel = "<C-e>",
+    --         -- Confirmar completado (changed from Enter to Tab for explicit confirmation)
+    --         confirm = "<Tab>",
+    --         -- Make Enter abort the completion instead of confirming
+    --         abort = "<CR>",
+    --         -- Navegar por completados
+    --         select_next = "<C-j>",
+    --         select_prev = "<C-k>",
+    --     },
+    -- })
+
+    local process_items = function(items, base)
+        -- Don't show 'Text' suggestions
+        items = vim.tbl_filter(function(x) return x.kind ~= 1 end, items)
+        return require("mini.completion").default_process_items(items, base)
+    end
+    require("mini.completion").setup({
+        lsp_completion = { source_func = "omnifunc", auto_setup = false, process_items = process_items },
+    })
+
+    -- Set up LSP part of completion
+    local on_attach = function(args) vim.bo[args.buf].omnifunc = "v:lua.MiniCompletion.completefunc_lsp" end
+    vim.api.nvim_create_autocmd("LspAttach", { callback = on_attach })
+    if vim.fn.has("nvim-0.11") == 1 then
+        vim.lsp.config("*", { capabilities = require("mini.completion").get_lsp_capabilities() })
+    end
+end)

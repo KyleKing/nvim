@@ -27,10 +27,9 @@ later(function()
     vim.cmd("syntax enable")
     vim.cmd.colorscheme("nightfox")
 
-    -- Override line number styles with nightfox palette colors
+    -- Override line number styles with colors from https://www.nordtheme.com
     --  Alternatively, override the theme directly: https://stackoverflow.com/a/76039670/3219667
-    local theme = require("kyleking.theme")
-    local colors = theme.get_colors()
-    vim.api.nvim_set_hl(0, "LineNrAbove", { fg = colors.fg3, bold = true })
-    vim.api.nvim_set_hl(0, "LineNrBelow", { fg = colors.fg2, bold = true })
+    vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#98bbba", bold = true })
+    -- vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#94bfce", bold = true })
+    vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#87a0be", bold = true })
 end)

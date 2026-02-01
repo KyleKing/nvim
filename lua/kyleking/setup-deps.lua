@@ -15,9 +15,7 @@ if not vim.loop.fs_stat(mini_path) then
     vim.cmd('echo "Installed `mini.nvim`" | redraw')
 end
 
-require("mini.deps").setup({
-    silent = true, -- Only show ERROR and WARN messages, suppress INFO (snapshots, etc.)
-})
+require("mini.deps").setup()
 
 require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
@@ -64,7 +62,7 @@ local function run_all_tests(only_failed)
     local buf = vim.api.nvim_create_buf(false, true)
     local width = math.floor(vim.o.columns * 0.8)
     local height = math.floor(vim.o.lines * 0.8)
-    vim.api.nvim_open_win(buf, true, {
+    local win = vim.api.nvim_open_win(buf, true, {
         relative = "editor",
         width = width,
         height = height,
@@ -257,15 +255,9 @@ end)
 -- later(function() require("mini.comment").setup() end)
 -- later(function() require("mini.pick").setup() end)
 
--- Save Mini.Deps snapshot when run from config directory (but not for temp sessions)
+-- Save Mini.Deps snapshot when run from config directory
 later(function()
     if vim.fn.getcwd() == vim.fn.stdpath("config") then
-        -- Don't save snapshot for temp sessions (would exclude lualine)
-        local utils = require("kyleking.utils")
-        local is_temp_session = utils.detect_temp_session()
-
-        if not is_temp_session then
-            vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
-        end
+        vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
     end
 end)

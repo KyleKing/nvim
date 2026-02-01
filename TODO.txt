@@ -1,0 +1,1 @@
+See ../nvim-claude for a possible reference implementation for the features that I'm missing
