@@ -77,10 +77,7 @@ end)
 
 later(function()
     -- TODO: alternatively could use: https://github.com/stsewd/tree-sitter-comment
-    add({
-        source = "folke/todo-comments.nvim",
-        depends = { "nvim-telescope/telescope.nvim" },
-    })
+    add("folke/todo-comments.nvim")
     require("todo-comments").setup({
         keywords = {
             NOTE = { icon = " ", color = "#9FA4C4", alt = { "INFO", "FYI" } }, -- Overrides default for NOTE
@@ -89,7 +86,10 @@ later(function()
     })
 
     local K = vim.keymap.set
-    K("n", "<leader>ft", "<Cmd>TodoTelescope<CR>", { desc = "Find in TODOs" })
+    -- Use mini.pick for TODO search
+    K("n", "<leader>ft", function()
+        require("mini.pick").builtin.grep({ pattern = "TODO|FIXME|NOTE|PLANNED|FYI|HACK|WARNING|PERF|TEST" })
+    end, { desc = "Find in TODOs" })
     K("n", "<leader>uT", "<Cmd>TodoTrouble<CR>", { desc = "Show TODOs with Trouble" })
 end)
 
