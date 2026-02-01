@@ -1,5 +1,5 @@
 local MiniDeps = require("mini.deps")
-local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 -- Shows a list of your marks on ' and `
 -- Shows your registers on " in NORMAL or <C-r> in INSERT mode
@@ -8,27 +8,84 @@ local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 -- Scroll with "<c-d>" and "<c-u>"
 
 later(function()
-    add("folke/which-key.nvim")
+    local miniclue = require("mini.clue")
 
-    ------@class wk.Opts
-    ---opts = {
-    ---    --- You can add any mappings here, or use `require('which-key').add()` later
-    ---    ---@type wk.Spec
-    ---    spec = {
-    ---        { "<leader>S", group = "Session" },
-    ---        { "<leader>b", group = "Buffer" },
-    ---        { "<leader>bO", group = "Order" },
-    ---        { "<leader>f", group = "Find" },
-    ---        { "<leader>g", group = "Git" },
-    ---        { "<leader>l", group = "LSP", mode = { "n", "v" } },
-    ---        { "<leader>lw", group = "Workspace" },
-    ---        { "<leader>m", group = "Move", mode = { "n", "v" } },
-    ---        { "<leader>p", group = "Plugins" },
-    ---        { "<leader>r", group = "Register" },
-    ---        { "<leader>t", group = "ToggleTerm" },
-    ---        { "<leader>u", group = "UI" },
-    ---        { "<leader>uc", group = "Color" },
-    ---        { "<leader>ug", group = "Git" },
-    ---    }
-    ---}
+    miniclue.setup({
+        triggers = {
+            -- Leader triggers
+            { mode = "n", keys = "<Leader>" },
+            { mode = "x", keys = "<Leader>" },
+
+            -- Built-in completion
+            { mode = "i", keys = "<C-x>" },
+
+            -- `g` key
+            { mode = "n", keys = "g" },
+            { mode = "x", keys = "g" },
+
+            -- Marks
+            { mode = "n", keys = "'" },
+            { mode = "n", keys = "`" },
+            { mode = "x", keys = "'" },
+            { mode = "x", keys = "`" },
+
+            -- Registers
+            { mode = "n", keys = '"' },
+            { mode = "x", keys = '"' },
+            { mode = "i", keys = "<C-r>" },
+            { mode = "c", keys = "<C-r>" },
+
+            -- Window commands
+            { mode = "n", keys = "<C-w>" },
+
+            -- `z` key
+            { mode = "n", keys = "z" },
+            { mode = "x", keys = "z" },
+
+            -- Brackets
+            { mode = "n", keys = "[" },
+            { mode = "n", keys = "]" },
+        },
+
+        clues = {
+            -- Leader key groups
+            { mode = "n", keys = "<Leader>S", desc = "+Session" },
+            { mode = "n", keys = "<Leader>b", desc = "+Buffer" },
+            { mode = "n", keys = "<Leader>bO", desc = "+Order" },
+            { mode = "n", keys = "<Leader>f", desc = "+Find" },
+            { mode = "n", keys = "<Leader>g", desc = "+Git" },
+            { mode = "n", keys = "<Leader>l", desc = "+LSP" },
+            { mode = "x", keys = "<Leader>l", desc = "+LSP" },
+            { mode = "n", keys = "<Leader>lg", desc = "+LSP Go to" },
+            { mode = "n", keys = "<Leader>lw", desc = "+Workspace" },
+            { mode = "n", keys = "<Leader>m", desc = "+Move" },
+            { mode = "x", keys = "<Leader>m", desc = "+Move" },
+            { mode = "n", keys = "<Leader>p", desc = "+Plugins" },
+            { mode = "n", keys = "<Leader>r", desc = "+Register" },
+            { mode = "n", keys = "<Leader>t", desc = "+Terminal/Test" },
+            { mode = "n", keys = "<Leader>u", desc = "+UI" },
+            { mode = "n", keys = "<Leader>uc", desc = "+Color" },
+            { mode = "n", keys = "<Leader>ug", desc = "+Git" },
+
+            -- Built-in clue generators
+            miniclue.gen_clues.builtin_completion(),
+            miniclue.gen_clues.g(),
+            miniclue.gen_clues.marks(),
+            miniclue.gen_clues.registers(),
+            miniclue.gen_clues.windows({
+                submode_move = true,
+                submode_navigate = true,
+                submode_resize = true,
+            }),
+            miniclue.gen_clues.z(),
+        },
+
+        window = {
+            delay = 500, -- Show after 500ms
+            config = {
+                border = "rounded",
+                width = "auto",
+            },
+        },
+    })
 end)
