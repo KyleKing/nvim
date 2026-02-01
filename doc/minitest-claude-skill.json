@@ -1,0 +1,126 @@
+{
+  "name": "minitest_helper",
+  "description": "A comprehensive helper for working with Mini.Test, a Neovim testing framework. This skill helps generate test files, understand the Mini.Test API, create test cases with proper structure, and use expectations and hooks correctly.",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "generate_test_file",
+          "create_test_case",
+          "explain_api",
+          "generate_expectation",
+          "create_hooks",
+          "create_parametrized_test",
+          "create_child_neovim_test",
+          "run_test_example"
+        ],
+        "description": "The action to perform with Mini.Test"
+      },
+      "module_name": {
+        "type": "string",
+        "description": "Name of the module being tested (e.g., 'kyleking.deps.color')"
+      },
+      "test_description": {
+        "type": "string",
+        "description": "Description of what the test should verify"
+      },
+      "test_cases": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Name of the test case"
+            },
+            "description": {
+              "type": "string",
+              "description": "What this test case verifies"
+            },
+            "expectations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["equality", "no_equality", "error", "no_error", "truthy", "falsy", "reference_screenshot"],
+                    "description": "Type of expectation"
+                  },
+                  "actual": {
+                    "type": "string",
+                    "description": "Lua expression for the actual value"
+                  },
+                  "expected": {
+                    "type": "string",
+                    "description": "Lua expression for the expected value (if applicable)"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Optional message describing the expectation"
+                  }
+                },
+                "required": ["type", "actual"]
+              }
+            },
+            "setup": {
+              "type": "string",
+              "description": "Optional Lua code to run before the test"
+            },
+            "teardown": {
+              "type": "string",
+              "description": "Optional Lua code to run after the test"
+            }
+          },
+          "required": ["name"]
+        },
+        "description": "Array of test cases to generate"
+      },
+      "hooks": {
+        "type": "object",
+        "properties": {
+          "pre_once": {
+            "type": "string",
+            "description": "Lua code to run once before all tests"
+          },
+          "pre_case": {
+            "type": "string",
+            "description": "Lua code to run before each test case"
+          },
+          "post_case": {
+            "type": "string",
+            "description": "Lua code to run after each test case"
+          },
+          "post_once": {
+            "type": "string",
+            "description": "Lua code to run once after all tests"
+          }
+        },
+        "description": "Test hooks configuration"
+      },
+      "parametrize": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "description": "Array of parameter values for parametrized tests"
+        },
+        "description": "Parameters for parametrized test cases"
+      },
+      "api_function": {
+        "type": "string",
+        "description": "Mini.Test API function to explain (e.g., 'new_set', 'expect', 'run_file')"
+      },
+      "use_child_neovim": {
+        "type": "boolean",
+        "description": "Whether to use child Neovim process for isolation"
+      },
+      "file_path": {
+        "type": "string",
+        "description": "Path where the test file should be created (relative to lua/tests/)"
+      }
+    },
+    "required": ["action"]
+  }
+}
