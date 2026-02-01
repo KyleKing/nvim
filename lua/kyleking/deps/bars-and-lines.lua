@@ -11,7 +11,7 @@ later(function()
 
     local K = vim.keymap.set
     K("n", "]r", function() require("illuminate")["goto_next_reference"](false) end, { desc = "Next reference" })
-    K("n", "]r", function() require("illuminate")["goto_prev_reference"](false) end, { desc = "Previous reference" })
+    K("n", "[r", function() require("illuminate")["goto_prev_reference"](false) end, { desc = "Previous reference" })
     K("n", "<leader>ur", require("illuminate").toggle, { desc = "Toggle reference highlighting" })
     K("n", "<leader>uR", require("illuminate").toggle_buf, { desc = "Toggle reference highlighting (buffer)" })
 end)
@@ -22,40 +22,84 @@ local is_temp_session = utils.detect_temp_session()
 
 if not is_temp_session then
     later(function()
-        add({
-            -- PLANNED: Switch to mini.statusline
-            source = "nvim-lualine/lualine.nvim",
+        local MiniStatusline = require("mini.statusline")
 
-            depends = {
-                "nvim-tree/nvim-web-devicons",
+        MiniStatusline.setup({
+            content = {
+                active = function()
+                    local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
+                    local git = MiniStatusline.section_git({ trunc_width = 75 })
+                    local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+
+                    -- Custom filename section with dynamic width calculation
+                    local filename_section = function()
+                        local path = vim.fn.expand("%:p")
+                        if path == "" then return "[No Name]" end
+
+                        local filename = vim.fn.expand("%:t")
+                        local dir = vim.fn.expand("%:h")
+
+                        -- Calculate available space
+                        local mode_width = vim.fn.strdisplaywidth(mode)
+                        local git_width = vim.fn.strdisplaywidth(git)
+                        local diag_width = vim.fn.strdisplaywidth(diagnostics)
+                        local available = vim.o.columns - (mode_width + git_width + diag_width + 20)
+
+                        -- Max width for path (reserve 40 chars for filename)
+                        local max_path = math.max(40, available - 40)
+                        local full_path = dir .. "/" .. filename
+
+                        -- Truncate from left if too long
+                        if vim.fn.strdisplaywidth(full_path) > max_path then
+                            local dir_space = max_path - vim.fn.strdisplaywidth(filename) - 4 -- 4 for ".../"
+                            if dir_space > 0 then
+                                local truncated_dir = string.sub(dir, -dir_space)
+                                return ".../" .. truncated_dir .. "/" .. filename
+                            else
+                                return ".../" .. filename
+                            end
+                        end
+
+                        -- File status indicators
+                        local modified = vim.bo.modified and " [+]" or ""
+                        local readonly = vim.bo.readonly and " []" or ""
+
+                        return full_path .. modified .. readonly
+                    end
+
+                    local filename = filename_section()
+                    local location = MiniStatusline.section_location({ trunc_width = 75 })
+
+                    return MiniStatusline.combine_groups({
+                        { hl = mode_hl, strings = { mode } },
+                        { hl = "MiniStatuslineDevinfo", strings = { git, diagnostics } },
+                        "%<", -- Mark truncation point
+                        { hl = "MiniStatuslineFilename", strings = { filename } },
+                        "%=", -- End left alignment
+                        { hl = "MiniStatuslineFileinfo", strings = { location } },
+                    })
+                end,
             },
+            use_icons = true,
+            set_vim_settings = true,
         })
 
-        local rel_filename = {
-            "filename",
-            file_status = true,
-            new_file_status = true,
-            path = 1, -- 0: Filename, 1: Relative path, 2: Absolute path
-            shorting_target = 40, -- Shortens path to leave 'n' spaces in the window
-        }
-        require("lualine").setup({
-            options = {
-                -- https://github.com/nvim-lualine/lualine.nvim/blob/master/THEMES.md
-                theme = "nightfly",
-            },
-            sections = {
-                lualine_c = { rel_filename },
-                lualine_x = { {} }, -- Remove filetype, etc.
-                -- FYI: example displaying status of spell: https://github.com/nvim-lualine/lualine.nvim/issues/487#issuecomment-1345625242
-            },
-            extensions = {
-                "fugitive",
-                "man",
-                "quickfix",
-                "toggleterm",
-                "trouble",
-            },
-        })
+        -- Apply nightfly-inspired theme colors
+        local colors = require("kyleking.theme").get_colors()
+
+        -- Mode colors (similar to lualine nightfly theme)
+        vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = colors.bg0, bg = colors.fg1, bold = true })
+        vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = colors.bg0, bg = colors.green, bold = true })
+        vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = colors.bg0, bg = colors.orange, bold = true })
+        vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = colors.bg0, bg = "#e06c75", bold = true })
+        vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = colors.bg0, bg = "#61afef", bold = true })
+        vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = colors.bg0, bg = colors.fg3, bold = true })
+
+        -- Other sections
+        vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = colors.fg2, bg = colors.bg2 })
+        vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = colors.fg1, bg = colors.bg1 })
+        vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = colors.fg2, bg = colors.bg2 })
+        vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = colors.fg3, bg = colors.bg1 })
     end)
 end
 
