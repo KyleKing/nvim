@@ -1,7 +1,7 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
-later(function() add({ source = "sindrets/diffview.nvim", depends = { "nvim-tree/nvim-web-devicons" } }) end)
+later(function() add("sindrets/diffview.nvim") end)
 
 later(function()
     -- Adds git related signs to the gutter, as well as utilities for managing changes,
