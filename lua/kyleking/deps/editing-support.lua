@@ -62,9 +62,41 @@ later(function()
 end)
 
 later(function()
-    -- PLANNED: Fix implementation of mini.surround
-    require("mini.surround").setup()
-    vim.keymap.set({ "n", "x" }, "s", "<Nop>") -- Disable `s` shortcut and use `cl`
+    -- Enhanced mini.surround configuration (replaces vim-sandwich)
+    require("mini.surround").setup({
+        -- Custom surroundings
+        custom_surroundings = {
+            -- Function call support
+            f = {
+                input = function()
+                    local fn = vim.fn.input("Function name: ")
+                    if fn == "" then return nil end
+                    return { string.format("%%s*%s%%s*%(", vim.patt.escape(fn)), "%)" }
+                end,
+                output = function()
+                    local fn = vim.fn.input("Function name: ")
+                    if fn == "" then return nil end
+                    return { left = fn .. "(", right = ")" }
+                end,
+            },
+        },
+        mappings = {
+            add = "sa", -- Add surrounding (sandwich-like)
+            delete = "sd", -- Delete surrounding (sandwich-like)
+            find = "sf", -- Find surrounding (to right)
+            find_left = "sF", -- Find surrounding (to left)
+            highlight = "sh", -- Highlight surrounding
+            replace = "sr", -- Replace surrounding (sandwich-like)
+            update_n_lines = "sn", -- Update n_lines
+        },
+        -- Number of lines to search
+        n_lines = 50,
+        -- Whether to respect selection type
+        respect_selection_type = false,
+    })
+
+    -- Disable `s` in normal/visual mode (use `cl` instead)
+    vim.keymap.set({ "n", "x" }, "s", "<Nop>")
 end)
 
 later(function() require("mini.trailspace").setup() end)
@@ -94,26 +126,17 @@ later(function()
 end)
 
 later(function()
-    add("folke/ts-comments.nvim")
-    require("ts-comments").setup()
-end)
-
-later(function()
-    add("machakann/vim-sandwich")
-    vim.fn["operator#sandwich#set"]("add", "char", "skip_space", 1)
-    vim.g.operator_sandwich_no_default_key_mappings = true
-    vim.g.textobj_sandwich_no_default_key_mappings = true
-
-    local K = vim.keymap.set
-    -- Operator
-    K({ "n", "x", "o" }, "sa", "<Plug>(sandwich-add)")
-    K({ "n", "x" }, "sd", "<Plug>(sandwich-delete)")
-    K({ "n" }, "sdb", "<Plug>(sandwich-delete-auto)")
-    K({ "n", "x" }, "sr", "<Plug>(sandwich-replace)")
-    K({ "n" }, "srb", "<Plug>(sandwich-replace-auto)")
-    -- Textobject
-    K({ "x", "o" }, "ib", "<Plug>(textobj-sandwich-auto-i)")
-    K({ "x", "o" }, "ab", "<Plug>(textobj-sandwich-auto-a)")
-    K({ "x", "o" }, "is", "<Plug>(textobj-query-auto-i)")
-    K({ "x", "o" }, "as", "<Plug>(textobj-query-auto-a)")
+    -- Use mini.comment with native treesitter support (replaces ts-comments.nvim)
+    require("mini.comment").setup({
+        options = {
+            -- Uses 'commentstring' option or treesitter for language-aware commenting
+            custom_commentstring = nil,
+        },
+        mappings = {
+            comment = "gc",
+            comment_line = "gcc",
+            comment_visual = "gc",
+            textobject = "gc",
+        },
+    })
 end)
