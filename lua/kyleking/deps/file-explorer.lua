@@ -6,21 +6,13 @@ local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 -- Adapted from: https://github.com/mrjones2014/dotfiles/blob/9914556e4cb346de44d486df90a0410b463998e4/nvim/lua/my/configure/mini_files.lua
 later(function()
+    local constants = require("kyleking.utils.constants")
+    
     require("mini.files").setup({
         content = {
             filter = function(entry)
-                -- FIXME: use a shared list of ignored files/directories with telescope
-                return entry.name ~= ".DS_Store"
-                    and entry.name ~= ".cover"
-                    and entry.name ~= ".git"
-                    and entry.name ~= ".jj"
-                    and entry.name ~= ".mypy_cache"
-                    and entry.name ~= ".pytest_cache"
-                    and entry.name ~= ".ropeproject"
-                    and entry.name ~= ".ruff_cache"
-                    and entry.name ~= ".venv"
-                    and entry.name ~= "__pycache__"
-                    and entry.name ~= "node_modules"
+                -- Use shared ignore list from constants
+                return not constants.should_ignore(entry.name)
             end,
         },
         windows = {
