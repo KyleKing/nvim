@@ -54,7 +54,7 @@ repos:
           # Note: this version must be the same as the hook revision
           - "prettier@4.0.0-alpha.8"
           - "prettier-plugin-sh"
-        types_or: [html, javascript, json, shell, yaml]
+        types_or: [html, javascript, shell, yaml]
   - repo: https://github.com/executablebooks/mdformat
     rev: 1.0.0
     hooks:

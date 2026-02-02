@@ -1,6 +1,5 @@
 -- Test custom terminal implementation
 local MiniTest = require("mini.test")
-local helpers = require("tests.helpers")
 
 local T = MiniTest.new_set({
     hooks = {

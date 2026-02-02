@@ -102,9 +102,9 @@ end
         vim.wait(500)
 
         -- Check if completion menu is visible (pumvisible)
-        local pum_visible = vim.fn.pumvisible() == 1
-        -- Note: This might not always be true depending on LSP server response time
-        -- So we just verify the trigger didn't error
+        -- Note: pumvisible() might not be true depending on LSP server response time
+        -- so we just verify the trigger didn't error
+        vim.fn.pumvisible()
     end
 
     -- Cleanup
