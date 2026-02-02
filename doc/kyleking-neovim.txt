@@ -5,230 +5,826 @@
 ===============================================================================
 CONTENTS                                              *kyleking-neovim-contents*
 
-    1. Introduction .......................... |kyleking-neovim-introduction|
-    2. Key Mappings .......................... |kyleking-neovim-keymaps|
-       2.1 General Mappings .................. |kyleking-keymaps-general|
-       2.2 Leader Mappings ................... |kyleking-keymaps-leader|
-       2.3 Fuzzy Finding (mini.pick) ......... |kyleking-keymaps-pick|
-       2.4 LSP Mappings ...................... |kyleking-keymaps-lsp|
-       2.5 Codanna (Semantic Search) ......... |kyleking-keymaps-codanna|
-       2.6 Buffer Mappings ................... |kyleking-keymaps-buffer|
-       2.7 Testing Mappings .................. |kyleking-keymaps-testing|
-    3. Plugins ............................... |kyleking-neovim-plugins|
-       3.1 mini.nvim ........................ |kyleking-plugins-mini|
-       3.2 Fuzzy Finding (mini.pick) ........ |kyleking-plugins-pick|
-       3.3 Codanna Semantic Search .......... |kyleking-plugins-codanna|
-       3.4 patch_it.nvim .................... |kyleking-plugins-patchit|
-       3.5 LSP Support ...................... |kyleking-plugins-lsp|
-       3.6 Colorscheme & UI ................. |kyleking-plugins-ui|
-       3.7 File Explorer .................... |kyleking-plugins-explorer|
-       3.8 Git Integration .................. |kyleking-plugins-git|
-       3.9 Terminal Integration ............. |kyleking-plugins-terminal|
-    4. Custom Commands ....................... |kyleking-neovim-commands|
-    5. Testing Framework ..................... |kyleking-neovim-testing|
+    1. Navigating Help ......................... |kyleking-help|
+    2. Vim Essentials .......................... |kyleking-essentials|
+       2.1  Modes .............................. |kyleking-modes|
+       2.2  Motions & Text Objects ............. |kyleking-motions|
+       2.3  Operators .......................... |kyleking-operators|
+       2.4  Registers .......................... |kyleking-registers|
+       2.5  Marks .............................. |kyleking-marks|
+       2.6  Macros ............................. |kyleking-macros|
+       2.7  Visual Mode ........................ |kyleking-visual|
+       2.8  Quickfix & Location Lists .......... |kyleking-quickfix|
+       2.9  Folds .............................. |kyleking-folds|
+       2.10 Substitute & Global ................ |kyleking-substitute|
+       2.11 The Dot Command .................... |kyleking-dot|
+       2.12 Undo Tree .......................... |kyleking-undo|
+    3. This Config ............................. |kyleking-config|
+    4. Keymaps ................................. |kyleking-keymaps|
+       4.1 General ............................. |kyleking-keymaps-general|
+       4.2 Leader .............................. |kyleking-keymaps-leader|
+       4.3 LSP ................................. |kyleking-keymaps-lsp|
+       4.4 Completion .......................... |kyleking-keymaps-completion|
+    5. Plugin Guides ........................... |kyleking-plugins|
+       5.1  Fuzzy Finding (mini.pick) .......... |kyleking-pick|
+       5.2  File Explorer (mini.files) ......... |kyleking-files|
+       5.3  Surround (mini.surround) ........... |kyleking-surround|
+       5.4  Comment (mini.comment) ............. |kyleking-comment|
+       5.5  Move (mini.move) ................... |kyleking-move|
+       5.6  Clue / Which-key (mini.clue) ....... |kyleking-clue|
+       5.7  Git (mini.diff, mini.git) .......... |kyleking-git|
+       5.8  Flash (motion/jumping) ............. |kyleking-flash|
+       5.9  Treesitter & Text Objects .......... |kyleking-treesitter|
+       5.10 LSP, Linting & Formatting .......... |kyleking-lsp-tools|
+       5.11 Codanna (semantic search) .......... |kyleking-codanna|
+       5.12 Terminal Integration ............... |kyleking-terminal|
+       5.13 Color & UI ......................... |kyleking-ui|
+       5.14 patch_it.nvim ...................... |kyleking-patchit|
+       5.15 Other Utilities .................... |kyleking-utilities|
+    6. Custom Commands ......................... |kyleking-commands|
+    7. Testing ................................. |kyleking-testing|
+    8. Learning Notes .......................... |kyleking-notes|
+       8.1 Modern Vim (PragProg) ............... |kyleking-notes-modern-vim|
+       8.2 Learn Neovim (ofirgall) ............. |kyleking-notes-learn-nvim|
+       8.3 Tips & Tricks ....................... |kyleking-notes-tips|
 
 ===============================================================================
-1. INTRODUCTION                                    *kyleking-neovim-introduction*
+1. NAVIGATING HELP                                             *kyleking-help*
 
-This is the documentation for KyleKing's Neovim configuration.
+Neovim's built-in help system is navigated with tags. Every `*word*` in help
+files defines a tag; every `|word|` links to one.
 
-The configuration is organized in a modular structure:
-- Core settings in `lua/kyleking/core/`
-- Plugins managed by mini.deps in `lua/kyleking/deps/`
-- Custom utilities in `lua/kyleking/custom/`
+    <C-]>         Follow the tag under the cursor
+    <C-t>         Jump back to previous location
+    <C-o>         Jump back (generic jumplist)
 
-Leader key: <Space>    Local leader: ","
+Useful help commands: >
+    :h {topic}             Open help for a topic
+    :h key-notation        How keys are written (<CR>, <C-w>, etc.)
+    :helpgrep {pattern}    Search across all help files
+    :h index               Full index of all default key bindings
+<
+This config adds pickers for discovering bindings interactively:
+
+    <leader>fh     Find in nvim help (fuzzy search help tags)
+    <leader>fk     Find keymaps (all active keymaps, searchable)
+
+Reading help syntax: ~
+    `{arg}`          Required argument
+    `[arg]`          Optional argument
+    `|tag|`          Clickable link to another help tag
+    `CTRL-X`         Hold Ctrl and press X (written <C-x> in mappings)
+
+See also: |:help|, |key-notation|, |helpgrep|
 
 ===============================================================================
-2. KEY MAPPINGS                                        *kyleking-neovim-keymaps*
+2. VIM ESSENTIALS                                         *kyleking-essentials*
 
-This section documents all key mappings configured in the setup.
-
--------------------------------------------------------------------------------
-2.1 General Mappings                                  *kyleking-keymaps-general*
-
-<Esc>           Clear search highlighting
-<C-s>           Force write the current buffer
-<C-q>           Force quit
-k / j           Smart movement with word wrap
-
-Special text objects:
-  A             Select whole buffer (e.g., dA, yA)
+A concise reference for the most commonly used Vim features. Each section
+includes a `:h` cross-reference for deeper reading.
 
 -------------------------------------------------------------------------------
-2.2 Leader Mappings                                   *kyleking-keymaps-leader*
+2.1 Modes                                                    *kyleking-modes*
 
-<leader>w       Save if modified
-<leader>W       Save all
-<leader>q       Confirm quit
-<leader>Q       Confirm quit all
-<leader>n       New file
+    Normal          Default mode; navigate and compose commands
+    Insert          Type text (enter with `i`, `a`, `o`, etc.)
+    Visual          Select text (`v` char, `V` line, `<C-v>` block)
+    Command-line    Enter commands (`:`, `/`, `?`)
+    Operator-pending Waiting for a motion after an operator (`d`, `c`, etc.)
+    Terminal         Inside `:terminal` buffer
 
-Register operations:
-<leader>ry      Yank to * register
-<leader>rp      Paste from * register
-<leader>rY      Yank to + register
-<leader>rP      Paste from + register
+    <Esc>           Return to Normal mode from any mode
+    <C-c>           Alternative escape (does not trigger InsertLeave)
 
-UI toggles:
-<leader>us      Toggle spell check
-<leader>uw      Toggle line wrapping
-
-Tab operations:
-<leader>ttn     New tab
-<leader>ttc     Close tab
+See also: |vim-modes|, |mode-switching|
 
 -------------------------------------------------------------------------------
-2.3 Fuzzy Finding (mini.pick)                           *kyleking-keymaps-pick*
+2.2 Motions & Text Objects                                  *kyleking-motions*
 
-Core pickers:
-<leader><CR>    Resume last picker
-<leader>;       Find in open buffers
+Motions move the cursor. Text objects select regions.
 
-Buffer related:
-<leader>bb      Find word in current buffer
-<leader>bL      Find lines across all buffers
-<leader>br      Find recently opened files
+Basic motions: ~
+    h j k l         Left, down, up, right
+    w / W           Next word / WORD start
+    b / B           Previous word / WORD start
+    e / E           End of word / WORD
+    0 / ^           Start of line / first non-blank
+    $               End of line
+    gg / G          Start / end of file
+    { / }           Previous / next blank line (paragraph)
+    % match         Matching bracket
 
-Git operations:
-<leader>gf      Find in git files
+Search motions: ~
+    f{char}         Forward to char on current line
+    t{char}         Forward to before char
+    F{char}/T{char} Backward equivalents
+    ;               Repeat last f/t forward
+    ,               Repeat last f/t backward
+    /{pattern}      Search forward
+    ?{pattern}      Search backward
+    n / N           Next / previous search match
+    *               Search for word under cursor
 
-File operations:
-<leader>ff      Find in files
-<leader>fe      Explore files with picker
-<leader>fw      Find word in files (live grep)
-<leader>f*      Find word from visual selection (visual mode)
+Text objects (use after operator or in Visual mode): ~
+    iw / aw         Inner / around word
+    is / as         Inner / around sentence
+    ip / ap         Inner / around paragraph
+    i" / a"         Inner / around double quotes
+    i( / a(         Inner / around parentheses
+    i{ / a{         Inner / around braces
+    it / at         Inner / around HTML/XML tag
 
-Other pickers:
-<leader>fB      Find in pickers (list all available pickers)
-<leader>f'      Find marks
-<leader>fC      Find commands
-<leader>fh      Find in nvim help
-<leader>fH      Find in command/search history
-<leader>fk      Find keymaps
-<leader>fl      Find in quickfix/location lists
-<leader>fr      Find registers
-
-Inside mini.pick windows:
-<C-j>           Move down
-<C-k>           Move up
-<C-Space>       Refine results
-
--------------------------------------------------------------------------------
-2.4 LSP Mappings                                       *kyleking-keymaps-lsp*
-
-<leader>ld      Find in diagnostics
-<leader>lgd     Go to definition
-<leader>lgi     Go to implementation
-<leader>lgr     Find references
-<leader>lgs     Find document symbols
-<leader>lgt     Go to type definition
+See also: |motion.txt|, |text-objects|, |object-select|
 
 -------------------------------------------------------------------------------
-2.5 Codanna (Semantic Search)                       *kyleking-keymaps-codanna*
+2.3 Operators                                              *kyleking-operators*
 
-Semantic search operations complement LSP with cross-file analysis.
-Capital letters distinguish semantic operations from LSP equivalents.
+Operators act on motions or text objects: `{operator}{motion}`.
 
-Prefix: <leader>ls
+    d               Delete (cut)
+    c               Change (delete + enter Insert)
+    y               Yank (copy)
+    >  /  <         Indent / dedent
+    =               Auto-indent
+    gU / gu         Uppercase / lowercase
+    !               Filter through external program
 
-<leader>lsc     Calls FROM symbol (outgoing calls)
-<leader>lsC     Callers OF symbol (incoming calls)
-<leader>lsd     Search documentation
-<leader>lsi     Impact analysis (what code is affected by this symbol)
-<leader>lss     Semantic search (natural language code queries)
-<leader>lsS     Browse symbols
+Common combinations: ~
+    dd / cc / yy    Operate on whole line
+    D / C           Delete / change to end of line
+    diw             Delete inner word
+    ci"             Change inside double quotes
+    yap             Yank around paragraph
+    >ip             Indent paragraph
+    gUiw            Uppercase inner word
 
-When to use codanna vs LSP:
+The operator-motion grammar composes: any operator works with any motion
+or text object. Learning them separately multiplies your capabilities.
+
+See also: |operator|, |04.1|
+
+-------------------------------------------------------------------------------
+2.4 Registers                                              *kyleking-registers*
+
+Registers are named storage slots for text. Every yank/delete uses one.
+
+    ""              Default register (unnamed)
+    "0              Last yank (not delete)
+    "1 - "9         Delete history (most recent = "1)
+    "a - "z         Named registers (you choose)
+    "A - "Z         Append to named register
+    "+              System clipboard
+    "*              Primary selection (X11) / clipboard (macOS)
+    "_              Black hole (discard)
+    "/              Last search pattern
+    ".              Last inserted text
+    ":              Last command
+    "%              Current filename
+
+Usage: ~
+    "ayy            Yank line into register a
+    "ap             Paste from register a
+    <C-r>a          Insert register a in Insert/Command mode
+    :reg            Show all register contents
+
+This config maps: ~
+    <leader>ry      Yank to * register
+    <leader>rp      Paste from * register
+    <leader>rY      Yank to + register
+    <leader>rP      Paste from + register
+    <leader>fr      Find registers (picker)
+
+See also: |registers|, |:reg|, |quotequote|
+
+-------------------------------------------------------------------------------
+2.5 Marks                                                    *kyleking-marks*
+
+Marks save cursor positions you can jump back to.
+
+    m{a-z}          Set local mark (buffer-local)
+    m{A-Z}          Set global mark (cross-file)
+    '{mark}         Jump to mark (first non-blank)
+    `{mark}         Jump to mark (exact column)
+
+Automatic marks: ~
+    ''              Position before last jump
+    '.              Position of last change
+    '^              Position of last insert
+    '[  /  ']       Start / end of last change or yank
+    '<  /  '>       Start / end of last visual selection
+
+    :marks          List all marks
+    :delmarks a-d   Delete marks a through d
+    <leader>f'      Find marks (picker)
+
+See also: |mark-motions|, |:marks|
+
+-------------------------------------------------------------------------------
+2.6 Macros                                                  *kyleking-macros*
+
+Record a sequence of commands, replay it any number of times.
+
+    q{register}     Start recording into register
+    q               Stop recording
+    @{register}     Play back macro
+    @@              Repeat last played macro
+    {count}@{reg}   Play macro {count} times
+
+Tips: ~
+- Use `0` or `^` at the start to ensure consistent cursor position
+- End with `j` to move to the next line for line-wise repetition
+- `5@a` runs macro `a` five times
+- Edit a macro: `"ap` to paste, edit text, `"ayy` to re-yank
+
+See also: |recording|, |@|, |q|
+
+-------------------------------------------------------------------------------
+2.7 Visual Mode                                             *kyleking-visual*
+
+    v               Character-wise visual
+    V               Line-wise visual
+    <C-v>           Block-wise visual (column select)
+    gv              Reselect last visual selection
+    o               Move to other end of selection
+
+In Visual mode, operators apply to the selection: ~
+    d               Delete selection
+    c               Change selection
+    y               Yank selection
+    >  /  <         Indent / dedent selection
+    U / u           Uppercase / lowercase selection
+    :               Enter command for selection (auto-fills range)
+    I / A           Block insert / append (block mode)
+
+This config adds: ~
+    A (visual)      Select whole buffer
+
+See also: |visual-mode|, |visual-operators|, |blockwise-visual|
+
+-------------------------------------------------------------------------------
+2.8 Quickfix & Location Lists                              *kyleking-quickfix*
+
+Quickfix is a global list of file locations. Location list is per-window.
+
+    :copen / :lopen     Open quickfix / location list
+    :cclose / :lclose   Close
+    :cnext / :cprev     Next / previous entry
+    :cfirst / :clast    First / last entry
+    :cdo {cmd}          Run {cmd} on each quickfix entry
+
+Populated by: ~
+- `:grep` or `:vimgrep`
+- LSP diagnostics (`<leader>cD` in this config)
+- `:helpgrep`
+- Many plugins (mini.pick sends to quickfix)
+
+    <leader>fl      Find in quickfix/location lists (picker)
+
+See also: |quickfix|, |location-list|, |:cdo|
+
+-------------------------------------------------------------------------------
+2.9 Folds                                                    *kyleking-folds*
+
+This config uses treesitter-based folding with all folds open by default
+(`foldlevel = 99`).
+
+    za              Toggle fold under cursor
+    zo / zc         Open / close fold
+    zR / zM         Open / close all folds
+    zr / zm         Reduce / increase fold level by one
+    [z / ]z         Go to start / end of current fold
+
+See also: |folding|, |fold-commands|
+
+-------------------------------------------------------------------------------
+2.10 Substitute & Global                                  *kyleking-substitute*
+
+    :[range]s/{pattern}/{replacement}/[flags]
+
+Common flags: ~
+    g               All occurrences on each line (not just first)
+    c               Confirm each substitution
+    i / I           Case insensitive / sensitive
+    n               Count matches without replacing
+
+Examples: ~
+    :%s/foo/bar/g       Replace all "foo" with "bar" in file
+    :'<,'>s/foo/bar/g   Replace in visual selection
+    :s/\v(\w+)/\U\1/g  Uppercase all words on current line
+
+The |:global| command runs Ex commands on matching lines: ~
+    :g/{pattern}/{cmd}      Execute {cmd} on lines matching {pattern}
+    :v/{pattern}/{cmd}      Execute on lines NOT matching
+    :g/TODO/d               Delete all lines containing TODO
+    :g/^$/d                 Delete all empty lines
+    :g/pattern/normal @a    Run macro `a` on matching lines
+
+See also: |:substitute|, |:global|, |sub-replace-special|
+
+-------------------------------------------------------------------------------
+2.11 The Dot Command                                           *kyleking-dot*
+
+    .               Repeat the last change
+
+The dot command replays the last edit. Structure your edits as
+repeatable units: use text objects, avoid extra motions inside a change.
+
+    ciw{new}<Esc>   Change word. Now `n.` repeats on next match.
+    A;{Esc}         Append semicolon. Now `j.` repeats on next line.
+
+See also: |single-repeat|, |.|
+
+-------------------------------------------------------------------------------
+2.12 Undo Tree                                                *kyleking-undo*
+
+Vim tracks undo as a tree, not a linear stack. Branches form when you
+undo then make a new edit.
+
+    u               Undo
+    <C-r>           Redo
+    g-  /  g+       Go to older / newer text state (traverses branches)
+    :earlier 5m     Go back 5 minutes
+    :later 5m       Go forward 5 minutes
+    :undolist       Show undo branches
+
+This config highlights undo/redo changes with `highlight-undo.nvim`.
+
+See also: |undo-tree|, |:earlier|, |:undolist|
+
+===============================================================================
+3. THIS CONFIG                                               *kyleking-config*
+
+Leader key: `<Space>`      Local leader: `,`
+
+Boot sequence: ~
+    `init.lua` -> `lua/kyleking/init.lua` which loads two phases:
+    1. Core (`lua/kyleking/core/init.lua`): options -> lsp -> keymaps -> autocmds
+    2. Plugins (`lua/kyleking/setup-deps.lua`): bootstraps mini.deps, then
+       requires each `lua/kyleking/deps/*.lua` file
+
+Plugin management: ~
+    All plugins are managed through mini.deps. Each `deps/*.lua` file groups
+    related plugins by functionality.
+    - `now()` for plugins needed at startup (colorscheme, mini.test)
+    - `later()` for everything else (deferred loading)
+    - Plugin keymaps live in their respective `deps/*.lua` file
+
+Directory layout: ~
+    `lua/kyleking/core/`      Core settings (options, keymaps, autocmds, lsp)
+    `lua/kyleking/deps/`      Plugin configurations (one file per group)
+    `lua/kyleking/custom/`    Custom utilities
+    `lua/kyleking/utils/`     Shared helpers (fs, json, bin discovery)
+    `lua/tests/`              Test files (*_spec.lua)
+
+Conventions: ~
+    - `local K = vim.keymap.set` alias used in deps files
+    - Autocmd groups prefixed with `kyleking_`
+    - Theme colors: `require("kyleking.theme").get_colors()`
+    - `PLANNED:` comments mark features to add when upstream support arrives
+    - Floating windows skipped in global autocmds via `relative ~= ""`
+
+See also: |kyleking-keymaps|, |kyleking-plugins|
+
+===============================================================================
+4. KEYMAPS                                                  *kyleking-keymaps*
+
+Core keymaps that are not plugin-specific. Plugin keymaps are documented
+with their respective plugins in |kyleking-plugins|.
+
+-------------------------------------------------------------------------------
+4.1 General                                          *kyleking-keymaps-general*
+
+    <Esc>           Clear search highlighting
+    <C-s>           Force write the current buffer
+    <C-q>           Force quit
+    k / j           Smart movement respecting word wrap (gk/gj)
+    dd              Smart delete: empty lines go to black hole register
+
+Text objects: ~
+    A (o, x)        Select whole buffer (e.g., `dA` delete all, `yA` yank all)
+
+-------------------------------------------------------------------------------
+4.2 Leader                                           *kyleking-keymaps-leader*
+
+    <leader>w       Save if modified
+    <leader>W       Save all
+    <leader>q       Quit (with confirm)
+    <leader>Q       Quit all (with confirm)
+    <leader>n       New file
+
+Register operations: ~
+    <leader>ry      Yank to * register
+    <leader>rp      Paste from * register
+    <leader>rY      Yank to + register
+    <leader>rP      Paste from + register
+
+Buffer management: ~
+    <leader>bw      Wipeout buffer (including marks)
+    <leader>bW      Wipeout all buffers (including marks)
+    <leader>bn      Jump next to different buffer
+    <leader>bp      Jump previous to different buffer
+    <leader>bN      Jump next within same buffer
+    <leader>bP      Jump previous within same buffer
+
+UI toggles: ~
+    <leader>us      Toggle spell check
+    <leader>uw      Toggle line wrapping
+    <leader>ur      Toggle reference highlighting
+    <leader>uR      Toggle reference highlighting (buffer only)
+
+Source: `lua/kyleking/core/keymaps.lua`, `lua/kyleking/deps/buffer.lua`
+
+-------------------------------------------------------------------------------
+4.3 LSP                                                *kyleking-keymaps-lsp*
+
+These keymaps attach only when an LSP server connects to a buffer.
+
+    <leader>ca      Code actions
+    <leader>cR      References (LSP, not picker)
+    <leader>cr      Rename symbol
+    <leader>cf      Format buffer (LSP)
+    <leader>cd      Line diagnostics (floating window)
+    <leader>cD      Diagnostics to location list
+
+Picker-based LSP navigation (see also |kyleking-pick|):
+
+    <leader>ld      Find in diagnostics
+    <leader>lgd     Go to definition
+    <leader>lgi     Go to implementation
+    <leader>lgr     Find references
+    <leader>lgs     Find document symbols
+    <leader>lgt     Go to type definition
+
+Source: `lua/kyleking/deps/lsp.lua`, `lua/kyleking/deps/fuzzy-finder.lua`
+See also: |lsp|, |vim.lsp.buf|, |kyleking-lsp-tools|
+
+-------------------------------------------------------------------------------
+4.4 Completion                                    *kyleking-keymaps-completion*
+
+Built-in LSP completion (nvim 0.11+), manually triggered.
+
+    <C-Space>       Trigger completion
+    <C-j>           Next item in completion menu
+    <C-k>           Previous item
+    <C-CR>          Accept selected completion
+    <CR>            Abort completion and insert newline
+
+Source: `lua/kyleking/core/lsp.lua`
+See also: |lsp-completion|, |ins-completion|
+
+===============================================================================
+5. PLUGIN GUIDES                                          *kyleking-plugins*
+
+Each subsection covers a plugin group: what it does, its keybindings,
+practical tips, and upstream help references.
+
+-------------------------------------------------------------------------------
+5.1 Fuzzy Finding (mini.pick)                              *kyleking-pick*
+
+Fuzzy finder for files, buffers, grep, help, keymaps, and more. Uses
+mini.pick with mini.extra for additional pickers.
+
+Window: 80% of screen, centered, rounded border.
+
+Navigation inside picker: ~
+    <C-j>           Move down
+    <C-k>           Move up
+    <C-Space>       Refine results (narrow down)
+    <CR>            Accept selection
+    <Esc>           Close picker
+
+Core: ~
+    <leader><CR>    Resume last picker
+    <leader>;       Find in open buffers
+
+Buffer pickers: ~
+    <leader>bb      Find word in current buffer
+    <leader>bL      Find lines across all buffers
+    <leader>br      Find recently opened files
+
+Git: ~
+    <leader>gf      Find in git files
+
+File operations: ~
+    <leader>ff      Find in files (via git)
+    <leader>fe      Explore files with picker
+    <leader>fw      Find word in files (live grep)
+    <leader>f*      Find word from visual selection (visual mode)
+
+Other pickers: ~
+    <leader>fB      Find in pickers (list all available pickers)
+    <leader>f'      Find marks
+    <leader>fC      Find commands
+    <leader>fh      Find in nvim help
+    <leader>fH      Find in command/search history
+    <leader>fk      Find keymaps
+    <leader>fl      Find in quickfix/location lists
+    <leader>fr      Find registers
+    <leader>ft      Find in TODOs (FIXME, NOTE, PLANNED, etc.)
+
+Tips: ~
+- `<C-Space>` refines: type a query, refine, type another query to
+  progressively narrow results.
+- `<leader>fB` lists all built-in pickers -- useful for discovering what
+  is available.
+
+Source: `lua/kyleking/deps/fuzzy-finder.lua`
+See also: |MiniPick|, |MiniExtra|
+
+-------------------------------------------------------------------------------
+5.2 File Explorer (mini.files)                             *kyleking-files*
+
+Miller-column file explorer with preview. Navigate, create, rename, and
+delete files directly.
+
+    <leader>e       Toggle explorer (opens at current file)
+
+Inside mini.files: ~
+    h / l           Navigate up / into directory
+    j / k           Move cursor down / up
+    =               Synchronize (apply pending changes)
+    `w`             Bookmark: jump to working directory
+
+Editing files: ~
+- Type a new filename in the explorer to create a file
+- Delete a line to delete a file
+- Rename by editing the filename in place
+- Press `=` to apply all pending changes
+
+Filtered entries: `.git`, `.venv`, `node_modules`, `__pycache__`, and
+other common non-project directories are hidden.
+
+Source: `lua/kyleking/deps/file-explorer.lua`
+See also: |MiniFiles|
+
+-------------------------------------------------------------------------------
+5.3 Surround (mini.surround)                            *kyleking-surround*
+
+Add, delete, find, and replace surrounding pairs (quotes, brackets,
+function calls, etc.).
+
+    sa{motion}{char}  Add surrounding (e.g., `saiw"` wraps word in quotes)
+    sd{char}          Delete surrounding (e.g., `sd"` removes quotes)
+    sr{old}{new}      Replace surrounding (e.g., `sr"'` changes " to ')
+    sf{char}          Find surrounding (to right)
+    sF{char}          Find surrounding (to left)
+    sh{char}          Highlight surrounding
+    sn                Update n_lines search range
+
+Custom surroundings: ~
+    f                 Function call: `saiwf` prompts for function name and
+                      wraps with `func(...)`. `sdf` with function name to
+                      unwrap.
+
+`s` is disabled in normal/visual mode to avoid conflict. Use `cl` instead.
+
+Source: `lua/kyleking/deps/editing-support.lua`
+See also: |MiniSurround|
+
+-------------------------------------------------------------------------------
+5.4 Comment (mini.comment)                               *kyleking-comment*
+
+Toggle comments using treesitter-aware commentstring.
+
+    gc{motion}      Toggle comment (e.g., `gcip` comments paragraph)
+    gcc             Toggle comment on current line
+    gc (visual)     Toggle comment on selection
+
+Supports embedded languages (e.g., JS inside HTML) via treesitter.
+
+Source: `lua/kyleking/deps/editing-support.lua`
+See also: |MiniComment|
+
+-------------------------------------------------------------------------------
+5.5 Move (mini.move)                                       *kyleking-move*
+
+Move lines or visual selections in any direction.
+
+    <leader>mh      Move left
+    <leader>ml      Move right
+    <leader>mj      Move down
+    <leader>mk      Move up
+
+Works in both Normal mode (moves current line) and Visual mode (moves
+selection). Auto-indents when moving vertically.
+
+Source: `lua/kyleking/deps/editing-support.lua`
+See also: |MiniMove|
+
+-------------------------------------------------------------------------------
+5.6 Clue / Which-key (mini.clue)                           *kyleking-clue*
+
+Displays available keybinding continuations after a 500ms delay. Triggers
+on these prefixes:
+
+    <Leader>        All leader mappings
+    <C-x>           Built-in completion
+    g               Go-to / miscellaneous
+    ' / `           Marks
+    "               Registers
+    <C-r>           Registers (Insert/Command mode)
+    <C-w>           Window commands (with submodes for move/resize)
+    z               Folds, spelling, scrolling
+    [ / ]           Bracket navigation (prev/next)
+
+Tips: ~
+- Wait 500ms on any trigger prefix to see all continuations.
+- Scroll the clue window with `<C-d>` / `<C-u>`.
+- Register clue shows register contents inline.
+
+Source: `lua/kyleking/deps/keybinding.lua`
+See also: |MiniClue|
+
+-------------------------------------------------------------------------------
+5.7 Git (mini.diff, mini.git, diffview)                      *kyleking-git*
+
+Inline diff signs and git integration.
+
+    <leader>ugd     Toggle git diff overlay (full inline diff)
+
+mini.diff shows change signs in the sign column. mini.git provides
+statusline integration.
+
+diffview.nvim is available for side-by-side diff viewing: >
+    :DiffviewOpen
+    :DiffviewClose
+<
+Source: `lua/kyleking/deps/git.lua`
+See also: |MiniDiff|, |MiniGit|
+
+-------------------------------------------------------------------------------
+5.8 Flash (motion/jumping)                                  *kyleking-flash*
+
+Jump to any visible location with minimal keystrokes.
+
+    <Alt-s>         Flash jump (normal, visual, operator-pending)
+    <Alt-S>         Flash Treesitter (select treesitter node)
+    <C-s>           Toggle Flash Search (in command-line `/` search)
+
+Flash labels visible matches so you can jump with 1-2 keystrokes.
+Treesitter mode selects entire syntax nodes.
+
+nap.nvim is also loaded for `[` / `]` bracket navigation pairs.
+
+Source: `lua/kyleking/deps/motion.lua`
+See also: https://github.com/folke/flash.nvim
+
+-------------------------------------------------------------------------------
+5.9 Treesitter & Text Objects                           *kyleking-treesitter*
+
+Syntax-aware highlighting, folding, indentation, and incremental
+selection powered by nvim-treesitter.
+
+Incremental selection: ~
+    <C-Space>       Init selection / expand to larger node
+    <C-s>           Expand to enclosing scope
+    <M-,>           Shrink selection (node decremental)
+
+Features: ~
+- Syntax highlighting (disabled for large buffers)
+- Treesitter-based folding (see |kyleking-folds|)
+- Auto-indent
+- Language-aware commenting (used by mini.comment)
+- 40+ language parsers auto-installed
+
+mkdx is loaded for additional markdown editing support.
+
+Source: `lua/kyleking/deps/syntax.lua`
+See also: |nvim-treesitter|, |treesitter|
+
+-------------------------------------------------------------------------------
+5.10 LSP, Linting & Formatting                          *kyleking-lsp-tools*
+
+LSP servers: ~
+    gopls           Go
+    lua_ls          Lua
+    pyright         Python
+    ts_ls           TypeScript/JavaScript
+
+Signature help: ~
+    <leader>ks      Toggle signature help (normal and insert mode)
+
+Linting (nvim-lint, auto-triggers on BufEnter/BufWritePost/InsertLeave): ~
+    <leader>ll      Trigger linting for current file
+
+    Linters by filetype:
+    css: stylelint | go: golangcilint | js/jsx: oxlint | lua: selene
+    python: ruff | sh: shellcheck | ts/tsx: oxlint | yaml: yamllint
+    zsh: zsh
+
+Formatting (conform.nvim): ~
+    <leader>lf      Format file or range (normal and visual mode)
+
+    Formatters by filetype:
+    bash: beautysh | css/html/json/yaml: prettier | go: golangci-lint, golines
+    js/ts: prettier | lua: stylua | markdown: mdformat | python: ruff
+    sh: shfmt | all files: typos (spell-checking)
+
+Source: `lua/kyleking/deps/lsp.lua`, `lua/kyleking/deps/formatting.lua`
+See also: |lspconfig|, |kyleking-keymaps-lsp|
+
+-------------------------------------------------------------------------------
+5.11 Codanna (semantic search)                            *kyleking-codanna*
+
+Semantic code analysis beyond syntactic search. Capital letters distinguish
+semantic operations from LSP equivalents.
+
+    <leader>lsc     Calls FROM symbol (outgoing calls)
+    <leader>lsC     Callers OF symbol (incoming calls)
+    <leader>lsd     Search documentation
+    <leader>lsi     Impact analysis (what code is affected)
+    <leader>lss     Semantic search (natural language code queries)
+    <leader>lsS     Browse symbols
+
+When to use codanna vs LSP: ~
 - LSP (`<leader>lg*`): quick navigation, definitions, references
 - Codanna (`<leader>ls*`): cross-file impact, call hierarchies, NL queries
 
-Requires the `codanna` CLI. Install via `cargo install codanna` or binary
-release. Configuration in `lua/kyleking/deps/fuzzy-finder.lua`.
+Requires the `codanna` CLI: `cargo install codanna` or binary release.
+Supported: Rust, Python, JS, TS, Go, Java, C, C++, C#, Swift, Kotlin,
+PHP, GDScript. Limited value for Lua and Bash.
 
-Supported languages: Rust, Python, JS, TS, Go, Java, C, C++, C#, Swift,
-Kotlin, PHP, GDScript. Limited value for Lua and Bash.
-
--------------------------------------------------------------------------------
-2.6 Buffer Mappings                                  *kyleking-keymaps-buffer*
-
-<leader>bw      Wipeout buffer (including marks)
-<leader>bW      Wipeout all buffers (including marks)
+Source: `lua/kyleking/deps/fuzzy-finder.lua`
+See also: https://github.com/KyleKing/codanna.nvim
 
 -------------------------------------------------------------------------------
-2.7 Testing Mappings                                *kyleking-keymaps-testing*
+5.12 Terminal Integration                               *kyleking-terminal*
 
-<leader>ta      Run all tests
-<leader>tf      Run failed tests
+Shell terminal runs in a dedicated tab. TUI apps run in floating windows.
 
-===============================================================================
-3. PLUGINS                                            *kyleking-neovim-plugins*
+Shell tab: ~
+    <leader>tt      Toggle shell tab (normal and terminal mode)
+    <C-'>           Toggle shell tab (alternative binding)
 
-All plugins are managed through mini.deps, not lazy.nvim. Each `deps/*.lua`
-file groups related plugins by functionality.
+TUI applications (floating): ~
+    <leader>gg      lazygit (respects git worktrees)
+    <leader>gj      lazyjj
+    <leader>td      lazydocker
 
--------------------------------------------------------------------------------
-3.1 mini.nvim                                          *kyleking-plugins-mini*
+Tips: ~
+- The shell tab preserves its buffer across toggles.
+- TUI floats use 90% of the screen with rounded borders.
+- When the TUI process exits, the float closes and cleans up.
 
-The configuration uses mini.nvim modules heavily instead of standalone plugins:
-mini.pick (fuzzy finder), mini.files (file explorer), mini.diff/mini.git
-(git), mini.hipatterns (keyword highlights), mini.surround, mini.move,
-mini.clue (which-key), mini.comment, mini.trailspace, and more.
-
--------------------------------------------------------------------------------
-3.2 Fuzzy Finding (mini.pick)                          *kyleking-plugins-pick*
-
-Fuzzy finding uses mini.pick and mini.extra pickers. Configured in
-`lua/kyleking/deps/fuzzy-finder.lua`.
-
-See |kyleking-keymaps-pick| for all key mappings.
+Source: `lua/kyleking/deps/terminal-integration.lua`
 
 -------------------------------------------------------------------------------
-3.3 Codanna Semantic Search                         *kyleking-plugins-codanna*
+5.13 Color & UI                                                *kyleking-ui*
 
-Codanna provides semantic code understanding beyond syntactic search.
-Configured in `lua/kyleking/deps/fuzzy-finder.lua`.
+Colorscheme: nightfox with custom highlights. `dim_inactive = true`.
 
-Setup: >lua
-    require("codanna").setup({
-        picker = "mini.pick",
-        timeout = 5000,
-        cache_results = true,
-    })
-<
+Color tools (ccc.nvim): ~
+    <leader>ucC     Toggle color highlighting (inline hex/rgb preview)
+    <leader>ucc     Convert color format (hex <-> rgb <-> hsl)
+    <leader>ucp     Pick color (interactive color picker)
 
-See |kyleking-keymaps-codanna| for keybindings and usage guidance.
+vim-illuminate: ~
+    ]r              Jump to next reference of word under cursor
+    [r              Jump to previous reference
+    <leader>ur      Toggle reference highlighting
+    <leader>uR      Toggle reference highlighting (buffer only)
 
-Troubleshooting:
-- Plugin fails to load: verify `codanna` CLI with `which codanna`
-- Slow queries: increase timeout or run `codanna index` if supported
-- No results: check language support and ensure code is indexed
+Highlighted keywords (mini.hipatterns): ~
+    FIXME, HACK, TODO, NOTE, FYI, PLANNED, WARNING, PERF, TEST
+    Each is highlighted inline. Use `<leader>ft` to search for them.
+
+highlight-undo.nvim: ~
+    Undo/redo changes are briefly highlighted to show what changed.
+
+Statusline (mini.statusline): ~
+    Shows mode, git branch, diagnostics, dynamic filename, location.
+    Disabled in temp sessions (Claude Code, git commits).
+
+Column rulers (multicolumn.nvim): ~
+    Lua: 120 columns. Python: 80 and 120 columns.
+
+Source: `lua/kyleking/deps/colorscheme.lua`, `lua/kyleking/deps/color.lua`,
+`lua/kyleking/deps/bars-and-lines.lua`, `lua/kyleking/deps/editing-support.lua`
+See also: |kyleking-config|
 
 -------------------------------------------------------------------------------
-3.4 patch_it.nvim                                   *kyleking-plugins-patchit*
+5.14 patch_it.nvim                                        *kyleking-patchit*
 
-Apply LLM-generated patches with fuzzy matching. Configured in
-`lua/kyleking/deps/utility.lua`.
+Apply LLM-generated patches with fuzzy matching.
 
-Keybindings:
-
-<leader>paa     Apply patch - prompts for target file, applies buffer
-<leader>pap     Preview patch - dry-run showing what would change
-<leader>pab     Apply with auto-suggest - suggests target from buffer name
+    <leader>paa     Apply patch -- prompts for target file, applies buffer
+    <leader>pap     Preview patch -- dry-run showing what would change
+    <leader>pab     Apply with auto-suggest -- suggests target from buffer name
 
 Workflow: ~
-
 1. Get an LLM-generated patch (from Claude, Code Rabbit, etc.)
 2. Paste into a buffer (`:enew` then paste; no save needed)
 3. Preview with `<leader>pap`, enter target file path
 4. Apply with `<leader>paa` if satisfied
 5. Undo with `u` if incorrect
 
-Features:
+Features: ~
 - Fuzzy matching tolerates whitespace differences
 - Accepts patches with or without space-prefixed context lines
 - Handles interleaved additions and removals within a hunk
 - Single-hunk, single-file per patch (apply one at a time)
+
+Command: `:PatchApply path/to/target.lua`
 
 Lua API: >lua
     local patch_it = require("patch_it")
@@ -236,65 +832,124 @@ Lua API: >lua
     patch_it.apply_buffer("target.lua")
     patch_it.apply_buffer("target.lua", { preview = true })
 <
-Command: `:PatchApply path/to/target.lua`
+Source: `lua/kyleking/deps/utility.lua`
+See also: https://github.com/KyleKing/patch_it.nvim
 
 -------------------------------------------------------------------------------
-3.5 LSP Support                                        *kyleking-plugins-lsp*
+5.15 Other Utilities                                    *kyleking-utilities*
 
-LSP configurations are in `lua/kyleking/deps/lsp.lua`.
-See |kyleking-keymaps-lsp| for key mappings.
+gx.nvim: ~
+    gx (n, x)       Open URL or file path under cursor (uses ecosia)
 
--------------------------------------------------------------------------------
-3.6 Colorscheme & UI                                     *kyleking-plugins-ui*
+url-open: ~
+    <leader>uu      Open URL under cursor
 
-The configuration uses nightfox colorscheme with custom highlights for
-line numbers, configured in `lua/kyleking/deps/colorscheme.lua`.
+vim-dirtytalk: ~
+    Extends spell dictionary with programming terms.
+    <leader>pzs     Sort English spell dictionary file
 
-Theme colors are accessed via `require("kyleking.theme").get_colors()`.
+vim-spellsync: ~
+    Automatically syncs spell files.
 
--------------------------------------------------------------------------------
-3.7 File Explorer                                  *kyleking-plugins-explorer*
+nap.nvim: ~
+    Provides `[` and `]` bracket-pair navigation for various Vim lists
+    (buffers, quickfix, diagnostics, etc.). See `:h nap.nvim`.
 
-File explorer uses mini.files. Configured in
-`lua/kyleking/deps/file-explorer.lua`.
-
--------------------------------------------------------------------------------
-3.8 Git Integration                                    *kyleking-plugins-git*
-
-Git integration via mini.diff, mini.git, and additional plugins.
-Configured in `lua/kyleking/deps/git.lua`.
-
--------------------------------------------------------------------------------
-3.9 Terminal Integration                           *kyleking-plugins-terminal*
-
-Terminal integration allows for using terminal features within Neovim.
-Configured in `lua/kyleking/deps/terminal-integration.lua`.
+Source: `lua/kyleking/deps/utility.lua`, `lua/kyleking/deps/motion.lua`
 
 ===============================================================================
-4. CUSTOM COMMANDS                                  *kyleking-neovim-commands*
+6. CUSTOM COMMANDS                                        *kyleking-commands*
 
-:RunAllTests    Run all Mini.test test files
-:RunFailedTests Run only failed tests from last run
-:PatchApply     Apply patch from current buffer to target file
+    :RunAllTests        Run all mini.test test files (floating window)
+    :RunFailedTests     Run only failed tests from last run
+    :PatchApply {file}  Apply patch from current buffer to {file}
+    :DiffviewOpen       Open side-by-side git diff viewer
+    :DiffviewClose      Close diffview
+
+See also: |kyleking-testing|, |kyleking-patchit|
 
 ===============================================================================
-5. TESTING FRAMEWORK                                 *kyleking-neovim-testing*
+7. TESTING                                                *kyleking-testing*
 
-Tests use mini.test (not plenary or busted). Test files live in `lua/tests/`
-and follow `*_spec.lua` naming.
+Tests use mini.test. Test files live in `lua/tests/` and follow `*_spec.lua`
+naming. Commands and keymaps are only available when cwd is the config
+directory.
 
-Key mappings for testing:
-<leader>ta      Run all tests
-<leader>tf      Run failed tests
-
-Commands for testing:
-:RunAllTests    Run all Mini.test test files
-:RunFailedTests Run only failed tests from last run
+    <leader>ta      Run all tests
+    <leader>tf      Run failed tests from last run
+    :RunAllTests    Run all mini.test test files
+    :RunFailedTests Run only failed tests from last run
 
 From command line: >bash
     nvim --headless -c "lua MiniTest.run()" -c "qall!"
     nvim --headless -c "lua MiniTest.run_file('lua/tests/core/smoke_spec.lua')" -c "qall!"
 <
+Test results display in a floating window (80% of screen). Press `q` or
+`<Esc>` to close. Failed tests are tracked for re-running with
+`:RunFailedTests`.
+
+Test file pattern: >lua
+    local MiniTest = require("mini.test")
+    local helpers = require("tests.helpers")
+
+    local T = MiniTest.new_set({ hooks = { pre_case = function() end } })
+    T["group"] = MiniTest.new_set()
+    T["group"]["case name"] = function()
+        MiniTest.expect.equality(actual, expected, "message")
+    end
+
+    if ... == nil then MiniTest.run() end
+    return T
+<
+Source: `lua/kyleking/setup-deps.lua`
+See also: |MiniTest|
+
+===============================================================================
+8. LEARNING NOTES                                           *kyleking-notes*
+
+Personal learning notes and references. Edit freely.
+
+-------------------------------------------------------------------------------
+8.1 Modern Vim (PragProg)                         *kyleking-notes-modern-vim*
+
+Quickfix workflows: ~
+
+
+Terminal emulator: ~
+
+
+Sessions & persistent undo: ~
+
+
+Autocommands: ~
+
+
+-------------------------------------------------------------------------------
+8.2 Learn Neovim (ofirgall)                      *kyleking-notes-learn-nvim*
+
+The Vim language (operators + motions): ~
+
+
+Movements & operators: ~
+
+
+Text objects: ~
+
+
+Registers deep dive: ~
+
+
+Macros: ~
+
+
+Vim goodies (quickfix, substitute, global, folds): ~
+
+
+-------------------------------------------------------------------------------
+8.3 Tips & Tricks                                    *kyleking-notes-tips*
+
+
+
 
 ===============================================================================
 vim:tw=78:ts=8:ft=help:norl:
