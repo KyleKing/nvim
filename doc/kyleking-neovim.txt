@@ -9,20 +9,23 @@ CONTENTS                                              *kyleking-neovim-contents*
     2. Key Mappings .......................... |kyleking-neovim-keymaps|
        2.1 General Mappings .................. |kyleking-keymaps-general|
        2.2 Leader Mappings ................... |kyleking-keymaps-leader|
-       2.3 Telescope Mappings ................ |kyleking-keymaps-telescope|
+       2.3 Fuzzy Finding (mini.pick) ......... |kyleking-keymaps-pick|
        2.4 LSP Mappings ...................... |kyleking-keymaps-lsp|
-       2.5 Buffer Mappings ................... |kyleking-keymaps-buffer|
-       2.6 Testing Mappings .................. |kyleking-keymaps-testing|
-    3. Plugins .............................. |kyleking-neovim-plugins|
+       2.5 Codanna (Semantic Search) ......... |kyleking-keymaps-codanna|
+       2.6 Buffer Mappings ................... |kyleking-keymaps-buffer|
+       2.7 Testing Mappings .................. |kyleking-keymaps-testing|
+    3. Plugins ............................... |kyleking-neovim-plugins|
        3.1 mini.nvim ........................ |kyleking-plugins-mini|
-       3.2 Fuzzy Finding (Telescope) ........ |kyleking-plugins-telescope|
-       3.3 LSP Support ...................... |kyleking-plugins-lsp|
-       3.4 Colorscheme & UI ................. |kyleking-plugins-ui|
-       3.5 File Explorer .................... |kyleking-plugins-explorer|
-       3.6 Git Integration .................. |kyleking-plugins-git|
-       3.7 Terminal Integration ............. |kyleking-plugins-terminal|
-    4. Custom Commands ...................... |kyleking-neovim-commands|
-    5. Testing Framework .................... |kyleking-neovim-testing|
+       3.2 Fuzzy Finding (mini.pick) ........ |kyleking-plugins-pick|
+       3.3 Codanna Semantic Search .......... |kyleking-plugins-codanna|
+       3.4 patch_it.nvim .................... |kyleking-plugins-patchit|
+       3.5 LSP Support ...................... |kyleking-plugins-lsp|
+       3.6 Colorscheme & UI ................. |kyleking-plugins-ui|
+       3.7 File Explorer .................... |kyleking-plugins-explorer|
+       3.8 Git Integration .................. |kyleking-plugins-git|
+       3.9 Terminal Integration ............. |kyleking-plugins-terminal|
+    4. Custom Commands ....................... |kyleking-neovim-commands|
+    5. Testing Framework ..................... |kyleking-neovim-testing|
 
 ===============================================================================
 1. INTRODUCTION                                    *kyleking-neovim-introduction*
@@ -30,12 +33,11 @@ CONTENTS                                              *kyleking-neovim-contents*
 This is the documentation for KyleKing's Neovim configuration.
 
 The configuration is organized in a modular structure:
-- Core settings in |lua/kyleking/core/|
-- Plugins managed by mini.deps in |lua/kyleking/deps/|
-- LSP configurations in |lua/kyleking/plugins/lsp/|
-- Utility functions in |lua/kyleking/utils/|
+- Core settings in `lua/kyleking/core/`
+- Plugins managed by mini.deps in `lua/kyleking/deps/`
+- Custom utilities in `lua/kyleking/custom/`
 
-Leader key is mapped to <Space> and local leader key is mapped to comma (",").
+Leader key: <Space>    Local leader: ","
 
 ===============================================================================
 2. KEY MAPPINGS                                        *kyleking-neovim-keymaps*
@@ -77,49 +79,84 @@ Tab operations:
 <leader>ttc     Close tab
 
 -------------------------------------------------------------------------------
-2.3 Telescope Mappings                             *kyleking-keymaps-telescope*
+2.3 Fuzzy Finding (mini.pick)                           *kyleking-keymaps-pick*
 
-<leader><CR>    Resume last Telescope session
+Core pickers:
+<leader><CR>    Resume last picker
 <leader>;       Find in open buffers
 
 Buffer related:
+<leader>bb      Find word in current buffer
+<leader>bL      Find lines across all buffers
 <leader>br      Find recently opened files
-<leader>bb      Fuzzy find in current buffer
-
-File operations:
-<leader>ff      Find files (including hidden)
-<leader>fw      Find word in files (live grep)
-<leader>f*      Find word from visual selection
 
 Git operations:
 <leader>gf      Find in git files
 
-Other Telescope:
-<leader>fB      Find in Telescope builtins
+File operations:
+<leader>ff      Find in files
+<leader>fe      Explore files with picker
+<leader>fw      Find word in files (live grep)
+<leader>f*      Find word from visual selection (visual mode)
+
+Other pickers:
+<leader>fB      Find in pickers (list all available pickers)
 <leader>f'      Find marks
 <leader>fC      Find commands
-<leader>fh      Find in Neovim help
+<leader>fh      Find in nvim help
+<leader>fH      Find in command/search history
 <leader>fk      Find keymaps
+<leader>fl      Find in quickfix/location lists
 <leader>fr      Find registers
+
+Inside mini.pick windows:
+<C-j>           Move down
+<C-k>           Move up
+<C-Space>       Refine results
 
 -------------------------------------------------------------------------------
 2.4 LSP Mappings                                       *kyleking-keymaps-lsp*
 
 <leader>ld      Find in diagnostics
-<leader>lgs     Find document symbols
 <leader>lgd     Go to definition
 <leader>lgi     Go to implementation
 <leader>lgr     Find references
+<leader>lgs     Find document symbols
 <leader>lgt     Go to type definition
 
 -------------------------------------------------------------------------------
-2.5 Buffer Mappings                                  *kyleking-keymaps-buffer*
+2.5 Codanna (Semantic Search)                       *kyleking-keymaps-codanna*
+
+Semantic search operations complement LSP with cross-file analysis.
+Capital letters distinguish semantic operations from LSP equivalents.
+
+Prefix: <leader>ls
+
+<leader>lsc     Calls FROM symbol (outgoing calls)
+<leader>lsC     Callers OF symbol (incoming calls)
+<leader>lsd     Search documentation
+<leader>lsi     Impact analysis (what code is affected by this symbol)
+<leader>lss     Semantic search (natural language code queries)
+<leader>lsS     Browse symbols
+
+When to use codanna vs LSP:
+- LSP (`<leader>lg*`): quick navigation, definitions, references
+- Codanna (`<leader>ls*`): cross-file impact, call hierarchies, NL queries
+
+Requires the `codanna` CLI. Install via `cargo install codanna` or binary
+release. Configuration in `lua/kyleking/deps/fuzzy-finder.lua`.
+
+Supported languages: Rust, Python, JS, TS, Go, Java, C, C++, C#, Swift,
+Kotlin, PHP, GDScript. Limited value for Lua and Bash.
+
+-------------------------------------------------------------------------------
+2.6 Buffer Mappings                                  *kyleking-keymaps-buffer*
 
 <leader>bw      Wipeout buffer (including marks)
 <leader>bW      Wipeout all buffers (including marks)
 
 -------------------------------------------------------------------------------
-2.6 Testing Mappings                                *kyleking-keymaps-testing*
+2.7 Testing Mappings                                *kyleking-keymaps-testing*
 
 <leader>ta      Run all tests
 <leader>tf      Run failed tests
@@ -127,80 +164,124 @@ Other Telescope:
 ===============================================================================
 3. PLUGINS                                            *kyleking-neovim-plugins*
 
-This section documents the plugins and their configurations.
+All plugins are managed through mini.deps, not lazy.nvim. Each `deps/*.lua`
+file groups related plugins by functionality.
 
 -------------------------------------------------------------------------------
 3.1 mini.nvim                                          *kyleking-plugins-mini*
 
-The configuration uses mini.nvim as a plugin manager through mini.deps. The
-core plugins are installed and managed automatically.
+The configuration uses mini.nvim modules heavily instead of standalone plugins:
+mini.pick (fuzzy finder), mini.files (file explorer), mini.diff/mini.git
+(git), mini.hipatterns (keyword highlights), mini.surround, mini.move,
+mini.clue (which-key), mini.comment, mini.trailspace, and more.
 
 -------------------------------------------------------------------------------
-3.2 Fuzzy Finding (Telescope)                      *kyleking-plugins-telescope*
+3.2 Fuzzy Finding (mini.pick)                          *kyleking-plugins-pick*
 
-Telescope is configured for fuzzy finding files, text, and various Neovim
-entities. See |kyleking-keymaps-telescope| for key mappings.
+Fuzzy finding uses mini.pick and mini.extra pickers. Configured in
+`lua/kyleking/deps/fuzzy-finder.lua`.
 
-Telescope extensions:
-- zf-native: For faster performance
-- live-grep-args: For advanced grep capabilities with arguments
-
-Telescope configuration highlights:
-- Prompt at top with ascending sort
-- Custom layout with optimized preview width
-- Custom key mappings in insert mode
-- Auto quoting in live grep args
+See |kyleking-keymaps-pick| for all key mappings.
 
 -------------------------------------------------------------------------------
-3.3 LSP Support                                        *kyleking-plugins-lsp*
+3.3 Codanna Semantic Search                         *kyleking-plugins-codanna*
 
-LSP (Language Server Protocol) support is provided through Mason and
-related plugins. See |kyleking-keymaps-lsp| for LSP-related key mappings.
+Codanna provides semantic code understanding beyond syntactic search.
+Configured in `lua/kyleking/deps/fuzzy-finder.lua`.
 
--------------------------------------------------------------------------------
-3.4 Colorscheme & UI                                     *kyleking-plugins-ui*
+Setup: >lua
+    require("codanna").setup({
+        picker = "mini.pick",
+        timeout = 5000,
+        cache_results = true,
+    })
+<
 
-The configuration uses nightfox colorscheme with custom highlights for line
-numbers.
+See |kyleking-keymaps-codanna| for keybindings and usage guidance.
 
-UI features:
-- Dim inactive windows
-- Custom line number styling with nord-inspired colors
-
--------------------------------------------------------------------------------
-3.5 File Explorer                                  *kyleking-plugins-explorer*
-
-File explorer functionality is available for browsing and managing the file
-system.
-
--------------------------------------------------------------------------------
-3.6 Git Integration                                    *kyleking-plugins-git*
-
-Git integration provides tools for working with Git repositories directly
-from Neovim.
+Troubleshooting:
+- Plugin fails to load: verify `codanna` CLI with `which codanna`
+- Slow queries: increase timeout or run `codanna index` if supported
+- No results: check language support and ensure code is indexed
 
 -------------------------------------------------------------------------------
-3.7 Terminal Integration                           *kyleking-plugins-terminal*
+3.4 patch_it.nvim                                   *kyleking-plugins-patchit*
+
+Apply LLM-generated patches with fuzzy matching. Configured in
+`lua/kyleking/deps/utility.lua`.
+
+Keybindings:
+
+<leader>paa     Apply patch - prompts for target file, applies buffer
+<leader>pap     Preview patch - dry-run showing what would change
+<leader>pab     Apply with auto-suggest - suggests target from buffer name
+
+Workflow: ~
+
+1. Get an LLM-generated patch (from Claude, Code Rabbit, etc.)
+2. Paste into a buffer (`:enew` then paste; no save needed)
+3. Preview with `<leader>pap`, enter target file path
+4. Apply with `<leader>paa` if satisfied
+5. Undo with `u` if incorrect
+
+Features:
+- Fuzzy matching tolerates whitespace differences
+- Accepts patches with or without space-prefixed context lines
+- Handles interleaved additions and removals within a hunk
+- Single-hunk, single-file per patch (apply one at a time)
+
+Lua API: >lua
+    local patch_it = require("patch_it")
+    patch_it.apply(patch_string, "target.lua")
+    patch_it.apply_buffer("target.lua")
+    patch_it.apply_buffer("target.lua", { preview = true })
+<
+Command: `:PatchApply path/to/target.lua`
+
+-------------------------------------------------------------------------------
+3.5 LSP Support                                        *kyleking-plugins-lsp*
+
+LSP configurations are in `lua/kyleking/deps/lsp.lua`.
+See |kyleking-keymaps-lsp| for key mappings.
+
+-------------------------------------------------------------------------------
+3.6 Colorscheme & UI                                     *kyleking-plugins-ui*
+
+The configuration uses nightfox colorscheme with custom highlights for
+line numbers, configured in `lua/kyleking/deps/colorscheme.lua`.
+
+Theme colors are accessed via `require("kyleking.theme").get_colors()`.
+
+-------------------------------------------------------------------------------
+3.7 File Explorer                                  *kyleking-plugins-explorer*
+
+File explorer uses mini.files. Configured in
+`lua/kyleking/deps/file-explorer.lua`.
+
+-------------------------------------------------------------------------------
+3.8 Git Integration                                    *kyleking-plugins-git*
+
+Git integration via mini.diff, mini.git, and additional plugins.
+Configured in `lua/kyleking/deps/git.lua`.
+
+-------------------------------------------------------------------------------
+3.9 Terminal Integration                           *kyleking-plugins-terminal*
 
 Terminal integration allows for using terminal features within Neovim.
+Configured in `lua/kyleking/deps/terminal-integration.lua`.
 
 ===============================================================================
 4. CUSTOM COMMANDS                                  *kyleking-neovim-commands*
 
 :RunAllTests    Run all Mini.test test files
 :RunFailedTests Run only failed tests from last run
+:PatchApply     Apply patch from current buffer to target file
 
 ===============================================================================
 5. TESTING FRAMEWORK                                 *kyleking-neovim-testing*
 
-The configuration includes a Mini.test framework for running tests. This is
-primarily used when the current working directory matches the Neovim config
-directory.
-
-Test configuration highlights:
-- Baseline directory at ~/.config/nvim/mini-deps-snap
-- Case timing in verbose mode
-- Stop on first error in summary
+Tests use mini.test (not plenary or busted). Test files live in `lua/tests/`
+and follow `*_spec.lua` naming.
 
 Key mappings for testing:
 <leader>ta      Run all tests
@@ -209,6 +290,11 @@ Key mappings for testing:
 Commands for testing:
 :RunAllTests    Run all Mini.test test files
 :RunFailedTests Run only failed tests from last run
+
+From command line: >bash
+    nvim --headless -c "lua MiniTest.run()" -c "qall!"
+    nvim --headless -c "lua MiniTest.run_file('lua/tests/core/smoke_spec.lua')" -c "qall!"
+<
 
 ===============================================================================
 vim:tw=78:ts=8:ft=help:norl:
