@@ -9,5 +9,5 @@ later(function()
     add("lewis6991/gitsigns.nvim")
     require("gitsigns").setup()
 
-    vim.keymap.set("n", "<leader>ugd", require("gitsigns").toggle_deleted, { desc = "toggle git show deleted" })
+    vim.keymap.set("n", "<leader>ugd", function() require("gitsigns").toggle_deleted() end, { desc = "toggle git show deleted" })
 end)
