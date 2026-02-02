@@ -28,7 +28,7 @@ My preference is for opinionated plugins that require minimal configuration.
     - Programming Language Support: [markdown-preview](https://github.com/KyleKing/nvim/commit/3a3b0c667e1b755f26443e5968168db08b460ff3)
     - Session: [auto-session](https://github.com/KyleKing/nvim/commit/7ae6899681355904b83a757f28f014295a0321d8)
     - UI: [colorful-winsep](https://github.com/KyleKing/nvim/commit/bd4c99d), [nvim-web-devicons](https://github.com/KyleKing/nvim/commit/35a72a3e57db9650f5df97cc00433a436a32c8aa)
-    - Utility: [dressing](https://github.com/KyleKing/nvim/commit/a58d2e9c71c25ac584cd1581295b8b68d0c516e9), [noice](https://github.com/KyleKing/nvim/commit/8a30f4d03c8271756ecd1659e241013e78788834), [structlog](https://github.com/KyleKing/nvim/commit/9e10e13), [todo-comments](https://github.com/KyleKing/nvim/commit/bd4c99d)
+    - Utility: [dressing](https://github.com/KyleKing/nvim/commit/a58d2e9c71c25ac584cd1581295b8b68d0c516e9), [gx.nvim](https://github.com/KyleKing/nvim/commit/9da0fae), [noice](https://github.com/KyleKing/nvim/commit/8a30f4d03c8271756ecd1659e241013e78788834), [structlog](https://github.com/KyleKing/nvim/commit/9e10e13), [todo-comments](https://github.com/KyleKing/nvim/commit/bd4c99d)
 - Removed, but would revisit
     - [kanban.nvim](https://github.com/KyleKing/nvim/commit/fba8b07ecd6b19495ba297a4e8a10f481eb0c939): removed while migrating to Mini.Deps and appeared to require `nvim-cmp`
 - I've replaced:
@@ -38,6 +38,7 @@ My preference is for opinionated plugins that require minimal configuration.
     - [leap.nvim and alternative motion plugins](https://github.com/KyleKing/nvim/commit/d93f43420229cf43fdc7cab12576d1af1f34b4e6) with `flash.nvim`
     - [lualine](https://github.com/KyleKing/nvim/commit/1f4ce89) with `mini.statusline`
     - [luacheck](https://github.com/KyleKing/nvim/commit/a76ebc1) with `selene`
+    - [mkdx](https://github.com/KyleKing/nvim/commit/61c56a2) with custom markdown/djot list editing and preview utilities
     - [nvim-cmp](https://github.com/KyleKing/nvim/commit/c9c09d96ab3be993f52150eec3bed26d93615ab7) with nvim 0.11+ built-in LSP completion
     - [quick-scope](https://github.com/KyleKing/nvim/commit/d93f43420229cf43fdc7cab12576d1af1f34b4e6) with `flash.nvim`
     - [reticle](https://github.com/KyleKing/nvim/commit/3297142) with `colorful-winsep`
