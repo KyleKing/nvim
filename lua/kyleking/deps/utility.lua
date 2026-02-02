@@ -62,6 +62,31 @@ later(function()
     -- })
 end)
 
+later(function()
+    add({
+        source = "KyleKing/patch_it.nvim",
+    })
+    local patch_it = require("patch_it")
+
+    -- Apply LLM-generated patches with fuzzy matching
+    vim.keymap.set("n", "<leader>paa", function()
+        local target = vim.fn.input("Target file: ", "", "file")
+        if target ~= "" then patch_it.apply_buffer(target) end
+    end, { desc = "Apply patch from buffer" })
+
+    vim.keymap.set("n", "<leader>pap", function()
+        local target = vim.fn.input("Target file: ", "", "file")
+        if target ~= "" then patch_it.apply_buffer(target, { preview = true }) end
+    end, { desc = "Preview patch from buffer" })
+
+    vim.keymap.set("n", "<leader>pab", function()
+        -- Apply to file matching current buffer name (common LLM workflow)
+        local current = vim.fn.expand("%:t")
+        local target = vim.fn.input("Target file: ", current, "file")
+        if target ~= "" then patch_it.apply_buffer(target) end
+    end, { desc = "Apply patch (auto-suggest target)" })
+end)
+
 later(function() add("micarmst/vim-spellsync") end)
 
 later(function()
