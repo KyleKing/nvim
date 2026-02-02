@@ -7,6 +7,8 @@
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
+local function resolve_leader(keys) return keys:gsub("<[Ll]eader>", vim.g.mapleader or "\\") end
+
 local T = MiniTest.new_set({
     hooks = {
         pre_case = function()
@@ -126,11 +128,15 @@ T["group descriptions"]["leader groups are defined"] = function()
 
     -- Expected groups
     local expected_groups = {
-        ["<Leader>S"] = "+Session",
         ["<Leader>b"] = "+Buffer",
+        ["<Leader>c"] = "+Code",
         ["<Leader>f"] = "+Find",
         ["<Leader>g"] = "+Git",
+        ["<Leader>k"] = "+Keys",
         ["<Leader>l"] = "+LSP",
+        ["<Leader>m"] = "+Move",
+        ["<Leader>p"] = "+Plugins",
+        ["<Leader>r"] = "+Register",
         ["<Leader>t"] = "+Terminal/Test",
         ["<Leader>u"] = "+UI",
     }
@@ -153,7 +159,6 @@ T["group descriptions"]["LSP subgroups are defined"] = function()
 
     MiniTest.expect.equality(groups["<Leader>lg"], "+LSP Go to", "LSP Go to group should exist")
     MiniTest.expect.equality(groups["<Leader>ls"], "+Semantic", "Semantic group should exist")
-    MiniTest.expect.equality(groups["<Leader>lw"], "+Workspace", "Workspace group should exist")
 end
 
 T["group descriptions"]["UI subgroups are defined"] = function()
@@ -351,21 +356,21 @@ end
 T["clue completeness"]["all leader group prefixes have descriptions"] = function()
     vim.wait(1000)
 
-    -- Get all keymaps that start with <Leader>
+    local leader = vim.g.mapleader or "\\"
     local keymaps = vim.api.nvim_get_keymap("n")
     local leader_prefixes = {}
 
     for _, keymap in ipairs(keymaps) do
         local lhs = keymap.lhs
-        -- Match <Leader> followed by 1-2 letters (group prefix)
-        local prefix = lhs:match("^<[Ll]eader>([%a]+)")
-        if prefix and #prefix <= 2 then
-            local full_prefix = "<Leader>" .. prefix
-            leader_prefixes[full_prefix] = true
+        if lhs:sub(1, #leader) == leader then
+            local suffix = lhs:sub(#leader + 1)
+            for len = 1, math.min(2, #suffix) do
+                local prefix = "<Leader>" .. suffix:sub(1, len)
+                leader_prefixes[prefix] = true
+            end
         end
     end
 
-    -- Check that all prefixes have clue descriptions
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
 
@@ -385,6 +390,98 @@ T["clue completeness"]["all leader group prefixes have descriptions"] = function
         #missing_clues,
         0,
         "All leader prefixes should have clue descriptions. Missing: " .. table.concat(missing_clues, ", ")
+    )
+end
+
+T["clue completeness"]["no orphan clue groups"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    local groups = {}
+    for _, clue in ipairs(config.clues) do
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
+            table.insert(groups, { keys = clue.keys, mode = clue.mode or "n" })
+        end
+    end
+
+    local orphans = {}
+    for _, group in ipairs(groups) do
+        local resolved_prefix = resolve_leader(group.keys)
+        local keymaps = vim.api.nvim_get_keymap(group.mode)
+        local has_child = false
+        for _, keymap in ipairs(keymaps) do
+            if keymap.lhs:sub(1, #resolved_prefix) == resolved_prefix and #keymap.lhs > #resolved_prefix then
+                has_child = true
+                break
+            end
+        end
+        if not has_child then table.insert(orphans, group.keys .. " (" .. group.mode .. ")") end
+    end
+
+    table.sort(orphans)
+
+    MiniTest.expect.equality(#orphans, 0, "Clue groups without any keymaps underneath: " .. table.concat(orphans, ", "))
+end
+
+T["group descriptions"]["no duplicate descriptions among siblings"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    local siblings = {}
+    for _, clue in ipairs(config.clues) do
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
+            local parent = clue.keys:match("^(.+).$") or ""
+            local mode = clue.mode or "n"
+            local key = parent .. "|" .. mode
+            siblings[key] = siblings[key] or {}
+            table.insert(siblings[key], { keys = clue.keys, desc = clue.desc })
+        end
+    end
+
+    local duplicates = {}
+    for _, group in pairs(siblings) do
+        local seen = {}
+        for _, entry in ipairs(group) do
+            if seen[entry.desc] then
+                table.insert(duplicates, entry.keys .. " duplicates " .. seen[entry.desc] .. " (" .. entry.desc .. ")")
+            else
+                seen[entry.desc] = entry.keys
+            end
+        end
+    end
+
+    table.sort(duplicates)
+
+    MiniTest.expect.equality(
+        #duplicates,
+        0,
+        "Duplicate descriptions among sibling groups: " .. table.concat(duplicates, ", ")
+    )
+end
+
+T["group descriptions"]["descriptions follow +Name pattern"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    local malformed = {}
+    for _, clue in ipairs(config.clues) do
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
+            if not clue.desc:match("^%+%u") then table.insert(malformed, clue.keys .. " -> " .. clue.desc) end
+        end
+    end
+
+    table.sort(malformed)
+
+    MiniTest.expect.equality(
+        #malformed,
+        0,
+        "Group descriptions should match +Name (uppercase after +): " .. table.concat(malformed, ", ")
     )
 end
 

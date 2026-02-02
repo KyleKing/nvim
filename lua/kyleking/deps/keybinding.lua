@@ -54,6 +54,8 @@ later(function()
             { mode = "n", keys = "<Leader>c", desc = "+Code" },
             { mode = "n", keys = "<Leader>f", desc = "+Find" },
             { mode = "n", keys = "<Leader>g", desc = "+Git" },
+            { mode = "n", keys = "<Leader>k", desc = "+Keys" },
+            { mode = "i", keys = "<Leader>k", desc = "+Keys" },
             { mode = "n", keys = "<Leader>l", desc = "+LSP" },
             { mode = "x", keys = "<Leader>l", desc = "+LSP" },
             { mode = "n", keys = "<Leader>lg", desc = "+LSP Go to" },
