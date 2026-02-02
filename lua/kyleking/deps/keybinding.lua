@@ -11,29 +11,37 @@ later(function()
     local miniclue = require("mini.clue")
 
     miniclue.setup({
+        -- Each trigger must use a string mode, not a table (nvim_get_keymap rejects tables)
         triggers = {
             -- Leader triggers
-            { mode = { "n", "x" }, keys = "<Leader>" },
+            { mode = "n", keys = "<Leader>" },
+            { mode = "x", keys = "<Leader>" },
 
             -- Built-in completion
             { mode = "i", keys = "<C-x>" },
 
             -- `g` key
-            { mode = { "n", "x" }, keys = "g" },
+            { mode = "n", keys = "g" },
+            { mode = "x", keys = "g" },
 
             -- Marks
-            { mode = { "n", "x" }, keys = "'" },
-            { mode = { "n", "x" }, keys = "`" },
+            { mode = "n", keys = "'" },
+            { mode = "x", keys = "'" },
+            { mode = "n", keys = "`" },
+            { mode = "x", keys = "`" },
 
             -- Registers
-            { mode = { "n", "x" }, keys = '"' },
-            { mode = { "i", "c" }, keys = "<C-r>" },
+            { mode = "n", keys = '"' },
+            { mode = "x", keys = '"' },
+            { mode = "i", keys = "<C-r>" },
+            { mode = "c", keys = "<C-r>" },
 
             -- Window commands
             { mode = "n", keys = "<C-w>" },
 
             -- `z` key
-            { mode = { "n", "x" }, keys = "z" },
+            { mode = "n", keys = "z" },
+            { mode = "x", keys = "z" },
 
             -- Brackets
             { mode = "n", keys = "[" },
