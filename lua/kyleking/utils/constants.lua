@@ -25,15 +25,23 @@ M.CHAR_LIMIT = {
 -- Paths to ignore in file explorers and pickers
 M.IGNORED_PATHS = {
     ".DS_Store", -- macOS metadata
+    ".cache", -- Generic cache directory
+    ".codanna", -- From codanna
     ".cover", -- Python coverage
+    ".coverage", -- Python coverage data
+    ".fastembed_cache", -- From codanna
     ".git", -- Git repository
     ".jj", -- Jujutsu version control
     ".mypy_cache", -- MyPy type checker cache
     ".pytest_cache", -- Pytest cache
     ".ropeproject", -- Rope Python refactoring cache
     ".ruff_cache", -- Ruff linter cache
+    ".tox", -- Python tox environments
     ".venv", -- Python virtual environment
     "__pycache__", -- Python bytecode cache
+    "build", -- Build artifacts
+    "dist", -- Distribution artifacts
+    "htmlcov", -- Python coverage HTML reports
     "node_modules", -- Node.js dependencies
 }
 
