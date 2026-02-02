@@ -6,15 +6,14 @@ function M.get_highlight_groups()
     local colors = theme.get_colors()
 
     return {
+        TempModeCommand = { fg = colors.bg0, bg = colors.blue, bold = true },
+        TempModeInsert = { fg = colors.bg0, bg = colors.green, bold = true },
+        TempModeNormal = { fg = colors.bg0, bg = colors.fg1, bold = true },
+        TempModeOther = { fg = colors.bg0, bg = colors.fg3, bold = true },
+        TempModeReplace = { fg = colors.bg0, bg = colors.red, bold = true },
+        TempModeVisual = { fg = colors.bg0, bg = colors.orange, bold = true },
         TempSessionClaude = { fg = colors.black, bg = colors.orange, bold = true },
         TempSessionGit = { fg = colors.black, bg = colors.green, bold = true },
-        -- Mode-specific groups for temp sessions (reuse main statusline colors)
-        TempModeNormal = { fg = colors.bg0, bg = colors.fg1, bold = true },
-        TempModeInsert = { fg = colors.bg0, bg = colors.green, bold = true },
-        TempModeVisual = { fg = colors.bg0, bg = colors.orange, bold = true },
-        TempModeReplace = { fg = colors.bg0, bg = "#e06c75", bold = true },
-        TempModeCommand = { fg = colors.bg0, bg = "#61afef", bold = true },
-        TempModeOther = { fg = colors.bg0, bg = colors.fg3, bold = true },
     }
 end
 
@@ -43,31 +42,6 @@ function M.get_temp_mode_info()
     return mode_map[mode_code] or { label = " OTHER ", hl = "TempModeOther" }
 end
 
--- Get smart truncated filename for temp statusline (reserves min 40 chars)
-function M.get_temp_truncated_filename()
-    local constants = require("kyleking.utils.constants")
-    local full_path = vim.fn.expand("%:p")
-    local filename_min = constants.FILENAME_MIN or 40
-
-    -- Calculate available width (accounting for mode ~10, session badge ~10, padding)
-    local win_width = vim.o.columns
-    local reserved = 25 -- Space for mode, session badge, and padding
-    local available = win_width - reserved
-
-    -- If path fits or we have good space, show it all
-    if #full_path <= available or available >= filename_min then
-        if #full_path > available then
-            -- Truncate from left, keeping rightmost part
-            return ".../" .. string.sub(full_path, -(available - 4))
-        end
-        return full_path
-    end
-
-    -- Minimal case: just show what we can
-    if #full_path > filename_min then return ".../" .. string.sub(full_path, -(filename_min - 4)) end
-    return full_path
-end
-
 -- Get abbreviated session type label
 function M.get_abbreviated_session_type(session_type)
     if session_type == "CLAUDE CODE EDITOR" then
@@ -79,31 +53,61 @@ function M.get_abbreviated_session_type(session_type)
     end
 end
 
+-- Get truncated filename for statusline display with dynamic width
+-- Calculates available space based on mode/session lengths when in temp session
+function M.get_truncated_filename()
+    local constants = require("kyleking.utils.constants")
+    local full_path = vim.fn.expand("%:p")
+
+    -- Check if in temp session to calculate precise reserved space
+    local is_temp, session_type, _ = M.detect_temp_session()
+
+    if is_temp then
+        local mode_info = M.get_temp_mode_info()
+        local abbreviated_session = M.get_abbreviated_session_type(session_type)
+
+        -- Precise calculation: actual mode + session lengths
+        local mode_width = #mode_info.label
+        local session_width = #abbreviated_session + 2 -- " SESSION "
+        local separators = 6 -- Spaces, %m, padding
+        local reserved = mode_width + session_width + separators
+
+        local columns = vim.o.columns
+        local available = columns - reserved
+        local min_width = constants.CHAR_LIMIT.FILENAME_MIN
+
+        -- Use available space or fall back to minimum
+        local max_width = math.max(min_width, available)
+
+        if #full_path > max_width then
+            local truncation_len = constants.CHAR_LIMIT.TRUNCATION_INDICATOR
+            return ".../" .. string.sub(full_path, -(max_width - truncation_len))
+        end
+        return full_path
+    else
+        -- Non-temp session: simple truncation
+        if #full_path > 70 then return "..." .. string.sub(full_path, -67) end
+        return full_path
+    end
+end
+
 -- Build temp session statusline string with current mode
 function M.build_temp_statusline(session_type, session_hl_group)
     local mode_info = M.get_temp_mode_info()
     local abbreviated_session = M.get_abbreviated_session_type(session_type)
 
     return table.concat({
-        "%#" .. mode_info.hl .. "#", -- Mode highlight
-        mode_info.label, -- Mode label
-        "%*", -- Reset highlight
+        "%#" .. mode_info.hl .. "#",
+        mode_info.label,
+        "%*",
         " ",
-        "%{v:lua.require('kyleking.utils').get_temp_truncated_filename()}", -- Filename
-        " %m", -- Modified flag
-        "%=", -- Right align
-        "%#" .. session_hl_group .. "#", -- Session badge highlight
+        "%{v:lua.require('kyleking.utils').get_truncated_filename()}",
+        " %m",
+        "%=",
+        "%#" .. session_hl_group .. "#",
         " " .. abbreviated_session .. " ",
-        "%*", -- Reset highlight
+        "%*",
     }, "")
-end
-
--- Get truncated filename for statusline display (max 100 chars)
--- DEPRECATED: Use get_temp_truncated_filename for temp sessions
-function M.get_truncated_filename()
-    local full_path = vim.fn.expand("%:p")
-    if #full_path > 70 then return "..." .. string.sub(full_path, -67) end
-    return full_path
 end
 
 -- Detect if current session is temporary (Claude Code, git commits, etc.)

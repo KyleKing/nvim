@@ -26,8 +26,10 @@ function M.get_colors()
         return {
             -- Primary colors from nightfox
             black = get_color(palette.black),
-            orange = get_color(palette.orange),
+            blue = get_color(palette.blue),
             green = get_color(palette.green),
+            orange = get_color(palette.orange),
+            red = get_color(palette.red),
             -- Foreground/background shades (ensure all are processed)
             fg0 = get_color(palette.fg0),
             fg1 = get_color(palette.fg1),
@@ -42,8 +44,10 @@ function M.get_colors()
         -- Fallback colors matching nightfox palette
         return {
             black = "#393b44",
-            orange = "#f4a261",
+            blue = "#719cd6",
             green = "#81b29a",
+            orange = "#f4a261",
+            red = "#c94f6d",
             fg0 = "#d6d6d7",
             fg1 = "#cdcecf",
             fg2 = "#aeafb0",
