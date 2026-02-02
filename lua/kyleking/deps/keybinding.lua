@@ -13,34 +13,27 @@ later(function()
     miniclue.setup({
         triggers = {
             -- Leader triggers
-            { mode = "n", keys = "<Leader>" },
-            { mode = "x", keys = "<Leader>" },
+            { mode = { "n", "x" }, keys = "<Leader>" },
 
             -- Built-in completion
             { mode = "i", keys = "<C-x>" },
 
             -- `g` key
-            { mode = "n", keys = "g" },
-            { mode = "x", keys = "g" },
+            { mode = { "n", "x" }, keys = "g" },
 
             -- Marks
-            { mode = "n", keys = "'" },
-            { mode = "n", keys = "`" },
-            { mode = "x", keys = "'" },
-            { mode = "x", keys = "`" },
+            { mode = { "n", "x" }, keys = "'" },
+            { mode = { "n", "x" }, keys = "`" },
 
             -- Registers
-            { mode = "n", keys = '"' },
-            { mode = "x", keys = '"' },
-            { mode = "i", keys = "<C-r>" },
-            { mode = "c", keys = "<C-r>" },
+            { mode = { "n", "x" }, keys = '"' },
+            { mode = { "i", "c" }, keys = "<C-r>" },
 
             -- Window commands
             { mode = "n", keys = "<C-w>" },
 
             -- `z` key
-            { mode = "n", keys = "z" },
-            { mode = "x", keys = "z" },
+            { mode = { "n", "x" }, keys = "z" },
 
             -- Brackets
             { mode = "n", keys = "[" },
@@ -57,6 +50,7 @@ later(function()
             { mode = "n", keys = "<Leader>l", desc = "+LSP" },
             { mode = "x", keys = "<Leader>l", desc = "+LSP" },
             { mode = "n", keys = "<Leader>lg", desc = "+LSP Go to" },
+            { mode = "n", keys = "<Leader>ls", desc = "+Semantic" },
             { mode = "n", keys = "<Leader>lw", desc = "+Workspace" },
             { mode = "n", keys = "<Leader>m", desc = "+Move" },
             { mode = "x", keys = "<Leader>m", desc = "+Move" },
@@ -71,7 +65,8 @@ later(function()
             miniclue.gen_clues.builtin_completion(),
             miniclue.gen_clues.g(),
             miniclue.gen_clues.marks(),
-            miniclue.gen_clues.registers(),
+            miniclue.gen_clues.registers({ show_contents = true }),
+            miniclue.gen_clues.square_brackets(),
             miniclue.gen_clues.windows({
                 submode_move = true,
                 submode_navigate = true,

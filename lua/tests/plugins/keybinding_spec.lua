@@ -1,4 +1,9 @@
 -- Test mini.clue integration
+-- Includes automatic detection of new gen_clues generators
+-- When mini.clue adds new generators, the test "all available gen_clues are used or intentionally skipped"
+-- will fail and prompt you to either:
+--   1. Add the generator to your config (lua/kyleking/deps/keybinding.lua)
+--   2. Add it to the expected_config skip list with a reason
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
@@ -30,12 +35,18 @@ T["clue configuration"]["leader triggers are configured"] = function()
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
 
-    -- Check that triggers include leader
+    -- Check that triggers include leader with mode array
     local has_leader_trigger = false
     for _, trigger in ipairs(config.triggers) do
-        if trigger.keys == "<Leader>" and trigger.mode == "n" then
-            has_leader_trigger = true
-            break
+        if trigger.keys == "<Leader>" then
+            -- Accept either mode array or single mode
+            local modes = type(trigger.mode) == "table" and trigger.mode or { trigger.mode }
+            for _, mode in ipairs(modes) do
+                if mode == "n" then
+                    has_leader_trigger = true
+                    break
+                end
+            end
         end
     end
 
@@ -77,6 +88,30 @@ T["clue configuration"]["window has rounded border"] = function()
     local config = MiniClue.config
 
     MiniTest.expect.equality(config.window.config.border, "rounded", "Window should have rounded border")
+end
+
+T["clue configuration"]["uses mode arrays for common triggers"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    -- Check that common triggers use mode arrays instead of separate entries
+    local trigger_counts = {}
+    for _, trigger in ipairs(config.triggers) do
+        local key = trigger.keys
+        trigger_counts[key] = (trigger_counts[key] or 0) + 1
+    end
+
+    -- Common triggers should appear only once (using mode arrays)
+    local common_triggers = { "<Leader>", "g", "'", "`", '"', "z" }
+    for _, key in ipairs(common_triggers) do
+        MiniTest.expect.equality(
+            trigger_counts[key],
+            1,
+            string.format("Trigger '%s' should use mode array (found %d entries)", key, trigger_counts[key] or 0)
+        )
+    end
 end
 
 T["group descriptions"] = MiniTest.new_set()
@@ -121,6 +156,7 @@ T["group descriptions"]["LSP subgroups are defined"] = function()
     end
 
     MiniTest.expect.equality(groups["<Leader>lg"], "+LSP Go to", "LSP Go to group should exist")
+    MiniTest.expect.equality(groups["<Leader>ls"], "+Semantic", "Semantic group should exist")
     MiniTest.expect.equality(groups["<Leader>lw"], "+Workspace", "Workspace group should exist")
 end
 
@@ -212,6 +248,148 @@ T["builtin clue generators"]["registers clues are included"] = function()
     end
 
     MiniTest.expect.equality(has_registers_trigger, true, "Registers trigger should exist")
+end
+
+T["builtin clue generators"]["square_brackets clues are included"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    -- Check for bracket triggers
+    local has_bracket_trigger = false
+    for _, trigger in ipairs(config.triggers) do
+        if (trigger.keys == "[" or trigger.keys == "]") and trigger.mode == "n" then
+            has_bracket_trigger = true
+            break
+        end
+    end
+
+    MiniTest.expect.equality(has_bracket_trigger, true, "Bracket trigger should exist")
+end
+
+T["builtin clue generators"]["all available gen_clues are used or intentionally skipped"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+
+    -- Get all available gen_clues functions
+    local available_generators = {}
+    for name, value in pairs(MiniClue.gen_clues) do
+        if type(value) == "function" then table.insert(available_generators, name) end
+    end
+    table.sort(available_generators)
+
+    -- Expected configuration: generators we use or intentionally skip
+    local expected_config = {
+        builtin_completion = "used",
+        g = "used",
+        marks = "used",
+        registers = "used",
+        square_brackets = "used",
+        windows = "used",
+        z = "used",
+        -- Add skipped generators here with reason:
+        -- example_gen = "skipped - not useful for our workflow",
+    }
+
+    -- Find generators that exist but aren't in our expected config
+    local unknown_generators = {}
+    for _, gen_name in ipairs(available_generators) do
+        if not expected_config[gen_name] then table.insert(unknown_generators, gen_name) end
+    end
+
+    -- Find generators in expected config that no longer exist
+    local missing_generators = {}
+    for gen_name, status in pairs(expected_config) do
+        local exists = false
+        for _, available_name in ipairs(available_generators) do
+            if available_name == gen_name then
+                exists = true
+                break
+            end
+        end
+        if not exists then table.insert(missing_generators, gen_name .. " (" .. status .. ")") end
+    end
+
+    -- Report findings
+    local errors = {}
+    if #unknown_generators > 0 then
+        table.insert(
+            errors,
+            "New gen_clues detected - add to expected_config: " .. table.concat(unknown_generators, ", ")
+        )
+    end
+    if #missing_generators > 0 then
+        table.insert(errors, "Configured gen_clues no longer exist: " .. table.concat(missing_generators, ", "))
+    end
+
+    MiniTest.expect.equality(#errors, 0, table.concat(errors, "; "))
+end
+
+T["clue completeness"] = MiniTest.new_set()
+
+T["clue completeness"]["no groups use default +# descriptions"] = function()
+    vim.wait(1000)
+
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    -- Collect all group descriptions
+    local invalid_descriptions = {}
+    for _, clue in ipairs(config.clues) do
+        if type(clue) == "table" and clue.desc then
+            -- Check if description matches default pattern "+#" or "+1", "+2", etc
+            if clue.desc:match("^%+%d+$") then table.insert(invalid_descriptions, clue.keys .. " -> " .. clue.desc) end
+        end
+    end
+
+    MiniTest.expect.equality(
+        #invalid_descriptions,
+        0,
+        "All groups should have custom descriptions, found default descriptions: "
+            .. table.concat(invalid_descriptions, ", ")
+    )
+end
+
+T["clue completeness"]["all leader group prefixes have descriptions"] = function()
+    vim.wait(1000)
+
+    -- Get all keymaps that start with <Leader>
+    local keymaps = vim.api.nvim_get_keymap("n")
+    local leader_prefixes = {}
+
+    for _, keymap in ipairs(keymaps) do
+        local lhs = keymap.lhs
+        -- Match <Leader> followed by 1-2 letters (group prefix)
+        local prefix = lhs:match("^<[Ll]eader>([%a]+)")
+        if prefix and #prefix <= 2 then
+            local full_prefix = "<Leader>" .. prefix
+            leader_prefixes[full_prefix] = true
+        end
+    end
+
+    -- Check that all prefixes have clue descriptions
+    local MiniClue = require("mini.clue")
+    local config = MiniClue.config
+
+    local clue_groups = {}
+    for _, clue in ipairs(config.clues) do
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then clue_groups[clue.keys] = true end
+    end
+
+    local missing_clues = {}
+    for prefix, _ in pairs(leader_prefixes) do
+        if not clue_groups[prefix] then table.insert(missing_clues, prefix) end
+    end
+
+    table.sort(missing_clues)
+
+    MiniTest.expect.equality(
+        #missing_clues,
+        0,
+        "All leader prefixes should have clue descriptions. Missing: " .. table.concat(missing_clues, ", ")
+    )
 end
 
 -- For manual running
