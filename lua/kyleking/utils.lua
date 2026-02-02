@@ -18,8 +18,8 @@ function M.get_highlight_groups()
     }
 end
 
--- Get current mode indicator for statusline
-function M.get_temp_mode_indicator()
+-- Get current mode info (label and highlight group)
+function M.get_temp_mode_info()
     local mode_code = vim.api.nvim_get_mode().mode
     local mode_map = {
         ["n"] = { label = " NORMAL ", hl = "TempModeNormal" },
@@ -40,8 +40,7 @@ function M.get_temp_mode_indicator()
         ["rm"] = { label = " MORE ", hl = "TempModeOther" },
         ["t"] = { label = " TERMINAL ", hl = "TempModeOther" },
     }
-    local mode_info = mode_map[mode_code] or { label = " OTHER ", hl = "TempModeOther" }
-    return string.format("%%#%s#%s%%*", mode_info.hl, mode_info.label)
+    return mode_map[mode_code] or { label = " OTHER ", hl = "TempModeOther" }
 end
 
 -- Get smart truncated filename for temp statusline (reserves min 40 chars)
@@ -78,6 +77,25 @@ function M.get_abbreviated_session_type(session_type)
     else
         return session_type
     end
+end
+
+-- Build temp session statusline string with current mode
+function M.build_temp_statusline(session_type, session_hl_group)
+    local mode_info = M.get_temp_mode_info()
+    local abbreviated_session = M.get_abbreviated_session_type(session_type)
+
+    return table.concat({
+        "%#" .. mode_info.hl .. "#", -- Mode highlight
+        mode_info.label, -- Mode label
+        "%*", -- Reset highlight
+        " ",
+        "%{v:lua.require('kyleking.utils').get_temp_truncated_filename()}", -- Filename
+        " %m", -- Modified flag
+        "%=", -- Right align
+        "%#" .. session_hl_group .. "#", -- Session badge highlight
+        " " .. abbreviated_session .. " ",
+        "%*", -- Reset highlight
+    }, "")
 end
 
 -- Get truncated filename for statusline display (max 100 chars)
@@ -120,6 +138,60 @@ function M.detect_temp_session()
     end
 
     return is_temp, session_type, highlight_group
+end
+
+-- Toggle between focused and equal window layouts
+-- Focused mode: active window gets larger share of space (60-70%), others share remainder equally
+-- Equal mode: all windows get equal space
+function M.toggle_window_focus()
+    -- Skip if only one window
+    local win_count = vim.fn.winnr("$")
+    if win_count == 1 then
+        vim.notify("Only one window open", vim.log.levels.INFO)
+        return
+    end
+
+    -- Toggle state stored in global variable
+    vim.g.window_focus_mode = not vim.g.window_focus_mode
+
+    if vim.g.window_focus_mode then
+        -- FOCUSED MODE: active window gets majority of space
+        local total_lines = vim.o.lines - vim.o.cmdheight - 2 -- Account for statusline/tabline
+        local total_cols = vim.o.columns
+
+        -- Calculate ratios based on window count
+        -- 2-3 windows: active gets 66%, others share 34%
+        -- 4-5 windows: active gets 60%, others share 40%
+        -- 6+ windows: active gets 50%, others share 50%
+        local active_ratio = win_count <= 3 and 0.66 or win_count <= 5 and 0.60 or 0.50
+
+        -- Minimum viable window size
+        local min_height = 5
+        local min_width = 20
+
+        -- Calculate active window size
+        local active_height = math.floor(total_lines * active_ratio)
+        local active_width = math.floor(total_cols * active_ratio)
+
+        -- Ensure minimum sizes for other windows
+        local remaining_windows = win_count - 1
+        local min_required_height = remaining_windows * min_height
+        local min_required_width = remaining_windows * min_width
+
+        -- Adjust if active window would make others too small
+        if total_lines - active_height < min_required_height then active_height = total_lines - min_required_height end
+        if total_cols - active_width < min_required_width then active_width = total_cols - min_required_width end
+
+        -- Apply dimensions to active window
+        vim.cmd("resize " .. active_height)
+        vim.cmd("vertical resize " .. active_width)
+
+        vim.notify("Focused layout (active window enlarged)", vim.log.levels.INFO)
+    else
+        -- EQUAL MODE: reset to equal sizing
+        vim.cmd("wincmd =")
+        vim.notify("Equal layout (all windows equal size)", vim.log.levels.INFO)
+    end
 end
 
 return M

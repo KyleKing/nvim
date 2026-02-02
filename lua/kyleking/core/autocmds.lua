@@ -56,22 +56,27 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
             -- Define all highlight groups using theme colors
             define_temp_session_highlights()
 
-            -- Build statusline: Mode | Filename | Session Badge
-            local abbreviated_session = utils.get_abbreviated_session_type(session_type)
-            local statusline = table.concat({
-                "%{v:lua.require('kyleking.utils').get_temp_mode_indicator()}", -- Mode (left)
-                " ",
-                "%{v:lua.require('kyleking.utils').get_temp_truncated_filename()}", -- Filename (center)
-                " %m", -- Modified flag
-                "%=", -- Right align
-                "%#" .. highlight_group .. "#", -- Session badge highlight
-                " " .. abbreviated_session .. " ",
-                "%*",
-            }, "")
-            vim.opt.statusline = statusline
+            -- Store session info for ModeChanged autocmd
+            vim.b.temp_session_type = session_type
+            vim.b.temp_session_hl_group = highlight_group
+
+            -- Build and set statusline with current mode
+            vim.opt.statusline = utils.build_temp_statusline(session_type, highlight_group)
 
             -- Add easy quit mapping
             vim.keymap.set("n", "<leader>q", ":wq<CR>", { buffer = true, desc = "Save and quit" })
+        end
+    end,
+})
+
+-- Update temp session statusline when mode changes
+create_autocmd("ModeChanged", {
+    group = augroup,
+    callback = function()
+        -- Only update if this is a temp session buffer
+        if vim.b.temp_session_type and vim.b.temp_session_hl_group then
+            local utils = require("kyleking.utils")
+            vim.opt.statusline = utils.build_temp_statusline(vim.b.temp_session_type, vim.b.temp_session_hl_group)
         end
     end,
 })
