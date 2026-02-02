@@ -107,7 +107,12 @@ later(function()
     K(
         "n",
         "<leader>ff",
-        function() builtin.files({ tool = "git" }, { source = { cwd = vim.fn.getcwd() } }) end,
+        function()
+            builtin.cli(
+                { command = { "rg", "--files", "--hidden", "--color=never" } },
+                { source = { name = "Files", cwd = vim.fn.getcwd() } }
+            )
+        end,
         { desc = "Find in files" }
     )
 

@@ -9,23 +9,87 @@ via `<leader>fk` and mini.clue.
 Fuzzy finder for files, buffers, grep, help, keymaps, and more. Uses
 mini.pick with mini.extra for additional pickers.
 
-Picker navigation: `<C-j>`/`<C-k>` to move, `<C-Space>` to refine
-(narrow), `<CR>` to accept, `<Esc>` to close.
+### Navigation
 
-Paste into picker: `<C-r>` followed by register name (like insert mode).
+    <C-j>/<C-k>     Move down/up through matches
+    <C-g>            Jump to first match
+    <C-f>/<C-b>      Scroll page down/up (matches or preview)
+    <C-h>/<C-l>      Scroll left/right (matches or preview)
+    <CR>             Choose item
+    <C-s>            Choose in horizontal split
+    <C-v>            Choose in vertical split
+    <C-t>            Choose in new tab
+    <Esc>            Close picker
 
-    <C-r>"          Paste from default register (last yank/delete)
-    <C-r>+          Paste from system clipboard
-    <C-r>*          Paste from selection clipboard
-    <C-r>/          Paste last search pattern
-    <C-r>:          Paste last command
+### Preview
 
-Tips:
+    <Tab>            Toggle preview (replaces match list in same window)
+    <S-Tab>          Toggle info (shows available mappings)
 
-- `<C-Space>` refines: type a query, refine, type another to
-  progressively narrow results.
-- `<leader>fB` lists all built-in pickers -- useful for discovering what
-  is available.
+While preview is active, `<C-f>`/`<C-b>` scroll the preview content.
+Moving between items (`<C-j>`/`<C-k>`) updates preview automatically.
+
+### Query syntax
+
+Queries are fuzzy by default. Prefix/suffix characters change matching:
+
+    'text            Exact (substring) match
+    ^text            Exact match anchored to start
+    text$            Exact match anchored to end
+    *text            Forced fuzzy match (override other modes)
+    text1 text2      Grouped: each term matched independently
+
+Respects `ignorecase` and `smartcase` settings.
+
+Scoring sorts by narrowest match width first, then earliest start
+position. No special preference for filename vs path -- matches are
+scored uniformly on the full string.
+
+### Marking and bulk actions
+
+    <C-x>            Toggle mark on current item
+    <C-a>            Toggle mark on all matches
+    <M-CR>           Choose all marked items (e.g., open in quickfix)
+
+### Refine (progressive narrowing)
+
+    <C-Space>        Refine current matches (reset query, keep results)
+    <M-Space>        Refine marked items only
+
+Example: type `'hello`, press `<C-Space>`, then type `'world` to find
+items containing both terms in any order.
+
+### Paste into prompt
+
+`<C-r>` followed by register key (like insert mode):
+
+    <C-r>"           Paste from default register (last yank/delete)
+    <C-r>+           Paste from system clipboard
+    <C-r>*           Paste from selection clipboard
+    <C-r>/           Paste last search pattern
+    <C-r>:           Paste last command
+    <C-r><C-w>       Paste word under cursor
+    <C-r><C-a>       Paste WORD under cursor
+    <C-r><C-l>       Paste current line
+
+### Grep glob filtering
+
+In live grep (`<leader>fw`), press `<C-o>` to add a glob pattern that
+restricts results to matching files (e.g., `*.lua`, `tests/**`).
+Multiple globs can be stacked. Only supported with rg and git tools.
+
+### File picker and hidden files
+
+`<leader>ff` uses rg which includes hidden/dotfiles (`.github/**`,
+etc.) and respects `.gitignore`. `<leader>gf` uses `git ls-files` to
+list only git-tracked files.
+
+### Tips
+
+- `<leader>fB` lists all built-in pickers -- useful for discovering
+  what is available.
+- `<leader><CR>` resumes the last picker with its previous query and
+  matches intact.
 
 Source: `lua/kyleking/deps/fuzzy-finder.lua`
 
