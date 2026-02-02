@@ -22,4 +22,27 @@ M.CHAR_LIMIT = {
     TRUNCATION_INDICATOR = 4, -- Characters for ".../" indicator
 }
 
+-- Paths to ignore in file explorers and pickers
+M.IGNORED_PATHS = {
+    ".DS_Store", -- macOS metadata
+    ".cover", -- Python coverage
+    ".git", -- Git repository
+    ".jj", -- Jujutsu version control
+    ".mypy_cache", -- MyPy type checker cache
+    ".pytest_cache", -- Pytest cache
+    ".ropeproject", -- Rope Python refactoring cache
+    ".ruff_cache", -- Ruff linter cache
+    ".venv", -- Python virtual environment
+    "__pycache__", -- Python bytecode cache
+    "node_modules", -- Node.js dependencies
+}
+
+-- Helper function to check if a path should be ignored
+M.should_ignore = function(name)
+    for _, ignored in ipairs(M.IGNORED_PATHS) do
+        if name == ignored then return true end
+    end
+    return false
+end
+
 return M

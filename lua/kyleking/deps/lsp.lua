@@ -29,7 +29,9 @@ later(function()
         lua = { "selene" },
         python = { "ruff" },
         sh = { "shellcheck" },
-        -- terraform = { "tflint" }, -- TODO: this is using up CPU
+        -- tflint intentionally disabled due to high CPU usage on large Terraform projects
+        -- To enable: uncomment and consider using BufWritePost instead of TextChanged
+        -- terraform = { "tflint" },
         typescript = { "oxlint" },
         typescriptreact = { "oxlint" },
         yaml = { "yamllint" },

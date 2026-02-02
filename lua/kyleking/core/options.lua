@@ -28,6 +28,7 @@ vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.backspace:append({ "nostop" }) -- don't stop backspace at insert
 vim.opt.breakindent = true -- wrap indent to match  line start
 -- FIXME: use named registers rather than always copying to the clipboard
+-- Alternative: Use <leader>y/p for explicit system clipboard operations
 vim.opt.clipboard = "unnamedplus" -- connection to the system clipboard
 vim.opt.cmdheight = 1 -- show command line for messages
 vim.opt.copyindent = true -- copy the previous indentation on auto-indenting
