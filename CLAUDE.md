@@ -59,7 +59,14 @@ end)
 
 ### mini.nvim ecosystem
 
-This config uses mini.nvim modules heavily instead of standalone plugins: mini.pick (fuzzy finder), mini.files (file explorer), mini.diff/mini.git (git), mini.hipatterns (keyword highlights), mini.surround, mini.move, mini.clue (which-key), mini.comment, mini.trailspace, and more.
+This config uses mini.nvim modules heavily instead of standalone plugins: mini.pick (fuzzy finder), mini.files (file explorer), mini.diff/mini.git (git), mini.hipatterns (keyword highlights), mini.surround, mini.ai (enhanced text objects), mini.move, mini.clue (which-key), mini.comment, mini.trailspace, mini.icons (Nerd Font icons), mini.statusline, mini.tabline, and more.
+
+**mini.ai text objects**: Provides enhanced "around/inside next/last" text objects that work with treesitter:
+
+- `vaN` - select around next argument
+- `viL` - select inside last brackets
+- `daf` - delete around function call
+- Works with: `f` (function), `a` (argument), `b` (brackets), `q` (quotes), `t` (tags)
 
 ### Test structure
 

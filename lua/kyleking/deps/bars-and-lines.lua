@@ -1,5 +1,15 @@
 local MiniDeps = require("mini.deps")
-local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+
+-- Load mini.icons early so other plugins can detect and use it
+now(function()
+    require("mini.icons").setup({
+        -- Use default icon set (requires Nerd Fonts)
+        style = "glyph", -- Use actual icons, not ASCII
+        -- Customize specific icons if needed
+        -- extension = { lua = { glyph = "󰢱", hl = "MiniIconsAzure" } },
+    })
+end)
 
 later(function()
     add("RRethy/vim-illuminate")

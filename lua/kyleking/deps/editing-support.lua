@@ -66,6 +66,17 @@ later(function()
     K({ "n", "x" }, "s", "<Nop>")
 end)
 
+later(function()
+    -- Enhanced text objects with treesitter support
+    -- Adds "around/inside next/last" intelligence: vaN (select around next argument), viL (inside last brackets)
+    -- Works with: f (function), a (argument), b (brackets), q (quotes), t (tags), and more
+    require("mini.ai").setup({
+        n_lines = 500, -- Search within 500 lines
+        search_method = "cover_or_next", -- Prefer covering current cursor, then next occurrence
+        custom_textobjects = nil, -- Use defaults (can customize for project-specific text objects)
+    })
+end)
+
 later(function() require("mini.trailspace").setup() end)
 
 later(function()

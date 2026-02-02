@@ -202,6 +202,11 @@ T["other editing plugins"]["mini.hipatterns is configured"] = function()
     MiniTest.expect.equality(helpers.is_plugin_loaded("mini.hipatterns"), true, "mini.hipatterns should be loaded")
 end
 
+T["other editing plugins"]["mini.ai is configured"] = function()
+    vim.wait(1000)
+    MiniTest.expect.equality(helpers.is_plugin_loaded("mini.ai"), true, "mini.ai should be loaded")
+end
+
 -- For manual running
 if ... == nil then MiniTest.run() end
 
