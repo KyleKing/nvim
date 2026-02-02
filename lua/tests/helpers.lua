@@ -1,5 +1,6 @@
 -- Test helper utilities for Mini.test
 local M = {}
+local constants = require("kyleking.utils.constants")
 
 -- Wait for LSP client to attach to buffer
 -- @param bufnr number: Buffer number to wait for
@@ -159,6 +160,18 @@ end
 -- @param plugin_name string: Name of plugin module
 -- @return boolean: true if loaded
 function M.is_plugin_loaded(plugin_name) return package.loaded[plugin_name] ~= nil end
+
+-- Wait for plugins to load (uses standard plugin load delay)
+function M.wait_for_plugins() vim.wait(constants.DELAY.PLUGIN_LOAD) end
+
+-- Wait for a specific plugin to load
+-- @param plugin_name string: Name of the plugin module
+-- @param timeout_ms number: Timeout in milliseconds (default: DELAY.PLUGIN_LOAD)
+-- @return boolean: true if plugin loaded, false if timeout
+function M.wait_for_plugin(plugin_name, timeout_ms)
+    timeout_ms = timeout_ms or constants.DELAY.PLUGIN_LOAD
+    return M.wait_for_condition(function() return M.is_plugin_loaded(plugin_name) end, timeout_ms)
+end
 
 -- Reload a module (clear from package.loaded)
 -- @param module_name string: Module to reload

@@ -11,8 +11,9 @@ later(function()
         handler_opts = { border = "rounded" },
     })
 
+    local K = vim.keymap.set
     local toggle_signature = function() signature.toggle_float_win() end
-    vim.keymap.set({ "n", "i" }, "<leader>ks", toggle_signature, { desc = "Toggle signature help" })
+    K({ "n", "i" }, "<leader>ks", toggle_signature, { desc = "Toggle signature help" })
 end)
 
 later(function()

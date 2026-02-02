@@ -44,7 +44,8 @@ later(function()
         },
     })
 
-    vim.keymap.set(
+    local K = vim.keymap.set
+    K(
         { "n", "v" },
         "<leader>lf",
         function()

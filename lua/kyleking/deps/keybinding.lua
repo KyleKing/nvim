@@ -85,7 +85,7 @@ later(function()
         },
 
         window = {
-            delay = 500, -- Show after 500ms
+            delay = require("kyleking.utils.constants").DELAY.KEYMAP_DISPLAY,
             config = {
                 border = "rounded",
                 width = "auto",

@@ -23,14 +23,14 @@ end
 
 T["mini.clue"]["mini.clue is configured"] = function()
     -- Wait for later() to execute
-    vim.wait(1000)
+    helpers.wait_for_plugins()
     MiniTest.expect.equality(helpers.is_plugin_loaded("mini.clue"), true, "mini.clue should be loaded")
 end
 
 T["clue configuration"] = MiniTest.new_set()
 
 T["clue configuration"]["leader triggers are configured"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config

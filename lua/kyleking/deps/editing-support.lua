@@ -61,8 +61,9 @@ later(function()
         respect_selection_type = false,
     })
 
+    local K = vim.keymap.set
     -- Disable `s` in normal/visual mode (use `cl` instead)
-    vim.keymap.set({ "n", "x" }, "s", "<Nop>")
+    K({ "n", "x" }, "s", "<Nop>")
 end)
 
 later(function() require("mini.trailspace").setup() end)
@@ -92,7 +93,8 @@ later(function()
 
     vim.api.nvim_set_hl(0, "MiniHipatternsPlanned", { bg = "#FCD7AD", fg = "#1c1c1c", bold = true })
 
-    vim.keymap.set(
+    local K = vim.keymap.set
+    K(
         "n",
         "<leader>ft",
         function() require("mini.pick").builtin.grep({ pattern = "TODO|FIXME|NOTE|PLANNED|FYI|HACK|WARNING|PERF|TEST" }) end,

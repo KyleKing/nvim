@@ -8,5 +8,6 @@ later(function()
     diff.setup()
     require("mini.git").setup()
 
-    vim.keymap.set("n", "<leader>ugd", function() diff.toggle_overlay() end, { desc = "toggle git diff overlay" })
+    local K = vim.keymap.set
+    K("n", "<leader>ugd", function() diff.toggle_overlay() end, { desc = "toggle git diff overlay" })
 end)

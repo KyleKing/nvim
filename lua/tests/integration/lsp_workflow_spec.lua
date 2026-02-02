@@ -1,5 +1,6 @@
 -- Test complete LSP workflow
 local MiniTest = require("mini.test")
+local helpers = require("tests.helpers")
 
 local T = MiniTest.new_set({
     hooks = {
@@ -16,7 +17,7 @@ T["lsp workflow"]["LSP module loads"] = function()
 end
 
 T["lsp workflow"]["LSP keymaps are configured"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- Check common LSP keymaps
     local check_keymap = function(lhs)
@@ -30,42 +31,42 @@ T["lsp workflow"]["LSP keymaps are configured"] = function()
 end
 
 T["lsp workflow"]["Diagnostic configuration exists"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local config = vim.diagnostic.config()
     MiniTest.expect.equality(type(config), "table", "Diagnostic config should be a table")
 end
 
 T["lsp workflow"]["Can format with conform"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local conform = require("conform")
     MiniTest.expect.equality(type(conform.format), "function", "conform.format should be callable")
 end
 
 T["lsp workflow"]["Can lint with nvim-lint"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local lint = require("lint")
     MiniTest.expect.equality(type(lint.try_lint), "function", "lint.try_lint should be callable")
 end
 
 T["lsp workflow"]["MiniExtra diagnostic picker is available"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniExtra = require("mini.extra")
     MiniTest.expect.equality(type(MiniExtra.pickers.diagnostic), "function", "diagnostic picker should be callable")
 end
 
 T["lsp workflow"]["LSP signature help is configured"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local signature = require("lsp_signature")
     MiniTest.expect.equality(type(signature.toggle_float_win), "function", "Signature help should be available")
 end
 
 T["lsp workflow"]["LSP pickers are available"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniExtra = require("mini.extra")
     MiniTest.expect.equality(type(MiniExtra.pickers.lsp), "function", "LSP picker should be available")

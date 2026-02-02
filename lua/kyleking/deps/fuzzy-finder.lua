@@ -4,6 +4,7 @@ local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 later(function()
     local MiniPick = require("mini.pick")
     local MiniExtra = require("mini.extra")
+    local ui = require("kyleking.utils.ui")
 
     MiniPick.setup({
         mappings = {
@@ -12,18 +13,7 @@ later(function()
             refine = "<C-Space>",
         },
         window = {
-            config = function()
-                local height = math.floor(0.8 * vim.o.lines)
-                local width = math.floor(0.8 * vim.o.columns)
-                return {
-                    anchor = "NW",
-                    height = height,
-                    width = width,
-                    row = math.floor(0.5 * (vim.o.lines - height)),
-                    col = math.floor(0.5 * (vim.o.columns - width)),
-                    border = "rounded",
-                }
-            end,
+            config = function() return ui.create_centered_window({ anchor = "NW" }) end,
         },
     })
 

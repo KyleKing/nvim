@@ -30,7 +30,8 @@ later(function()
         },
     })
 
-    vim.keymap.set("n", "<leader>e", function()
+    local K = vim.keymap.set
+    K("n", "<leader>e", function()
         local MiniFiles = require("mini.files")
         if vim.bo.ft == "minifiles" then
             MiniFiles.close()

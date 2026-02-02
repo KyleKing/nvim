@@ -12,7 +12,8 @@ later(function()
         },
     })
     vim.opt.spelllang = { "en_us", "programming" }
-    vim.keymap.set(
+    local K = vim.keymap.set
+    K(
         "n",
         -- From: https://github.com/nickjj/dotfiles/blob/d3c2b74f50e786edf78eceaa5359145f6f370eb3/.config/zsh/.aliases#L47C12-L47C86
         "<leader>pzs",
@@ -33,7 +34,8 @@ later(function()
         },
     })
     vim.g.netrw_nogx = 1 -- disable netrw gx
-    vim.keymap.set({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open File" })
+    local K = vim.keymap.set
+    K({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open File" })
 end)
 
 later(function()
@@ -67,19 +69,20 @@ later(function()
         source = "KyleKing/patch_it.nvim",
     })
     local patch_it = require("patch_it")
+    local K = vim.keymap.set
 
     -- Apply LLM-generated patches with fuzzy matching
-    vim.keymap.set("n", "<leader>paa", function()
+    K("n", "<leader>paa", function()
         local target = vim.fn.input("Target file: ", "", "file")
         if target ~= "" then patch_it.apply_buffer(target) end
     end, { desc = "Apply patch from buffer" })
 
-    vim.keymap.set("n", "<leader>pap", function()
+    K("n", "<leader>pap", function()
         local target = vim.fn.input("Target file: ", "", "file")
         if target ~= "" then patch_it.apply_buffer(target, { preview = true }) end
     end, { desc = "Preview patch from buffer" })
 
-    vim.keymap.set("n", "<leader>pab", function()
+    K("n", "<leader>pab", function()
         -- Apply to file matching current buffer name (common LLM workflow)
         local current = vim.fn.expand("%:t")
         local target = vim.fn.input("Target file: ", current, "file")
@@ -92,5 +95,6 @@ later(function() add("micarmst/vim-spellsync") end)
 later(function()
     add("sontungexpt/url-open")
     require("url-open").setup()
-    vim.keymap.set("n", "<leader>uu", "<esc>:URLOpenUnderCursor<cr>", { desc = "Open URL" })
+    local K = vim.keymap.set
+    K("n", "<leader>uu", "<esc>:URLOpenUnderCursor<cr>", { desc = "Open URL" })
 end)

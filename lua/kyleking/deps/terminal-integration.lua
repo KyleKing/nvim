@@ -84,17 +84,17 @@ local function toggle_tui_float(opts)
         term = tui_terminals[term_id]
     end
 
-    local width = math.floor(vim.o.columns * 0.9)
-    local height = math.floor(vim.o.lines * 0.9)
-    local winid = vim.api.nvim_open_win(term.bufnr, true, {
-        relative = "editor",
-        width = width,
-        height = height,
-        row = math.floor((vim.o.lines - height) / 2),
-        col = math.floor((vim.o.columns - width) / 2),
-        style = "minimal",
-        border = "rounded",
-    })
+    local ui = require("kyleking.utils.ui")
+    local constants = require("kyleking.utils.constants")
+    local winid = vim.api.nvim_open_win(
+        term.bufnr,
+        true,
+        ui.create_centered_window({
+            ratio = constants.WINDOW.LARGE,
+            relative = "editor",
+            style = "minimal",
+        })
+    )
     term.winid = winid
 
     local chan_id = vim.b[term.bufnr].terminal_job_id

@@ -61,17 +61,15 @@ local function run_all_tests(only_failed)
 
     -- Create a floating window for the test output
     local buf = vim.api.nvim_create_buf(false, true)
-    local width = math.floor(vim.o.columns * 0.8)
-    local height = math.floor(vim.o.lines * 0.8)
-    vim.api.nvim_open_win(buf, true, {
-        relative = "editor",
-        width = width,
-        height = height,
-        row = math.floor((vim.o.lines - height) / 2),
-        col = math.floor((vim.o.columns - width) / 2),
-        style = "minimal",
-        border = "rounded",
-    })
+    local ui = require("kyleking.utils.ui")
+    vim.api.nvim_open_win(
+        buf,
+        true,
+        ui.create_centered_window({
+            relative = "editor",
+            style = "minimal",
+        })
+    )
 
     -- Function to append lines to the buffer
     local function append_line(line) vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line }) end

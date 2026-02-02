@@ -45,18 +45,23 @@ if not is_temp_session then
                         local dir = vim.fn.expand("%:h")
 
                         -- Calculate available space
+                        local constants = require("kyleking.utils.constants")
                         local mode_width = vim.fn.strdisplaywidth(mode)
                         local git_width = vim.fn.strdisplaywidth(git)
                         local diag_width = vim.fn.strdisplaywidth(diagnostics)
-                        local available = vim.o.columns - (mode_width + git_width + diag_width + 20)
+                        local available = vim.o.columns
+                            - (mode_width + git_width + diag_width + constants.CHAR_LIMIT.PATH_PADDING)
 
-                        -- Max width for path (reserve 40 chars for filename)
-                        local max_path = math.max(40, available - 40)
+                        -- Max width for path (reserve space for filename)
+                        local max_path =
+                            math.max(constants.CHAR_LIMIT.FILENAME_MIN, available - constants.CHAR_LIMIT.FILENAME_MIN)
                         local full_path = dir .. "/" .. filename
 
                         -- Truncate from left if too long
                         if vim.fn.strdisplaywidth(full_path) > max_path then
-                            local dir_space = max_path - vim.fn.strdisplaywidth(filename) - 4 -- 4 for ".../"
+                            local dir_space = max_path
+                                - vim.fn.strdisplaywidth(filename)
+                                - constants.CHAR_LIMIT.TRUNCATION_INDICATOR
                             if dir_space > 0 then
                                 local truncated_dir = string.sub(dir, -dir_space)
                                 return ".../" .. truncated_dir .. "/" .. filename
