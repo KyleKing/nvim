@@ -2,11 +2,6 @@ local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 later(function()
-    -- Keymaps are added automatically (docs: https://github.com/SidOfc/mkdx?tab=readme-ov-file#mappings)
-    add("SidOfc/mkdx")
-end)
-
-later(function()
     add({
         source = "nvim-treesitter/nvim-treesitter",
         hooks = { post_checkout = function() vim.cmd("TSUpdate") end },

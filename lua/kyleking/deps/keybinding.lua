@@ -50,9 +50,7 @@ later(function()
 
         clues = {
             -- Leader key groups
-            { mode = "n", keys = "<Leader>S", desc = "+Session" },
             { mode = "n", keys = "<Leader>b", desc = "+Buffer" },
-            { mode = "n", keys = "<Leader>bO", desc = "+Order" },
             { mode = "n", keys = "<Leader>c", desc = "+Code" },
             { mode = "n", keys = "<Leader>f", desc = "+Find" },
             { mode = "n", keys = "<Leader>g", desc = "+Git" },
@@ -60,7 +58,6 @@ later(function()
             { mode = "x", keys = "<Leader>l", desc = "+LSP" },
             { mode = "n", keys = "<Leader>lg", desc = "+LSP Go to" },
             { mode = "n", keys = "<Leader>ls", desc = "+Semantic" },
-            { mode = "n", keys = "<Leader>lw", desc = "+Workspace" },
             { mode = "n", keys = "<Leader>m", desc = "+Move" },
             { mode = "x", keys = "<Leader>m", desc = "+Move" },
             { mode = "n", keys = "<Leader>p", desc = "+Plugins" },

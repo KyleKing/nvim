@@ -124,6 +124,8 @@ See `lua/find-relative-executable/init.lua` for API (`resolve`, `command_for`, `
 
 - `lua/kyleking/utils/noqa.lua` - Diagnostic suppression (noqa-style comments). See file for API.
 - `lua/kyleking/utils/fs_utils.lua` - File system utilities (git worktrees, Python path detection)
+- `lua/kyleking/utils/list_editing.lua` - Markdown/djot list editing (continuation, indent/dedent, djot blank line handling)
+- `lua/kyleking/utils/preview.lua` - CLI-based markdown/djot preview in browser using pandoc or djot CLI
 
 ## Style
 

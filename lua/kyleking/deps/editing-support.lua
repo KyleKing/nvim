@@ -1,6 +1,12 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
+-- Setup markdown/djot list editing and preview
+later(function()
+    require("kyleking.utils.list_editing").setup()
+    require("kyleking.utils.preview").setup()
+end)
+
 -- PLANNED: Consider mini.cycle when released for bool/semver/custom cycling
 
 later(function()

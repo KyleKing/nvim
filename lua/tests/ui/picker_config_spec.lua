@@ -67,10 +67,8 @@ T["file picker rg"]["rg --hidden finds dotfiles"] = function()
     vim.fn.writefile({ "name: CI" }, tmpdir .. "/.github/workflows/ci.yml")
     vim.fn.writefile({ "hello" }, tmpdir .. "/visible.txt")
 
-    local result = vim.system(
-        { "rg", "--files", "--hidden", "--color=never" },
-        { text = true, cwd = tmpdir }
-    ):wait(5000)
+    local result = vim.system({ "rg", "--files", "--hidden", "--color=never" }, { text = true, cwd = tmpdir })
+        :wait(5000)
 
     local stdout = result.stdout or ""
     local has_hidden = stdout:find("%.github/workflows/ci%.yml") ~= nil
@@ -91,10 +89,8 @@ T["file picker rg"]["rg --hidden respects gitignore"] = function()
 
     vim.system({ "git", "init" }, { cwd = tmpdir }):wait(5000)
 
-    local result = vim.system(
-        { "rg", "--files", "--hidden", "--color=never" },
-        { text = true, cwd = tmpdir }
-    ):wait(5000)
+    local result = vim.system({ "rg", "--files", "--hidden", "--color=never" }, { text = true, cwd = tmpdir })
+        :wait(5000)
 
     local stdout = result.stdout or ""
     local has_ignored = stdout:find("secret%.txt") ~= nil
@@ -115,10 +111,8 @@ T["file picker rg"]["rg excludes .git directory"] = function()
 
     vim.system({ "git", "init" }, { cwd = tmpdir }):wait(5000)
 
-    local result = vim.system(
-        { "rg", "--files", "--hidden", "--color=never" },
-        { text = true, cwd = tmpdir }
-    ):wait(5000)
+    local result = vim.system({ "rg", "--files", "--hidden", "--color=never" }, { text = true, cwd = tmpdir })
+        :wait(5000)
 
     local stdout = result.stdout or ""
     local has_git_internal = stdout:find("%.git/") ~= nil
@@ -233,9 +227,15 @@ T["grep globs"]["rg glob restricts to matching files"] = function()
     vim.fn.writefile({ "hello world" }, tmpdir .. "/file.txt")
 
     local result = vim.system({
-        "rg", "--column", "--line-number", "--no-heading", "--color=never",
-        "--glob", "*.lua",
-        "--", "hello",
+        "rg",
+        "--column",
+        "--line-number",
+        "--no-heading",
+        "--color=never",
+        "--glob",
+        "*.lua",
+        "--",
+        "hello",
     }, { text = true, cwd = tmpdir }):wait(5000)
 
     local stdout = result.stdout or ""
@@ -256,9 +256,17 @@ T["grep globs"]["multiple globs combine correctly"] = function()
     vim.fn.writefile({ "match" }, tmpdir .. "/c.txt")
 
     local result = vim.system({
-        "rg", "--column", "--line-number", "--no-heading", "--color=never",
-        "--glob", "*.lua", "--glob", "*.py",
-        "--", "match",
+        "rg",
+        "--column",
+        "--line-number",
+        "--no-heading",
+        "--color=never",
+        "--glob",
+        "*.lua",
+        "--glob",
+        "*.py",
+        "--",
+        "match",
     }, { text = true, cwd = tmpdir }):wait(5000)
 
     local stdout = result.stdout or ""
@@ -302,7 +310,11 @@ T["keymap descriptions"]["all picker keymaps have descriptive desc fields"] = fu
         local keymap = vim.fn.maparg(lhs, mode, false, true)
         MiniTest.expect.equality(keymap.lhs ~= nil, true, "Missing keymap: " .. lhs)
         local has_desc = keymap.desc and keymap.desc:lower():find(desc_pattern:lower()) ~= nil
-        MiniTest.expect.equality(has_desc, true, lhs .. " desc should contain '" .. desc_pattern .. "', got: " .. (keymap.desc or "nil"))
+        MiniTest.expect.equality(
+            has_desc,
+            true,
+            lhs .. " desc should contain '" .. desc_pattern .. "', got: " .. (keymap.desc or "nil")
+        )
     end
 end
 

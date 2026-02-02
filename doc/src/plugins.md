@@ -322,7 +322,15 @@ Features: syntax highlighting (disabled for large buffers),
 treesitter-based folding (see `kyleking-neovim-folds`), auto-indent,
 language-aware commenting, 40+ parsers auto-installed.
 
-mkdx is loaded for additional markdown editing support.
+Custom list editing provides markdown and djot list continuation, indentation,
+and preview functionality:
+
+- `<CR>` (insert mode): Continue list or stop on empty item
+- `<Tab>` (insert mode): Indent list item (djot: auto-inserts blank line before sublists)
+- `<S-Tab>` (insert mode): Dedent list item
+- `<leader>cp`: Preview markdown/djot file in browser (requires pandoc or djot CLI)
+
+Source: `lua/kyleking/utils/list_editing.lua`, `lua/kyleking/utils/preview.lua`
 
 Source: `lua/kyleking/deps/syntax.lua`
 
