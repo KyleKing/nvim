@@ -29,9 +29,9 @@ T["gitsigns"]["gitsigns toggle deleted keymap is set"] = function()
     local keymap = vim.fn.maparg("<leader>ugd", "n", false, true)
     MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "<leader>ugd mapping should exist")
 
-    -- Verify callable
+    -- Verify callable (this test would catch the nil keymap bug)
     local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
-    MiniTest.expect.equality(has_callable, true, "<leader>ugd should have callable rhs")
+    MiniTest.expect.equality(has_callable, true, "<leader>ugd should have callable rhs (prevents nil errors)")
 end
 
 T["gitsigns"]["gitsigns functions are callable"] = function()

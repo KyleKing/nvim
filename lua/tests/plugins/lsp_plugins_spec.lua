@@ -147,6 +147,17 @@ T["nvim-lint"]["try_lint function exists"] = function()
     MiniTest.expect.equality(type(lint.try_lint), "function", "try_lint should be a function")
 end
 
+T["nvim-lint"]["lint keymap is set"] = function()
+    vim.wait(1000)
+
+    local keymap = vim.fn.maparg("<leader>ll", "n", false, true)
+    MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "<leader>ll mapping should exist")
+
+    -- Verify callable
+    local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
+    MiniTest.expect.equality(has_callable, true, "<leader>ll should have callable rhs")
+end
+
 T["trouble.nvim"] = MiniTest.new_set()
 
 T["trouble.nvim"]["trouble module loads without errors"] = function()
