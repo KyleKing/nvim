@@ -144,6 +144,15 @@ K(
     { desc = "Terminal: lazydocker" }
 )
 
+K("t", "gf", function() require("kyleking.utils.file_opener").open_from_terminal() end, {
+    desc = "Terminal: open file under cursor",
+})
+
+K("t", "<C-w>gf", function()
+    require("kyleking.utils.file_opener").open_from_terminal()
+    vim.cmd("tabprevious")
+end, { desc = "Terminal: peek file and return" })
+
 return {
     toggle_shell_tab = toggle_shell_tab,
     toggle_tui_float = toggle_tui_float,

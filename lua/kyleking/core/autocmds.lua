@@ -22,17 +22,25 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
         local is_temp_session, session_type, highlight_group = utils.detect_temp_session()
 
         if is_temp_session then
-            -- Define highlight group using theme colors
+            -- Define all highlight groups using theme colors
             local highlight_groups = utils.get_highlight_groups()
-            local hl_config = highlight_groups[highlight_group]
-            if hl_config then vim.api.nvim_set_hl(0, highlight_group, hl_config) end
+            for group_name, hl_config in pairs(highlight_groups) do
+                vim.api.nvim_set_hl(0, group_name, hl_config)
+            end
 
-            -- Set statusline with prominent indicator (dynamically truncated filename)
-            vim.opt.statusline = "%#"
-                .. highlight_group
-                .. "# "
-                .. session_type
-                .. " %* %{v:lua.require('kyleking.utils').get_truncated_filename()} %m"
+            -- Build statusline: Mode | Filename | Session Badge
+            local abbreviated_session = utils.get_abbreviated_session_type(session_type)
+            local statusline = table.concat({
+                "%{v:lua.require('kyleking.utils').get_temp_mode_indicator()}", -- Mode (left)
+                " ",
+                "%{v:lua.require('kyleking.utils').get_temp_truncated_filename()}", -- Filename (center)
+                " %m", -- Modified flag
+                "%=", -- Right align
+                "%#" .. highlight_group .. "#", -- Session badge highlight
+                " " .. abbreviated_session .. " ",
+                "%*",
+            }, "")
+            vim.opt.statusline = statusline
 
             -- Add easy quit mapping
             vim.keymap.set("n", "<leader>q", ":wq<CR>", { buffer = true, desc = "Save and quit" })
