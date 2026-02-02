@@ -28,15 +28,15 @@ function M.get_colors()
             black = get_color(palette.black),
             orange = get_color(palette.orange),
             green = get_color(palette.green),
-            -- Foreground/background shades
-            fg0 = palette.fg0,
-            fg1 = palette.fg1,
-            fg2 = palette.fg2,
-            fg3 = palette.fg3,
-            bg0 = palette.bg0,
-            bg1 = palette.bg1,
-            bg2 = palette.bg2,
-            bg3 = palette.bg3,
+            -- Foreground/background shades (ensure all are processed)
+            fg0 = get_color(palette.fg0),
+            fg1 = get_color(palette.fg1),
+            fg2 = get_color(palette.fg2),
+            fg3 = get_color(palette.fg3),
+            bg0 = get_color(palette.bg0),
+            bg1 = get_color(palette.bg1),
+            bg2 = get_color(palette.bg2),
+            bg3 = get_color(palette.bg3),
         }
     else
         -- Fallback colors matching nightfox palette

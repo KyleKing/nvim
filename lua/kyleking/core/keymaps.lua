@@ -13,6 +13,10 @@ local K = vim.keymap.set
 
 K("n", "<Esc>", ":nohlsearch<CR>") -- Clear last search highlighting
 
+-- Terminal mode escape
+K("t", "<C-\\><C-n>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+K("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode (double escape)" })
+
 -- Convenience functions for yanking/putting to difference registers
 -- PLANNED: also consider 0p, but figure out how these can be useful first
 K("n", "<leader>ry", "*y", { desc = "Yank to *" })
