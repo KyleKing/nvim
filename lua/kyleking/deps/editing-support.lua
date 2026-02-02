@@ -1,12 +1,24 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
--- PLANNED: Consider mini.operators or mini.cycle when released for bool/semver/custom cycling
+-- PLANNED: Consider mini.cycle when released for bool/semver/custom cycling
 
 later(function()
     add("tzachar/highlight-undo.nvim")
     require("highlight-undo").setup()
 end)
+
+later(
+    function()
+        require("mini.operators").setup({
+            evaluate = { prefix = "g=" },
+            exchange = { prefix = "" },
+            multiply = { prefix = "gm" },
+            replace = { prefix = "" },
+            sort = { prefix = "gs" },
+        })
+    end
+)
 
 later(function()
     -- Defaults are Alt (Meta) + hjkl. Works in both Visual and Normal modes

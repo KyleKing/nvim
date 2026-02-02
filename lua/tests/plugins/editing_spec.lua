@@ -176,6 +176,76 @@ T["mini.surround"]["can replace surround"] = function()
     helpers.delete_buffer(bufnr)
 end
 
+T["mini.operators"] = MiniTest.new_set()
+
+T["mini.operators"]["mini.operators is loaded"] = function()
+    vim.wait(1000)
+    MiniTest.expect.equality(helpers.is_plugin_loaded("mini.operators"), true, "mini.operators should be loaded")
+end
+
+T["mini.operators"]["sort keymap exists"] = function()
+    vim.wait(1000)
+    local keymap = vim.fn.maparg("gs", "n", false, true)
+    MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "gs mapping should exist")
+end
+
+T["mini.operators"]["gx still maps to gx.nvim"] = function()
+    vim.wait(1000)
+    local keymap = vim.fn.maparg("gx", "n", false, true)
+    MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "gx mapping should exist")
+    local desc = keymap.desc or ""
+    MiniTest.expect.equality(desc:lower():find("browse") ~= nil, true, "gx should map to Browse, got: " .. desc)
+end
+
+T["mini.operators"]["sorts comma-separated values"] = function()
+    vim.wait(1000)
+
+    local bufnr = helpers.create_test_buffer({ "b,c,aa" }, "text")
+    vim.api.nvim_set_current_buf(bufnr)
+
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    vim.cmd("normal V")
+    vim.cmd("normal gs")
+
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+    MiniTest.expect.equality(line, "aa,b,c", "Comma-separated values should be sorted")
+
+    helpers.delete_buffer(bufnr)
+end
+
+T["mini.operators"]["sorts semicolon-separated values"] = function()
+    vim.wait(1000)
+
+    local bufnr = helpers.create_test_buffer({ "c; a; b" }, "text")
+    vim.api.nvim_set_current_buf(bufnr)
+
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    vim.cmd("normal V")
+    vim.cmd("normal gs")
+
+    local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+    MiniTest.expect.equality(line, "a; b; c", "Semicolon-separated values should be sorted")
+
+    helpers.delete_buffer(bufnr)
+end
+
+T["mini.operators"]["sorts lines in paragraph"] = function()
+    vim.wait(1000)
+
+    local bufnr = helpers.create_test_buffer({ "cherry", "apple", "banana" }, "text")
+    vim.api.nvim_set_current_buf(bufnr)
+
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+    vim.cmd("normal gsip")
+
+    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, 3, false)
+    MiniTest.expect.equality(lines[1], "apple", "First line should be apple")
+    MiniTest.expect.equality(lines[2], "banana", "Second line should be banana")
+    MiniTest.expect.equality(lines[3], "cherry", "Third line should be cherry")
+
+    helpers.delete_buffer(bufnr)
+end
+
 T["other editing plugins"] = MiniTest.new_set()
 
 T["other editing plugins"]["highlight-undo is configured"] = function()
