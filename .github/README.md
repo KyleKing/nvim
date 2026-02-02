@@ -54,3 +54,12 @@ nvim
 ```
 
 Any missing CLI tools should be flagged by running `:checkhealth` in `nvim`
+
+## Documentation
+
+Plugin usage guides and development documentation are available in [doc/](../doc/README.md):
+
+- [Plugin Usage Guide Index](../doc/plugins-guide.md)
+- [Codanna Semantic Search](../doc/codanna-guide.md)
+- [patch_it.nvim](../doc/patch_it-guide.md)
+- [Claude Skills Development](../doc/claude-skills-guide.md)

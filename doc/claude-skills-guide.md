@@ -7,6 +7,7 @@ Claude Skills are custom tools and capabilities that extend Claude's functionali
 ## What are Claude Skills?
 
 Claude Skills are:
+
 - **Custom tools** that extend Claude's capabilities
 - **Reusable** across different conversations and users
 - **Shareable** with the community
@@ -17,6 +18,7 @@ Claude Skills are:
 ### 1. Skill Structure
 
 A Claude Skill typically consists of:
+
 - **Name**: A descriptive name for the skill
 - **Description**: What the skill does and when to use it
 - **Parameters**: Input parameters the skill accepts
@@ -26,6 +28,7 @@ A Claude Skill typically consists of:
 ### 2. Types of Skills
 
 Skills can be categorized into:
+
 - **API Integrations**: Connect to external services (databases, APIs, etc.)
 - **Data Processing**: Transform, analyze, or manipulate data
 - **Workflow Automation**: Automate multi-step processes
@@ -53,7 +56,9 @@ Create a schema that describes your skill:
         "description": "Description of parameter 2"
       }
     },
-    "required": ["param1"]
+    "required": [
+      "param1"
+    ]
   }
 }
 ```
@@ -63,11 +68,13 @@ Create a schema that describes your skill:
 The implementation depends on your use case:
 
 **For API-based skills:**
+
 - Create an HTTP endpoint that accepts requests
 - Process the input parameters
 - Return results in a structured format
 
 **For function-based skills:**
+
 - Write the core logic in your preferred language
 - Ensure proper error handling
 - Return consistent response formats
@@ -75,6 +82,7 @@ The implementation depends on your use case:
 ### Step 3: Register the Skill
 
 Skills are typically registered through:
+
 - **Anthropic Console**: For official Claude Skills
 - **API Registration**: Using Anthropic's API
 - **Local Development**: For testing before deployment
@@ -82,6 +90,7 @@ Skills are typically registered through:
 ### Step 4: Test Your Skill
 
 Test your skill with various inputs:
+
 - Valid inputs that should succeed
 - Invalid inputs that should fail gracefully
 - Edge cases and boundary conditions
@@ -89,28 +98,33 @@ Test your skill with various inputs:
 ## Best Practices
 
 ### 1. Clear Descriptions
+
 - Write clear, concise descriptions
 - Explain when and why to use the skill
 - Document all parameters thoroughly
 
 ### 2. Error Handling
+
 - Always handle errors gracefully
 - Return meaningful error messages
 - Log errors for debugging
 
 ### 3. Security
+
 - Validate all inputs
 - Sanitize user data
 - Use secure authentication methods
 - Follow principle of least privilege
 
 ### 4. Performance
+
 - Optimize for speed
 - Cache results when appropriate
 - Handle timeouts gracefully
 - Consider rate limiting
 
 ### 5. Documentation
+
 - Document all parameters
 - Provide usage examples
 - Include error scenarios
@@ -127,7 +141,12 @@ Test your skill with various inputs:
     "properties": {
       "operation": {
         "type": "string",
-        "enum": ["add", "subtract", "multiply", "divide"],
+        "enum": [
+          "add",
+          "subtract",
+          "multiply",
+          "divide"
+        ],
         "description": "The arithmetic operation to perform"
       },
       "a": {
@@ -139,7 +158,11 @@ Test your skill with various inputs:
         "description": "Second number"
       }
     },
-    "required": ["operation", "a", "b"]
+    "required": [
+      "operation",
+      "a",
+      "b"
+    ]
   }
 }
 ```
@@ -149,6 +172,7 @@ Test your skill with various inputs:
 ```python
 import requests
 from typing import Dict, Any
+
 
 def weather_skill(city: str, units: str = "celsius") -> Dict[str, Any]:
     """
@@ -176,16 +200,19 @@ def weather_skill(city: str, units: str = "celsius") -> Dict[str, Any]:
 ## Resources and Documentation
 
 ### Official Resources
+
 - **Anthropic Documentation**: https://docs.anthropic.com
 - **Claude API Reference**: Check Anthropic's latest API documentation
 - **Skill Examples**: Look for official examples in Anthropic's GitHub repositories
 
 ### Development Tools
+
 - **Anthropic Console**: For managing and testing skills
 - **API Testing Tools**: Postman, curl, or similar for testing endpoints
 - **Local Development Environment**: Set up for testing before deployment
 
 ### Community Resources
+
 - **Anthropic Community Forum**: For discussions and Q&A
 - **GitHub**: Search for Claude Skills examples
 - **Discord/Slack**: Community channels for developers
@@ -193,42 +220,46 @@ def weather_skill(city: str, units: str = "celsius") -> Dict[str, Any]:
 ## Common Use Cases
 
 1. **Database Queries**: Create skills that query databases safely
-2. **API Integrations**: Connect to third-party services
-3. **Data Analysis**: Perform calculations and analysis
-4. **File Operations**: Read, write, or process files
-5. **Workflow Automation**: Chain multiple operations together
-6. **Custom Business Logic**: Implement domain-specific functions
+1. **API Integrations**: Connect to third-party services
+1. **Data Analysis**: Perform calculations and analysis
+1. **File Operations**: Read, write, or process files
+1. **Workflow Automation**: Chain multiple operations together
+1. **Custom Business Logic**: Implement domain-specific functions
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **Skill Not Found**
-   - Verify skill is properly registered
-   - Check skill name spelling
-   - Ensure proper permissions
 
-2. **Parameter Validation Errors**
-   - Review parameter schema
-   - Check required vs optional parameters
-   - Validate parameter types
+    - Verify skill is properly registered
+    - Check skill name spelling
+    - Ensure proper permissions
 
-3. **Authentication Failures**
-   - Verify API keys are correct
-   - Check token expiration
-   - Review authentication method
+1. **Parameter Validation Errors**
 
-4. **Timeout Errors**
-   - Optimize skill performance
-   - Increase timeout limits if appropriate
-   - Consider async processing for long operations
+    - Review parameter schema
+    - Check required vs optional parameters
+    - Validate parameter types
+
+1. **Authentication Failures**
+
+    - Verify API keys are correct
+    - Check token expiration
+    - Review authentication method
+
+1. **Timeout Errors**
+
+    - Optimize skill performance
+    - Increase timeout limits if appropriate
+    - Consider async processing for long operations
 
 ## Next Steps
 
 1. **Start Simple**: Begin with a basic skill to understand the workflow
-2. **Iterate**: Improve your skill based on usage and feedback
-3. **Share**: Consider sharing useful skills with the community
-4. **Document**: Keep your documentation comprehensive and up to date
+1. **Iterate**: Improve your skill based on usage and feedback
+1. **Share**: Consider sharing useful skills with the community
+1. **Document**: Keep your documentation comprehensive and up to date
 
 ## Notes
 
