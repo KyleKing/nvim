@@ -193,4 +193,42 @@ function M.set_visual_selection(start_line, start_col, end_line, end_col)
     vim.fn.setpos("'>", { 0, end_line, end_col, 0 })
 end
 
+--- Run Lua code in a subprocess nvim with full user config loaded.
+--- Waits for plugins to initialize, executes the code, then checks for errors.
+--- @param lua_code string Lua code to execute after plugins load
+--- @param timeout_ms number|nil Subprocess timeout (default: 15000)
+--- @return table {code: number, stdout: string, stderr: string}
+function M.nvim_interaction_test(lua_code, timeout_ms)
+    timeout_ms = timeout_ms or 15000
+    local tmpfile = vim.fn.tempname() .. "_interaction_test.lua"
+
+    local wrapped = table.concat({
+        "vim.wait(2000, function() return false end)",
+        lua_code,
+        "vim.wait(500, function() return false end)",
+        "vim.cmd('qall!')",
+    }, "\n")
+
+    local f = io.open(tmpfile, "w")
+    if f then
+        f:write(wrapped)
+        f:close()
+    end
+
+    local result = vim.system({
+        "nvim",
+        "--headless",
+        "-c",
+        "luafile " .. tmpfile,
+    }, { text = true }):wait(timeout_ms)
+
+    vim.fn.delete(tmpfile)
+
+    return {
+        code = result.code,
+        stdout = result.stdout or "",
+        stderr = result.stderr or "",
+    }
+end
+
 return M

@@ -113,6 +113,52 @@ T["nvim configuration"]["mini.nvim is installed"] = function()
     MiniTest.expect.no_error(function() require("mini.test") end)
 end
 
+T["plugin interactions"] = MiniTest.new_set()
+
+local function assert_no_stderr_errors(result, label)
+    local stderr = result.stderr
+    local has_error = stderr:find("E%d+:") or stderr:find("Error executing") or stderr:find("stack traceback")
+    MiniTest.expect.equality(has_error, nil, label .. " produced errors:\n" .. stderr)
+end
+
+T["plugin interactions"]["float windows do not trigger winsep errors"] = function()
+    local result = helpers.nvim_interaction_test([[
+        local buf = vim.api.nvim_create_buf(false, true)
+        local win = vim.api.nvim_open_win(buf, true, {
+            relative = "editor", row = 5, col = 5, width = 40, height = 10,
+        })
+        vim.wait(100, function() return false end)
+        vim.api.nvim_set_current_win(win)
+        vim.wait(100, function() return false end)
+        vim.api.nvim_win_close(win, true)
+    ]])
+    assert_no_stderr_errors(result, "Float window interaction")
+end
+
+T["plugin interactions"]["mini.files open and close without errors"] = function()
+    local result = helpers.nvim_interaction_test([[
+        local ok, mini_files = pcall(require, "mini.files")
+        if ok and mini_files then
+            pcall(mini_files.open)
+            vim.wait(500, function() return false end)
+            pcall(mini_files.close)
+        end
+    ]])
+    assert_no_stderr_errors(result, "mini.files interaction")
+end
+
+T["plugin interactions"]["mini.pick can be invoked without errors"] = function()
+    local result = helpers.nvim_interaction_test([[
+        local ok, pick = pcall(require, "mini.pick")
+        if ok and pick then
+            pcall(pick.builtin.files, { tool = "git" })
+            vim.wait(200, function() return false end)
+            pcall(pick.stop)
+        end
+    ]])
+    assert_no_stderr_errors(result, "mini.pick interaction")
+end
+
 -- For manual running
 if ... == nil then MiniTest.run() end
 
