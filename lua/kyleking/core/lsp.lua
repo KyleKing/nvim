@@ -12,8 +12,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
             -- Keymaps for completion (buffer-local)
             local opts = { buffer = ev.buf, silent = true }
 
-            -- Trigger completion manually
-            vim.keymap.set("i", "<C-Space>", vim.lsp.completion.trigger, opts)
+            -- Trigger completion manually (<C-x><C-o> for 0.11, native trigger for 0.12+)
+            local trigger = vim.lsp.completion.trigger or function() vim.api.nvim_feedkeys("\24\15", "n", false) end
+            vim.keymap.set("i", "<C-Space>", trigger, opts)
 
             -- Navigate completion menu
             vim.keymap.set("i", "<C-j>", function()

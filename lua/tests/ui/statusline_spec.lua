@@ -96,11 +96,7 @@ T["statusline in non-temp session"]["statusline highlight groups are set"] = fun
 
         for _, hl_group in ipairs(hl_groups) do
             local hl = vim.api.nvim_get_hl(0, { name = hl_group })
-            MiniTest.expect.equality(
-                next(hl) ~= nil,
-                true,
-                "Highlight group should be defined: " .. hl_group
-            )
+            MiniTest.expect.equality(next(hl) ~= nil, true, "Highlight group should be defined: " .. hl_group)
         end
     end
 end

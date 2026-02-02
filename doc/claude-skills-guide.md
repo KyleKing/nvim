@@ -153,18 +153,18 @@ from typing import Dict, Any
 def weather_skill(city: str, units: str = "celsius") -> Dict[str, Any]:
     """
     Get weather information for a city.
-    
+
     Args:
         city: Name of the city
         units: Temperature units (celsius or fahrenheit)
-    
+
     Returns:
         Dictionary with weather information
     """
     api_key = os.getenv("WEATHER_API_KEY")
     url = f"https://api.weather.com/v1/current?city={city}&units={units}"
     headers = {"Authorization": f"Bearer {api_key}"}
-    
+
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()

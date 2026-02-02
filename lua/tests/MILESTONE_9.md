@@ -5,26 +5,27 @@
 ## Actions
 
 1. Run full test suite: `nvim --headless -c "lua MiniTest.run()" -c "q"`
-2. Fix any failing tests or startup errors
-3. Test all LSP workflows manually:
-   - Python: completion, diagnostics, formatting (ruff), linting
-   - TypeScript: completion, diagnostics, formatting (prettier)
-   - Lua: completion, diagnostics, formatting (stylua)
-   - Go: completion, diagnostics, formatting (gofmt)
-4. Test all pickers:
-   - Files, buffers, grep, LSP (symbols, definitions, references)
-   - Visual grep, help tags, resume
-5. Test terminal modes:
-   - Float toggle, horizontal, vertical
-   - Lazygit integration with worktree support
-6. Test git integration:
-   - Gitsigns: hunks, blame, toggle deleted
-   - Diffview: open, file history
-7. Verify startup time: `nvim --startuptime startup.log`
+1. Fix any failing tests or startup errors
+1. Test all LSP workflows manually:
+    - Python: completion, diagnostics, formatting (ruff), linting
+    - TypeScript: completion, diagnostics, formatting (prettier)
+    - Lua: completion, diagnostics, formatting (stylua)
+    - Go: completion, diagnostics, formatting (gofmt)
+1. Test all pickers:
+    - Files, buffers, grep, LSP (symbols, definitions, references)
+    - Visual grep, help tags, resume
+1. Test terminal modes:
+    - Float toggle, horizontal, vertical
+    - Lazygit integration with worktree support
+1. Test git integration:
+    - Gitsigns: hunks, blame, toggle deleted
+    - Diffview: open, file history
+1. Verify startup time: `nvim --startuptime startup.log`
 
 ## Testing
 
 **Expected results:**
+
 - All ~440 tests pass
 - No errors in `:messages` on startup
 - All workflows functional

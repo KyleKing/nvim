@@ -90,9 +90,7 @@ T["group descriptions"]["leader groups are defined"] = function()
     -- Check that clues include group descriptions
     local groups = {}
     for _, clue in ipairs(config.clues) do
-        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
-            groups[clue.keys] = clue.desc
-        end
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then groups[clue.keys] = clue.desc end
     end
 
     -- Expected groups
@@ -119,9 +117,7 @@ T["group descriptions"]["LSP subgroups are defined"] = function()
 
     local groups = {}
     for _, clue in ipairs(config.clues) do
-        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
-            groups[clue.keys] = clue.desc
-        end
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then groups[clue.keys] = clue.desc end
     end
 
     MiniTest.expect.equality(groups["<Leader>lg"], "+LSP Go to", "LSP Go to group should exist")
@@ -136,9 +132,7 @@ T["group descriptions"]["UI subgroups are defined"] = function()
 
     local groups = {}
     for _, clue in ipairs(config.clues) do
-        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
-            groups[clue.keys] = clue.desc
-        end
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then groups[clue.keys] = clue.desc end
     end
 
     MiniTest.expect.equality(groups["<Leader>uc"], "+Color", "Color group should exist")

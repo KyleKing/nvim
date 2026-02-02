@@ -84,7 +84,11 @@ T["filename utilities"] = MiniTest.new_set()
 
 T["filename utilities"]["get_truncated_filename function exists"] = function()
     local utils = require("kyleking.utils")
-    MiniTest.expect.equality(type(utils.get_truncated_filename), "function", "get_truncated_filename should be a function")
+    MiniTest.expect.equality(
+        type(utils.get_truncated_filename),
+        "function",
+        "get_truncated_filename should be a function"
+    )
 end
 
 T["filename utilities"]["truncates long filenames"] = function()

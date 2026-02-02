@@ -30,10 +30,15 @@ T["flash.nvim"]["flash keymaps are set"] = function()
     local check_flash_keymap = function(lhs, modes)
         for _, mode in ipairs(modes) do
             local keymap = vim.fn.maparg(lhs, mode, false, true)
-            MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, lhs .. " mapping should exist in " .. mode)
+            MiniTest.expect.equality(
+                keymap ~= nil and keymap.lhs ~= nil,
+                true,
+                lhs .. " mapping should exist in " .. mode
+            )
 
             -- Verify the mapping has a callable rhs (function or string)
-            local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
+            local has_callable = (type(keymap.callback) == "function")
+                or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
             MiniTest.expect.equality(has_callable, true, lhs .. " should have callable rhs in " .. mode)
         end
     end
@@ -75,7 +80,8 @@ T["illuminate"]["illuminate keymaps are set"] = function()
         MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, lhs .. " mapping should exist")
 
         -- Verify callable
-        local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
+        local has_callable = (type(keymap.callback) == "function")
+            or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
         MiniTest.expect.equality(has_callable, true, lhs .. " should have callable rhs")
     end
 
@@ -91,8 +97,16 @@ T["illuminate"]["illuminate functions are callable"] = function()
     local illuminate = require("illuminate")
     MiniTest.expect.equality(type(illuminate.toggle), "function", "illuminate.toggle should be a function")
     MiniTest.expect.equality(type(illuminate.toggle_buf), "function", "illuminate.toggle_buf should be a function")
-    MiniTest.expect.equality(type(illuminate.goto_next_reference), "function", "illuminate.goto_next_reference should be a function")
-    MiniTest.expect.equality(type(illuminate.goto_prev_reference), "function", "illuminate.goto_prev_reference should be a function")
+    MiniTest.expect.equality(
+        type(illuminate.goto_next_reference),
+        "function",
+        "illuminate.goto_next_reference should be a function"
+    )
+    MiniTest.expect.equality(
+        type(illuminate.goto_prev_reference),
+        "function",
+        "illuminate.goto_prev_reference should be a function"
+    )
 end
 
 T["bufjump"] = MiniTest.new_set()
@@ -110,7 +124,8 @@ T["bufjump"]["bufjump keymaps are set"] = function()
         MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, lhs .. " mapping should exist")
 
         -- Verify callable
-        local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
+        local has_callable = (type(keymap.callback) == "function")
+            or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
         MiniTest.expect.equality(has_callable, true, lhs .. " should have callable rhs")
     end
 
@@ -126,8 +141,16 @@ T["bufjump"]["bufjump functions are callable"] = function()
     local bufjump = require("bufjump")
     MiniTest.expect.equality(type(bufjump.forward), "function", "bufjump.forward should be a function")
     MiniTest.expect.equality(type(bufjump.backward), "function", "bufjump.backward should be a function")
-    MiniTest.expect.equality(type(bufjump.forward_same_buf), "function", "bufjump.forward_same_buf should be a function")
-    MiniTest.expect.equality(type(bufjump.backward_same_buf), "function", "bufjump.backward_same_buf should be a function")
+    MiniTest.expect.equality(
+        type(bufjump.forward_same_buf),
+        "function",
+        "bufjump.forward_same_buf should be a function"
+    )
+    MiniTest.expect.equality(
+        type(bufjump.backward_same_buf),
+        "function",
+        "bufjump.backward_same_buf should be a function"
+    )
 end
 
 -- For manual running

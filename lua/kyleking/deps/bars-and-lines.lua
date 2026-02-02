@@ -13,7 +13,12 @@ later(function()
     K("n", "]r", function() require("illuminate")["goto_next_reference"](false) end, { desc = "Next reference" })
     K("n", "[r", function() require("illuminate")["goto_prev_reference"](false) end, { desc = "Previous reference" })
     K("n", "<leader>ur", function() require("illuminate").toggle() end, { desc = "Toggle reference highlighting" })
-    K("n", "<leader>uR", function() require("illuminate").toggle_buf() end, { desc = "Toggle reference highlighting (buffer)" })
+    K(
+        "n",
+        "<leader>uR",
+        function() require("illuminate").toggle_buf() end,
+        { desc = "Toggle reference highlighting (buffer)" }
+    )
 end)
 
 -- Check for temp session BEFORE scheduling later()

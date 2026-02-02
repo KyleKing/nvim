@@ -15,13 +15,13 @@ A comprehensive Claude Skill for working with [Mini.Test](https://github.com/nvi
 The skill supports 8 different actions:
 
 1. **`generate_test_file`** - Generate a complete test file
-2. **`create_test_case`** - Create individual test cases
-3. **`explain_api`** - Get API documentation
-4. **`generate_expectation`** - Generate expectation code
-5. **`create_hooks`** - Create test hooks
-6. **`create_parametrized_test`** - Create parametrized tests
-7. **`create_child_neovim_test`** - Create isolated tests
-8. **`run_test_example`** - Get examples of running tests
+1. **`create_test_case`** - Create individual test cases
+1. **`explain_api`** - Get API documentation
+1. **`generate_expectation`** - Generate expectation code
+1. **`create_hooks`** - Create test hooks
+1. **`create_parametrized_test`** - Create parametrized tests
+1. **`create_child_neovim_test`** - Create isolated tests
+1. **`run_test_example`** - Get examples of running tests
 
 ### Example Usage
 
@@ -97,6 +97,7 @@ return T
 ## Documentation
 
 For detailed information, see:
+
 - [Implementation Guide](minitest-claude-skill-guide.md) - Complete guide with examples
 - [Claude Skills Guide](claude-skills-guide.md) - General Claude Skills documentation
 - [Mini.Test GitHub](https://github.com/nvim-mini/mini.test) - Official repository
@@ -117,8 +118,8 @@ The skill understands your conventions and generates code that matches your exis
 To improve this skill:
 
 1. Update `minitest-claude-skill.json` to add new actions or parameters
-2. Add examples to `minitest-claude-skill-guide.md`
-3. Test with actual Mini.Test usage patterns
+1. Add examples to `minitest-claude-skill-guide.md`
+1. Test with actual Mini.Test usage patterns
 
 ## License
 

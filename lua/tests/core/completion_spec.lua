@@ -28,12 +28,15 @@ end
 
 T["built-in completion"]["completion keymaps set after LSP attach"] = function()
     -- Create a Lua test file
-    local tmpfile = helpers.create_temp_file([[
+    local tmpfile = helpers.create_temp_file(
+        [[
 -- Test Lua file
 local function test()
     vim.api.nvim_
 end
-]], "lua")
+]],
+        "lua"
+    )
 
     -- Open the file
     vim.cmd("edit " .. tmpfile)
@@ -67,12 +70,15 @@ end
 
 T["built-in completion"]["completion can be triggered"] = function()
     -- Create a Lua test file with partial API call
-    local tmpfile = helpers.create_temp_file([[
+    local tmpfile = helpers.create_temp_file(
+        [[
 -- Test Lua file
 local function test()
     vim.api.nvim_buf_
 end
-]], "lua")
+]],
+        "lua"
+    )
 
     vim.cmd("edit " .. tmpfile)
     local bufnr = vim.api.nvim_get_current_buf()
@@ -108,11 +114,14 @@ end
 
 T["built-in completion"]["LSP client supports completion method"] = function()
     -- Create a Lua file to trigger LSP
-    local tmpfile = helpers.create_temp_file([[
+    local tmpfile = helpers.create_temp_file(
+        [[
 -- Test Lua file
 local M = {}
 return M
-]], "lua")
+]],
+        "lua"
+    )
 
     vim.cmd("edit " .. tmpfile)
     local bufnr = vim.api.nvim_get_current_buf()
@@ -142,13 +151,16 @@ end
 
 T["built-in completion"]["works with Python LSP"] = function()
     -- Create a Python test file
-    local tmpfile = helpers.create_temp_file([[
+    local tmpfile = helpers.create_temp_file(
+        [[
 # Test Python file
 import os
 
 def test_function():
     os.path.
-]], "py")
+]],
+        "py"
+    )
 
     vim.cmd("edit " .. tmpfile)
     local bufnr = vim.api.nvim_get_current_buf()
@@ -170,14 +182,17 @@ end
 
 T["built-in completion"]["works with TypeScript LSP"] = function()
     -- Create a TypeScript test file
-    local tmpfile = helpers.create_temp_file([[
+    local tmpfile = helpers.create_temp_file(
+        [[
 // Test TypeScript file
 const obj = {
     test: "value"
 };
 
 obj.
-]], "ts")
+]],
+        "ts"
+    )
 
     vim.cmd("edit " .. tmpfile)
     local bufnr = vim.api.nvim_get_current_buf()

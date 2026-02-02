@@ -123,15 +123,15 @@ return T
 ### Best Practices
 
 1. **Cleanup**: Always clean up resources (buffers, temp files, keymaps)
-2. **Isolation**: Each test should be independent
-3. **Helpers**: Use helpers for common operations
-4. **Async**: Use `wait_for_*` helpers for async operations
-5. **LSP**: Wait for LSP attachment before testing LSP features
+1. **Isolation**: Each test should be independent
+1. **Helpers**: Use helpers for common operations
+1. **Async**: Use `wait_for_*` helpers for async operations
+1. **LSP**: Wait for LSP attachment before testing LSP features
 
 ## Coverage Goals
 
 - **Core**: LSP, diagnostics, keymaps, autocmds (~150 tests)
-- **Plugins**: All mini.* and third-party plugins (~200 tests)
+- **Plugins**: All mini.\* and third-party plugins (~200 tests)
 - **Custom**: Utils, fs_utils, bin_discovery (~40 tests)
 - **Integration**: Complete workflows (~50 tests)
 - **Total**: ~440 tests

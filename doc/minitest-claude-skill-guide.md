@@ -11,19 +11,20 @@ The skill is defined in `minitest-claude-skill.json` and supports the following 
 ### Available Actions
 
 1. **`generate_test_file`** - Generate a complete test file with proper structure
-2. **`create_test_case`** - Create individual test cases with expectations
-3. **`explain_api`** - Explain Mini.Test API functions and usage
-4. **`generate_expectation`** - Generate expectation code snippets
-5. **`create_hooks`** - Create test hooks (pre_once, pre_case, post_case, post_once)
-6. **`create_parametrized_test`** - Create parametrized test cases
-7. **`create_child_neovim_test`** - Create tests using child Neovim processes
-8. **`run_test_example`** - Generate examples of running tests
+1. **`create_test_case`** - Create individual test cases with expectations
+1. **`explain_api`** - Explain Mini.Test API functions and usage
+1. **`generate_expectation`** - Generate expectation code snippets
+1. **`create_hooks`** - Create test hooks (pre_once, pre_case, post_case, post_once)
+1. **`create_parametrized_test`** - Create parametrized test cases
+1. **`create_child_neovim_test`** - Create tests using child Neovim processes
+1. **`run_test_example`** - Generate examples of running tests
 
 ## Mini.Test API Reference
 
 ### Core Functions
 
 #### `MiniTest.new_set(opts, tbl)`
+
 Creates a hierarchical test set. This is the fundamental building block of Mini.Test.
 
 ```lua
@@ -43,6 +44,7 @@ local T = MiniTest.new_set({
 ```
 
 #### `MiniTest.expect.*`
+
 Predefined expectation functions:
 
 - `MiniTest.expect.equality(actual, expected, message)` - Assert equality
@@ -54,6 +56,7 @@ Predefined expectation functions:
 - `MiniTest.expect.reference_screenshot(child, name)` - Compare screenshots
 
 #### `MiniTest.run_file(file, opts)`
+
 Run tests from a specific file:
 
 ```lua
@@ -61,6 +64,7 @@ MiniTest.run_file("lua/tests/color_spec.lua", { verbose = true })
 ```
 
 #### `MiniTest.run_at_location(location, opts)`
+
 Run tests at a specific location (cursor position):
 
 ```lua
@@ -68,6 +72,7 @@ MiniTest.run_at_location({ file = "lua/tests/color_spec.lua", line = 20 })
 ```
 
 #### `MiniTest.new_child_neovim(opts)`
+
 Create an isolated child Neovim process for testing:
 
 ```lua
@@ -104,6 +109,7 @@ Hooks allow you to run code at different stages:
 ### Example 1: Generate a Basic Test File
 
 **Request:**
+
 ```json
 {
   "action": "generate_test_file",
@@ -127,6 +133,7 @@ Hooks allow you to run code at different stages:
 ```
 
 **Generated Output:**
+
 ```lua
 -- Test file for color.lua using Mini.test
 local MiniTest = require("mini.test")
@@ -164,14 +171,24 @@ return T
 ### Example 2: Create Parametrized Tests
 
 **Request:**
+
 ```json
 {
   "action": "create_parametrized_test",
   "module_name": "kyleking.deps.color",
   "parametrize": [
-    ["#FF0000", "red"],
-    ["#00FF00", "green"],
-    ["#0000FF", "blue"]
+    [
+      "#FF0000",
+      "red"
+    ],
+    [
+      "#00FF00",
+      "green"
+    ],
+    [
+      "#0000FF",
+      "blue"
+    ]
   ],
   "test_cases": [
     {
@@ -191,6 +208,7 @@ return T
 ```
 
 **Generated Output:**
+
 ```lua
 T["color module"]["color_conversion"] = MiniTest.new_set({
     parametrize = { { "#FF0000", "red" }, { "#00FF00", "green" }, { "#0000FF", "blue" } },
@@ -205,6 +223,7 @@ end
 ### Example 3: Create Tests with Hooks
 
 **Request:**
+
 ```json
 {
   "action": "create_hooks",
@@ -230,6 +249,7 @@ end
 ```
 
 **Generated Output:**
+
 ```lua
 local T = MiniTest.new_set({
     hooks = {
@@ -257,6 +277,7 @@ end
 ### Example 4: Create Child Neovim Test
 
 **Request:**
+
 ```json
 {
   "action": "create_child_neovim_test",
@@ -267,6 +288,7 @@ end
 ```
 
 **Generated Output:**
+
 ```lua
 T["color module"].highlighting = function()
     -- Create a child Neovim process for isolation
@@ -306,6 +328,7 @@ end
 ### Example 5: Explain API Function
 
 **Request:**
+
 ```json
 {
   "action": "explain_api",
@@ -314,6 +337,7 @@ end
 ```
 
 **Generated Output:**
+
 ```
 MiniTest.new_set(opts, tbl) creates a hierarchical test set.
 
@@ -420,16 +444,16 @@ end
 T["module_name"].with_mock = function()
     -- Save original
     local original_func = package.loaded["plugin"].func
-    
+
     -- Create mock
     package.loaded["plugin"].func = function()
         return "mocked_value"
     end
-    
+
     -- Test
     require("module.name")
     -- ... test code ...
-    
+
     -- Restore original
     package.loaded["plugin"].func = original_func
 end
@@ -503,11 +527,12 @@ Based on your setup in `setup-deps.lua`:
 This skill is designed to be used with Claude's tool calling capabilities. When Claude needs to help with Mini.Test:
 
 1. It can call the skill with appropriate parameters
-2. The skill generates proper Lua code following Mini.Test patterns
-3. Code follows the existing codebase conventions
-4. Output includes proper error handling and best practices
+1. The skill generates proper Lua code following Mini.Test patterns
+1. Code follows the existing codebase conventions
+1. Output includes proper error handling and best practices
 
 The skill understands:
+
 - Your project structure (`lua/kyleking/deps/*`)
 - Your test file naming (`*_spec.lua`)
 - Your existing test patterns (from `color_spec.lua` and `terminal_integration_spec.lua`)

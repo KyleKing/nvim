@@ -33,10 +33,11 @@ T["mini.diff"]["toggle overlay keymap is set"] = function()
     MiniTest.expect.equality(has_callable, true, "<leader>ugd should have callable rhs (prevents nil errors)")
 end
 
-T["mini.diff"]["MiniDiff.toggle_overlay is callable"] = function()
+T["mini.diff"]["toggle_overlay is callable"] = function()
     vim.wait(1000)
 
-    MiniTest.expect.equality(type(MiniDiff.toggle_overlay), "function", "toggle_overlay should be a function")
+    local diff = require("mini.diff")
+    MiniTest.expect.equality(type(diff.toggle_overlay), "function", "toggle_overlay should be a function")
 end
 
 T["mini.git"] = MiniTest.new_set()

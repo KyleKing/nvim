@@ -93,26 +93,41 @@ K("n", "<leader>gg", function()
 end, { desc = "Terminal: lazygit" })
 
 -- Other terminal commands
-K("n", "<leader>gj", function()
-    toggle_terminal({ cmd = "lazyjj", term_id = "lazyjj", direction = "float" })
-end, { desc = "Terminal: lazyjj" })
+K(
+    "n",
+    "<leader>gj",
+    function() toggle_terminal({ cmd = "lazyjj", term_id = "lazyjj", direction = "float" }) end,
+    { desc = "Terminal: lazyjj" }
+)
 
-K("n", "<leader>td", function()
-    toggle_terminal({ cmd = "lazydocker", term_id = "lazydocker", direction = "float" })
-end, { desc = "Terminal: lazydocker" })
+K(
+    "n",
+    "<leader>td",
+    function() toggle_terminal({ cmd = "lazydocker", term_id = "lazydocker", direction = "float" }) end,
+    { desc = "Terminal: lazydocker" }
+)
 
 -- Generic terminal toggles
-K("n", "<leader>tf", function()
-    toggle_terminal({ term_id = "float", direction = "float" })
-end, { desc = "Terminal: float" })
+K(
+    "n",
+    "<leader>tf",
+    function() toggle_terminal({ term_id = "float", direction = "float" }) end,
+    { desc = "Terminal: float" }
+)
 
-K("n", "<leader>th", function()
-    toggle_terminal({ term_id = "horizontal", direction = "horizontal", size = 15 })
-end, { desc = "Terminal: horizontal split" })
+K(
+    "n",
+    "<leader>th",
+    function() toggle_terminal({ term_id = "horizontal", direction = "horizontal", size = 15 }) end,
+    { desc = "Terminal: horizontal split" }
+)
 
-K("n", "<leader>tv", function()
-    toggle_terminal({ term_id = "vertical", direction = "vertical", size = 80 })
-end, { desc = "Terminal: vertical split" })
+K(
+    "n",
+    "<leader>tv",
+    function() toggle_terminal({ term_id = "vertical", direction = "vertical", size = 80 }) end,
+    { desc = "Terminal: vertical split" }
+)
 
 -- Toggle last used terminal with Ctrl-'
 K({ "n", "t" }, "<C-'>", function()

@@ -148,15 +148,20 @@ T["treesitter-textobjects"] = MiniTest.new_set()
 
 T["treesitter-textobjects"]["textobjects is configured"] = function()
     vim.wait(1000)
-    MiniTest.expect.equality(helpers.is_plugin_loaded("nvim-treesitter-textobjects"), true, "textobjects should be loaded")
+    MiniTest.expect.equality(
+        helpers.is_plugin_loaded("nvim-treesitter-textobjects"),
+        true,
+        "textobjects should be loaded"
+    )
 end
 
 T["treesitter-textobjects"]["textobjects module exists"] = function()
     vim.wait(1000)
 
-    MiniTest.expect.no_error(function()
-        require("nvim-treesitter-textobjects")
-    end, "Textobjects module should load without error")
+    MiniTest.expect.no_error(
+        function() require("nvim-treesitter-textobjects") end,
+        "Textobjects module should load without error"
+    )
 end
 
 T["incremental selection"] = MiniTest.new_set()

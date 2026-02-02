@@ -80,7 +80,10 @@ later(function()
             todo = { pattern = { word_pattern("TODO"), paren_pattern("TODO") }, group = "MiniHipatternsTodo" },
             note = { pattern = { word_pattern("NOTE"), paren_pattern("NOTE") }, group = "MiniHipatternsNote" },
             fyi = { pattern = { word_pattern("FYI"), paren_pattern("FYI") }, group = "MiniHipatternsNote" },
-            planned = { pattern = { word_pattern("PLANNED"), paren_pattern("PLANNED") }, group = "MiniHipatternsPlanned" },
+            planned = {
+                pattern = { word_pattern("PLANNED"), paren_pattern("PLANNED") },
+                group = "MiniHipatternsPlanned",
+            },
             warning = { pattern = { word_pattern("WARNING"), paren_pattern("WARNING") }, group = "MiniHipatternsFixme" },
             perf = { pattern = { word_pattern("PERF"), paren_pattern("PERF") }, group = "MiniHipatternsHack" },
             test = { pattern = { word_pattern("TEST"), paren_pattern("TEST") }, group = "MiniHipatternsTodo" },
@@ -89,9 +92,12 @@ later(function()
 
     vim.api.nvim_set_hl(0, "MiniHipatternsPlanned", { bg = "#FCD7AD", fg = "#1c1c1c", bold = true })
 
-    vim.keymap.set("n", "<leader>ft", function()
-        require("mini.pick").builtin.grep({ pattern = "TODO|FIXME|NOTE|PLANNED|FYI|HACK|WARNING|PERF|TEST" })
-    end, { desc = "Find in TODOs" })
+    vim.keymap.set(
+        "n",
+        "<leader>ft",
+        function() require("mini.pick").builtin.grep({ pattern = "TODO|FIXME|NOTE|PLANNED|FYI|HACK|WARNING|PERF|TEST" }) end,
+        { desc = "Find in TODOs" }
+    )
 end)
 
 later(function()

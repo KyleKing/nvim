@@ -29,12 +29,22 @@ T["lsp_signature"]["signature keymap is set"] = function()
     local keymap_n = vim.fn.maparg("<leader>ks", "n", false, true)
     local keymap_i = vim.fn.maparg("<leader>ks", "i", false, true)
 
-    MiniTest.expect.equality(keymap_n ~= nil and keymap_n.lhs ~= nil, true, "<leader>ks mapping should exist in normal mode")
-    MiniTest.expect.equality(keymap_i ~= nil and keymap_i.lhs ~= nil, true, "<leader>ks mapping should exist in insert mode")
+    MiniTest.expect.equality(
+        keymap_n ~= nil and keymap_n.lhs ~= nil,
+        true,
+        "<leader>ks mapping should exist in normal mode"
+    )
+    MiniTest.expect.equality(
+        keymap_i ~= nil and keymap_i.lhs ~= nil,
+        true,
+        "<leader>ks mapping should exist in insert mode"
+    )
 
     -- Verify callable
-    local has_callable_n = (type(keymap_n.callback) == "function") or (type(keymap_n.rhs) == "string" and keymap_n.rhs ~= "")
-    local has_callable_i = (type(keymap_i.callback) == "function") or (type(keymap_i.rhs) == "string" and keymap_i.rhs ~= "")
+    local has_callable_n = (type(keymap_n.callback) == "function")
+        or (type(keymap_n.rhs) == "string" and keymap_n.rhs ~= "")
+    local has_callable_i = (type(keymap_i.callback) == "function")
+        or (type(keymap_i.rhs) == "string" and keymap_i.rhs ~= "")
 
     MiniTest.expect.equality(has_callable_n, true, "<leader>ks should have callable rhs in normal mode")
     MiniTest.expect.equality(has_callable_i, true, "<leader>ks should have callable rhs in insert mode")

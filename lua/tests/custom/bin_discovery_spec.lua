@@ -20,14 +20,21 @@ T["node_modules detection"] = MiniTest.new_set()
 
 T["node_modules detection"]["detect_node_modules function exists"] = function()
     local bin_discovery = require("kyleking.utils.bin_discovery")
-    MiniTest.expect.equality(type(bin_discovery.detect_node_modules), "function", "detect_node_modules should be a function")
+    MiniTest.expect.equality(
+        type(bin_discovery.detect_node_modules),
+        "function",
+        "detect_node_modules should be a function"
+    )
 end
 
 T["node_modules detection"]["detect_node_modules is callable"] = function()
     local bin_discovery = require("kyleking.utils.bin_discovery")
 
     -- Should not error when called
-    MiniTest.expect.no_error(function() bin_discovery.detect_node_modules() end, "detect_node_modules should be callable")
+    MiniTest.expect.no_error(
+        function() bin_discovery.detect_node_modules() end,
+        "detect_node_modules should be callable"
+    )
 end
 
 T["node_modules detection"]["autocmd is configured"] = function()

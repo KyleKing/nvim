@@ -35,9 +35,12 @@ later(function()
     K("n", "<leader>;", builtin.buffers, { desc = "Find in open buffers" })
 
     -- Leader-b (buffer operations)
-    K("n", "<leader>bb", function()
-        builtin.grep({ pattern = "" }, { source = { name = "Current buffer" } })
-    end, { desc = "Find word in current buffer" })
+    K(
+        "n",
+        "<leader>bb",
+        function() builtin.grep({ pattern = "" }, { source = { name = "Current buffer" } }) end,
+        { desc = "Find word in current buffer" }
+    )
     K("n", "<leader>bL", MiniExtra.pickers.buf_lines, { desc = "Find lines across all buffers" })
     K("n", "<leader>br", MiniExtra.pickers.oldfiles, { desc = "Find recently opened files" })
 
@@ -46,21 +49,26 @@ later(function()
 
     -- Leader-l (LSP operations)
     K("n", "<leader>ld", MiniExtra.pickers.diagnostic, { desc = "Find in diagnostics" })
-    K("n", "<leader>lgs", function()
-        MiniExtra.pickers.lsp({ scope = "document_symbol" })
-    end, { desc = "Find in symbols" })
-    K("n", "<leader>lgd", function()
-        MiniExtra.pickers.lsp({ scope = "definition" })
-    end, { desc = "LSP definitions" })
-    K("n", "<leader>lgi", function()
-        MiniExtra.pickers.lsp({ scope = "implementation" })
-    end, { desc = "LSP implementations" })
-    K("n", "<leader>lgr", function()
-        MiniExtra.pickers.lsp({ scope = "references" })
-    end, { desc = "LSP references" })
-    K("n", "<leader>lgt", function()
-        MiniExtra.pickers.lsp({ scope = "type_definition" })
-    end, { desc = "LSP type definitions" })
+    K(
+        "n",
+        "<leader>lgs",
+        function() MiniExtra.pickers.lsp({ scope = "document_symbol" }) end,
+        { desc = "Find in symbols" }
+    )
+    K("n", "<leader>lgd", function() MiniExtra.pickers.lsp({ scope = "definition" }) end, { desc = "LSP definitions" })
+    K(
+        "n",
+        "<leader>lgi",
+        function() MiniExtra.pickers.lsp({ scope = "implementation" }) end,
+        { desc = "LSP implementations" }
+    )
+    K("n", "<leader>lgr", function() MiniExtra.pickers.lsp({ scope = "references" }) end, { desc = "LSP references" })
+    K(
+        "n",
+        "<leader>lgt",
+        function() MiniExtra.pickers.lsp({ scope = "type_definition" }) end,
+        { desc = "LSP type definitions" }
+    )
 
     -- Leader-f (find operations)
     K("n", "<leader>fB", function()
@@ -106,9 +114,12 @@ later(function()
     K("n", "<leader>fC", MiniExtra.pickers.commands, { desc = "Find commands" })
     K("n", "<leader>fe", MiniExtra.pickers.explorer, { desc = "Explore files with picker" })
 
-    K("n", "<leader>ff", function()
-        builtin.files({ tool = "git" }, { source = { cwd = vim.fn.getcwd() } })
-    end, { desc = "Find in files" })
+    K(
+        "n",
+        "<leader>ff",
+        function() builtin.files({ tool = "git" }, { source = { cwd = vim.fn.getcwd() } }) end,
+        { desc = "Find in files" }
+    )
 
     K("n", "<leader>fh", builtin.help, { desc = "Find in nvim help" })
     K("n", "<leader>fH", MiniExtra.pickers.history, { desc = "Find in command/search history" })
@@ -116,9 +127,7 @@ later(function()
     K("n", "<leader>fl", MiniExtra.pickers.list, { desc = "Find in quickfix/location lists" })
     K("n", "<leader>fr", MiniExtra.pickers.registers, { desc = "Find registers" })
 
-    K("n", "<leader>fw", function()
-        builtin.grep_live()
-    end, { desc = "Find word in files (live grep)" })
+    K("n", "<leader>fw", function() builtin.grep_live() end, { desc = "Find word in files (live grep)" })
 
     -- Additional mini.extra pickers (uncomment to enable):
     -- MiniExtra.pickers.hipatterns - Browse active highlight patterns from mini.hipatterns

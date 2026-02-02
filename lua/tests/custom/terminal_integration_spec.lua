@@ -13,9 +13,7 @@ local T = MiniTest.new_set({
             for _, winid in ipairs(vim.api.nvim_list_wins()) do
                 local bufnr = vim.api.nvim_win_get_buf(winid)
                 if vim.bo[bufnr].buftype == "terminal" then
-                    if vim.api.nvim_win_is_valid(winid) then
-                        pcall(vim.api.nvim_win_close, winid, true)
-                    end
+                    if vim.api.nvim_win_is_valid(winid) then pcall(vim.api.nvim_win_close, winid, true) end
                 end
             end
         end,
@@ -85,9 +83,7 @@ T["terminal operations"]["float terminal creates floating window"] = function()
     MiniTest.expect.equality(vim.bo[term.bufnr].buftype, "terminal", "Buffer should be terminal type")
 
     -- Clean up
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then
-        vim.api.nvim_win_close(term.winid, true)
-    end
+    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
 end
 
 T["terminal operations"]["horizontal terminal creates split"] = function()
@@ -107,9 +103,7 @@ T["terminal operations"]["horizontal terminal creates split"] = function()
     MiniTest.expect.equality(term.direction, "horizontal", "Direction should be horizontal")
 
     -- Clean up
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then
-        vim.api.nvim_win_close(term.winid, true)
-    end
+    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
 end
 
 T["terminal operations"]["vertical terminal creates split"] = function()
@@ -129,9 +123,7 @@ T["terminal operations"]["vertical terminal creates split"] = function()
     MiniTest.expect.equality(term.direction, "vertical", "Direction should be vertical")
 
     -- Clean up
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then
-        vim.api.nvim_win_close(term.winid, true)
-    end
+    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
 end
 
 T["terminal operations"]["toggle hides visible terminal"] = function()
@@ -179,9 +171,7 @@ T["terminal operations"]["reuses existing terminal buffer"] = function()
 
     -- Clean up
     local term = module.terminals["test_reuse"]
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then
-        vim.api.nvim_win_close(term.winid, true)
-    end
+    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
 end
 
 T["lazygit integration"] = MiniTest.new_set()
