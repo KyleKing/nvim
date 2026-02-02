@@ -108,7 +108,7 @@ later(function()
         builtin.files({ tool = "git" }, { source = { cwd = vim.fn.getcwd() } })
     end, { desc = "Find in files" })
 
-    K("n", "<leader>fh", MiniExtra.pickers.help, { desc = "Find in nvim help" })
+    K("n", "<leader>fh", builtin.help, { desc = "Find in nvim help" })
     K("n", "<leader>fk", MiniExtra.pickers.keymaps, { desc = "Find keymaps" })
     K("n", "<leader>fr", MiniExtra.pickers.registers, { desc = "Find registers" })
 

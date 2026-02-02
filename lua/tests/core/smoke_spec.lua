@@ -79,6 +79,24 @@ T["test infrastructure"]["helpers.is_plugin_loaded detects loaded plugins"] = fu
     MiniTest.expect.equality(helpers.is_plugin_loaded("nonexistent_plugin_xyz"), false)
 end
 
+T["mini.deps startup"] = MiniTest.new_set()
+
+T["mini.deps startup"]["no errors during two-stage execution"] = function()
+    local result = vim
+        .system({
+            "nvim",
+            "--headless",
+            "-c",
+            "lua vim.wait(3000, function() return false end)",
+            "-c",
+            "q",
+        }, { text = true })
+        :wait(10000)
+    local output = (result.stdout or "") .. (result.stderr or "")
+    local error_start = output:find("%(mini%.deps%) There were errors")
+    MiniTest.expect.equality(error_start, nil, "mini.deps two-stage errors:\n" .. output)
+end
+
 T["nvim configuration"] = MiniTest.new_set()
 
 T["nvim configuration"]["nvim version is 0.11+"] = function()
