@@ -106,6 +106,29 @@ if not is_temp_session then
         vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = colors.fg2, bg = colors.bg2 })
         vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = colors.fg3, bg = colors.bg1 })
     end)
+
+    later(function()
+        local MiniTabline = require("mini.tabline")
+
+        MiniTabline.setup({
+            show_icons = true,
+            set_vim_settings = true,
+            tabpage_section = "right",
+        })
+
+        -- Apply nightfly-inspired theme colors
+        local colors = require("kyleking.theme").get_colors()
+
+        -- Tabline colors matching statusline theme
+        vim.api.nvim_set_hl(0, "MiniTablineCurrent", { fg = colors.fg1, bg = colors.bg2, bold = true })
+        vim.api.nvim_set_hl(0, "MiniTablineVisible", { fg = colors.fg2, bg = colors.bg1 })
+        vim.api.nvim_set_hl(0, "MiniTablineHidden", { fg = colors.fg3, bg = colors.bg0 })
+        vim.api.nvim_set_hl(0, "MiniTablineModifiedCurrent", { fg = colors.orange, bg = colors.bg2, bold = true })
+        vim.api.nvim_set_hl(0, "MiniTablineModifiedVisible", { fg = colors.orange, bg = colors.bg1 })
+        vim.api.nvim_set_hl(0, "MiniTablineModifiedHidden", { fg = colors.orange, bg = colors.bg0 })
+        vim.api.nvim_set_hl(0, "MiniTablineFill", { bg = colors.bg0 })
+        vim.api.nvim_set_hl(0, "MiniTablineTabpagesection", { fg = colors.fg1, bg = colors.bg2, bold = true })
+    end)
 end
 
 later(function()
