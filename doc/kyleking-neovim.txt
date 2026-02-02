@@ -1023,7 +1023,26 @@ The shell tab preserves its buffer across toggles. TUI floats use 90% of the
 screen with rounded borders. When the TUI process exits, the float closes and
 cleans up.
 
-Source: `lua/kyleking/deps/terminal-integration.lua`
+
+OPENING FILES FROM TERMINAL ~
+
+From within terminal mode, you can open files under the cursor:
+
+>
+    gf              Open file/path under cursor in new tab
+    <C-w>gf         Peek file in new tab, then return to terminal
+<
+
+Supports both absolute and relative paths (resolved from terminal’s cwd),
+with optional `:line:col` suffixes (e.g., `src/file.lua:42:10`). Paths are
+resolved relative to the terminal’s working directory, not nvim’s cwd.
+
+Examples of supported formats: - `README.md` (relative path) -
+`/absolute/path/to/file.txt` - `src/main.lua:123` (with line number) -
+`lib/utils.py:45:12` (with line and column)
+
+Source: `lua/kyleking/deps/terminal-integration.lua`,
+`lua/kyleking/utils/file_opener.lua`
 
 
 COLOR & UI                                        *kyleking-neovim-color-&-ui*
