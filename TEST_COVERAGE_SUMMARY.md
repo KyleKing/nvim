@@ -13,7 +13,7 @@
 | ----------------------------- | ---------------------------------------------- | -------------- | ----------------------------------------------------------------------- |
 | **Built-in LSP Completion**   | `core/completion_spec.lua`                     | HIGH           | Tests keymaps, LSP attach, Python/TS completion                         |
 | **Startup & Infrastructure**  | `core/smoke_spec.lua`                          | HIGH           | Tests mini.deps two-stage execution, plugin interactions, float windows |
-| **Custom Utilities**          | `custom/*_spec.lua`                            | HIGH           | bin_discovery, fs_utils, terminal, utils all covered                    |
+| **Custom Utilities**          | `custom/*_spec.lua`                            | HIGH           | tool_resolve, fs_utils, terminal, utils all covered                     |
 | **mini.comment**              | `plugins/editing_spec.lua`                     | HIGH           | Tests commenting in multiple languages                                  |
 | **mini.surround**             | `plugins/editing_spec.lua`                     | HIGH           | Tests add/delete/replace surround operations                            |
 | **Formatting (conform.nvim)** | `plugins/formatting_spec.lua`                  | HIGH           | Tests formatters for Lua, Python, JS, global formatters                 |
@@ -59,10 +59,11 @@ Core (2 files, ~20 tests)
 ├── completion_spec.lua         - 6 tests
 └── smoke_spec.lua             - 14 tests
 
-Custom (4 files, ~44 tests)
-├── bin_discovery_spec.lua      - 5 tests
+Custom (5 files, ~51 tests)
 ├── fs_utils_spec.lua          - 13 tests
+├── noqa_spec.lua              - 5 tests
 ├── terminal_integration_spec.lua - 16 tests
+├── tool_resolve_spec.lua      - 7 tests
 └── utils_spec.lua             - 10 tests
 
 Integration (5 files, ~46 tests)
@@ -78,7 +79,7 @@ Plugins (6 files, ~86 tests)
 ├── formatting_spec.lua         - 12 tests
 ├── git_spec.lua                - 7 tests
 ├── keybinding_spec.lua         - 18 tests
-├── lsp_plugins_spec.lua        - 13 tests
+├── lsp_plugins_spec.lua        - 16 tests
 ├── motion_spec.lua             - 11 tests
 └── treesitter_spec.lua         - 19 tests
 

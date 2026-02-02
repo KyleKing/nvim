@@ -7,9 +7,9 @@ local M = {}
 -- @return boolean: true if LSP attached, false if timeout
 function M.wait_for_lsp_attach(bufnr, timeout_ms)
     timeout_ms = timeout_ms or 5000
-    local start_time = vim.loop.now()
+    local start_time = vim.uv.now()
 
-    while vim.loop.now() - start_time < timeout_ms do
+    while vim.uv.now() - start_time < timeout_ms do
         local clients = vim.lsp.get_clients({ bufnr = bufnr })
         if #clients > 0 then return true end
         vim.wait(100)
@@ -62,9 +62,9 @@ end
 function M.wait_for_condition(fn, timeout_ms, interval_ms)
     timeout_ms = timeout_ms or 2000
     interval_ms = interval_ms or 100
-    local start_time = vim.loop.now()
+    local start_time = vim.uv.now()
 
-    while vim.loop.now() - start_time < timeout_ms do
+    while vim.uv.now() - start_time < timeout_ms do
         if fn() then return true end
         vim.wait(interval_ms)
     end

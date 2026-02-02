@@ -9,7 +9,7 @@ function M.path_join(parts) return table.concat(parts, M.path_separator) end
 
 function M.path_exists(path)
     ---@diagnostic disable-next-line: unused-local
-    local ok, _err = vim.loop.fs_stat(path)
+    local ok, _err = vim.uv.fs_stat(path)
     if ok then return true end
     return false
 end

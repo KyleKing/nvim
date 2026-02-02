@@ -53,6 +53,7 @@ later(function()
             { mode = "n", keys = "<Leader>S", desc = "+Session" },
             { mode = "n", keys = "<Leader>b", desc = "+Buffer" },
             { mode = "n", keys = "<Leader>bO", desc = "+Order" },
+            { mode = "n", keys = "<Leader>c", desc = "+Code" },
             { mode = "n", keys = "<Leader>f", desc = "+Find" },
             { mode = "n", keys = "<Leader>g", desc = "+Git" },
             { mode = "n", keys = "<Leader>l", desc = "+LSP" },

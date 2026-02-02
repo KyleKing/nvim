@@ -93,6 +93,14 @@ return T
 
 `helpers.nvim_interaction_test(lua_code)` spawns a subprocess nvim with full config to test plugin interactions (float windows, mini.files, pickers). Use this for bugs that only manifest when plugins interact at runtime.
 
+### LSP configuration (nvim 0.11+)
+
+LSP servers are configured via native `lsp/` directory files (not mason). Each `lsp/<server>.lua` returns a config table with `filetypes`, `root_markers`, and `settings`. Servers that depend on plugins (jsonls, yamlls with SchemaStore) are configured in `deps/lsp.lua` via `vim.lsp.config()` instead.
+
+### Tool resolution (find-relative-executable)
+
+`lua/find-relative-executable/init.lua` is structured as an internal plugin (modular monolith). It resolves project-local binaries for linters and formatters by walking upward from the buffer to find `pyproject.toml` (`.venv/bin/`) or `package.json` (`node_modules/.bin/`), caches results per project root, and falls back to global `$PATH`. Public API: `resolve(tool, buf_path)`, `command_for(tool)` (conform adapter), `cmd_for(tool)` (nvim-lint adapter), `clear_cache()`.
+
 ### Key conventions
 
 - Leader: `<space>`, local leader: `,`

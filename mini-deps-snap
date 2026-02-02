@@ -1,4 +1,5 @@
 return {
+  ["SchemaStore.nvim"] = "9b6a3ab14cecc7da9f3aa4fa0ae2a7390748aca5",
   ["bufjump.nvim"] = "ae2728a77defbd27e9e5ef64c854fb0813ffba01",
   ["ccc.nvim"] = "9d1a256e006decc574789dfc7d628ca11644d4c2",
   ["codanna.nvim"] = "5abdcfcc4fe9bf39e1b022c4b9fdb0430bd4e012",

@@ -67,7 +67,21 @@ vim.opt.spell = true -- Always on spell checking
 vim.opt.mouse = "a" -- enable mouse support
 vim.opt.mousescroll = "ver:1,hor:0" -- prevent horizontal scroll (https://vi.stackexchange.com/a/42209)
 
--- Opt-in to virtual text
+local function _format_diagnostic(diagnostic)
+    local parts = {}
+    if diagnostic.source then table.insert(parts, diagnostic.source) end
+    if diagnostic.code then table.insert(parts, tostring(diagnostic.code)) end
+    local prefix = #parts > 0 and ("[" .. table.concat(parts, " ") .. "] ") or ""
+    return prefix .. diagnostic.message
+end
+
 vim.diagnostic.config({
-    virtual_text = { current_line = true },
+    virtual_text = {
+        current_line = true,
+        format = _format_diagnostic,
+    },
+    float = {
+        border = "rounded",
+        format = _format_diagnostic,
+    },
 })
