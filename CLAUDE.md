@@ -91,25 +91,55 @@ if ... == nil then MiniTest.run() end
 return T
 ```
 
-`helpers.nvim_interaction_test(lua_code)` spawns a subprocess nvim with full config to test plugin interactions (float windows, mini.files, pickers). Use this for bugs that only manifest when plugins interact at runtime.
+Key test utilities in `lua/tests/helpers.lua`:
+
+- `nvim_interaction_test(lua_code)` - Spawns subprocess nvim with full config to test plugin interactions (floats, mini.files, pickers). Use for bugs that only manifest at runtime.
+- `wait_for_condition(fn, timeout_ms)` - Polls condition function until true or timeout
+- `check_keymap(mode, lhs, desc_pattern)` - Validates keymap exists with matching description
+- `create_test_buffer(lines)` - Creates scratch buffer with content
+- `get_diagnostic_count(bufnr, severity)` - Returns count of diagnostics by severity level
 
 ### LSP configuration (nvim 0.11+)
 
-LSP servers are configured via native `lsp/` directory files (not mason). Each `lsp/<server>.lua` returns a config table with `filetypes`, `root_markers`, and `settings`. Servers that depend on plugins (jsonls, yamlls with SchemaStore) are configured in `deps/lsp.lua` via `vim.lsp.config()` instead.
+LSP configuration is split across three locations:
+
+1. **Core setup** (`lua/kyleking/core/lsp.lua`): Completion, snippet, keymap setup
+1. **Server configs** (`lsp/*.lua`): Per-server settings files returning `{filetypes, root_markers, settings}` tables:
+    - `lsp/lua_ls.lua`, `lsp/pyright.lua`, `lsp/gopls.lua`, `lsp/ts_ls.lua`, `lsp/terraformls.lua`
+    - Auto-loaded by nvim 0.11+ native LSP system
+    - To add new LSP: create `lsp/<server>.lua` following existing patterns
+1. **Plugin integration** (`lua/kyleking/deps/lsp.lua`): Linters (nvim-lint), formatting (conform.nvim), signature help, plugin-dependent servers (jsonls/yamlls with SchemaStore)
 
 ### Tool resolution (find-relative-executable)
 
-`lua/find-relative-executable/init.lua` is structured as an internal plugin (modular monolith). It resolves project-local binaries for linters and formatters by walking upward from the buffer to find `pyproject.toml` (`.venv/bin/`) or `package.json` (`node_modules/.bin/`), caches results per project root, and falls back to global `$PATH`. Public API: `resolve(tool, buf_path)`, `command_for(tool)` (conform adapter), `cmd_for(tool)` (nvim-lint adapter), `clear_cache()`.
+`lua/find-relative-executable/init.lua` resolves project-local binaries for linters/formatters. Walks upward from buffer to find `pyproject.toml` (→ `.venv/bin/`) or `package.json` (→ `node_modules/.bin/`), caches by project root, falls back to `$PATH`.
+
+API:
+
+- `resolve(tool, buf_path)` - Returns resolved path string
+- `command_for(tool)` - Returns conform.nvim adapter function
+- `cmd_for(tool)` - Returns nvim-lint adapter function
+- `clear_cache()` - Clears resolution cache
+
+Used in `deps/lsp.lua` and `deps/formatting.lua` to prefer local tool installations.
 
 ### Key conventions
 
 - Leader: `<space>`, local leader: `,`
-- `local K = vim.keymap.set` alias used in deps files
+- `local K = vim.keymap.set` alias consistently used in deps files
 - **Use mode arrays**: `vim.keymap.set({ "n", "x" }, ...)` instead of separate calls for each mode
 - Autocmd groups prefixed with `kyleking_` (e.g., `kyleking_winsep`)
 - Theme colors accessed via `require("kyleking.theme").get_colors()`
 - `PLANNED:` comments mark features to add when upstream support arrives
 - Skip floating windows in global autocmds: `if vim.api.nvim_win_get_config(0).relative ~= "" then return end`
+
+### Custom utilities
+
+- `lua/kyleking/utils/noqa.lua` - Diagnostic suppression (noqa-style comments for ruff, selene, oxlint, etc.)
+    - `ignore_inline()` - Add suppression comment at cursor line
+    - `ignore_file()` - Add file-wide suppression at top
+- `lua/kyleking/utils/fs_utils.lua` - File system utilities (git worktrees, Python path detection)
+- `lua/find-relative-executable/init.lua` - Project-local tool resolution (see Tool resolution section)
 
 ## Style
 
