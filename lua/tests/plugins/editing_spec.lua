@@ -189,14 +189,6 @@ T["mini.operators"]["sort keymap exists"] = function()
     MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "gs mapping should exist")
 end
 
-T["mini.operators"]["gx still maps to gx.nvim"] = function()
-    vim.wait(1000)
-    local keymap = vim.fn.maparg("gx", "n", false, true)
-    MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "gx mapping should exist")
-    local desc = keymap.desc or ""
-    MiniTest.expect.equality(desc:lower():find("browse") ~= nil, true, "gx should map to Browse, got: " .. desc)
-end
-
 T["mini.operators"]["sorts comma-separated values"] = function()
     vim.wait(1000)
 

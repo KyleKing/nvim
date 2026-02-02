@@ -24,22 +24,6 @@ end)
 
 later(function()
     add({
-        source = "chrishrb/gx.nvim",
-        depends = { "nvim-lua/plenary.nvim" },
-    })
-    require("gx").setup({
-        open_browser_args = {}, -- specify any arguments, such as --background for macOS' "open".
-        handler_options = {
-            search_engine = "ecosia", -- you can select between google, bing, duckduckgo, and ecosia
-        },
-    })
-    vim.g.netrw_nogx = 1 -- disable netrw gx
-    local K = vim.keymap.set
-    K({ "n", "x" }, "gx", "<cmd>Browse<cr>", { desc = "Open File" })
-end)
-
-later(function()
-    add({
         source = "https://gitlab.com/itaranto/preview.nvim",
         depends = { "aklt/plantuml-syntax" }, -- Required for plantuml filetype
     })
