@@ -35,10 +35,11 @@ later(function()
     K("n", "<leader>;", builtin.buffers, { desc = "Find in open buffers" })
 
     -- Leader-b (buffer operations)
-    K("n", "<leader>br", MiniExtra.pickers.oldfiles, { desc = "Find recently opened files" })
     K("n", "<leader>bb", function()
         builtin.grep({ pattern = "" }, { source = { name = "Current buffer" } })
     end, { desc = "Find word in current buffer" })
+    K("n", "<leader>bL", MiniExtra.pickers.buf_lines, { desc = "Find lines across all buffers" })
+    K("n", "<leader>br", MiniExtra.pickers.oldfiles, { desc = "Find recently opened files" })
 
     -- Leader-g (git operations)
     K("n", "<leader>gf", MiniExtra.pickers.git_files, { desc = "Find in Git files" })
@@ -103,16 +104,51 @@ later(function()
     end, { desc = "Find word from visual" })
 
     K("n", "<leader>fC", MiniExtra.pickers.commands, { desc = "Find commands" })
+    K("n", "<leader>fe", MiniExtra.pickers.explorer, { desc = "Explore files with picker" })
 
     K("n", "<leader>ff", function()
         builtin.files({ tool = "git" }, { source = { cwd = vim.fn.getcwd() } })
     end, { desc = "Find in files" })
 
     K("n", "<leader>fh", builtin.help, { desc = "Find in nvim help" })
+    K("n", "<leader>fH", MiniExtra.pickers.history, { desc = "Find in command/search history" })
     K("n", "<leader>fk", MiniExtra.pickers.keymaps, { desc = "Find keymaps" })
+    K("n", "<leader>fl", MiniExtra.pickers.list, { desc = "Find in quickfix/location lists" })
     K("n", "<leader>fr", MiniExtra.pickers.registers, { desc = "Find registers" })
 
     K("n", "<leader>fw", function()
         builtin.grep_live()
     end, { desc = "Find word in files (live grep)" })
+
+    -- Additional mini.extra pickers (uncomment to enable):
+    -- MiniExtra.pickers.hipatterns - Browse active highlight patterns from mini.hipatterns
+    -- MiniExtra.pickers.options - Browse and modify vim options interactively
+    -- MiniExtra.pickers.spellsuggest - Spelling suggestions for word under cursor
+    -- MiniExtra.pickers.visit_labels - Browse mini.visit labels (requires mini.visit)
+    -- MiniExtra.pickers.visit_paths - Browse mini.visit paths (requires mini.visit)
+end)
+
+-- Semantic code search via codanna
+later(function()
+    _add({
+        source = "KyleKing/codanna.nvim",
+        depends = { "echasnovski/mini.nvim" },
+    })
+
+    require("codanna").setup({
+        picker = "mini.pick",
+        timeout = 5000,
+        cache_results = true,
+    })
+
+    local K = vim.keymap.set
+
+    -- Leader-ls (LSP semantic operations via codanna)
+    -- Capital letters distinguish semantic search from LSP equivalents
+    K("n", "<leader>lsc", "<cmd>CodannaCalls<cr>", { desc = "Semantic: calls from symbol" })
+    K("n", "<leader>lsC", "<cmd>CodannaCallers<cr>", { desc = "Semantic: callers of symbol" })
+    K("n", "<leader>lsd", "<cmd>CodannaDocuments<cr>", { desc = "Semantic: search docs" })
+    K("n", "<leader>lsi", "<cmd>CodannaImpact<cr>", { desc = "Semantic: impact analysis" })
+    K("n", "<leader>lss", "<cmd>CodannaSearch<cr>", { desc = "Semantic: search code" })
+    K("n", "<leader>lsS", "<cmd>CodannaSymbols<cr>", { desc = "Semantic: browse symbols" })
 end)
