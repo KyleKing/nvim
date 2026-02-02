@@ -35,12 +35,11 @@ K("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, desc = "M
 K("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, desc = "Move cursor down" })
 
 -- Standard Operations
-K("n", "<leader>w", "<Cmd>update<CR>", { desc = "Save if modified" })
-K("n", "<leader>W", "<Cmd>wall<CR>", { desc = "Save all" })
 K("n", "<leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
 K("n", "<leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
 K("n", "<leader>n", "<Cmd>new<CR>", { desc = "New File" })
-K("n", "<C-s>", "<Cmd>w!<CR>", { desc = "Force write" })
+K("n", "<C-s>", "<Cmd>update<CR>", { desc = "Save if modified" })
+K("i", "<C-s>", "<Esc><Cmd>update<CR>a", { desc = "Save if modified" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 
 -- Use operator pending mode to visually select the whole buffer

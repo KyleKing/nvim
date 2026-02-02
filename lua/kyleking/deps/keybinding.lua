@@ -50,6 +50,7 @@ later(function()
 
         clues = {
             -- Leader key groups
+            { mode = "n", keys = "<Leader>?", desc = "+Help" },
             { mode = "n", keys = "<Leader>b", desc = "+Buffer" },
             { mode = "n", keys = "<Leader>c", desc = "+Code" },
             { mode = "n", keys = "<Leader>f", desc = "+Find" },
@@ -68,6 +69,7 @@ later(function()
             { mode = "n", keys = "<Leader>u", desc = "+UI" },
             { mode = "n", keys = "<Leader>uc", desc = "+Color" },
             { mode = "n", keys = "<Leader>ug", desc = "+Git" },
+            { mode = "n", keys = "<Leader>w", desc = "+Window" },
 
             -- Built-in clue generators
             miniclue.gen_clues.builtin_completion(),
@@ -91,4 +93,18 @@ later(function()
             },
         },
     })
+
+    -- Clue help system: view clues for non-leader triggers
+    local clue_help = require("kyleking.utils.clue_help")
+    local K = vim.keymap.set
+
+    K("n", "<Leader>?", clue_help.show_menu, { desc = "Show clue help menu" })
+    K("n", "<Leader>?w", function() clue_help.show("<C-w>") end, { desc = "Window commands (<C-w>)" })
+    K("n", "<Leader>?[", function() clue_help.show("[") end, { desc = "Bracket navigation ([)" })
+    K("n", "<Leader>?]", function() clue_help.show("]") end, { desc = "Bracket navigation (])" })
+    K("n", "<Leader>?g", function() clue_help.show("g") end, { desc = "g commands" })
+    K("n", "<Leader>?z", function() clue_help.show("z") end, { desc = "z commands" })
+    K("n", "<Leader>?'", function() clue_help.show("'") end, { desc = "Marks (')" })
+    K("n", "<Leader>?`", function() clue_help.show("`") end, { desc = "Marks (`)" })
+    K("n", '<Leader>?"', function() clue_help.show('"') end, { desc = 'Registers (")' })
 end)

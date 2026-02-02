@@ -128,6 +128,7 @@ T["group descriptions"]["leader groups are defined"] = function()
 
     -- Expected groups
     local expected_groups = {
+        ["<Leader>?"] = "+Help",
         ["<Leader>b"] = "+Buffer",
         ["<Leader>c"] = "+Code",
         ["<Leader>f"] = "+Find",
@@ -139,6 +140,7 @@ T["group descriptions"]["leader groups are defined"] = function()
         ["<Leader>r"] = "+Register",
         ["<Leader>t"] = "+Terminal/Test",
         ["<Leader>u"] = "+UI",
+        ["<Leader>w"] = "+Window",
     }
 
     for keys, expected_desc in pairs(expected_groups) do
