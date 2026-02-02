@@ -13,7 +13,7 @@
 # Pending rename of pre-push from: https://github.com/pre-commit/pre-commit/issues/2732
 default_install_hook_types: ["commit-msg", "pre-commit", "pre-push"]
 
-exclude: lazy-lock\.json|mason-lock\.json|LICENSE\.md
+exclude: lazy-lock\.json|LICENSE\.md
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -38,6 +38,7 @@ repos:
       - id: pretty-format-json
         args: [--autofix, --indent=4]
       - id: trailing-whitespace
+        exclude: doc/kyleking-neovim\.txt
   - repo: https://github.com/JohnnyMorganz/StyLua
     rev: v2.3.1
     hooks:
@@ -63,7 +64,25 @@ repos:
           - mdformat-mkdocs[recommended]>=2.0.6
           - mdformat-gfm-alerts>=0.0.1
         args: [--wrap=no]
-        exclude: CODE_TAG_SUMMARY\.md
+        exclude: CODE_TAG_SUMMARY\.md|doc/src/
+  - repo: https://github.com/kdheepak/panvimdoc
+    rev: v4.0.1
+    hooks:
+      - id: panvimdoc
+        args:
+          - --project-name
+          - kyleking-neovim
+          - --input-file
+          - doc/src/main.md
+          - --toc
+          - "true"
+          - --treesitter
+          - "true"
+          - --dedup-subheadings
+          - "false"
+          - --demojify
+          - "true"
+        files: ^doc/src/.*\.md$
   - repo: https://github.com/pappasam/toml-sort
     rev: v0.24.3
     hooks:
@@ -83,3 +102,9 @@ repos:
         entry: selene
         language: system
         types: [lua]
+      - id: helptags
+        name: Generate helptags
+        entry: nvim --headless -c "helptags doc" -c "qall!"
+        language: system
+        files: ^doc/kyleking-neovim\.txt$
+        pass_filenames: false

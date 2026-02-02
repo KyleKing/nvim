@@ -1,0 +1,106 @@
+## This Config
+
+Leader key: `<Space>` -- Local leader: `,`
+
+## Boot Sequence
+
+`init.lua` -> `lua/kyleking/init.lua` which loads two phases:
+
+1. **Core** (`lua/kyleking/core/init.lua`): options -> lsp -> keymaps -> autocmds
+2. **Plugins** (`lua/kyleking/setup-deps.lua`): bootstraps mini.deps, then
+   requires each `lua/kyleking/deps/*.lua` file
+
+## Plugin Management
+
+All plugins are managed through mini.deps. Each `deps/*.lua` file groups
+related plugins by functionality.
+
+- `now()` for plugins needed at startup (colorscheme, mini.test)
+- `later()` for everything else (deferred loading)
+- Plugin keymaps live in their respective `deps/*.lua` file
+
+## Directory Layout
+
+    lua/kyleking/core/      Core settings (options, keymaps, autocmds, lsp)
+    lua/kyleking/deps/      Plugin configurations (one file per group)
+    lua/kyleking/custom/    Custom utilities
+    lua/kyleking/utils/     Shared helpers (fs, json, tool_resolve, noqa)
+    lsp/                    Native LSP server configs (nvim 0.11+)
+    lua/tests/              Test files (*_spec.lua)
+
+## Conventions
+
+- `local K = vim.keymap.set` alias used in deps files
+- Autocmd groups prefixed with `kyleking_`
+- Theme colors: `require("kyleking.theme").get_colors()`
+- `PLANNED:` comments mark features to add when upstream support arrives
+- Floating windows skipped in global autocmds via `relative ~= ""`
+
+## Keymaps
+
+All keymaps are discoverable at runtime:
+
+    <leader>fk     Find keymaps (searchable picker of all active keymaps)
+
+mini.clue shows available continuations after a 500ms delay on any prefix
+key. See `kyleking-neovim-clue`.
+
+Completion keymaps (built-in LSP completion, nvim 0.11+):
+
+    <C-Space>       Trigger completion
+    <C-j>           Next item in completion menu
+    <C-k>           Previous item
+    <C-CR>          Accept selected completion
+    <CR>            Abort completion and insert newline
+
+Source: `lua/kyleking/core/lsp.lua`
+
+See also: `lsp-completion`, `ins-completion`
+
+## Custom Commands
+
+    :RunAllTests        Run all mini.test test files (floating window)
+    :RunFailedTests     Run only failed tests from last run
+    :PatchApply {file}  Apply patch from current buffer to {file}
+    :DiffviewOpen       Open side-by-side git diff viewer
+    :DiffviewClose      Close diffview
+
+## Testing
+
+Tests use mini.test. Test files live in `lua/tests/` and follow `*_spec.lua`
+naming. Commands and keymaps are only available when cwd is the config
+directory.
+
+    <leader>ta      Run all tests
+    <leader>tf      Run failed tests from last run
+    :RunAllTests    Run all mini.test test files
+    :RunFailedTests Run only failed tests from last run
+
+From the command line:
+
+    nvim --headless -c "lua MiniTest.run()" -c "qall!"
+    nvim --headless -c "lua MiniTest.run_file('lua/tests/core/smoke_spec.lua')" -c "qall!"
+
+Test results display in a floating window (80% of screen). Press `q` or
+`<Esc>` to close. Failed tests are tracked for re-running with
+`:RunFailedTests`.
+
+Test file pattern:
+
+```lua
+local MiniTest = require("mini.test")
+local helpers = require("tests.helpers")
+
+local T = MiniTest.new_set({ hooks = { pre_case = function() end } })
+T["group"] = MiniTest.new_set()
+T["group"]["case name"] = function()
+    MiniTest.expect.equality(actual, expected, "message")
+end
+
+if ... == nil then MiniTest.run() end
+return T
+```
+
+Source: `lua/kyleking/setup-deps.lua`
+
+See also: `MiniTest`
