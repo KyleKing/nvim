@@ -24,12 +24,35 @@ end
 
 local function _on_shell_exit()
     vim.schedule(function()
-        local prev = shell_term.prev_tabnr
-        if shell_term.tabnr and vim.api.nvim_tabpage_is_valid(shell_term.tabnr) then
-            vim.api.nvim_set_current_tabpage(shell_term.tabnr)
-            vim.cmd("tabclose")
+        local bufnr = shell_term.bufnr
+        local tabnr = shell_term.tabnr
+
+        -- Early return if terminal state is already cleared
+        if not (bufnr and tabnr) then
+            _reset_shell_state()
+            return
         end
-        _go_to_tab(prev)
+
+        -- Validate tab still exists
+        if not vim.api.nvim_tabpage_is_valid(tabnr) then
+            _reset_shell_state()
+            return
+        end
+
+        -- Get the tab's window and buffer info before switching
+        local tab_wins = vim.api.nvim_tabpage_list_wins(tabnr)
+
+        -- Switch to previous tab first (if valid)
+        _go_to_tab(shell_term.prev_tabnr)
+
+        -- Close all windows in the terminal tab (which will close the tab)
+        for _, win in ipairs(tab_wins) do
+            if vim.api.nvim_win_is_valid(win) then pcall(vim.api.nvim_win_close, win, true) end
+        end
+
+        -- Force delete the terminal buffer to ensure cleanup
+        if vim.api.nvim_buf_is_valid(bufnr) then pcall(vim.api.nvim_buf_delete, bufnr, { force = true }) end
+
         _reset_shell_state()
     end)
 end
