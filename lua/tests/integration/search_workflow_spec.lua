@@ -1,6 +1,5 @@
 -- Test search and navigation workflow
 local MiniTest = require("mini.test")
-local helpers = require("tests.helpers")
 
 local T = MiniTest.new_set({
     hooks = {
@@ -59,11 +58,6 @@ T["search workflow"]["illuminate is available"] = function()
 
     local illuminate = require("illuminate")
     MiniTest.expect.equality(type(illuminate.toggle), "function", "illuminate should be available")
-end
-
-T["search workflow"]["nvim-hlslens is configured"] = function()
-    vim.wait(1000)
-    MiniTest.expect.equality(helpers.is_plugin_loaded("nvim-hlslens"), true, "nvim-hlslens should be loaded")
 end
 
 -- For manual running

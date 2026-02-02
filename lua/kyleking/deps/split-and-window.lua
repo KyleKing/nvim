@@ -1,7 +1,17 @@
 local MiniDeps = require("mini.deps")
-local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
 later(function()
-    add("nvim-zh/colorful-winsep.nvim")
-    require("colorful-winsep").setup()
+    local colors = require("kyleking.theme").get_colors()
+    vim.api.nvim_set_hl(0, "ActiveWinSep", { fg = colors.orange, bold = true })
+
+    local winsep_group = vim.api.nvim_create_augroup("kyleking_winsep", { clear = true })
+    vim.api.nvim_create_autocmd("WinEnter", {
+        group = winsep_group,
+        callback = function() vim.wo.winhighlight = "WinSeparator:ActiveWinSep" end,
+    })
+    vim.api.nvim_create_autocmd("WinLeave", {
+        group = winsep_group,
+        callback = function() vim.wo.winhighlight = "" end,
+    })
 end)

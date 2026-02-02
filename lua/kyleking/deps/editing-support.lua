@@ -1,41 +1,7 @@
 local MiniDeps = require("mini.deps")
 local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
-later(function()
-    add("monaqa/dial.nvim")
-
-    -- All options: https://github.com/monaqa/dial.nvim?tab=readme-ov-file#augend-alias
-    local augend = require("dial.augend")
-    require("dial.config").augends:register_group({
-        default = {
-            augend.integer.alias.decimal, -- nonnegative decimal number (0, 1, 2, 3, ...)
-            -- augend.integer.alias.hex, -- nonnegative hex number  (0x01, 0x1a1f, etc.)
-            augend.constant.alias.bool, -- boolean value (true <-> false)
-            augend.semver.alias.semver,
-            augend.misc.alias.markdown_header,
-            augend.constant.new({
-                elements = { "and", "or" },
-                word = true, -- if false, "sand" is incremented into "sor", "doctor" into "doctand", etc.
-                cyclic = true, -- "or" is incremented into "and".
-            }),
-            augend.constant.new({
-                elements = { "&&", "||" },
-                word = false,
-                cyclic = true,
-            }),
-            -- uppercase hex number (0x1A1A, 0xEEFE, etc.)
-            augend.hexcolor.new({
-                case = "lower",
-            }),
-        },
-    })
-
-    local K = vim.keymap.set
-    K({ "n", "v" }, "<C-a>", "<Plug>(dial-increment)", { desc = "Dial Increment" })
-    K({ "n", "v" }, "<C-x>", "<Plug>(dial-decrement)", { desc = "Dial Decrement" })
-    K({ "n", "v" }, "g<C-a>", "g<Plug>(dial-increment)", { desc = "Dial Increment" })
-    K({ "n", "v" }, "g<C-x>", "g<Plug>(dial-decrement)", { desc = "Dial Decrement" })
-end)
+-- PLANNED: Consider mini.operators or mini.cycle when released for bool/semver/custom cycling
 
 later(function()
     add("tzachar/highlight-undo.nvim")
@@ -102,27 +68,30 @@ end)
 later(function() require("mini.trailspace").setup() end)
 
 later(function()
-    add("johmsalas/text-case.nvim")
-    require("textcase").setup()
-    -- keys={"ga"} -- PLANNED: Default invocation prefix
-end)
+    local hipatterns = require("mini.hipatterns")
 
-later(function()
-    -- TODO: alternatively could use: https://github.com/stsewd/tree-sitter-comment
-    add("folke/todo-comments.nvim")
-    require("todo-comments").setup({
-        keywords = {
-            NOTE = { icon = " ", color = "#9FA4C4", alt = { "INFO", "FYI" } }, -- Overrides default for NOTE
-            PLANNED = { icon = " ", color = "#FCD7AD" },
+    local word_pattern = function(word) return "%f[%w]()" .. word .. "()%f[%W]" end
+    local paren_pattern = function(word) return "%f[%w]()" .. word .. "%(.-%):?()%s" end
+
+    hipatterns.setup({
+        highlighters = {
+            fixme = { pattern = { word_pattern("FIXME"), paren_pattern("FIXME") }, group = "MiniHipatternsFixme" },
+            hack = { pattern = { word_pattern("HACK"), paren_pattern("HACK") }, group = "MiniHipatternsHack" },
+            todo = { pattern = { word_pattern("TODO"), paren_pattern("TODO") }, group = "MiniHipatternsTodo" },
+            note = { pattern = { word_pattern("NOTE"), paren_pattern("NOTE") }, group = "MiniHipatternsNote" },
+            fyi = { pattern = { word_pattern("FYI"), paren_pattern("FYI") }, group = "MiniHipatternsNote" },
+            planned = { pattern = { word_pattern("PLANNED"), paren_pattern("PLANNED") }, group = "MiniHipatternsPlanned" },
+            warning = { pattern = { word_pattern("WARNING"), paren_pattern("WARNING") }, group = "MiniHipatternsFixme" },
+            perf = { pattern = { word_pattern("PERF"), paren_pattern("PERF") }, group = "MiniHipatternsHack" },
+            test = { pattern = { word_pattern("TEST"), paren_pattern("TEST") }, group = "MiniHipatternsTodo" },
         },
     })
 
-    local K = vim.keymap.set
-    -- Use mini.pick for TODO search
-    K("n", "<leader>ft", function()
+    vim.api.nvim_set_hl(0, "MiniHipatternsPlanned", { bg = "#FCD7AD", fg = "#1c1c1c", bold = true })
+
+    vim.keymap.set("n", "<leader>ft", function()
         require("mini.pick").builtin.grep({ pattern = "TODO|FIXME|NOTE|PLANNED|FYI|HACK|WARNING|PERF|TEST" })
     end, { desc = "Find in TODOs" })
-    K("n", "<leader>uT", "<Cmd>TodoTrouble<CR>", { desc = "Show TODOs with Trouble" })
 end)
 
 later(function()

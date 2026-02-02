@@ -146,25 +146,4 @@ later(function()
     })
 end)
 
-later(function()
-    add("folke/trouble.nvim")
-    require("trouble").setup({
-        auto_close = true,
-        use_diagnostic_signs = true,
-    })
-
-    local K = vim.keymap.set
-    K("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
-    K("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", {
-        desc = "Buffer Diagnostics (Trouble)",
-    })
-    K("n", "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", { desc = "Symbols (Trouble)" })
-    K(
-        "n",
-        "<leader>cl",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-        { desc = "LSP Definitions / references / ... (Trouble)" }
-    )
-    K("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" })
-    K("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List (Trouble)" })
-end)
+-- PLANNED: Consider mini.quickfix when released for persistent diagnostic list

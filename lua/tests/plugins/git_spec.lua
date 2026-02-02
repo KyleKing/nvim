@@ -1,4 +1,4 @@
--- Test git plugins (gitsigns, diffview)
+-- Test git plugins (mini.diff, mini.git, diffview)
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
@@ -16,30 +16,34 @@ T["git plugins"]["git module loads without errors"] = function()
     MiniTest.expect.no_error(function() require("kyleking.deps.git") end)
 end
 
-T["gitsigns"] = MiniTest.new_set()
+T["mini.diff"] = MiniTest.new_set()
 
-T["gitsigns"]["gitsigns is configured"] = function()
+T["mini.diff"]["mini.diff is configured"] = function()
     vim.wait(1000)
-    MiniTest.expect.equality(helpers.is_plugin_loaded("gitsigns"), true, "gitsigns should be loaded")
+    MiniTest.expect.equality(helpers.is_plugin_loaded("mini.diff"), true, "mini.diff should be loaded")
 end
 
-T["gitsigns"]["gitsigns toggle deleted keymap is set"] = function()
+T["mini.diff"]["toggle overlay keymap is set"] = function()
     vim.wait(1000)
 
     local keymap = vim.fn.maparg("<leader>ugd", "n", false, true)
     MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, "<leader>ugd mapping should exist")
 
-    -- Verify callable (this test would catch the nil keymap bug)
     local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
     MiniTest.expect.equality(has_callable, true, "<leader>ugd should have callable rhs (prevents nil errors)")
 end
 
-T["gitsigns"]["gitsigns functions are callable"] = function()
+T["mini.diff"]["MiniDiff.toggle_overlay is callable"] = function()
     vim.wait(1000)
 
-    local gitsigns = require("gitsigns")
-    MiniTest.expect.equality(type(gitsigns.toggle_deleted), "function", "toggle_deleted should be a function")
-    MiniTest.expect.equality(type(gitsigns.setup), "function", "setup should be a function")
+    MiniTest.expect.equality(type(MiniDiff.toggle_overlay), "function", "toggle_overlay should be a function")
+end
+
+T["mini.git"] = MiniTest.new_set()
+
+T["mini.git"]["mini.git is configured"] = function()
+    vim.wait(1000)
+    MiniTest.expect.equality(helpers.is_plugin_loaded("mini.git"), true, "mini.git should be loaded")
 end
 
 T["diffview"] = MiniTest.new_set()

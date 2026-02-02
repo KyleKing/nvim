@@ -1,4 +1,4 @@
--- Test editing support plugins (mini.comment, mini.surround, etc.)
+-- Test editing support plugins (mini.comment, mini.surround, mini.hipatterns, etc.)
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
@@ -182,11 +182,6 @@ end
 
 T["other editing plugins"] = MiniTest.new_set()
 
-T["other editing plugins"]["dial.nvim is configured"] = function()
-    vim.wait(1000)
-    MiniTest.expect.equality(helpers.is_plugin_loaded("dial"), true, "dial should be loaded")
-end
-
 T["other editing plugins"]["highlight-undo is configured"] = function()
     vim.wait(1000)
     MiniTest.expect.equality(helpers.is_plugin_loaded("highlight-undo"), true, "highlight-undo should be loaded")
@@ -202,9 +197,9 @@ T["other editing plugins"]["mini.trailspace is configured"] = function()
     MiniTest.expect.equality(helpers.is_plugin_loaded("mini.trailspace"), true, "mini.trailspace should be loaded")
 end
 
-T["other editing plugins"]["text-case is configured"] = function()
+T["other editing plugins"]["mini.hipatterns is configured"] = function()
     vim.wait(1000)
-    MiniTest.expect.equality(helpers.is_plugin_loaded("textcase"), true, "text-case should be loaded")
+    MiniTest.expect.equality(helpers.is_plugin_loaded("mini.hipatterns"), true, "mini.hipatterns should be loaded")
 end
 
 -- For manual running

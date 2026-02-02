@@ -1,4 +1,4 @@
--- Test LSP-related plugins (lsp_signature, nvim-lint, trouble)
+-- Test LSP-related plugins (lsp_signature, nvim-lint)
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
@@ -156,44 +156,6 @@ T["nvim-lint"]["lint keymap is set"] = function()
     -- Verify callable
     local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
     MiniTest.expect.equality(has_callable, true, "<leader>ll should have callable rhs")
-end
-
-T["trouble.nvim"] = MiniTest.new_set()
-
-T["trouble.nvim"]["trouble module loads without errors"] = function()
-    vim.wait(1000)
-    MiniTest.expect.no_error(function() require("kyleking.deps.utility") end)
-end
-
-T["trouble.nvim"]["trouble is configured"] = function()
-    vim.wait(1000)
-    MiniTest.expect.equality(helpers.is_plugin_loaded("trouble"), true, "trouble should be loaded")
-end
-
-T["trouble.nvim"]["trouble keymaps are set"] = function()
-    vim.wait(1000)
-
-    local check_keymap = function(lhs)
-        local keymap = vim.fn.maparg(lhs, "n", false, true)
-        MiniTest.expect.equality(keymap ~= nil and keymap.lhs ~= nil, true, lhs .. " mapping should exist")
-
-        -- Verify callable
-        local has_callable = (type(keymap.callback) == "function") or (type(keymap.rhs) == "string" and keymap.rhs ~= "")
-        MiniTest.expect.equality(has_callable, true, lhs .. " should have callable rhs")
-    end
-
-    check_keymap("<leader>xx") -- Toggle trouble
-    check_keymap("<leader>xd") -- Document diagnostics
-    check_keymap("<leader>xl") -- Location list
-    check_keymap("<leader>xq") -- Quickfix list
-end
-
-T["trouble.nvim"]["trouble functions are callable"] = function()
-    vim.wait(1000)
-
-    local trouble = require("trouble")
-    MiniTest.expect.equality(type(trouble.toggle), "function", "trouble.toggle should be a function")
-    MiniTest.expect.equality(type(trouble.open), "function", "trouble.open should be a function")
 end
 
 -- For manual running

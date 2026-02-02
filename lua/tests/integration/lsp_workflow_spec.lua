@@ -1,6 +1,5 @@
 -- Test complete LSP workflow
 local MiniTest = require("mini.test")
-local helpers = require("tests.helpers")
 
 local T = MiniTest.new_set({
     hooks = {
@@ -51,11 +50,11 @@ T["lsp workflow"]["Can lint with nvim-lint"] = function()
     MiniTest.expect.equality(type(lint.try_lint), "function", "lint.try_lint should be callable")
 end
 
-T["lsp workflow"]["Trouble is available for diagnostics"] = function()
+T["lsp workflow"]["MiniExtra diagnostic picker is available"] = function()
     vim.wait(1000)
 
-    local trouble = require("trouble")
-    MiniTest.expect.equality(type(trouble.toggle), "function", "trouble.toggle should be callable")
+    local MiniExtra = require("mini.extra")
+    MiniTest.expect.equality(type(MiniExtra.pickers.diagnostic), "function", "diagnostic picker should be callable")
 end
 
 T["lsp workflow"]["LSP signature help is configured"] = function()

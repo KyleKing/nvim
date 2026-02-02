@@ -4,10 +4,8 @@ local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 later(function() add("sindrets/diffview.nvim") end)
 
 later(function()
-    -- Adds git related signs to the gutter, as well as utilities for managing changes,
-    --  but I've removed most utilities from lack of use
-    add("lewis6991/gitsigns.nvim")
-    require("gitsigns").setup()
+    require("mini.diff").setup()
+    require("mini.git").setup()
 
-    vim.keymap.set("n", "<leader>ugd", function() require("gitsigns").toggle_deleted() end, { desc = "toggle git show deleted" })
+    vim.keymap.set("n", "<leader>ugd", function() MiniDiff.toggle_overlay() end, { desc = "toggle git diff overlay" })
 end)
