@@ -49,52 +49,15 @@ K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
 K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
 K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
--- Manage Buffers
---
--- Navigation (via nap.nvim plugin in deps/motion.lua):
---   ]b / [b         - Next/previous buffer
---   ]B / [B         - Next/previous buffer (alternative)
---   <C-n> / <C-p>   - Repeat last nap jump (works after any ]x or [x from nap.nvim)
---   <C-^>           - Toggle between current and alternate buffer (vim default)
---
--- nap.nvim also provides (same pattern with ] for next, [ for previous):
---   a/A: tabs, d: diagnostics, e: change list, f/F: files, l/L: location list,
---   q/Q: quickfix, s: spelling, t/T: tags, z: folds, ': marks
---
--- Closing:
---   :bdelete        - Close buffer, keep window (preserves buffer index for <C-^>)
---   :bwipeout       - Close buffer, keep window, clear marks/history (renumbers buffers)
--- Close keeps the buffer index (for <C-^> toggling), while wipeout renumbers all buffers
--- https://stackoverflow.com/a/60732165/3219667
--- K("n", "<leader>bc", ":bdelete<CR>", { desc = "Close current buffer" })
+-- Buffer management
+-- Navigation: ]b/[b (nap.nvim), <C-^> (alternate buffer)
+-- See: :h kyleking-neovim (navigation section)
 K("n", "<leader>bw", ":bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
--- From: https://stackoverflow.com/a/42071865/3219667
--- K("n", "<leader>bCA", ":%bdelete<CR>", { desc = "Close all buffers" })
 K("n", "<leader>bW", ":%bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
 
--- Managing Splits/Windows
---
--- Navigation (vim defaults):
---   <C-w>h/j/k/l    - Move to split left/down/up/right
---   <C-w>w          - Cycle to next window
---   <C-w>p          - Jump to previous window
---
--- Creation/closing:
---   <C-w>s          - Horizontal split (:split)
---   <C-w>v          - Vertical split (:vsplit)
---   <C-w>q          - Close current window (:quit)
---   <C-w>o          - Close all other windows (:only)
---
--- Resizing (vim defaults):
---   <C-w>=          - Make all splits equal size
---   <C-w>_          - Maximize height
---   <C-w>|          - Maximize width
---   <C-w>+/-        - Increase/decrease height
---   <C-w></>        - Increase/decrease width
---   :resize <N>     - Set height to N lines
---   :vertical resize <N> - Set width to N columns
---
--- Smart layout toggle (custom):
+-- Window (split) management
+-- Navigation: <C-w>h/j/k/l, creation: <C-w>s/v, resizing: <C-w>=/+/-/_/|
+-- See: :h kyleking-neovim (navigation section), :h window-moving, :h window-resize
 K(
     "n",
     "<leader>wf",
@@ -102,19 +65,9 @@ K(
     { desc = "Toggle focused/equal window layout" }
 )
 
--- Manage Tabs
---
--- Navigation (via nap.nvim plugin in deps/motion.lua):
---   ]a / [a         - Next/previous tab
---   ]A / [A         - Next/previous tab (alternative)
---   <C-n> / <C-p>   - Repeat last nap jump (after any ]x or [x from nap.nvim)
---
--- Management (vim defaults):
---   :tabnew         - Create new tab
---   :tabclose       - Close current tab
---   gt              - Go to next tab
---   gT              - Go to previous tab
---   <N>gt           - Go to tab N
+-- Tab management
+-- Navigation: ]a/[a (nap.nvim), gt/gT, creation: :tabnew
+-- See: :h kyleking-neovim (navigation section), :h tabpage
 
 -- PLANNED: review these additional keybinds
 

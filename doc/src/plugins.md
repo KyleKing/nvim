@@ -12,6 +12,14 @@ mini.pick with mini.extra for additional pickers.
 Picker navigation: `<C-j>`/`<C-k>` to move, `<C-Space>` to refine
 (narrow), `<CR>` to accept, `<Esc>` to close.
 
+Paste into picker: `<C-r>` followed by register name (like insert mode).
+
+    <C-r>"          Paste from default register (last yank/delete)
+    <C-r>+          Paste from system clipboard
+    <C-r>*          Paste from selection clipboard
+    <C-r>/          Paste last search pattern
+    <C-r>:          Paste last command
+
 Tips:
 
 - `<C-Space>` refines: type a query, refine, type another to
@@ -127,12 +135,113 @@ Jump to any visible location with minimal keystrokes.
 Flash labels visible matches so you can jump with 1-2 keystrokes.
 Treesitter mode selects entire syntax nodes.
 
-nap.nvim provides `[`/`]` bracket navigation pairs for buffers, quickfix,
-diagnostics, etc. See `:h nap.nvim`.
-
 Source: `lua/kyleking/deps/motion.lua`
 
 See also: <https://github.com/folke/flash.nvim>
+
+## Navigation (nap.nvim, buffers, windows, tabs)
+
+### nap.nvim
+
+Bracket-pair navigation for buffers, quickfix, diagnostics, and more.
+Press `]x` or `[x` to jump, then use `<C-n>`/`<C-p>` to repeat with a
+single keystroke.
+
+**Available operators** (`]` = next, `[` = previous):
+
+    a, A        Tabs
+    b, B        Buffers
+    d           Diagnostics
+    e           Change list / edit history
+    f, F        Files
+    l, L        Location list
+    q, Q        Quickfix list
+    s           Spelling errors
+    t, T        Tags
+    z           Folds
+    '           Marks
+
+**Repeat keys** (work after any `]x` or `[x`):
+
+    <C-n>       Repeat last jump forward
+    <C-p>       Repeat last jump backward
+
+Example: `]b` (next buffer) → `<C-n><C-n><C-n>` (jump 3 more) → `<C-p>`
+(oops, go back one).
+
+Source: `lua/kyleking/deps/motion.lua`
+
+See also: <https://github.com/liangxianzhe/nap.nvim>
+
+### Buffer Management
+
+**Navigation:**
+
+    ]b / [b         Next/previous buffer (nap.nvim)
+    <C-^>           Toggle between current and alternate buffer
+
+**Closing:**
+
+    <leader>bw      Wipeout current buffer (clears marks/history)
+    <leader>bW      Wipeout all buffers
+    :bdelete        Close buffer, keep window (preserves buffer index)
+    :bwipeout       Close buffer, keep window, clear marks
+
+Source: `lua/kyleking/core/keymaps.lua`
+
+### Window (Split) Management
+
+**Navigation:**
+
+    <C-w>h/j/k/l    Move to split left/down/up/right
+    <C-w>w          Cycle to next window
+    <C-w>p          Jump to previous window
+
+**Creation/closing:**
+
+    <C-w>s          Horizontal split (:split)
+    <C-w>v          Vertical split (:vsplit)
+    <C-w>q          Close current window (:quit)
+    <C-w>o          Close all other windows (:only)
+
+**Resizing:**
+
+    <C-w>=          Make all splits equal size
+    <C-w>_          Maximize height
+    <C-w>|          Maximize width
+    <C-w>+/-        Increase/decrease height
+    <C-w></>        Increase/decrease width
+    :resize N       Set height to N lines
+    :vertical resize N  Set width to N columns
+
+**Smart layout toggle:**
+
+    <leader>wf      Toggle focused/equal window layout
+
+Toggle between two modes:
+
+- **Focused mode:** Active window gets 60-70% of space (ratio decreases
+  with more splits), others share remainder equally
+- **Equal mode:** All windows equal size (equivalent to `<C-w>=`)
+
+Respects minimum viable window sizes. Most useful with 2-5 splits.
+
+Source: `lua/kyleking/core/keymaps.lua`, `lua/kyleking/utils.lua`
+
+### Tab Management
+
+**Navigation:**
+
+    ]a / [a         Next/previous tab (nap.nvim)
+    gt / gT         Next/previous tab
+    Ngt             Go to tab N
+
+**Creation/closing:**
+
+    :tabnew         Create new tab
+    :tabclose       Close current tab
+
+Source: `lua/kyleking/core/keymaps.lua`
 
 ## Treesitter & Text Objects
 
@@ -276,6 +385,4 @@ See also: <https://github.com/KyleKing/patch_it.nvim>
 
 `vim-spellsync` -- automatically syncs spell files
 
-`nap.nvim` -- `[`/`]` bracket-pair navigation. See `:h nap.nvim`
-
-Source: `lua/kyleking/deps/utility.lua`, `lua/kyleking/deps/motion.lua`
+Source: `lua/kyleking/deps/utility.lua`
