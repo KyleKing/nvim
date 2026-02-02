@@ -164,6 +164,52 @@ T["nvim-lint"]["lint keymap is set"] = function()
     MiniTest.expect.equality(has_callable, true, "<leader>ll should have callable rhs")
 end
 
+T["lazydev"] = MiniTest.new_set()
+
+T["lazydev"]["lazydev is configured"] = function()
+    vim.wait(1000)
+    MiniTest.expect.equality(helpers.is_plugin_loaded("lazydev"), true, "lazydev should be loaded")
+end
+
+T["lazydev"]["integrations disable cmp and coq"] = function()
+    vim.wait(1000)
+
+    local config = require("lazydev.config")
+    MiniTest.expect.equality(config.integrations.cmp, false, "cmp integration should be disabled")
+    MiniTest.expect.equality(config.integrations.coq, false, "coq integration should be disabled")
+end
+
+T["lazydev"]["lspconfig integration is enabled"] = function()
+    vim.wait(1000)
+
+    local config = require("lazydev.config")
+    MiniTest.expect.equality(config.integrations.lspconfig, true, "lspconfig integration should be enabled")
+end
+
+T["lazydev"]["runtime points to VIMRUNTIME"] = function()
+    vim.wait(1000)
+
+    local config = require("lazydev.config")
+    MiniTest.expect.equality(config.runtime, vim.env.VIMRUNTIME, "runtime should match $VIMRUNTIME")
+end
+
+T["lazydev"]["find_workspace is callable"] = function()
+    vim.wait(1000)
+
+    local lazydev = require("lazydev")
+    MiniTest.expect.equality(type(lazydev.find_workspace), "function", "find_workspace should be a function")
+end
+
+T["lazydev"]["workspace module loads"] = function()
+    vim.wait(1000)
+
+    MiniTest.expect.no_error(function()
+        local ws = require("lazydev.workspace")
+        MiniTest.expect.equality(type(ws.find), "function", "workspace.find should be a function")
+        MiniTest.expect.equality(type(ws.get), "function", "workspace.get should be a function")
+    end)
+end
+
 T["diagnostics"] = MiniTest.new_set()
 
 T["diagnostics"]["diagnostic config has format function"] = function()

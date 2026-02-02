@@ -7,6 +7,7 @@ return {
   ["diffview.nvim"] = "4516612fe98ff56ae0415a259ff6361a89419b0a",
   ["flash.nvim"] = "fcea7ff883235d9024dc41e638f164a450c14ca2",
   ["highlight-undo.nvim"] = "ee32e12693d70e66f954d09a504a7371d110fc27",
+  ["lazydev.nvim"] = "5231c62aa83c2f8dc8e7ba957aa77098cda1257d",
   ["lsp_signature.nvim"] = "7d3bb0a641f516f1c7fd2e47852580dadbd7a430",
   ["mini.nvim"] = "9b935c218ddba02e5dc75c94f90143bce1f7c646",
   ["multicolumn.nvim"] = "a363bdfd422abf26256f343dac4df183031f8e94",

@@ -164,4 +164,14 @@ later(function()
     })
 end)
 
+later(function()
+    add("folke/lazydev.nvim")
+    require("lazydev").setup({
+        integrations = {
+            cmp = false,
+            coq = false,
+        },
+    })
+end)
+
 -- PLANNED: Consider mini.quickfix when released for persistent diagnostic list
