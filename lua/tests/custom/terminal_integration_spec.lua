@@ -1,20 +1,26 @@
--- Test custom terminal implementation
 local MiniTest = require("mini.test")
+
+local function _close_extra_tabs()
+    while #vim.api.nvim_list_tabpages() > 1 do
+        vim.cmd("tablast | tabclose")
+    end
+end
+
+local function _close_terminal_windows()
+    for _, winid in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_is_valid(winid) then
+            local ok, bufnr = pcall(vim.api.nvim_win_get_buf, winid)
+            if ok and vim.bo[bufnr].buftype == "terminal" then pcall(vim.api.nvim_win_close, winid, true) end
+        end
+    end
+end
 
 local T = MiniTest.new_set({
     hooks = {
-        pre_case = function()
-            -- Reload module before each test
-            package.loaded["kyleking.deps.terminal-integration"] = nil
-        end,
+        pre_case = function() package.loaded["kyleking.deps.terminal-integration"] = nil end,
         post_case = function()
-            -- Clean up any open terminal windows
-            for _, winid in ipairs(vim.api.nvim_list_wins()) do
-                local bufnr = vim.api.nvim_win_get_buf(winid)
-                if vim.bo[bufnr].buftype == "terminal" then
-                    if vim.api.nvim_win_is_valid(winid) then pcall(vim.api.nvim_win_close, winid, true) end
-                end
-            end
+            _close_extra_tabs()
+            _close_terminal_windows()
         end,
     },
 })
@@ -25,14 +31,24 @@ T["terminal integration"]["module loads without errors"] = function()
     MiniTest.expect.no_error(function() require("kyleking.deps.terminal-integration") end)
 end
 
-T["terminal integration"]["exports toggle_terminal function"] = function()
+T["terminal integration"]["exports toggle_shell_tab function"] = function()
     local module = require("kyleking.deps.terminal-integration")
-    MiniTest.expect.equality(type(module.toggle_terminal), "function", "toggle_terminal should be a function")
+    MiniTest.expect.equality(type(module.toggle_shell_tab), "function", "toggle_shell_tab should be a function")
 end
 
-T["terminal integration"]["exports terminals table"] = function()
+T["terminal integration"]["exports toggle_tui_float function"] = function()
     local module = require("kyleking.deps.terminal-integration")
-    MiniTest.expect.equality(type(module.terminals), "table", "terminals should be a table")
+    MiniTest.expect.equality(type(module.toggle_tui_float), "function", "toggle_tui_float should be a function")
+end
+
+T["terminal integration"]["exports shell_term state"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+    MiniTest.expect.equality(type(module.shell_term), "table", "shell_term should be a table")
+end
+
+T["terminal integration"]["exports tui_terminals state"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+    MiniTest.expect.equality(type(module.tui_terminals), "table", "tui_terminals should be a table")
 end
 
 T["terminal integration"]["keymaps are registered"] = function()
@@ -47,152 +63,159 @@ T["terminal integration"]["keymaps are registered"] = function()
         end
     end
 
+    check_keymap("<leader>tt", "n", "toggle tab")
+    check_keymap("<leader>tt", "t", "toggle tab")
+    check_keymap("<C-'>", "n", "Toggle")
+    check_keymap("<C-'>", "t", "Toggle")
     check_keymap("<leader>gg", "n", "lazygit")
     check_keymap("<leader>gj", "n", "lazyjj")
     check_keymap("<leader>td", "n", "lazydocker")
-    check_keymap("<leader>tf", "n", "float")
-    check_keymap("<leader>th", "n", "horizontal")
-    check_keymap("<leader>tv", "n", "vertical")
-    check_keymap("<C-'>", "n", "Toggle")
-    check_keymap("<C-'>", "t", "Toggle")
 end
 
-T["terminal operations"] = MiniTest.new_set()
+T["shell terminal tab"] = MiniTest.new_set()
 
-T["terminal operations"]["float terminal creates floating window"] = function()
+T["shell terminal tab"]["creates new tab"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
-    -- Count windows before
+    local initial_tab_count = #vim.api.nvim_list_tabpages()
+
+    module.toggle_shell_tab()
+    vim.wait(200)
+
+    local new_tab_count = #vim.api.nvim_list_tabpages()
+    MiniTest.expect.equality(new_tab_count, initial_tab_count + 1, "Should create a new tab")
+    MiniTest.expect.equality(module.shell_term.tabnr ~= nil, true, "tabnr should be set")
+    MiniTest.expect.equality(module.shell_term.bufnr ~= nil, true, "bufnr should be set")
+end
+
+T["shell terminal tab"]["toggle from terminal returns to previous tab"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+
+    local original_tab = vim.api.nvim_get_current_tabpage()
+
+    module.toggle_shell_tab()
+    vim.wait(200)
+
+    MiniTest.expect.equality(vim.api.nvim_get_current_tabpage() ~= original_tab, true, "Should be on terminal tab")
+
+    module.toggle_shell_tab()
+    vim.wait(100)
+
+    MiniTest.expect.equality(vim.api.nvim_get_current_tabpage(), original_tab, "Should return to original tab")
+end
+
+T["shell terminal tab"]["toggle from other tab switches to terminal"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+
+    module.toggle_shell_tab()
+    vim.wait(200)
+
+    module.toggle_shell_tab()
+    vim.wait(100)
+
+    local current_tab = vim.api.nvim_get_current_tabpage()
+    MiniTest.expect.equality(current_tab ~= module.shell_term.tabnr, true, "Should not be on terminal tab")
+
+    module.toggle_shell_tab()
+    vim.wait(100)
+
+    MiniTest.expect.equality(
+        vim.api.nvim_get_current_tabpage(),
+        module.shell_term.tabnr,
+        "Should switch to terminal tab"
+    )
+end
+
+T["shell terminal tab"]["reuses buffer"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+
+    module.toggle_shell_tab()
+    vim.wait(200)
+
+    local first_bufnr = module.shell_term.bufnr
+
+    module.toggle_shell_tab()
+    vim.wait(100)
+
+    module.toggle_shell_tab()
+    vim.wait(100)
+
+    MiniTest.expect.equality(module.shell_term.bufnr, first_bufnr, "Should reuse same buffer")
+end
+
+T["tui float terminals"] = MiniTest.new_set()
+
+T["tui float terminals"]["float creates window"] = function()
+    local module = require("kyleking.deps.terminal-integration")
+
     local initial_win_count = #vim.api.nvim_list_wins()
 
-    -- Create float terminal
-    module.toggle_terminal({ term_id = "test_float", direction = "float", cmd = vim.o.shell })
-
-    -- Wait for window to be created
-    vim.wait(200)
-
-    -- Check that a new window was created
-    local new_win_count = #vim.api.nvim_list_wins()
-    MiniTest.expect.equality(new_win_count > initial_win_count, true, "Float terminal should create new window")
-
-    -- Check that terminal buffer exists
-    local term = module.terminals["test_float"]
-    MiniTest.expect.equality(term ~= nil, true, "Terminal should be tracked")
-    MiniTest.expect.equality(vim.api.nvim_buf_is_valid(term.bufnr), true, "Terminal buffer should be valid")
-    MiniTest.expect.equality(vim.bo[term.bufnr].buftype, "terminal", "Buffer should be terminal type")
-
-    -- Clean up
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
-end
-
-T["terminal operations"]["horizontal terminal creates split"] = function()
-    local module = require("kyleking.deps.terminal-integration")
-
-    local initial_win_count = #vim.api.nvim_list_wins()
-
-    module.toggle_terminal({ term_id = "test_horiz", direction = "horizontal", size = 10, cmd = vim.o.shell })
-
+    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_float" })
     vim.wait(200)
 
     local new_win_count = #vim.api.nvim_list_wins()
-    MiniTest.expect.equality(new_win_count > initial_win_count, true, "Horizontal split should create new window")
+    MiniTest.expect.equality(new_win_count > initial_win_count, true, "Float should create new window")
 
-    local term = module.terminals["test_horiz"]
+    local term = module.tui_terminals["test_float"]
     MiniTest.expect.equality(term ~= nil, true, "Terminal should be tracked")
-    MiniTest.expect.equality(term.direction, "horizontal", "Direction should be horizontal")
-
-    -- Clean up
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
+    MiniTest.expect.equality(vim.api.nvim_buf_is_valid(term.bufnr), true, "Buffer should be valid")
 end
 
-T["terminal operations"]["vertical terminal creates split"] = function()
+T["tui float terminals"]["toggle hides float"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
-    local initial_win_count = #vim.api.nvim_list_wins()
-
-    module.toggle_terminal({ term_id = "test_vert", direction = "vertical", size = 40, cmd = vim.o.shell })
-
+    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_hide" })
     vim.wait(200)
 
-    local new_win_count = #vim.api.nvim_list_wins()
-    MiniTest.expect.equality(new_win_count > initial_win_count, true, "Vertical split should create new window")
-
-    local term = module.terminals["test_vert"]
-    MiniTest.expect.equality(term ~= nil, true, "Terminal should be tracked")
-    MiniTest.expect.equality(term.direction, "vertical", "Direction should be vertical")
-
-    -- Clean up
-    if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
-end
-
-T["terminal operations"]["toggle hides visible terminal"] = function()
-    local module = require("kyleking.deps.terminal-integration")
-
-    -- Create terminal
-    module.toggle_terminal({ term_id = "test_toggle", direction = "float", cmd = vim.o.shell })
-    vim.wait(200)
-
-    local term = module.terminals["test_toggle"]
+    local term = module.tui_terminals["test_hide"]
     local winid_before = term.winid
+    MiniTest.expect.equality(vim.api.nvim_win_is_valid(winid_before), true, "Window should be valid")
 
-    MiniTest.expect.equality(vim.api.nvim_win_is_valid(winid_before), true, "Window should be valid initially")
-
-    -- Toggle again to hide
-    module.toggle_terminal({ term_id = "test_toggle", direction = "float", cmd = vim.o.shell })
+    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_hide" })
     vim.wait(100)
 
-    -- Check that window was closed
-    local win_still_valid = winid_before and vim.api.nvim_win_is_valid(winid_before)
-    MiniTest.expect.equality(win_still_valid, false, "Window should be closed after toggle")
+    MiniTest.expect.equality(vim.api.nvim_win_is_valid(winid_before), false, "Window should be closed after toggle")
 end
 
-T["terminal operations"]["reuses existing terminal buffer"] = function()
+T["tui float terminals"]["reuses buffer"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
-    -- Create terminal
-    module.toggle_terminal({ term_id = "test_reuse", direction = "float", cmd = vim.o.shell })
+    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_reuse" })
     vim.wait(200)
 
-    local bufnr_first = module.terminals["test_reuse"].bufnr
+    local first_bufnr = module.tui_terminals["test_reuse"].bufnr
 
-    -- Hide it
-    module.toggle_terminal({ term_id = "test_reuse", direction = "float", cmd = vim.o.shell })
+    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_reuse" })
     vim.wait(100)
 
-    -- Show it again
-    module.toggle_terminal({ term_id = "test_reuse", direction = "float", cmd = vim.o.shell })
+    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_reuse" })
     vim.wait(200)
 
-    local bufnr_second = module.terminals["test_reuse"].bufnr
+    MiniTest.expect.equality(module.tui_terminals["test_reuse"].bufnr, first_bufnr, "Should reuse same buffer")
 
-    -- Should reuse same buffer
-    MiniTest.expect.equality(bufnr_first, bufnr_second, "Should reuse same terminal buffer")
-
-    -- Clean up
-    local term = module.terminals["test_reuse"]
+    local term = module.tui_terminals["test_reuse"]
     if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
 end
 
-T["lazygit integration"] = MiniTest.new_set()
-
-T["lazygit integration"]["lazygit command includes worktree flags when in worktree"] = function()
-    -- This test checks the keymap setup but doesn't actually run lazygit
+T["tui float terminals"]["lazygit keymap exists"] = function()
+    require("kyleking.deps.terminal-integration")
     local keymap = vim.fn.maparg("<leader>gg", "n", false, true)
     MiniTest.expect.equality(keymap ~= nil, true, "lazygit keymap should exist")
     MiniTest.expect.equality(type(keymap.callback), "function", "lazygit keymap should have callback")
 end
 
-T["lazygit integration"]["lazyjj keymap exists"] = function()
+T["tui float terminals"]["lazyjj keymap exists"] = function()
+    require("kyleking.deps.terminal-integration")
     local keymap = vim.fn.maparg("<leader>gj", "n", false, true)
     MiniTest.expect.equality(keymap ~= nil, true, "lazyjj keymap should exist")
 end
 
-T["lazygit integration"]["lazydocker keymap exists"] = function()
+T["tui float terminals"]["lazydocker keymap exists"] = function()
+    require("kyleking.deps.terminal-integration")
     local keymap = vim.fn.maparg("<leader>td", "n", false, true)
     MiniTest.expect.equality(keymap ~= nil, true, "lazydocker keymap should exist")
 end
 
--- For manual running
 if ... == nil then MiniTest.run() end
 
 return T

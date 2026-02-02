@@ -59,8 +59,6 @@ K("n", "<leader>bW", ":%bwipeout<CR>", { desc = "Wipeout all buffers (including 
 
 -- Manage Tabs
 -- use nap.nvim plugin instead ([a and ]a, etc.)
-K("n", "<leader>ttn", "<Cmd>tabnew<CR>", { desc = "New tab" })
-K("n", "<leader>ttc", "<Cmd>tabclose<CR>", { desc = "Close tab" })
 
 -- PLANNED: review these additional keybinds
 

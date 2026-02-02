@@ -1,151 +1,152 @@
--- Custom terminal implementation (replaces toggleterm.nvim)
--- 103-line solution with float/horizontal/vertical support
+-- Tab-based shell terminal + floating TUI apps (lazygit, lazyjj, lazydocker)
 
---- Track terminals by command
----@type table<string,{bufnr: number, winid: number|nil, direction: string}>
-local terminals = {}
+---@type {bufnr: number|nil, tabnr: number|nil, prev_tabnr: number|nil}
+local shell_term = { bufnr = nil, tabnr = nil, prev_tabnr = nil }
 
---- Toggle a terminal window
----@param opts {cmd: string, term_id: string, direction: string, size: number|nil}
-local function toggle_terminal(opts)
+---@type table<string, {bufnr: number, winid: number|nil}>
+local tui_terminals = {}
+
+local function _is_shell_tab_current()
+    return shell_term.tabnr
+        and vim.api.nvim_tabpage_is_valid(shell_term.tabnr)
+        and vim.api.nvim_get_current_tabpage() == shell_term.tabnr
+end
+
+local function _go_to_tab(tabnr)
+    if tabnr and vim.api.nvim_tabpage_is_valid(tabnr) then vim.api.nvim_set_current_tabpage(tabnr) end
+end
+
+local function _reset_shell_state()
+    shell_term.bufnr = nil
+    shell_term.tabnr = nil
+    shell_term.prev_tabnr = nil
+end
+
+local function _on_shell_exit()
+    vim.schedule(function()
+        local prev = shell_term.prev_tabnr
+        if shell_term.tabnr and vim.api.nvim_tabpage_is_valid(shell_term.tabnr) then
+            vim.api.nvim_set_current_tabpage(shell_term.tabnr)
+            vim.cmd("tabclose")
+        end
+        _go_to_tab(prev)
+        _reset_shell_state()
+    end)
+end
+
+local function toggle_shell_tab()
+    if _is_shell_tab_current() then
+        _go_to_tab(shell_term.prev_tabnr)
+        return
+    end
+
+    if shell_term.tabnr and vim.api.nvim_tabpage_is_valid(shell_term.tabnr) then
+        shell_term.prev_tabnr = vim.api.nvim_get_current_tabpage()
+        _go_to_tab(shell_term.tabnr)
+        vim.cmd("startinsert")
+        return
+    end
+
+    shell_term.prev_tabnr = vim.api.nvim_get_current_tabpage()
+
+    if shell_term.bufnr and vim.api.nvim_buf_is_valid(shell_term.bufnr) then
+        vim.cmd("tabnew")
+        shell_term.tabnr = vim.api.nvim_get_current_tabpage()
+        vim.api.nvim_win_set_buf(0, shell_term.bufnr)
+        vim.cmd("startinsert")
+        return
+    end
+
+    vim.cmd("tabnew")
+    shell_term.tabnr = vim.api.nvim_get_current_tabpage()
+    local bufnr = vim.api.nvim_get_current_buf()
+    vim.fn.termopen(vim.o.shell, { on_exit = _on_shell_exit })
+    shell_term.bufnr = bufnr
+    vim.cmd("startinsert")
+end
+
+---@param opts {cmd: string, term_id: string}
+local function toggle_tui_float(opts)
     local term_id = opts.term_id or opts.cmd
-    local term = terminals[term_id]
+    local term = tui_terminals[term_id]
 
-    -- If terminal exists and window is visible, hide it
     if term and term.winid and vim.api.nvim_win_is_valid(term.winid) then
         vim.api.nvim_win_close(term.winid, true)
         term.winid = nil
         return
     end
 
-    -- If buffer doesn't exist, create it
     if not term or not vim.api.nvim_buf_is_valid(term.bufnr) then
         local bufnr = vim.api.nvim_create_buf(false, true)
         vim.bo[bufnr].bufhidden = "hide"
         vim.bo[bufnr].buflisted = false
-
-        terminals[term_id] = {
-            bufnr = bufnr,
-            winid = nil,
-            direction = opts.direction or "float",
-        }
-        term = terminals[term_id]
+        tui_terminals[term_id] = { bufnr = bufnr, winid = nil }
+        term = tui_terminals[term_id]
     end
 
-    -- Create window based on direction
-    local winid
-    if opts.direction == "float" then
-        local width = math.floor(vim.o.columns * 0.9)
-        local height = math.floor(vim.o.lines * 0.9)
-        winid = vim.api.nvim_open_win(term.bufnr, true, {
-            relative = "editor",
-            width = width,
-            height = height,
-            row = math.floor((vim.o.lines - height) / 2),
-            col = math.floor((vim.o.columns - width) / 2),
-            style = "minimal",
-            border = "rounded",
-        })
-    elseif opts.direction == "horizontal" then
-        vim.cmd("botright split")
-        if opts.size then vim.cmd("resize " .. opts.size) end
-        winid = vim.api.nvim_get_current_win()
-        vim.api.nvim_win_set_buf(winid, term.bufnr)
-    elseif opts.direction == "vertical" then
-        vim.cmd("botright vsplit")
-        if opts.size then vim.cmd("vertical resize " .. opts.size) end
-        winid = vim.api.nvim_get_current_win()
-        vim.api.nvim_win_set_buf(winid, term.bufnr)
-    end
-
+    local width = math.floor(vim.o.columns * 0.9)
+    local height = math.floor(vim.o.lines * 0.9)
+    local winid = vim.api.nvim_open_win(term.bufnr, true, {
+        relative = "editor",
+        width = width,
+        height = height,
+        row = math.floor((vim.o.lines - height) / 2),
+        col = math.floor((vim.o.columns - width) / 2),
+        style = "minimal",
+        border = "rounded",
+    })
     term.winid = winid
 
-    -- Start terminal if not already running
     local chan_id = vim.b[term.bufnr].terminal_job_id
     if not chan_id or vim.fn.jobwait({ chan_id }, 0)[1] == -1 then
-        vim.fn.termopen(opts.cmd or vim.o.shell, {
+        vim.fn.termopen(opts.cmd, {
             on_exit = function()
-                -- Clean up terminal when it exits
-                if terminals[term_id] then
-                    if terminals[term_id].winid and vim.api.nvim_win_is_valid(terminals[term_id].winid) then
-                        pcall(vim.api.nvim_win_close, terminals[term_id].winid, true)
+                vim.schedule(function()
+                    if tui_terminals[term_id] then
+                        if tui_terminals[term_id].winid and vim.api.nvim_win_is_valid(tui_terminals[term_id].winid) then
+                            pcall(vim.api.nvim_win_close, tui_terminals[term_id].winid, true)
+                        end
+                        if vim.api.nvim_buf_is_valid(tui_terminals[term_id].bufnr) then
+                            pcall(vim.api.nvim_buf_delete, tui_terminals[term_id].bufnr, { force = true })
+                        end
+                        tui_terminals[term_id] = nil
                     end
-                    if vim.api.nvim_buf_is_valid(terminals[term_id].bufnr) then
-                        pcall(vim.api.nvim_buf_delete, terminals[term_id].bufnr, { force = true })
-                    end
-                    terminals[term_id] = nil
-                end
+                end)
             end,
         })
     end
 
-    -- Enter insert mode for terminal
     vim.cmd("startinsert")
 end
 
 local K = vim.keymap.set
 
--- Lazygit with worktree support
+K({ "n", "t" }, "<leader>tt", toggle_shell_tab, { desc = "Terminal: toggle tab" })
+K({ "n", "t" }, "<C-'>", toggle_shell_tab, { desc = "Toggle terminal" })
+
 K("n", "<leader>gg", function()
     local worktree = require("kyleking.utils.fs_utils").file_worktree()
     local flags = worktree and ("--work-tree=%s --git-dir=%s"):format(worktree.toplevel, worktree.gitdir) or ""
-    toggle_terminal({ cmd = "lazygit " .. flags, term_id = "lazygit", direction = "float" })
+    toggle_tui_float({ cmd = "lazygit " .. flags, term_id = "lazygit" })
 end, { desc = "Terminal: lazygit" })
 
--- Other terminal commands
 K(
     "n",
     "<leader>gj",
-    function() toggle_terminal({ cmd = "lazyjj", term_id = "lazyjj", direction = "float" }) end,
+    function() toggle_tui_float({ cmd = "lazyjj", term_id = "lazyjj" }) end,
     { desc = "Terminal: lazyjj" }
 )
 
 K(
     "n",
     "<leader>td",
-    function() toggle_terminal({ cmd = "lazydocker", term_id = "lazydocker", direction = "float" }) end,
+    function() toggle_tui_float({ cmd = "lazydocker", term_id = "lazydocker" }) end,
     { desc = "Terminal: lazydocker" }
 )
 
--- Generic terminal toggles
-K(
-    "n",
-    "<leader>tf",
-    function() toggle_terminal({ term_id = "float", direction = "float" }) end,
-    { desc = "Terminal: float" }
-)
-
-K(
-    "n",
-    "<leader>th",
-    function() toggle_terminal({ term_id = "horizontal", direction = "horizontal", size = 15 }) end,
-    { desc = "Terminal: horizontal split" }
-)
-
-K(
-    "n",
-    "<leader>tv",
-    function() toggle_terminal({ term_id = "vertical", direction = "vertical", size = 80 }) end,
-    { desc = "Terminal: vertical split" }
-)
-
--- Toggle last used terminal with Ctrl-'
-K({ "n", "t" }, "<C-'>", function()
-    -- Find the most recently used terminal
-    local last_term_id = vim.g.last_term_id or "float"
-    local term = terminals[last_term_id]
-
-    if term and vim.api.nvim_buf_is_valid(term.bufnr) then
-        toggle_terminal({ term_id = last_term_id, direction = term.direction })
-    else
-        toggle_terminal({ term_id = "float", direction = "float" })
-    end
-
-    vim.g.last_term_id = last_term_id
-end, { desc = "Toggle terminal" })
-
--- Export for testing
 return {
-    toggle_terminal = toggle_terminal,
-    terminals = terminals,
+    toggle_shell_tab = toggle_shell_tab,
+    toggle_tui_float = toggle_tui_float,
+    shell_term = shell_term,
+    tui_terminals = tui_terminals,
 }
