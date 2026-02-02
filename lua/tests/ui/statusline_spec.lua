@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["statusline"] = MiniTest.new_set()
 
-T["statusline"]["bars-and-lines module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.bars-and-lines") end)
-end
-
 T["statusline"]["temp session detection prevents statusline setup"] = function()
     local utils = require("kyleking.utils")
     local is_temp = utils.detect_temp_session()

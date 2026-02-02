@@ -27,10 +27,6 @@ local T = MiniTest.new_set({
 
 T["terminal integration"] = MiniTest.new_set()
 
-T["terminal integration"]["module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.terminal-integration") end)
-end
-
 T["terminal integration"]["exports toggle_shell_tab function"] = function()
     local module = require("kyleking.deps.terminal-integration")
     MiniTest.expect.equality(type(module.toggle_shell_tab), "function", "toggle_shell_tab should be a function")

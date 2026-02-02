@@ -17,10 +17,6 @@ local T = MiniTest.new_set({
 
 T["mini.clue"] = MiniTest.new_set()
 
-T["mini.clue"]["keybinding module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.keybinding") end)
-end
-
 T["mini.clue"]["mini.clue is configured"] = function()
     -- Wait for later() to execute
     helpers.wait_for_plugins()

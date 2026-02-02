@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["treesitter"] = MiniTest.new_set()
 
-T["treesitter"]["syntax module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.syntax") end)
-end
-
 T["treesitter"]["nvim-treesitter is configured"] = function()
     vim.wait(1000)
     MiniTest.expect.equality(helpers.is_plugin_loaded("nvim-treesitter"), true, "nvim-treesitter should be loaded")

@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["conform.nvim"] = MiniTest.new_set()
 
-T["conform.nvim"]["formatting module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.formatting") end)
-end
-
 T["conform.nvim"]["conform is configured"] = function()
     vim.wait(1000)
     MiniTest.expect.equality(helpers.is_plugin_loaded("conform"), true, "conform should be loaded")

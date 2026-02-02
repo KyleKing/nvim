@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["motion plugins"] = MiniTest.new_set()
 
-T["motion plugins"]["motion module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.motion") end)
-end
-
 T["flash.nvim"] = MiniTest.new_set()
 
 T["flash.nvim"]["flash is configured"] = function()

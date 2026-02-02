@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["git plugins"] = MiniTest.new_set()
 
-T["git plugins"]["git module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.git") end)
-end
-
 T["mini.diff"] = MiniTest.new_set()
 
 T["mini.diff"]["mini.diff is configured"] = function()

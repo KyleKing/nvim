@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["lsp plugins"] = MiniTest.new_set()
 
-T["lsp plugins"]["lsp module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.lsp") end)
-end
-
 T["lsp_signature"] = MiniTest.new_set()
 
 T["lsp_signature"]["lsp_signature is configured"] = function()

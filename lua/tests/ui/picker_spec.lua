@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["mini.pick"] = MiniTest.new_set()
 
-T["mini.pick"]["fuzzy-finder module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.fuzzy-finder") end)
-end
-
 T["mini.pick"]["mini.pick is configured"] = function()
     -- Wait for later() to execute
     vim.wait(1000)

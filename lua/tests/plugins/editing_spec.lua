@@ -12,10 +12,6 @@ local T = MiniTest.new_set({
 
 T["editing support"] = MiniTest.new_set()
 
-T["editing support"]["editing-support module loads without errors"] = function()
-    MiniTest.expect.no_error(function() require("kyleking.deps.editing-support") end)
-end
-
 T["mini.comment"] = MiniTest.new_set()
 
 T["mini.comment"]["mini.comment is configured"] = function()
