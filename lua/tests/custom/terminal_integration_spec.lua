@@ -27,26 +27,6 @@ local T = MiniTest.new_set({
 
 T["terminal integration"] = MiniTest.new_set()
 
-T["terminal integration"]["exports toggle_shell_tab function"] = function()
-    local module = require("kyleking.deps.terminal-integration")
-    MiniTest.expect.equality(type(module.toggle_shell_tab), "function", "toggle_shell_tab should be a function")
-end
-
-T["terminal integration"]["exports toggle_tui_float function"] = function()
-    local module = require("kyleking.deps.terminal-integration")
-    MiniTest.expect.equality(type(module.toggle_tui_float), "function", "toggle_tui_float should be a function")
-end
-
-T["terminal integration"]["exports shell_term state"] = function()
-    local module = require("kyleking.deps.terminal-integration")
-    MiniTest.expect.equality(type(module.shell_term), "table", "shell_term should be a table")
-end
-
-T["terminal integration"]["exports tui_terminals state"] = function()
-    local module = require("kyleking.deps.terminal-integration")
-    MiniTest.expect.equality(type(module.tui_terminals), "table", "tui_terminals should be a table")
-end
-
 T["terminal integration"]["keymaps are registered"] = function()
     require("kyleking.deps.terminal-integration")
 
@@ -191,25 +171,6 @@ T["tui float terminals"]["reuses buffer"] = function()
 
     local term = module.tui_terminals["test_reuse"]
     if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
-end
-
-T["tui float terminals"]["lazygit keymap exists"] = function()
-    require("kyleking.deps.terminal-integration")
-    local keymap = vim.fn.maparg("<leader>gg", "n", false, true)
-    MiniTest.expect.equality(keymap ~= nil, true, "lazygit keymap should exist")
-    MiniTest.expect.equality(type(keymap.callback), "function", "lazygit keymap should have callback")
-end
-
-T["tui float terminals"]["lazyjj keymap exists"] = function()
-    require("kyleking.deps.terminal-integration")
-    local keymap = vim.fn.maparg("<leader>gj", "n", false, true)
-    MiniTest.expect.equality(keymap ~= nil, true, "lazyjj keymap should exist")
-end
-
-T["tui float terminals"]["lazydocker keymap exists"] = function()
-    require("kyleking.deps.terminal-integration")
-    local keymap = vim.fn.maparg("<leader>td", "n", false, true)
-    MiniTest.expect.equality(keymap ~= nil, true, "lazydocker keymap should exist")
 end
 
 if ... == nil then MiniTest.run() end

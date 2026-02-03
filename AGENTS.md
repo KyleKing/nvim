@@ -93,6 +93,39 @@ return T
 
 See `lua/tests/helpers.lua` for available test utilities (`nvim_interaction_test`, `check_keymap`, `create_test_buffer`, etc.).
 
+### Test quality guidelines
+
+Tests should verify **behavior**, not **existence**. The subprocess smoke test (`smoke_spec.lua`) already catches plugin load failures.
+
+**Do write tests that:**
+
+- Verify custom code produces expected output (Tier 1)
+- Verify plugin configuration produces expected behavior (Tier 2)
+- Test edge cases, error paths, and regressions
+
+**Do not write tests that only:**
+
+- Check `is_plugin_loaded("X")` or `type(X.func) == "function"`
+- Verify a keymap exists without testing what it does
+- Spawn a subprocess, call `pcall(function() end)`, and check exit code 0
+- Assert `true == true` to unconditionally pass
+
+When testing plugin configuration, prefer asserting config values or behavioral outcomes:
+
+```lua
+-- Good: tests config value
+MiniTest.expect.equality(MiniAi.config.n_lines, 500)
+
+-- Good: tests behavior
+vim.cmd("normal gcc")
+local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
+MiniTest.expect.equality(line:match("^%s*%-%-") ~= nil, true)
+
+-- Bad: tests existence only
+MiniTest.expect.equality(helpers.is_plugin_loaded("mini.comment"), true)
+MiniTest.expect.equality(type(flash.jump), "function")
+```
+
 ### LSP configuration (nvim 0.11+)
 
 LSP configuration is split across three locations:
