@@ -235,7 +235,7 @@ function WorkerPool:start()
         local start = vim.uv.now()
         while vim.uv.now() - start < max_wait do
             if vim.uv.fs_stat(socket) then break end
-            vim.wait(50)
+            vim.wait(15)
         end
     end
 end
@@ -380,7 +380,7 @@ function M.run_tests_parallel(shuffle, seed)
 
         table.insert(script_content, "local MiniTest = require('mini.test')")
         table.insert(script_content, "local helpers = require('tests.helpers')")
-        table.insert(script_content, "vim.wait(100)") -- Let plugins initialize
+        table.insert(script_content, "vim.wait(20)") -- Brief wait for plugins (MINI_DEPS_LATER_AS_NOW makes this fast)
 
         for _, test_file in ipairs(file_chunk) do
             local file_name = vim.fn.fnamemodify(test_file, ":t")

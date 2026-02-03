@@ -8,6 +8,9 @@ M.profiling = {
     results = {},
 }
 
+-- Snapshot cache to avoid re-parsing .snap files for each test
+local snapshot_cache = {}
+
 --- Format duration in milliseconds to human-readable string
 local function format_duration(ms)
     if ms < 1 then
@@ -103,11 +106,14 @@ local function parse_range(str)
     return { { tonumber(r1), tonumber(c1) }, { tonumber(r2), tonumber(c2) } }
 end
 
---- Parse .snap file into table keyed by test name
+--- Parse .snap file into table keyed by test name (with caching)
 function M.load_snapshots(fixture_path)
     local snap_path = fixture_path:gsub("%.lua$", ".snap")
 
     if vim.fn.filereadable(snap_path) == 0 then return {} end
+
+    -- Return cached snapshots if available (deep copy to allow mutations)
+    if snapshot_cache[snap_path] then return vim.deepcopy(snapshot_cache[snap_path]) end
 
     local content = vim.fn.readfile(snap_path)
     local snapshots = {}
@@ -184,8 +190,14 @@ function M.load_snapshots(fixture_path)
         if name then snapshots[name] = snapshot end
     end
 
+    -- Cache the parsed snapshots
+    snapshot_cache[snap_path] = vim.deepcopy(snapshots)
+
     return snapshots
 end
+
+--- Clear snapshot cache (useful for testing or after updates)
+function M.clear_snapshot_cache() snapshot_cache = {} end
 
 --- Write snapshots table to .snap file
 function M.save_snapshots(fixture_path, snapshots)
@@ -231,6 +243,9 @@ function M.save_snapshots(fixture_path, snapshots)
     end
 
     vim.fn.writefile(lines, snap_path)
+
+    -- Invalidate cache for this file
+    snapshot_cache[snap_path] = nil
 end
 
 --- Capture highlight extmarks from buffer

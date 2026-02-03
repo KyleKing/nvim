@@ -1,13 +1,11 @@
 local MiniTest = require("mini.test")
-local helpers = require("tests.helpers")
 local runner = require("tests.docs.runner")
 
 local T = MiniTest.new_set({
     hooks = {
-        pre_case = function() helpers.wait_for_plugins() end,
         post_once = function()
-            -- Print profiling summary after all tests complete
             runner.print_profiling_summary()
+            runner.clear_snapshot_cache()
         end,
     },
 })
