@@ -37,7 +37,10 @@ function M.run_all_tests(only_failed, shuffle, seed)
     )
 
     -- Function to append lines to the buffer
-    local function append_line(line) vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line }) end
+    local function append_line(line)
+        local lines = vim.split(line, "\n", { plain = true })
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+    end
 
     if only_failed then
         if not last_test_run.has_failures then
@@ -355,7 +358,10 @@ function M.run_tests_parallel(shuffle, seed)
         })
     )
 
-    local function append_line(line) vim.api.nvim_buf_set_lines(buf, -1, -1, false, { line }) end
+    local function append_line(line)
+        local lines = vim.split(line, "\n", { plain = true })
+        vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+    end
 
     append_line(string.format("Running %d tests across %d workers...", #test_files, num_workers))
     if shuffle then append_line(string.format("Random order (seed: %d)", seed)) end

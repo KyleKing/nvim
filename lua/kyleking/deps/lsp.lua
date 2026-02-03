@@ -1,6 +1,6 @@
 local MiniDeps = require("mini.deps")
-local maybe_later = _G.maybe_later
-local add, now, later = MiniDeps.add, MiniDeps.now, maybe_later
+local deps_utils = require("kyleking.deps_utils")
+local add, later = MiniDeps.add, deps_utils.maybe_later
 
 -- PLANNED: Configure keymaps and settings: https://github.com/ray-x/lsp_signature.nvim?tab=readme-ov-file#keymap
 later(function()

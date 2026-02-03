@@ -25,8 +25,9 @@ local MiniDeps = require("mini.deps")
 -- This provides explicit control over plugin loading during tests without overriding mini.deps
 local maybe_later = vim.env.MINI_DEPS_LATER_AS_NOW and MiniDeps.now or MiniDeps.later
 
--- Export maybe_later globally so all deps files can use it
-_G.maybe_later = maybe_later
+-- Export maybe_later via module to avoid global state
+local deps_utils = require("kyleking.deps_utils")
+deps_utils.maybe_later = maybe_later
 
 require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
@@ -47,8 +48,7 @@ require("kyleking.deps.terminal-integration")
 require("kyleking.deps.utility")
 require("kyleking.deps.local")
 
-local MiniDeps = require("mini.deps")
-local _add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local now, later = MiniDeps.now, MiniDeps.later
 
 -- Test runner (extracted to separate module for maintainability)
 local test_runner = require("kyleking.utils.test_runner")

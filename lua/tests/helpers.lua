@@ -253,6 +253,7 @@ function M.full_cleanup()
     end
 
     -- Clear test-specific global variables
+    -- selene: allow(global_usage)
     for key, _ in pairs(_G) do
         if type(key) == "string" and key:match("^test_") then _G[key] = nil end
     end

@@ -1,6 +1,6 @@
 local MiniDeps = require("mini.deps")
-local maybe_later = _G.maybe_later
-local add, now, later = MiniDeps.add, MiniDeps.now, maybe_later
+local deps_utils = require("kyleking.deps_utils")
+local add, later = MiniDeps.add, deps_utils.maybe_later
 
 -- Extend vim spelling dictionary with dynamically generated one
 ---@class LazyPluginSpec
