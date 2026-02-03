@@ -130,20 +130,6 @@ function M.cleanup_temp_file(filepath)
     if vim.fn.filereadable(filepath) == 1 then vim.fn.delete(filepath) end
 end
 
--- Run a command and wait for completion
--- @param cmd string: Command to run
--- @param timeout_ms number: Timeout in milliseconds (default: 5000)
--- @return boolean: true if command completed, false if timeout
-function M.run_command_async(cmd, timeout_ms)
-    timeout_ms = timeout_ms or 5000
-    local completed = false
-
-    vim.cmd(cmd)
-    completed = true
-
-    return completed
-end
-
 -- Get LSP client by name for buffer
 -- @param bufnr number: Buffer number
 -- @param name string: Client name to find

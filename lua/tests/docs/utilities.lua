@@ -47,12 +47,8 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, patch_it = pcall(require, "patch_it")
-                            if ok then
-                                MiniTest.expect.equality(type(patch_it.apply), "function")
-                            else
-                                -- Optional plugin, skip if not available
-                                MiniTest.expect.equality(true, true)
-                            end
+                            if not ok then MiniTest.skip("patch_it plugin not installed") end
+                            MiniTest.expect.equality(type(patch_it.apply), "function")
                         end,
                     },
                 },
@@ -67,8 +63,9 @@ return {
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
-                            -- Just verify keymaps exist
-                            MiniTest.expect.equality(true, true)
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("gx", "n")
+                            MiniTest.expect.equality(has_keymap, true, "Should have gx keymap in normal mode")
                         end,
                     },
                 },

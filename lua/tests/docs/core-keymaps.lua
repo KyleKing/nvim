@@ -58,7 +58,6 @@ return {
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
-                            local helpers = require("tests.helpers")
 
                             -- Verify j/k keymaps exist and are expr mappings
                             local keymaps = vim.api.nvim_get_keymap("n")

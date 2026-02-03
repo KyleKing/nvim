@@ -128,6 +128,7 @@ return {
                             local MiniPick = require("mini.pick")
                             local MiniTest = require("mini.test")
                             MiniPick.start({ source = { name = "Nav", items = { "a", "b", "c" } } })
+                            local was_active = MiniPick.is_picker_active()
                             -- Simulate navigation
                             vim.api.nvim_feedkeys(
                                 vim.api.nvim_replace_termcodes("<C-j>", true, false, true),
@@ -136,8 +137,7 @@ return {
                             )
                             vim.wait(20)
                             MiniPick.stop()
-                            -- Just verify picker responds to input
-                            MiniTest.expect.equality(true, true)
+                            MiniTest.expect.equality(was_active, true, "Picker should be active for navigation")
                         end,
                     },
                 },
@@ -153,7 +153,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>fh")
+                            local has_keymap = helpers.check_keymap("<leader>fh", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>fh keymap")
                         end,
                     },
@@ -170,7 +170,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>fk")
+                            local has_keymap = helpers.check_keymap("<leader>fk", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>fk keymap")
                         end,
                     },
@@ -187,7 +187,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>fr")
+                            local has_keymap = helpers.check_keymap("<leader>fr", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>fr keymap")
                         end,
                     },
@@ -204,7 +204,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>f'")
+                            local has_keymap = helpers.check_keymap("<leader>f'", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>f' keymap")
                         end,
                     },
@@ -221,7 +221,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>fl")
+                            local has_keymap = helpers.check_keymap("<leader>fl", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>fl keymap")
                         end,
                     },

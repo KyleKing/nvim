@@ -99,7 +99,9 @@ function M.run_all_tests(only_failed, shuffle, seed)
         append_line("==== Running tests from " .. file_name .. " ====")
 
         -- Clear package cache for the test module
-        local module_name = "tests." .. vim.fn.fnamemodify(file_name, ":r")
+        -- Get relative path from test_dir and convert to module name
+        local relative_path = test_file:sub(#test_dir + 2) -- +2 to skip the trailing "/"
+        local module_name = "tests." .. vim.fn.fnamemodify(relative_path, ":r"):gsub("/", ".")
         package.loaded[module_name] = nil
 
         -- Load the test module
