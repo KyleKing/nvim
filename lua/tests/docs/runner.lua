@@ -115,16 +115,18 @@ function M.save_snapshots(fixture_path, snapshots)
 
         table.insert(lines, "# name: " .. name)
         table.insert(lines, "before:")
-        for _, line in ipairs(snap.before) do
+        for _, line in ipairs(snap.before or {}) do
             table.insert(lines, "  " .. line)
         end
-        table.insert(lines, string.format("cursor: [%d, %d]", snap.cursor[1], snap.cursor[2]))
-        table.insert(lines, "keys: " .. snap.keys)
+        if snap.cursor then table.insert(lines, string.format("cursor: [%d, %d]", snap.cursor[1], snap.cursor[2])) end
+        if snap.keys then table.insert(lines, "keys: " .. snap.keys) end
         table.insert(lines, "after:")
-        for _, line in ipairs(snap.after) do
+        for _, line in ipairs(snap.after or {}) do
             table.insert(lines, "  " .. line)
         end
-        table.insert(lines, string.format("cursor_after: [%d, %d]", snap.cursor_after[1], snap.cursor_after[2]))
+        if snap.cursor_after then
+            table.insert(lines, string.format("cursor_after: [%d, %d]", snap.cursor_after[1], snap.cursor_after[2]))
+        end
 
         if snap.highlights and #snap.highlights > 0 then
             table.insert(lines, "highlights:")
@@ -190,9 +192,13 @@ function M.run_test(test, grammar_pattern, snapshots, update_mode)
     local MiniTest = require("mini.test")
     local snap_key = grammar_pattern .. " > " .. test.name
 
-    local bufnr = helpers.create_test_buffer(test.before, "text")
-    vim.api.nvim_set_current_buf(bufnr)
-    vim.api.nvim_win_set_cursor(0, test.cursor or { 1, 0 })
+    -- Handle tests without before (for tests that use expect.fn only)
+    local bufnr
+    if test.before then
+        bufnr = helpers.create_test_buffer(test.before, "text")
+        vim.api.nvim_set_current_buf(bufnr)
+        vim.api.nvim_win_set_cursor(0, test.cursor or { 1, 0 })
+    end
 
     -- Run setup
     if test.setup and test.setup.fn then test.setup.fn() end
@@ -209,12 +215,12 @@ function M.run_test(test, grammar_pattern, snapshots, update_mode)
     }
 
     -- Assert based on expect type
-    if test.expect.lines then
+    if test.expect.lines and bufnr then
         local actual = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
         MiniTest.expect.equality(actual, test.expect.lines)
     end
 
-    if test.expect.cursor then
+    if test.expect.cursor and bufnr then
         local actual = vim.api.nvim_win_get_cursor(0)
         MiniTest.expect.equality({ actual[1], actual[2] }, test.expect.cursor)
     end
@@ -236,7 +242,7 @@ function M.run_test(test, grammar_pattern, snapshots, update_mode)
         end
     end
 
-    helpers.delete_buffer(bufnr)
+    if bufnr then helpers.delete_buffer(bufnr) end
 end
 
 --- Run all tests in a fixture

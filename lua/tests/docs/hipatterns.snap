@@ -1,0 +1,25 @@
+# name: <leader>ft > find TODO keyword
+before:
+  -- TODO: fix this
+  -- NOTE: important
+cursor: [1, 0]
+after:
+  -- TODO: fix this
+  -- NOTE: important
+cursor_after: [1, 0]
+# ---
+# name: auto-highlight > FIXME highlighted
+before:
+  -- FIXME: broken
+cursor: [1, 0]
+after:
+  -- FIXME: broken
+cursor_after: [1, 0]
+# ---
+# name: auto-highlight > PLANNED highlighted
+before:
+  -- PLANNED: feature
+cursor: [1, 0]
+after:
+  -- PLANNED: feature
+cursor_after: [1, 0]
