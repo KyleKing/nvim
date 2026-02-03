@@ -86,7 +86,11 @@ function M.generate_all()
     -- Filter out non-fixture files
     fixture_files = vim.tbl_filter(function(f)
         local name = vim.fn.fnamemodify(f, ":t")
-        return name ~= "runner.lua" and name ~= "generator.lua" and name ~= "init.lua" and not name:match("_spec%.lua$")
+        return name ~= "runner.lua"
+            and name ~= "generator.lua"
+            and name ~= "init.lua"
+            and name ~= "validate_documentation.lua"
+            and not name:match("_spec%.lua$")
     end, fixture_files)
 
     -- Sort fixture files for deterministic output

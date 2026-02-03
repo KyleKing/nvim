@@ -49,6 +49,22 @@ return {
                     cursor = { 1, 0 },
                     expect = { lines = { 'first "" third' } },
                 },
+                {
+                    name = "select next argument",
+                    keys = "vaN",
+                    before = { "func(arg1, arg2, arg3)" },
+                    cursor = { 1, 5 },
+                    expect = {
+                        fn = function(ctx)
+                            local start_pos = vim.fn.getpos("'<")
+                            local end_pos = vim.fn.getpos("'>")
+                            local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
+                            local selected = line:sub(start_pos[3], end_pos[3])
+                            local MiniTest = require("mini.test")
+                            MiniTest.expect.equality(selected:match("arg1") ~= nil, true, "Should select next argument")
+                        end,
+                    },
+                },
             },
         },
         {
@@ -61,6 +77,29 @@ return {
                     before = { 'first "second" third' },
                     cursor = { 1, 15 },
                     expect = { lines = { 'first "" third' } },
+                },
+            },
+        },
+        {
+            pattern = "af/if",
+            desc = "Function text object (treesitter)",
+            tests = {
+                {
+                    name = "delete around function call",
+                    keys = "daf",
+                    before = { "local result = func(arg)", "return result" },
+                    cursor = { 1, 15 },
+                    expect = {
+                        fn = function(ctx)
+                            local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
+                            local MiniTest = require("mini.test")
+                            MiniTest.expect.equality(
+                                line:match("func%(") == nil,
+                                true,
+                                "Function call should be deleted"
+                            )
+                        end,
+                    },
                 },
             },
         },

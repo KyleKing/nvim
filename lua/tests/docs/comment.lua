@@ -48,6 +48,52 @@ return {
                     },
                     expect = { lines = { "local x = 1" } },
                 },
+                {
+                    name = "comment python line",
+                    keys = "gcc",
+                    before = { "x = 1" },
+                    cursor = { 1, 0 },
+                    setup = {
+                        fn = function()
+                            vim.bo.commentstring = "# %s"
+                            vim.bo.filetype = "python"
+                        end,
+                    },
+                    expect = {
+                        fn = function(ctx)
+                            local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
+                            local MiniTest = require("mini.test")
+                            MiniTest.expect.equality(
+                                line:match("^%s*#") ~= nil,
+                                true,
+                                "Line should be commented with #"
+                            )
+                        end,
+                    },
+                },
+                {
+                    name = "comment typescript line",
+                    keys = "gcc",
+                    before = { "const x = 1;" },
+                    cursor = { 1, 0 },
+                    setup = {
+                        fn = function()
+                            vim.bo.commentstring = "// %s"
+                            vim.bo.filetype = "typescript"
+                        end,
+                    },
+                    expect = {
+                        fn = function(ctx)
+                            local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
+                            local MiniTest = require("mini.test")
+                            MiniTest.expect.equality(
+                                line:match("^%s*//") ~= nil,
+                                true,
+                                "Line should be commented with //"
+                            )
+                        end,
+                    },
+                },
             },
         },
         {

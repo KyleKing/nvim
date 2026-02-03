@@ -25,6 +25,20 @@ return {
                     expect = { lines = { "(a, b, c)" } },
                 },
                 {
+                    name = "sort semicolon-separated",
+                    keys = "V",
+                    before = { "c; a; b" },
+                    cursor = { 1, 0 },
+                    expect = {
+                        fn = function(ctx)
+                            vim.cmd("normal gs")
+                            local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
+                            local MiniTest = require("mini.test")
+                            MiniTest.expect.equality(line, "a; b; c", "Semicolon-separated values should be sorted")
+                        end,
+                    },
+                },
+                {
                     name = "sort lines in paragraph",
                     keys = "gsip",
                     before = { "zebra", "apple", "banana", "" },
