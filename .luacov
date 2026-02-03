@@ -1,0 +1,33 @@
+-- LuaCov configuration for neovim custom modules
+-- Run tests with: luacov [test command]
+-- Generate report: luacov
+
+-- Include patterns (files to track coverage for)
+include = {
+  "kyleking/utils",
+  "kyleking/init",
+  "kyleking/core",
+  "find%-relative%-executable",
+}
+
+-- Exclude patterns (files to ignore)
+exclude = {
+  "kyleking/utils/test_runner",  -- Test infrastructure
+  "tests/",                       -- Test files themselves
+  "mini%.deps",                   -- Third-party plugins
+  "mini%.",                       -- All mini.nvim modules
+  ".*/site/pack/",                -- Installed plugins
+}
+
+-- Output settings
+statsfile = ".luacov.stats.out"
+reportfile = ".luacov.report.out"
+
+-- Reporter configuration
+reporter = "default"
+
+-- Run reporter automatically after stats collection
+runreport = false
+
+-- Coverage threshold settings (for future CI integration)
+-- min_coverage = 70  -- Minimum percentage for custom modules

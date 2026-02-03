@@ -29,3 +29,4 @@ node_modules
 
 # Generated documentation from test fixtures
 doc/generated/
+.luacov.*.out

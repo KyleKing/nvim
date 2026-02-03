@@ -51,6 +51,14 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_ru
 
 # Without MINI_DEPS_LATER_AS_NOW (slow, ~45+ seconds)
 nvim --headless -c "lua MiniTest.run()" -c "qall!"
+
+# Coverage tracking (requires luacov: luarocks install luacov)
+./scripts/run_tests_with_coverage.sh custom  # Custom modules only (fast)
+./scripts/run_tests_with_coverage.sh all     # All tests with coverage
+./scripts/run_tests_with_coverage.sh lua/tests/custom/ui_spec.lua  # Specific file
+
+# View coverage report
+cat .luacov.report.out
 ```
 
 **Interactive commands** (only when cwd is config directory):
@@ -92,6 +100,8 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.generator')
 1. **Async operations** (hipatterns highlights): Use `setup.fn` with `vim.wait()`
 
 See `ACTUALLY_GOOD_TESTS.md` for fixture schema and architecture.
+
+See `REGRESSION_TEST_GUIDE.md` for quick reference on adding tests for bugs.
 
 ### Startup validation
 

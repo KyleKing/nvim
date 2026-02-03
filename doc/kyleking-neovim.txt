@@ -29,6 +29,8 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
 2. Plugin Guides                               |kyleking-neovim-plugin-guides|
   - Text Objects (mini.ai)            |kyleking-neovim-text-objects-(mini.ai)|
   - See also: MiniAi, text-objects|kyleking-neovim-see-also:-miniai,-text-objects|
+  - Buffer Jump Navigation (bufjump.nvim)|kyleking-neovim-buffer-jump-navigation-(bufjump.nvim)|
+  - See also: jumps, CTRL-O, CTRL-I|kyleking-neovim-see-also:-jumps,-ctrl-o,-ctrl-i|
   - Clue (mini.clue)                        |kyleking-neovim-clue-(mini.clue)|
   - See also: MiniClue                    |kyleking-neovim-see-also:-miniclue|
   - Color & UI                                    |kyleking-neovim-color-&-ui|
@@ -45,8 +47,14 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - See also: flash.nvim                |kyleking-neovim-see-also:-flash.nvim|
   - Highlight Patterns (mini.hipatterns)|kyleking-neovim-highlight-patterns-(mini.hipatterns)|
   - See also: MiniHipatterns        |kyleking-neovim-see-also:-minihipatterns|
+  - Reference Highlighting (vim-illuminate)|kyleking-neovim-reference-highlighting-(vim-illuminate)|
+  - See also: gd, gr, LSP              |kyleking-neovim-see-also:-gd,-gr,-lsp|
+  - LSP Advanced Features              |kyleking-neovim-lsp-advanced-features|
+  - See also: lsp, diagnostic, nvim-lint|kyleking-neovim-see-also:-lsp,-diagnostic,-nvim-lint|
   - LSP Completion Keybindings    |kyleking-neovim-lsp-completion-keybindings|
   - See also: ins-completion, nvim-cmp|kyleking-neovim-see-also:-ins-completion,-nvim-cmp|
+  - Markdown/Djot Editing              |kyleking-neovim-markdown/djot-editing|
+  - See also: markdown, djot        |kyleking-neovim-see-also:-markdown,-djot|
   - Move (mini.move)                        |kyleking-neovim-move-(mini.move)|
   - See also: MiniMove                    |kyleking-neovim-see-also:-minimove|
   - Navigation (nap.nvim)              |kyleking-neovim-navigation-(nap.nvim)|
@@ -61,6 +69,8 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Source: lua/kyleking/deps/terminal-integration.lua|kyleking-neovim-source:-lua/kyleking/deps/terminal-integration.lua|
   - Utilities                                      |kyleking-neovim-utilities|
   - Source: lua/kyleking/deps/utility.lua|kyleking-neovim-source:-lua/kyleking/deps/utility.lua|
+  - Native Vim Search                      |kyleking-neovim-native-vim-search|
+  - See also: /, ?, n, N, search-commands|kyleking-neovim-see-also:-/,-?,-n,-n,-search-commands|
   - Window Management                      |kyleking-neovim-window-management|
   - Learning Notes                            |kyleking-neovim-learning-notes|
   - Modern Vim (PragProg)              |kyleking-neovim-modern-vim-(pragprog)|
@@ -671,6 +681,47 @@ Source: `lua/kyleking/deps/editing-support.lua`
 SEE ALSO: MINIAI, TEXT-OBJECTS*kyleking-neovim-see-also:-miniai,-text-objects*
 
 
+BUFFER JUMP NAVIGATION (BUFJUMP.NVIM)*kyleking-neovim-buffer-jump-navigation-(bufjump.nvim)*
+
+Alternative jump navigation that distinguishes between buffer-to-buffer jumps
+and within-buffer jumps.
+
+Operator grammar:
+
+>
+    <leader>bn / <leader>bp Jump between different buffers
+    <leader>bN / <leader>bP Jump within same buffer
+<
+
+**Buffer-to-buffer jumps** (alternative to `<C-o>` / `<C-i>`):
+
+- `<leader>bn` - Jump forward to next position in different buffer
+- `<leader>bp` - Jump backward to previous position in different buffer
+
+**Within-buffer jumps**
+
+- `<leader>bN`- Jump forward to next position in same buffer
+- `<leader>bP` - Jump backward to previous position in same buffer
+
+**Behavior**
+
+Standardvim `<C-o>` and `<C-i>` navigate through all jump positions regardless
+of buffer.
+
+bufjump.nvim provides filtered navigation:
+
+- `bn/bp` only jump to positions in different buffers
+- `bN/bP` only jump to positions within the current buffer
+
+Use case: After visiting multiple files and making edits, use `<leader>bp` to
+jump back to the previous file without cycling through all within-file jumps.
+
+Source: `lua/kyleking/deps/buffer.lua`
+
+
+SEE ALSO: JUMPS, CTRL-O, CTRL-I*kyleking-neovim-see-also:-jumps,-ctrl-o,-ctrl-i*
+
+
 CLUE (MINI.CLUE)                            *kyleking-neovim-clue-(mini.clue)*
 
 Displays available keybinding continuations after a 500ms delay.
@@ -946,6 +997,123 @@ Source: `lua/kyleking/deps/editing-support.lua`
 SEE ALSO: MINIHIPATTERNS            *kyleking-neovim-see-also:-minihipatterns*
 
 
+REFERENCE HIGHLIGHTING (VIM-ILLUMINATE)*kyleking-neovim-reference-highlighting-(vim-illuminate)*
+
+Automatically highlight and navigate between references to the symbol under
+cursor using LSP, Treesitter, or regex.
+
+Operator grammar:
+
+>
+    ]r / [r              Navigate between references
+    <leader>ur / <leader>uR Toggle reference highlighting
+<
+
+**Navigate between references**
+
+- `]r`- Jump to next reference
+- `[r` - Jump to previous reference
+
+**Toggle highlighting**
+
+- `<leader>ur`- Toggle reference highlighting globally
+- `<leader>uR` - Toggle reference highlighting for current buffer only
+
+**Behavior**
+
+Whencursor is on a symbol (variable, function, etc.), vim-illuminate
+automatically highlights all references to that symbol in the current buffer.
+
+**Highlight providers** (in order of priority):
+
+1. LSP - Uses language server for semantic reference detection
+
+
+2. Treesitter - Uses syntax tree for structural matches
+
+
+3. Regex - Falls back to pattern matching
+
+
+
+**Configuration**
+
+- Delay:200ms before highlighting (avoids flicker during navigation)
+- Minimum occurrences: 2 (won’t highlight unique symbols)
+- Large files: Only uses LSP provider for performance
+
+**Use cases**
+
+- Quicklysee all uses of a variable in current function
+- Navigate between usages with `]r` / `[r` without entering LSP references picker
+- Visual feedback when refactoring or understanding code flow
+
+Source: `lua/kyleking/deps/bars-and-lines.lua`
+
+
+SEE ALSO: GD, GR, LSP                  *kyleking-neovim-see-also:-gd,-gr,-lsp*
+
+
+LSP ADVANCED FEATURES                  *kyleking-neovim-lsp-advanced-features*
+
+Additional LSP features: signature help and manual linting.
+
+Operator grammar:
+
+>
+    <leader>ks           Toggle signature help
+    <leader>ll           Manual lint trigger
+<
+
+**Signature help** (lsp_signature.nvim):
+
+- `<leader>ks` - Toggle floating signature help window (normal and insert mode)
+
+Shows function signatures with parameter documentation while typing.
+
+Useful when calling functions with multiple parameters to see which parameter
+you’re on.
+
+**Manual linting** (nvim-lint):
+
+- `<leader>ll` - Manually trigger linting for current buffer
+
+**Automatic linting**
+
+Lintersrun automatically on:
+
+- BufEnter (opening a file)
+- BufWritePost (saving a file)
+- InsertLeave (leaving insert mode)
+
+**Configured linters by filetype**
+
+- CSS:stylelint
+- Go: golangcilint
+- JavaScript/JSX: oxlint
+- Lua: selene
+- Python: ruff
+- Shell: shellcheck
+- TypeScript/TSX: oxlint
+- YAML: yamllint
+- Zsh: zsh
+
+**Project-local linters**
+
+Usesfind-relative-executable to prefer project-local tools (`.venv/bin/`,
+`node_modules/.bin/`) over global installations.
+
+**Smart executable detection**
+
+Onlyruns linters that are actually installed - no errors if a linter is
+missing.
+
+Source: `lua/kyleking/deps/lsp.lua`
+
+
+SEE ALSO: LSP, DIAGNOSTIC, NVIM-LINT*kyleking-neovim-see-also:-lsp,-diagnostic,-nvim-lint*
+
+
 LSP COMPLETION KEYBINDINGS        *kyleking-neovim-lsp-completion-keybindings*
 
 Keybindings for LSP completion in insert mode, including navigation and
@@ -992,6 +1160,78 @@ Source: `lua/kyleking/core/lsp.lua`
 
 
 SEE ALSO: INS-COMPLETION, NVIM-CMP*kyleking-neovim-see-also:-ins-completion,-nvim-cmp*
+
+
+MARKDOWN/DJOT EDITING                  *kyleking-neovim-markdown/djot-editing*
+
+Custom utilities for markdown and djot: list editing and browser preview.
+
+Operator grammar:
+
+>
+    <CR> (insert mode)   Smart list continuation
+    <leader>cp           Preview in browser
+<
+
+**List editing** (buffer-local for markdown/djot files):
+
+**Smart Enter** - `<CR>` in insert mode:
+
+- On non-empty list item: Creates new list item with same marker
+- On empty list item: Exits list (removes marker, stays on line)
+- Outside list: Normal `<CR>` behavior
+
+**List indentation** - `<Tab>` in insert mode:
+
+- Indents current list item by one level
+- Updates marker if needed (e.g., `-` becomes `-`)
+
+**Supported list formats**
+
+- Unordered:`- item`, `* item`, `+ item`
+- Ordered: `1. item`, `2) item`
+
+**Djot-specific behavior**
+
+Automaticallyadds blank lines between nested lists to maintain proper djot
+syntax.
+
+------------------------------------------------------------------------------
+**Browser preview** (buffer-local for markdown/djot files):
+
+`<leader>cp` - Preview current file in browser
+
+`:Preview` - Command form
+
+**Markdown conversion** (tries in order):
+
+1. pandoc (if available)
+
+
+2. Python markdown module
+
+
+
+**Djot conversion**
+
+Requiresdjot CLI: `npm install -g @djot/djot`
+
+**Behavior**
+
+- Convertsfile to HTML
+- Writes to temp file with CSS styling
+- Opens in default browser
+- Temp file persists until system cleanup
+
+**Use case**
+
+Quickvisual check of markdown/djot rendering without external tools or build
+processes.
+
+Source: `lua/kyleking/utils/list_editing.lua, lua/kyleking/utils/preview.lua`
+
+
+SEE ALSO: MARKDOWN, DJOT            *kyleking-neovim-see-also:-markdown,-djot*
 
 
 MOVE (MINI.MOVE)                            *kyleking-neovim-move-(mini.move)*
@@ -1328,6 +1568,64 @@ See also: <https://github.com/KyleKing/patch_it.nvim>
 
 
 SOURCE: LUA/KYLEKING/DEPS/UTILITY.LUA*kyleking-neovim-source:-lua/kyleking/deps/utility.lua*
+
+
+NATIVE VIM SEARCH                          *kyleking-neovim-native-vim-search*
+
+Default vim search behavior with enhanced search count display.
+
+Operator grammar:
+
+>
+    / ? n N * #          Native vim search
+<
+
+**Basic search commands** (standard vim):
+
+- `/pattern<CR>` - Search forward for pattern
+- `?pattern<CR>` - Search backward for pattern
+- `n` - Jump to next search match
+- `N` - Jump to previous search match
+- `*` - Search forward for word under cursor
+- `#` - Search backward for word under cursor
+- `g*` - Search forward for partial word under cursor
+- `g#` - Search backward for partial word under cursor
+
+**Search count display** `[N/M]`
+
+Showscurrent match position and total matches in command line.
+
+Example: `[3/15]` means you’re on match 3 of 15 total matches.
+
+This feature is enabled by ensuring the 'S' flag is not in 'shortmess' option.
+
+Without this configuration, vim would only show `search hit BOTTOM, continuing
+at TOP` messages.
+
+**Search highlighting**
+
+- Searchresults are highlighted automatically (`:set hlsearch`)
+- Clear highlighting with `<Esc>` (custom keybinding, see core-keymaps.lua)
+- Or use `:noh` / `:nohlsearch` command
+
+**Search options** (vim defaults):
+
+- `ignorecase` - Case-insensitive search
+- `smartcase` - Case-sensitive if pattern contains uppercase
+- `incsearch` - Show matches as you type
+- `hlsearch` - Highlight all matches
+
+**Useful search patterns**
+
+- `/\<word\>`- Match whole word only
+- `/\v` - Very magic mode (less escaping needed)
+- `/\c` - Case-insensitive for this search only
+- `/\C` - Case-sensitive for this search only
+
+Source: `lua/kyleking/deps/search.lua`
+
+
+SEE ALSO: /, ?, N, N, SEARCH-COMMANDS*kyleking-neovim-see-also:-/,-?,-n,-n,-search-commands*
 
 
 WINDOW MANAGEMENT                          *kyleking-neovim-window-management*
