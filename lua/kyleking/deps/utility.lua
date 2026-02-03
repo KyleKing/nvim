@@ -81,7 +81,7 @@ later(function() add("micarmst/vim-spellsync") end)
 
 later(function()
     add("sontungexpt/url-open")
-    require("url-open").setup()
+    require("url-open").setup({})
     local K = vim.keymap.set
     K("n", "<leader>uu", "<esc>:URLOpenUnderCursor<cr>", { desc = "Open URL" })
 end)

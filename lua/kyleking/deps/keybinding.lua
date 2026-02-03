@@ -87,10 +87,13 @@ later(function()
 
         window = {
             delay = require("kyleking.utils.constants").DELAY.KEYMAP_DISPLAY,
-            config = {
-                border = "rounded",
-                width = "auto",
-            },
+            config = function()
+                return {
+                    border = "rounded",
+                    width = "auto",
+                    height = math.floor(vim.o.lines * 0.5),
+                }
+            end,
         },
     })
 
