@@ -103,7 +103,7 @@ return {
                     keys = "sh)",
                     before = { "(word)" },
                     cursor = { 1, 2 },
-                    expect = { lines = { "(word)" } },
+                    expect = { snapshot = true },
                 },
             },
         },

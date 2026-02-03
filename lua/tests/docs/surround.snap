@@ -1,0 +1,13 @@
+# name: sh > highlight parens
+before:
+  (word)
+cursor: [1, 2]
+keys: sh)
+after:
+  (word)
+cursor_after: [1, 2]
+highlights:
+  - group: MiniSurround
+    range: [[1, 0], [1, 1]]
+  - group: MiniSurround
+    range: [[1, 5], [1, 6]]
