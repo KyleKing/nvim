@@ -22,6 +22,7 @@ later(function()
 
     -- Core pickers
     K("n", "<leader><CR>", builtin.resume, { desc = "Resume last picker" })
+    K("n", "<leader><Enter>", builtin.resume, { desc = "Resume last picker" })
     K("n", "<leader>;", builtin.buffers, { desc = "Find in open buffers" })
 
     -- Leader-b (buffer operations)
