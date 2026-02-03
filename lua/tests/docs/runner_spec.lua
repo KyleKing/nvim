@@ -1,9 +1,10 @@
 local MiniTest = require("mini.test")
+local helpers = require("tests.helpers")
 local runner = require("tests.docs.runner")
 
 local T = MiniTest.new_set({
     hooks = {
-        pre_case = function() vim.wait(1000) end,
+        pre_case = function() helpers.wait_for_plugins() end,
     },
 })
 

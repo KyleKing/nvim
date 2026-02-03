@@ -4,7 +4,7 @@ local helpers = require("tests.helpers")
 
 local T = MiniTest.new_set({
     hooks = {
-        pre_case = function() vim.wait(1000) end,
+        pre_case = function() helpers.wait_for_plugins() end,
     },
 })
 

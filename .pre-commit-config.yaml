@@ -108,3 +108,10 @@ repos:
         language: system
         files: ^doc/kyleking-neovim\.txt$
         pass_filenames: false
+      - id: mini-test
+        name: Run Mini.test
+        description: Run neovim tests with synchronous plugin loading
+        entry: bash -c 'cd ~/.config/nvim && MINI_DEPS_LATER_AS_NOW=1 nvim --headless +"lua for _, f in ipairs(vim.fn.glob(\"lua/tests/**/*_spec.lua\", false, true)) do MiniTest.run_file(f) end" +qall'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

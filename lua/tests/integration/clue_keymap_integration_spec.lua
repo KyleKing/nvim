@@ -14,7 +14,7 @@ local T = MiniTest.new_set({
 T["keymap compatibility"] = MiniTest.new_set()
 
 T["keymap compatibility"]["all keymaps have valid modes for mini.clue"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- mini.clue calls nvim_get_keymap with mode as string
     -- If any keymap has mode as non-string, it will error
@@ -46,7 +46,7 @@ T["keymap compatibility"]["all keymaps have valid modes for mini.clue"] = functi
 end
 
 T["keymap compatibility"]["mode arrays in vim.keymap.set don't break mini.clue"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- Test that mode arrays (e.g., {"n", "x"}) work correctly
     -- This is a regression test for keymaps that use mode arrays
@@ -85,9 +85,6 @@ T["common keypress scenarios"] = MiniTest.new_set()
 T["common keypress scenarios"]["pressing 'g' doesn't error"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        -- Wait for plugins to load
-        vim.wait(1000)
-
         -- Create a buffer with some content
         vim.cmd("enew")
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {"line 1", "line 2", "line 3"})
@@ -110,8 +107,6 @@ end
 T["common keypress scenarios"]["pressing 'gg' navigation works"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(1000)
-
         -- Create buffer with multiple lines
         vim.cmd("enew")
         local lines = {}
@@ -149,8 +144,6 @@ end
 T["common keypress scenarios"]["leader key triggers clue window"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(1000)
-
         -- Press leader and wait for clue window
         vim.api.nvim_feedkeys(" ", "x", false)
         vim.wait(600) -- Wait longer than clue delay (500ms)
@@ -180,8 +173,6 @@ end
 T["common keypress scenarios"]["bracket navigation triggers clue"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(1000)
-
         vim.cmd("enew")
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {"line 1", "line 2"})
 
@@ -208,8 +199,6 @@ T["workflow scenarios"] = MiniTest.new_set()
 T["workflow scenarios"]["typical editing workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(1000)
-
         -- Simulate typical editing workflow
         vim.cmd("enew")
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {
@@ -249,8 +238,6 @@ end
 T["workflow scenarios"]["file navigation workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(1000)
-
         -- Create multiple buffers
         for i = 1, 3 do
             vim.cmd("enew")
@@ -280,7 +267,7 @@ end
 T["keymap validation"] = MiniTest.new_set()
 
 T["keymap validation"]["no keymaps have nil mode"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- Check all registered keymaps to ensure none have nil mode
     local modes = { "n", "i", "v", "x", "s", "o", "t", "c" }
@@ -305,7 +292,7 @@ T["keymap validation"]["no keymaps have nil mode"] = function()
 end
 
 T["keymap validation"]["all mode arrays are properly expanded"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- When using vim.keymap.set with mode array like {"n", "x"},
     -- it should create separate keymaps for each mode

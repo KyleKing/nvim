@@ -20,7 +20,7 @@ T["python workflow"]["can create python buffer"] = function()
 end
 
 T["python workflow"]["python formatter is configured"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local conform = require("conform")
     local formatters = conform.formatters_by_ft.python or {}
@@ -39,7 +39,7 @@ T["python workflow"]["python formatter is configured"] = function()
 end
 
 T["python workflow"]["python linter is configured"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local lint = require("lint")
     local linters = lint.linters_by_ft.python or {}
@@ -58,7 +58,7 @@ T["python workflow"]["python linter is configured"] = function()
 end
 
 T["python workflow"]["python parser is available"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local parsers = require("nvim-treesitter.parsers")
     local has_parser = parsers.has_parser("python")

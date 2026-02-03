@@ -19,6 +19,15 @@ require("mini.deps").setup({
     silent = true, -- Only show ERROR and WARN messages, suppress INFO (snapshots, etc.)
 })
 
+local MiniDeps = require("mini.deps")
+
+-- For testing: maybe_later uses now() when MINI_DEPS_LATER_AS_NOW=1, otherwise later()
+-- This provides explicit control over plugin loading during tests without overriding mini.deps
+local maybe_later = vim.env.MINI_DEPS_LATER_AS_NOW and MiniDeps.now or MiniDeps.later
+
+-- Export maybe_later globally so all deps files can use it
+_G.maybe_later = maybe_later
+
 require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
 require("kyleking.deps.color")
@@ -61,7 +70,7 @@ now(function()
         -- Add commands to run tests
         vim.api.nvim_create_user_command(
             "RunAllTests",
-            function() test_runner.run_all_tests(false) end,
+            function() test_runner.run_all_tests(false, false) end,
             { desc = "Run all Mini.test test files" }
         )
 
@@ -71,9 +80,42 @@ now(function()
             { desc = "Run only failed tests from last run" }
         )
 
+        vim.api.nvim_create_user_command(
+            "RunTestsParallel",
+            function() test_runner.run_tests_parallel(false) end,
+            { desc = "Run tests in parallel with worker pool" }
+        )
+
+        vim.api.nvim_create_user_command("RunTestsRandom", function(opts)
+            local seed = tonumber(opts.args) or os.time()
+            test_runner.run_all_tests(false, true, seed)
+        end, { nargs = "?", desc = "Run tests in random order (optional seed)" })
+
+        vim.api.nvim_create_user_command("RunTestsParallelRandom", function(opts)
+            local seed = tonumber(opts.args) or os.time()
+            test_runner.run_tests_parallel(true, seed)
+        end, { nargs = "?", desc = "Run tests in parallel with random order (optional seed)" })
+
         -- Add keymaps to run tests
-        vim.keymap.set("n", "<leader>ta", function() test_runner.run_all_tests(false) end, { desc = "Run all tests" })
+        vim.keymap.set(
+            "n",
+            "<leader>ta",
+            function() test_runner.run_all_tests(false, false) end,
+            { desc = "Run all tests" }
+        )
         vim.keymap.set("n", "<leader>tf", function() test_runner.run_failed_tests() end, { desc = "Run failed tests" })
+        vim.keymap.set(
+            "n",
+            "<leader>tp",
+            function() test_runner.run_tests_parallel(false) end,
+            { desc = "Run tests parallel" }
+        )
+        vim.keymap.set(
+            "n",
+            "<leader>tr",
+            function() test_runner.run_all_tests(false, true, os.time()) end,
+            { desc = "Run tests random" }
+        )
     end
 end)
 

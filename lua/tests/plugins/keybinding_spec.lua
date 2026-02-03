@@ -52,7 +52,7 @@ T["clue configuration"]["leader triggers are configured"] = function()
 end
 
 T["clue configuration"]["built-in triggers are configured"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -70,7 +70,7 @@ T["clue configuration"]["built-in triggers are configured"] = function()
 end
 
 T["clue configuration"]["window config has delay"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -80,7 +80,7 @@ T["clue configuration"]["window config has delay"] = function()
 end
 
 T["clue configuration"]["window has rounded border"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -89,7 +89,7 @@ T["clue configuration"]["window has rounded border"] = function()
 end
 
 T["clue configuration"]["uses mode arrays for common triggers"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -115,7 +115,7 @@ end
 T["group descriptions"] = MiniTest.new_set()
 
 T["group descriptions"]["leader groups are defined"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -149,7 +149,7 @@ T["group descriptions"]["leader groups are defined"] = function()
 end
 
 T["group descriptions"]["LSP subgroups are defined"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -164,7 +164,7 @@ T["group descriptions"]["LSP subgroups are defined"] = function()
 end
 
 T["group descriptions"]["UI subgroups are defined"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -181,7 +181,7 @@ end
 T["builtin clue generators"] = MiniTest.new_set()
 
 T["builtin clue generators"]["builtin completion clues are included"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -199,7 +199,7 @@ T["builtin clue generators"]["builtin completion clues are included"] = function
 end
 
 T["builtin clue generators"]["window commands clues are included"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -218,7 +218,7 @@ T["builtin clue generators"]["window commands clues are included"] = function()
 end
 
 T["builtin clue generators"]["marks clues are included"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -236,7 +236,7 @@ T["builtin clue generators"]["marks clues are included"] = function()
 end
 
 T["builtin clue generators"]["registers clues are included"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -254,7 +254,7 @@ T["builtin clue generators"]["registers clues are included"] = function()
 end
 
 T["builtin clue generators"]["square_brackets clues are included"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -272,7 +272,7 @@ T["builtin clue generators"]["square_brackets clues are included"] = function()
 end
 
 T["builtin clue generators"]["all available gen_clues are used or intentionally skipped"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
 
@@ -333,7 +333,7 @@ end
 T["clue completeness"] = MiniTest.new_set()
 
 T["clue completeness"]["no groups use default +# descriptions"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -356,7 +356,7 @@ T["clue completeness"]["no groups use default +# descriptions"] = function()
 end
 
 T["clue completeness"]["all leader group prefixes have descriptions"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local leader = vim.g.mapleader or "\\"
     local keymaps = vim.api.nvim_get_keymap("n")
@@ -396,7 +396,7 @@ T["clue completeness"]["all leader group prefixes have descriptions"] = function
 end
 
 T["clue completeness"]["no orphan clue groups"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -428,7 +428,7 @@ T["clue completeness"]["no orphan clue groups"] = function()
 end
 
 T["group descriptions"]["no duplicate descriptions among siblings"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
@@ -466,7 +466,7 @@ T["group descriptions"]["no duplicate descriptions among siblings"] = function()
 end
 
 T["group descriptions"]["descriptions follow +Name pattern"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config

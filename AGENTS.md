@@ -18,6 +18,9 @@ nvim --headless -c "lua MiniTest.run()" -c "qall!"
 
 # Single test file
 nvim --headless -c "lua MiniTest.run_file('lua/tests/core/smoke_spec.lua')" -c "qall!"
+
+# Tests with synchronous plugin loading (later() behaves like now())
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"
 ```
 
 From within nvim (only when cwd is config directory): `:RunAllTests`, `:RunFailedTests`, `<leader>ta`, `<leader>tf`.
@@ -52,6 +55,7 @@ end)
 
 - `now()` for plugins needed at startup (colorscheme, mini.test)
 - `later()` for everything else (deferred loading)
+- Set `MINI_DEPS_LATER_AS_NOW=1` to make `later()` behave like `now()` (useful for testing)
 - Plugin keymaps belong in their respective `deps/*.lua` file, not in `core/keymaps.lua`
 - Wrap plugin function calls in keymaps with anonymous functions to prevent nil-rhs errors when the plugin hasn't loaded yet
 

@@ -206,6 +206,69 @@ function M.set_visual_selection(start_line, start_col, end_line, end_col)
     vim.fn.setpos("'>", { 0, end_line, end_col, 0 })
 end
 
+-- Comprehensive cleanup for sequential test execution
+-- Resets state between tests to prevent interference
+function M.full_cleanup()
+    -- Delete all user-created buffers (keep scratch buffers from mini.test)
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_valid(buf) then
+            local buftype = vim.bo[buf].buftype
+            local bufname = vim.api.nvim_buf_get_name(buf)
+            -- Delete non-scratch buffers and named scratch buffers
+            if buftype == "" or (buftype == "nofile" and bufname ~= "") then
+                pcall(vim.api.nvim_buf_delete, buf, { force = true })
+            end
+        end
+    end
+
+    -- Reset to single window
+    vim.cmd("only")
+
+    -- Clear all diagnostics
+    vim.diagnostic.reset()
+
+    -- Stop all LSP clients
+    for _, client in pairs(vim.lsp.get_clients()) do
+        vim.lsp.stop_client(client.id)
+    end
+
+    -- Clear test-related autocmds (preserve user config autocmds)
+    local test_groups = vim.api.nvim_get_autocmds({ group = "test_*" })
+    for _, autocmd in ipairs(test_groups) do
+        pcall(vim.api.nvim_del_autocmd, autocmd.id)
+    end
+
+    -- Clear test keymaps (keymaps starting with <leader>test or containing "test")
+    -- Note: This is conservative to avoid clearing user keymaps
+    local modes = { "n", "i", "v", "x", "s", "o", "c", "t" }
+    for _, mode in ipairs(modes) do
+        local keymaps = vim.api.nvim_get_keymap(mode)
+        for _, keymap in ipairs(keymaps) do
+            if
+                keymap.lhs and (keymap.lhs:match("<leader>test") or (keymap.desc and keymap.desc:lower():match("test")))
+            then
+                pcall(vim.keymap.del, mode, keymap.lhs)
+            end
+        end
+    end
+
+    -- Clear test-specific global variables
+    for key, _ in pairs(_G) do
+        if type(key) == "string" and key:match("^test_") then _G[key] = nil end
+    end
+
+    -- Clear loaded test modules from package cache
+    for key, _ in pairs(package.loaded) do
+        if type(key) == "string" and (key:match("^tests%.") or key:match("_spec$")) then package.loaded[key] = nil end
+    end
+
+    -- Force garbage collection to clean up resources
+    collectgarbage("collect")
+
+    -- Brief wait for cleanup to settle
+    vim.wait(10)
+end
+
 --- Run Lua code in a subprocess nvim with full user config loaded.
 --- Waits for plugins to initialize, executes the code, then checks for errors.
 --- @param lua_code string Lua code to execute after plugins load
@@ -215,10 +278,14 @@ function M.nvim_interaction_test(lua_code, timeout_ms)
     timeout_ms = timeout_ms or 15000
     local tmpfile = vim.fn.tempname() .. "_interaction_test.lua"
 
+    local sync_mode = vim.env.MINI_DEPS_LATER_AS_NOW ~= nil
+    local pre_delay = sync_mode and 100 or 2000
+    local post_delay = sync_mode and 50 or 500
+
     local wrapped = table.concat({
-        "vim.wait(2000, function() return false end)",
+        ("vim.wait(%d, function() return false end)"):format(pre_delay),
         lua_code,
-        "vim.wait(500, function() return false end)",
+        ("vim.wait(%d, function() return false end)"):format(post_delay),
         "vim.cmd('qall!')",
     }, "\n")
 
@@ -228,12 +295,12 @@ function M.nvim_interaction_test(lua_code, timeout_ms)
         f:close()
     end
 
-    local result = vim.system({
-        "nvim",
-        "--headless",
-        "-c",
-        "luafile " .. tmpfile,
-    }, { text = true }):wait(timeout_ms)
+    local cmd = { "nvim", "--headless", "-c", "luafile " .. tmpfile }
+    local opts = { text = true }
+
+    if vim.env.MINI_DEPS_LATER_AS_NOW then cmd = { "env", "MINI_DEPS_LATER_AS_NOW=1", unpack(cmd) } end
+
+    local result = vim.system(cmd, opts):wait(timeout_ms)
 
     vim.fn.delete(tmpfile)
 

@@ -12,7 +12,7 @@ local T = MiniTest.new_set({
 T["format on save"] = MiniTest.new_set()
 
 T["format on save"]["format autocmd is registered"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- Check for BufWritePre autocmd for formatting
     local autocmds = vim.api.nvim_get_autocmds({
@@ -48,7 +48,7 @@ T["format on save"]["Lua file formats on write"] = function()
 
         -- Save file (should trigger format)
         vim.cmd("write")
-        vim.wait(1000)
+        helpers.wait_for_plugins()
 
         -- Read back and check formatting
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -87,7 +87,7 @@ T["format on save"]["Python file formats on write"] = function()
 
         -- Save file (should trigger format with ruff)
         vim.cmd("write")
-        vim.wait(1000)
+        helpers.wait_for_plugins()
 
         -- Read back
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -112,7 +112,7 @@ end
 T["lint on save"] = MiniTest.new_set()
 
 T["lint on save"]["lint autocmd is registered"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- Check for lint autocmds
     local events = { "BufWritePost", "BufReadPost", "InsertLeave" }
@@ -133,7 +133,7 @@ T["lint on save"]["lint autocmd is registered"] = function()
 end
 
 T["lint on save"]["linters configured for common filetypes"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     local lint = require("lint")
 
@@ -157,7 +157,7 @@ end
 T["autocmd conflicts"] = MiniTest.new_set()
 
 T["autocmd conflicts"]["no duplicate BufWritePre autocmds"] = function()
-    vim.wait(1000)
+    helpers.wait_for_plugins()
 
     -- Count BufWritePre autocmds to detect duplicates
     local autocmds = vim.api.nvim_get_autocmds({ event = "BufWritePre" })
