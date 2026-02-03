@@ -1,14 +1,22 @@
 return {
     title = "File Explorer (mini.files)",
     see_also = { "MiniFiles" },
-    desc = "File explorer with preview and manipulation.",
+    desc = "Miller-column file explorer with preview. Navigate, create, rename, and delete files directly.",
     source = "lua/kyleking/deps/file-explorer.lua",
 
     notes = {
-        "Toggle with `<leader>e`, opens at current file location.",
-        "Preview window shows file/directory contents.",
-        "Create/delete/rename files within explorer.",
-        "Bookmark working directory with `w`.",
+        "`<leader>e` Toggle explorer (opens at current file)",
+        "",
+        "**Inside the explorer**:",
+        "- `h`/`l` Navigate up/into directories",
+        "- `=` Synchronize (applies pending changes)",
+        "- `w` Bookmark to cwd",
+        "",
+        "**Edit workflow**:",
+        "Edit files by typing a new filename (create), deleting a line (delete), or editing the name in place (rename). Press `=` to apply.",
+        "",
+        "**Filtered entries**:",
+        "`.git`, `.venv`, `node_modules`, `__pycache__`, and other common non-project directories are hidden.",
     },
 
     grammars = {

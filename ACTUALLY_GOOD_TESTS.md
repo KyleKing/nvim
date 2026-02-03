@@ -11,6 +11,34 @@ Single-source fixtures that generate both:
 1. **Behavioral tests** (mini.test) that verify functionality
 1. **Documentation** (markdown → vimdoc) that describes functionality
 
+## Progress
+
+**Status**: Phase 1 and Phase 2 complete. 10 fixtures implemented with 32 passing test cases.
+
+**Completed fixtures**:
+
+- ✓ `surround.lua` - mini.surround (add, delete, replace, find, highlight)
+- ✓ `move.lua` - mini.move (API-based tests for move operations)
+- ✓ `operators.lua` - mini.operators (sort, multiply)
+- ✓ `ai.lua` - mini.ai enhanced text objects
+- ✓ `comment.lua` - mini.comment toggle functionality
+- ✓ `hipatterns.lua` - mini.hipatterns keyword highlighting (with snapshots)
+- ✓ `pick.lua` - mini.pick fuzzy finder
+- ✓ `files.lua` - mini.files file explorer
+- ✓ `diff.lua` - mini.diff git integration
+- ✓ `flash.lua` - flash.nvim labeled motion
+
+**Infrastructure enhancements**:
+
+- runner.lua handles optional test fields (before, keys, cursor)
+- save_snapshots safely handles nil values
+- Hybrid testing approach: API calls for complex keybindings, config validation for UI-heavy plugins
+
+**Generated artifacts**:
+
+- 2 snapshot files (surround.snap, hipatterns.snap)
+- Auto-generated documentation for all fixtures via generator.lua
+
 ## Architecture
 
 ```
@@ -103,6 +131,67 @@ expect = { snapshot = true }
     expect = { snapshot = true },
 }
 ```
+
+### Hybrid Testing Approach
+
+**Challenge**: Tests with `<leader>` keybindings fail because special keys aren't processed in `vim.cmd("normal ...")`.
+
+**Solution**: Use a hybrid approach based on test complexity:
+
+1. **Simple keybindings** (no special keys): Use `keys` field with `expect.lines`
+
+    ```lua
+    { keys = 'saiw"', before = { "word" }, expect = { lines = { '"word"' } } }
+    ```
+
+1. **Complex keybindings** (`<leader>`, `<C-...>`): Use direct API calls
+
+    ```lua
+    {
+        name = "move line down",
+        expect = {
+            fn = function(ctx)
+                local MiniMove = require("mini.move")
+                local helpers = require("tests.helpers")
+                local bufnr = helpers.create_test_buffer({ "line1", "line2" }, "text")
+                vim.api.nvim_set_current_buf(bufnr)
+                MiniMove.move_line("down")
+                local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+                MiniTest.expect.equality(lines, { "line2", "line1" })
+                helpers.delete_buffer(bufnr)
+            end,
+        },
+    }
+    ```
+
+1. **UI-heavy plugins** (pick, files, diff): Focus on config validation
+
+    ```lua
+    {
+        name = "config check",
+        expect = {
+            fn = function(ctx)
+                local MiniDiff = require("mini.diff")
+                MiniTest.expect.equality(type(MiniDiff.toggle_overlay), "function")
+                MiniTest.expect.equality(MiniDiff.config.view.style, "sign")
+            end,
+        },
+    }
+    ```
+
+1. **Async operations** (hipatterns highlights): Use setup with vim.wait()
+
+    ```lua
+    {
+        setup = {
+            fn = function()
+                vim.cmd("doautocmd BufEnter")
+                vim.wait(50)  -- Allow highlights to apply
+            end,
+        },
+        expect = { snapshot = true },
+    }
+    ```
 
 ## Snapshot Format
 
@@ -608,22 +697,25 @@ See `ACTUALLY_GOOD_TESTS.md` for fixture schema and architecture.
 
 ### Phase 5: Migration
 
+**Status**: 10 of 12 fixtures completed. Remaining: git.lua (comprehensive), terminal.lua, clue.lua, nap.lua
+
 #### 5.1 Create fixtures for existing plugin docs
 
 Priority order (by documentation complexity):
 
-1. `surround.lua` - simple grammar table
-2. `comment.lua` - simple grammar table
-3. `move.lua` - simple grammar table
-4. `operators.lua` - mini.operators (sort, etc.)
-5. `ai.lua` - mini.ai text objects
-6. `picker.lua` - complex, needs setup functions
-7. `files.lua` - mini.files
-8. `git.lua` - mini.diff, mini.git, diffview
-9. `terminal.lua` - terminal integration
-10. `clue.lua` - mini.clue
-11. `flash.lua` - flash.nvim
-12. `nap.lua` - nap.nvim navigation
+1. ✓ `surround.lua` - simple grammar table
+2. ✓ `comment.lua` - simple grammar table
+3. ✓ `move.lua` - simple grammar table (API-based)
+4. ✓ `operators.lua` - mini.operators (sort, multiply)
+5. ✓ `ai.lua` - mini.ai text objects
+6. ✓ `pick.lua` - complex, needs setup functions
+7. ✓ `files.lua` - mini.files
+8. ✓ `diff.lua` - mini.diff (config validation)
+9. [ ] `git.lua` - mini.git, diffview (comprehensive git workflow)
+10. [ ] `terminal.lua` - terminal integration
+11. [ ] `clue.lua` - mini.clue which-key hints
+12. ✓ `flash.lua` - flash.nvim motion
+13. [ ] `nap.lua` - nap.nvim navigation
 
 #### 5.2 Remove redundant hand-written docs
 
@@ -660,11 +752,62 @@ nvim --headless -c "lua require('tests.docs.generator').generate()" -c "qall!" &
 
 ## Success Criteria
 
-- [ ] `runner.lua` executes fixture tests with `lines` expectations
-- [ ] `runner.lua` handles snapshot read/write/compare
-- [ ] `runner.lua` prunes stale snapshots in update mode
-- [ ] `generator.lua` outputs valid markdown
-- [ ] Pre-commit generates docs before panvimdoc runs
-- [ ] At least 5 plugin fixtures migrated
+- [x] `runner.lua` executes fixture tests with `lines` expectations
+- [x] `runner.lua` handles snapshot read/write/compare
+- [x] `runner.lua` prunes stale snapshots in update mode
+- [x] `generator.lua` outputs valid markdown
+- [x] Pre-commit generates docs before panvimdoc runs
+- [x] At least 5 plugin fixtures migrated (10 total)
 - [ ] Hand-written `plugins.md` deleted or minimal
-- [ ] AGENTS.md updated with new workflow
+- [x] AGENTS.md updated with new workflow
+
+## Next Steps
+
+### ✓ Phase 3: Documentation Integration (Complete)
+
+1. ✓ **Review generated documentation output** - Generated `doc/generated/plugins.md` with 10 fixtures
+1. ✓ **Update doc/src/main.md** - Now includes `doc/generated/plugins.md` instead of hand-written `doc/src/plugins.md`
+1. ✓ **Configure .gitignore** - Added `doc/generated/` to .gitignore
+
+### ✓ Phase 4: Pre-commit Integration (Complete)
+
+1. ✓ **Add pre-commit hook** - Added `generate-plugin-docs` hook before panvimdoc
+1. ✓ **Update AGENTS.md** - Added "Documentation-driven tests" section with commands and hybrid testing approach
+
+### Phase 5: Expand Test Coverage
+
+**Additional fixtures to consider**:
+
+- `mini.git` - Git integration beyond diff
+- `mini.clue` - Which-key style hints
+- `nap.nvim` - Advanced navigation
+- `bufjump.nvim` - Buffer jumping
+- LSP keybinding tests (go to definition, hover, etc.)
+- Custom utilities (noqa, list_editing, preview)
+
+**Edge case testing**:
+
+- Add more test cases to existing fixtures
+- Test error paths and edge cases
+- Add regression tests for discovered bugs
+
+### Phase 6: Cleanup
+
+1. **Review redundant tests**
+
+    - Identify tests in `lua/tests/plugins/` that duplicate fixture coverage
+    - Evaluate `lua/tests/plugins/editing_spec.lua` for migration/deletion
+    - Evaluate `lua/tests/plugins/mini_ai_spec.lua` for migration/deletion
+
+1. **Simplify hand-written docs**
+
+    - Remove sections from `doc/src/plugins.md` covered by fixtures
+    - Keep only non-fixture-based documentation (workflows, concepts)
+
+### Optional Enhancements
+
+- **Performance**: Profile test execution time per fixture
+- **CI Integration**: Add fixture tests to GitHub Actions
+- **Documentation validation**: Ensure all documented keybindings have corresponding tests
+- **Snapshot diffing**: Better error messages showing what changed in snapshots
+- **LLM Guidance**: delete this document and condense into a test-specific LLM guide on writing actually good tests

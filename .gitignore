@@ -26,3 +26,6 @@ tags
 
 # For prettier cache
 node_modules
+
+# Generated documentation from test fixtures
+doc/generated/

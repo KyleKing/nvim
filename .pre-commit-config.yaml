@@ -96,6 +96,13 @@ repos:
   #       entry: calcipy-tags tags --doc-sub-dir=.github --filename=CODE_TAG_SUMMARY.md
   - repo: local
     hooks:
+      - id: generate-plugin-docs
+        name: Generate plugin docs from fixtures
+        description: Auto-generate doc/generated/plugins.md from test fixtures
+        entry: bash -c 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"tests.docs.generator\").generate_all()" +qall'
+        language: system
+        files: ^lua/tests/docs/.*\.lua$
+        pass_filenames: false
       - id: selene
         name: Selene
         description: Lints Lua files using Selene (install with homebrew)

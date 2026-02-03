@@ -1,13 +1,17 @@
 return {
-    title = "Flash Motion (flash.nvim)",
+    title = "Flash (motion/jumping)",
     see_also = { "flash.nvim" },
-    desc = "Enhanced motion with labeled jump targets.",
+    desc = "Jump to any visible location with minimal keystrokes.",
     source = "lua/kyleking/deps/motion.lua",
 
     notes = {
-        "`<a-s>` for character jump, `<a-S>` for treesitter jump.",
-        "`<c-s>` toggles flash in search mode.",
-        "Works in operator-pending mode: `d<a-s>`, `y<a-s>`.",
+        "`<Alt-s>` Flash jump (normal, visual, operator-pending)",
+        "`<Alt-S>` Flash Treesitter (select treesitter node)",
+        "`<C-s>` Toggle Flash Search (in command-line / search)",
+        "",
+        "Flash labels visible matches so you can jump with 1-2 keystrokes.",
+        "Treesitter mode selects entire syntax nodes.",
+        "Works in operator-pending mode: `d<Alt-s>`, `y<Alt-s>`.",
     },
 
     grammars = {

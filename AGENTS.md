@@ -63,6 +63,33 @@ nvim --headless -c "lua MiniTest.run()" -c "qall!"
 | `:RunTestsRandom [seed]`         | `<leader>tr` | Random order sequential       |
 | `:RunTestsParallelRandom [seed]` | -            | Parallel + random order       |
 
+### Documentation-driven tests
+
+Plugin documentation is auto-generated from test fixtures in `lua/tests/docs/`. Each fixture defines both behavioral tests and the documentation for that plugin.
+
+```bash
+# Run all fixture tests
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
+
+# Run single fixture
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.runner').run_fixture('lua/tests/docs/surround.lua')" -c "qall!"
+
+# Update snapshots (creates new, updates changed, prunes stale)
+UPDATE_SNAPSHOTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
+
+# Generate documentation (auto-runs in pre-commit)
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.generator').generate_all()" +qall
+```
+
+**Hybrid testing approach**:
+
+1. **Simple keybindings** (no special keys): Use `keys` field with `expect.lines`
+1. **Complex keybindings** (`<leader>`, `<C-...>`): Use direct API calls in `expect.fn`
+1. **UI-heavy plugins** (pick, files, diff): Focus on config validation
+1. **Async operations** (hipatterns highlights): Use `setup.fn` with `vim.wait()`
+
+See `ACTUALLY_GOOD_TESTS.md` for fixture schema and architecture.
+
 ### Startup validation
 
 The subprocess-based smoke test in `lua/tests/core/smoke_spec.lua` spawns a fresh nvim and checks stderr for `mini.deps` two-stage execution errors. This catches nil-rhs keymap errors and other issues that only surface after all `later()` callbacks complete -- issues that in-process MiniTest cases cannot observe due to `vim.schedule` nesting.

@@ -1,13 +1,14 @@
 return {
     title = "Move (mini.move)",
     see_also = { "MiniMove" },
-    desc = "Move selections and lines in all directions.",
+    desc = "Move lines or visual selections in any direction with `<leader>m{h,j,k,l}`. Works in both Normal mode (current line) and Visual mode (selection). Auto-indents when moving vertically.",
     source = "lua/kyleking/deps/editing-support.lua",
 
     notes = {
         "Keybindings: `<leader>m{h,j,k,l}` to move left, down, up, right.",
         "Move operations preserve indentation and handle boundary conditions (BOF/EOF).",
-        "Cursor moves with the line/selection in down/right operations.",
+        "Cursor moves with the line/selection during operations.",
+        "Auto-indents when moving vertically to maintain code structure.",
     },
 
     grammars = {

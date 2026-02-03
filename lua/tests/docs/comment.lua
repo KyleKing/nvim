@@ -5,6 +5,8 @@ return {
     source = "lua/kyleking/deps/editing-support.lua",
 
     notes = {
+        "Toggle comments using treesitter-aware commentstring.",
+        "Supports embedded languages (e.g., JS inside HTML) via treesitter.",
         "Works with any filetype that has commentstring configured.",
         "Preserves indentation when toggling comments.",
     },

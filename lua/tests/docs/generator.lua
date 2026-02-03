@@ -76,7 +76,11 @@ end
 --- Generate markdown from all fixture files in docs directory
 --- @return table<string, string> Map of fixture names to markdown content
 function M.generate_all()
-    local test_dir = vim.fn.stdpath("config") .. "/lua/tests/docs"
+    local config_dir = vim.fn.stdpath("config")
+    local test_dir = config_dir .. "/lua/tests/docs"
+    local output_dir = config_dir .. "/doc/generated"
+    local output_file = output_dir .. "/plugins.md"
+
     local fixture_files = vim.fn.glob(test_dir .. "/*.lua", false, true)
 
     -- Filter out non-fixture files
@@ -85,6 +89,32 @@ function M.generate_all()
         return name ~= "runner.lua" and name ~= "generator.lua" and name ~= "init.lua" and not name:match("_spec%.lua$")
     end, fixture_files)
 
+    -- Sort fixture files for deterministic output
+    table.sort(fixture_files)
+
+    -- Generate markdown for each fixture
+    local sections = {}
+    for _, path in ipairs(fixture_files) do
+        local markdown = M.generate_markdown(path)
+        table.insert(sections, markdown)
+    end
+
+    -- Combine all sections
+    local combined = "# Plugin Guides\n\n" .. table.concat(sections, "---\n\n")
+
+    -- Create output directory if needed
+    vim.fn.mkdir(output_dir, "p")
+
+    -- Write to file
+    local file = io.open(output_file, "w")
+    if not file then error("Failed to open output file: " .. output_file) end
+
+    file:write(combined)
+    file:close()
+
+    print("Generated: " .. output_file)
+
+    -- Also return the map for backwards compatibility
     local result = {}
     for _, path in ipairs(fixture_files) do
         local name = vim.fn.fnamemodify(path, ":t:r")
