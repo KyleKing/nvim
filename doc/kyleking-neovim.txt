@@ -35,6 +35,8 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Source: lua/kyleking/deps/colorscheme.lua, lua/kyleking/deps/color.lua, lua/kyleking/deps/bars-and-lines.lua|kyleking-neovim-source:-lua/kyleking/deps/colorscheme.lua,-lua/kyleking/deps/color.lua,-lua/kyleking/deps/bars-and-lines.lua|
   - Comment (mini.comment)            |kyleking-neovim-comment-(mini.comment)|
   - See also: MiniComment              |kyleking-neovim-see-also:-minicomment|
+  - Core Keybindings                        |kyleking-neovim-core-keybindings|
+  - Source: lua/kyleking/core/keymaps.lua|kyleking-neovim-source:-lua/kyleking/core/keymaps.lua|
   - Git (mini.diff, mini.git, diffview)|kyleking-neovim-git-(mini.diff,-mini.git,-diffview)|
   - See also: MiniDiff, MiniGit  |kyleking-neovim-see-also:-minidiff,-minigit|
   - File Explorer (mini.files)    |kyleking-neovim-file-explorer-(mini.files)|
@@ -43,8 +45,12 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - See also: flash.nvim                |kyleking-neovim-see-also:-flash.nvim|
   - Highlight Patterns (mini.hipatterns)|kyleking-neovim-highlight-patterns-(mini.hipatterns)|
   - See also: MiniHipatterns        |kyleking-neovim-see-also:-minihipatterns|
+  - LSP Completion Keybindings    |kyleking-neovim-lsp-completion-keybindings|
+  - See also: ins-completion, nvim-cmp|kyleking-neovim-see-also:-ins-completion,-nvim-cmp|
   - Move (mini.move)                        |kyleking-neovim-move-(mini.move)|
   - See also: MiniMove                    |kyleking-neovim-see-also:-minimove|
+  - Navigation (nap.nvim)              |kyleking-neovim-navigation-(nap.nvim)|
+  - Source: lua/kyleking/deps/motion.lua|kyleking-neovim-source:-lua/kyleking/deps/motion.lua|
   - Operators (mini.operators)    |kyleking-neovim-operators-(mini.operators)|
   - See also: MiniOperators          |kyleking-neovim-see-also:-minioperators|
   - Fuzzy Finding (mini.pick)      |kyleking-neovim-fuzzy-finding-(mini.pick)|
@@ -54,6 +60,8 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Terminal Integration                |kyleking-neovim-terminal-integration|
   - Source: lua/kyleking/deps/terminal-integration.lua|kyleking-neovim-source:-lua/kyleking/deps/terminal-integration.lua|
   - Utilities                                      |kyleking-neovim-utilities|
+  - Source: lua/kyleking/deps/utility.lua|kyleking-neovim-source:-lua/kyleking/deps/utility.lua|
+  - Window Management                      |kyleking-neovim-window-management|
   - Learning Notes                            |kyleking-neovim-learning-notes|
   - Modern Vim (PragProg)              |kyleking-neovim-modern-vim-(pragprog)|
   - Learn Neovim (ofirgall)          |kyleking-neovim-learn-neovim-(ofirgall)|
@@ -754,6 +762,76 @@ Source: `lua/kyleking/deps/editing-support.lua`
 SEE ALSO: MINICOMMENT                  *kyleking-neovim-see-also:-minicomment*
 
 
+CORE KEYBINDINGS                            *kyleking-neovim-core-keybindings*
+
+Custom keybindings that enhance or modify vim’s default behavior.
+
+Operator grammar:
+
+>
+    j / k                Enhanced up/down movement
+    dd                   Smart line deletion
+    A                    Whole buffer text object
+    <C-s>                Save if modified
+    <Esc>                Clear search highlighting
+    <leader>r[yYpP]      Register operations (* and + clipboards)
+<
+
+**Leaders**
+
+- `<Space>`- Leader key
+- `,` - Local leader key
+
+**Enhanced navigation**
+
+- `j`/ `k` - Move down/up (respects word wrap when no count prefix)
+- `<Esc>` - Clear search highlighting
+
+**Smart deletion**
+
+- `dd`- Delete line (doesn’t pollute register when deleting empty lines)
+
+**Text objects**
+
+- `A`- Whole buffer (operator-pending and visual)
+    - `dA` - Delete entire buffer
+    - `yA` - Yank entire buffer
+    - `vA` - Select entire buffer
+
+**Terminal mode escapes**
+
+- `<C-\><C-n>`- Exit terminal mode (standard vim)
+- `<Esc><Esc>` - Exit terminal mode (double escape)
+
+**File operations**
+
+- `<C-s>`- Save if modified (normal and insert mode)
+- `<C-q>` - Force quit without saving
+- `<leader>q` - Quit with confirmation
+- `<leader>Q` - Quit all with confirmation
+- `<leader>n` - New file
+
+**Buffer operations**
+
+- `<leader>bw`- Wipeout buffer (delete including marks)
+- `<leader>bW` - Wipeout all buffers
+
+**Register operations**
+
+- `<leader>ry`- Yank to `*` register (selection clipboard)
+- `<leader>rp` - Paste from `*` register
+- `<leader>rY` - Yank to `+` register (system clipboard)
+- `<leader>rP` - Paste from `+` register
+
+**UI toggles**
+
+- `<leader>us`- Toggle spellcheck
+- `<leader>uw` - Toggle line wrap
+
+
+SOURCE: LUA/KYLEKING/CORE/KEYMAPS.LUA*kyleking-neovim-source:-lua/kyleking/core/keymaps.lua*
+
+
 GIT (MINI.DIFF, MINI.GIT, DIFFVIEW)*kyleking-neovim-git-(mini.diff,-mini.git,-diffview)*
 
 Inline diff signs in the sign column (mini.diff), statusline git branch
@@ -868,6 +946,54 @@ Source: `lua/kyleking/deps/editing-support.lua`
 SEE ALSO: MINIHIPATTERNS            *kyleking-neovim-see-also:-minihipatterns*
 
 
+LSP COMPLETION KEYBINDINGS        *kyleking-neovim-lsp-completion-keybindings*
+
+Keybindings for LSP completion in insert mode, including navigation and
+acceptance.
+
+Operator grammar:
+
+>
+    <C-Space>            Trigger completion
+    <C-j> / <C-k>        Navigate completion items (buffer-local)
+<
+
+**Trigger completion**
+
+- `<C-Space>`- Manually trigger completion menu
+
+**Navigate completion menu**
+
+- `<C-j>`- Select next completion item
+- `<C-k>` - Select previous completion item
+
+**Accept completion**
+
+- `<C-CR>`- Accept selected completion item
+- `<CR>` - Accept completion if menu is visible and item is selected, otherwise
+    insert newline
+
+**Completion behavior**
+
+Thecompletion system uses nvim’s built-in LSP completion with
+`vim.lsp.completion.trigger()`.
+
+Completion menu appears automatically as you type when LSP is active.
+
+The `<CR>` key intelligently handles both completion acceptance and normal
+newline insertion.
+
+**LSP navigation** (buffer-local when LSP attaches):
+
+See LSP section in documentation for go-to-definition, hover, references, and
+other LSP features.
+
+Source: `lua/kyleking/core/lsp.lua`
+
+
+SEE ALSO: INS-COMPLETION, NVIM-CMP*kyleking-neovim-see-also:-ins-completion,-nvim-cmp*
+
+
 MOVE (MINI.MOVE)                            *kyleking-neovim-move-(mini.move)*
 
 Move lines or visual selections in any direction with `<leader>m{h,j,k,l}`.
@@ -892,6 +1018,57 @@ Source: `lua/kyleking/deps/editing-support.lua`
 
 
 SEE ALSO: MINIMOVE                        *kyleking-neovim-see-also:-minimove*
+
+
+NAVIGATION (NAP.NVIM)                  *kyleking-neovim-navigation-(nap.nvim)*
+
+Quick navigation through tabs, buffers, diagnostics, and more using ][ prefix
+keys.
+
+Operator grammar:
+
+>
+    ]a / [a              Navigate tabs (nap.nvim)
+    gt / gT              Standard vim tab navigation
+    <C-^>                Alternate buffer
+<
+
+nap.nvim provides `]`/`[` prefix keys for jumping to next/previous items:
+
+**Navigation operators**
+
+- `]a`/ `[a` - Tabs (next/previous)
+- `]b` / `[b` - Buffers
+- `]d` / `[d` - Diagnostics
+- `]q` / `[q` - Quickfix items
+- `]l` / `[l` - Location list items
+- `]s` / `[s` - Spell errors
+- `]f` / `[f` / `]F` / `[F` - Files
+- `]t` / `[t` - Tags
+- `]z` / `[z` - Folds
+- `]'` / `['` - Marks
+
+**Rapid repeat keys**
+
+Afterinitial jump, use `<C-n>` (next) or `<C-p>` (previous) to cycle quickly
+without retyping the prefix.
+
+**Example workflows**
+
+- Press`]b` to jump to next buffer, then `<C-n>` repeatedly to cycle through all
+    buffers
+- Press `]d` to jump to next diagnostic, then `<C-n>` to cycle through diagnostic
+    list
+- Press `]q` to jump to next quickfix item, then `<C-n>` to navigate results
+
+**Standard vim alternatives**
+
+- Tabs:`gt` (next tab), `gT` (previous tab), `:tabnew` (create tab)
+- Buffers: `<C-^>` (alternate buffer)
+- Windows: `<C-w>h/j/k/l` (navigate), `<C-w>s/v` (split)
+
+
+SOURCE: LUA/KYLEKING/DEPS/MOTION.LUA*kyleking-neovim-source:-lua/kyleking/deps/motion.lua*
 
 
 OPERATORS (MINI.OPERATORS)        *kyleking-neovim-operators-(mini.operators)*
@@ -933,6 +1110,11 @@ Operator grammar:
     <leader>;            Buffer picker
     <leader><leader>     Resume last picker
     <C-j> / <C-k>        Navigate picker items
+    <leader>fh           Find in nvim help
+    <leader>fk           Find keymaps
+    <leader>fr           Find registers
+    <leader>f'           Find marks
+    <leader>fl           Find in quickfix/location lists
 <
 
 **Navigation**
@@ -1144,7 +1326,65 @@ See also: <https://github.com/KyleKing/patch_it.nvim>
 
 **vim-spellsync** – automatically syncs spell files
 
-Source: `lua/kyleking/deps/utility.lua`
+
+SOURCE: LUA/KYLEKING/DEPS/UTILITY.LUA*kyleking-neovim-source:-lua/kyleking/deps/utility.lua*
+
+
+WINDOW MANAGEMENT                          *kyleking-neovim-window-management*
+
+Split window navigation, creation, and resizing with vim’s built-in commands
+and custom enhancements.
+
+Operator grammar:
+
+>
+    <C-w>h/j/k/l         Navigate between windows
+    <C-w>s/v             Split window horizontal/vertical
+    <C-w>=               Equalize window sizes
+    <leader>wf           Toggle focused/equal layout
+<
+
+**Navigation**
+
+- `<C-w>h/j/k/l`- Move to window left/down/up/right
+- `<C-w>w` - Cycle to next window
+- `<C-w>p` - Go to previous window
+
+**Creation**
+
+- `<C-w>s`- Split window horizontally
+- `<C-w>v` - Split window vertically
+- `<C-w>n` - New window with empty buffer
+
+**Closing**
+
+- `<C-w>q`/ `<C-w>c` - Close window
+- `<C-w>o` - Close all other windows (only current remains)
+
+**Resizing**
+
+- `<C-w>=`- Make all windows equal size
+- `<C-w>+` - Increase height
+- `<C-w>-` - Decrease height
+- `<C-w>>` - Increase width
+- `<C-w><` - Decrease width
+- `<C-w>_` - Maximize height
+- `<C-w>|` - Maximize width
+
+**Moving windows**
+
+- `<C-w>H/J/K/L`- Move window to far left/bottom/top/right
+- `<C-w>r` - Rotate windows downward/rightward
+- `<C-w>R` - Rotate windows upward/leftward
+- `<C-w>x` - Exchange current window with next
+
+**Custom keybindings**
+
+- `<leader>wf`- Toggle focused/equal window layout (maximize current or equalize all)
+
+Source: `lua/kyleking/core/keymaps.lua`
+
+See also: `window-moving`, `window-resize`
 
 
 LEARNING NOTES                                *kyleking-neovim-learning-notes*
