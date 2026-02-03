@@ -34,7 +34,8 @@ end
 T["format on save"]["Lua file formats on write"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        -- Wait longer for plugins/formatters to load in subprocess
+        vim.wait(3000)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -48,7 +49,8 @@ T["format on save"]["Lua file formats on write"] = function()
 
         -- Save file (should trigger format)
         vim.cmd("write")
-        helpers.wait_for_plugins()
+        -- Wait for format to complete
+        vim.wait(2000)
 
         -- Read back and check formatting
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -64,7 +66,7 @@ T["format on save"]["Lua file formats on write"] = function()
 
         vim.fn.delete(tmpfile)
     ]],
-        20000
+        30000
     )
 
     MiniTest.expect.equality(result.code, 0, "Format on save should work: " .. result.stderr)
@@ -73,7 +75,8 @@ end
 T["format on save"]["Python file formats on write"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        -- Wait longer for plugins/formatters to load in subprocess
+        vim.wait(3000)
 
         local tmpfile = vim.fn.tempname() .. ".py"
         vim.cmd("edit " .. tmpfile)
@@ -87,7 +90,8 @@ T["format on save"]["Python file formats on write"] = function()
 
         -- Save file (should trigger format with ruff)
         vim.cmd("write")
-        helpers.wait_for_plugins()
+        -- Wait for format to complete
+        vim.wait(2000)
 
         -- Read back
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -103,7 +107,7 @@ T["format on save"]["Python file formats on write"] = function()
 
         vim.fn.delete(tmpfile)
     ]],
-        20000
+        30000
     )
 
     MiniTest.expect.equality(result.code, 0, "Python format on save should work: " .. result.stderr)

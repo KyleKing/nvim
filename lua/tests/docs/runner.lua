@@ -365,6 +365,10 @@ end
 --- Run all tests in a fixture
 function M.run_fixture(fixture_path)
     local fixture_start = M.profiling.enabled and vim.uv.hrtime() or nil
+
+    -- Wait for plugins to load before running tests
+    helpers.wait_for_plugins()
+
     local fixture = dofile(fixture_path)
     local snapshots = M.load_snapshots(fixture_path)
     snapshots._used = {}

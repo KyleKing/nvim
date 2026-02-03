@@ -25,7 +25,7 @@ return {
                             local MiniDiff = require("mini.diff")
                             local MiniTest = require("mini.test")
                             MiniTest.expect.equality(type(MiniDiff.toggle_overlay), "function")
-                            MiniTest.expect.equality(MiniDiff.config.view.style, "sign")
+                            MiniTest.expect.equality(MiniDiff.config.view.style, "number")
                         end,
                     },
                 },

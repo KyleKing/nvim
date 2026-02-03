@@ -47,7 +47,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, patch_it = pcall(require, "patch_it")
-                            if not ok then MiniTest.skip("patch_it plugin not installed") end
+                            if not ok then error("patch_it plugin not installed - should be available") end
                             MiniTest.expect.equality(type(patch_it.apply), "function")
                         end,
                     },

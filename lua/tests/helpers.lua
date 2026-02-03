@@ -28,8 +28,14 @@ function M.create_test_buffer(lines, filetype)
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 
     if filetype then
-        vim.api.nvim_set_current_buf(bufnr)
-        vim.bo[bufnr].filetype = filetype
+        -- Try to set buffer as current, but fallback to direct option set if winfixbuf prevents it
+        local ok = pcall(vim.api.nvim_set_current_buf, bufnr)
+        if ok then
+            vim.bo[bufnr].filetype = filetype
+        else
+            -- Fallback: set filetype directly without switching buffers
+            vim.api.nvim_buf_set_option(bufnr, "filetype", filetype)
+        end
     end
 
     return bufnr

@@ -49,7 +49,7 @@ T["temp session statusline"]["filename truncation respects minimum width"] = fun
     vim.fn.writefile({ "test" }, long_path)
     vim.cmd("edit " .. long_path)
 
-    local truncated = utils.get_temp_truncated_filename()
+    local truncated = utils.get_truncated_filename()
 
     -- Should contain truncation indicator or full path
     MiniTest.expect.equality(type(truncated), "string", "Should return string")
@@ -167,7 +167,7 @@ T["temp session statusline"]["statusline is set in temp session"] = function()
 
         -- Should contain filename call
         MiniTest.expect.equality(
-            statusline:match("get_temp_truncated_filename") ~= nil,
+            statusline:match("get_truncated_filename") ~= nil,
             true,
             "Statusline should contain filename function call"
         )
