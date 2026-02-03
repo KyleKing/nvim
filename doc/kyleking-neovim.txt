@@ -664,6 +664,7 @@ Operator grammar:
     {a/i}{object}        Text objects (around/inside) (e.g., di) delete inside parens)
     {a/i}n{object}       Next occurrence (forward) (e.g., din" delete next quote)
     {a/i}l{object}       Last occurrence (backward) (e.g., dil" delete last quote)
+    af/if                Function text object (treesitter) (e.g., daf delete around function call)
     config               Configuration validation
 <
 
