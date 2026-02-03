@@ -2,10 +2,11 @@ return {
     title = "Surround (mini.surround)",
     see_also = { "MiniSurround" },
     desc = "Add, delete, find, and replace surrounding pairs.",
+    source = "lua/kyleking/deps/editing-support.lua",
 
     notes = {
+        "Custom: `f` for function calls -- `saiwf` prompts for function name and wraps with `func(...)`.",
         "`s` is disabled in normal/visual mode to avoid conflict. Use `cl` instead.",
-        "Custom: `f` for function calls -- `saiwf` prompts for function name.",
     },
 
     grammars = {

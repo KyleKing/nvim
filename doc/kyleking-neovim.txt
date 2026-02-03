@@ -771,11 +771,11 @@ Add, delete, find, and replace surrounding pairs.
 Operator grammar:
 
 >
-    sa{motion}{char}  Add surrounding (e.g., saiw" wraps word in quotes)
-    sd{char}          Delete surrounding (e.g., sd" removes quotes)
-    sr{old}{new}      Replace surrounding (e.g., sr"' changes " to ')
-    sf / sF           Find surrounding (right / left)
-    sh                Highlight surrounding
+    sa{motion}{char}     Add surrounding (e.g., saiw" word with quotes)
+    sd{char}             Delete surrounding (e.g., sd" delete quotes)
+    sr{old}{new}         Replace surrounding (e.g., sr"' quotes to single quotes)
+    sf / sF              Find surrounding (right / left) (e.g., sf) find right paren)
+    sh                   Highlight surrounding (e.g., sh) highlight parens)
 <
 
 Custom: `f` for function calls – `saiwf` prompts for function name and wraps
