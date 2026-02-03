@@ -755,6 +755,67 @@ All 14 fixtures implemented with appropriate testing strategies.
 
 ---
 
+## Performance Profiling
+
+The test runner includes built-in performance profiling to identify slow tests and optimize fixture execution.
+
+**Enable profiling**: Set `PROFILE_TESTS=1` environment variable.
+
+**Output format**:
+- Fixtures sorted by duration (slowest first)
+- Grammars taking >10ms shown with test counts
+- Total time, test count, and per-test average
+
+**Example output**:
+```
+=== Fixture Performance Profile ===
+
+flash: 245.32ms (8 tests)
+  s{motion} / S{motion}: 89.15ms (3 tests)
+  ;/,: 45.28ms (2 tests)
+
+surround: 156.89ms (15 tests)
+  sa{motion}{char}: 42.13ms (4 tests)
+
+Total: 2.45s across 142 tests in 18 fixtures
+Average per test: 17.25ms
+```
+
+**Use cases**:
+- Identify slow fixtures needing optimization
+- Track performance regressions in CI
+- Compare performance before/after changes
+
+## Snapshot Diffing
+
+Snapshot mismatch errors show detailed line-by-line diffs instead of generic equality failures.
+
+**Error format**:
+```
+Snapshot mismatch: sa{motion}{char} > word with quotes
+
+Lines differ:
+  Expected:
+    "word"
+  Actual:
+    "word
+
+Cursor position differs: expected [1, 1], got [1, 0]
+
+Highlights differ:
+  Expected:
+    MiniSurroundHighlight at [[1,0], [1,1]]
+  Actual:
+    (none)
+
+Run with UPDATE_SNAPSHOTS=1 to update this snapshot.
+```
+
+**Benefits**:
+- Immediately see what changed without re-running with verbose mode
+- Clear context for cursor and highlight differences
+- Actionable fix instructions
+
 ## Commands Reference
 
 ```bash
@@ -766,6 +827,9 @@ nvim --headless -c "lua require('tests.docs.runner').run_fixture('lua/tests/docs
 
 # Update snapshots (creates new, updates changed, prunes stale)
 UPDATE_SNAPSHOTS=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
+
+# Profile fixture performance
+PROFILE_TESTS=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
 
 # Generate documentation
 nvim --headless -c "lua require('tests.docs.generator').generate()" -c "qall!"
@@ -829,9 +893,9 @@ nvim --headless -c "lua require('tests.docs.generator').generate()" -c "qall!" &
 
 - **Expand test cases**: Add more edge cases and error paths to existing fixtures
 - **Regression tests**: Add tests for discovered bugs
-- **Performance profiling**: Profile test execution time per fixture
-- **CI integration**: Add fixture tests to GitHub Actions (currently runs all tests)
-- **Snapshot diffing**: Improve error messages showing what changed in snapshots
+- ✓ **Performance profiling**: Profile test execution time per fixture (set `PROFILE_TESTS=1`)
+- ✓ **CI integration**: Fixture tests explicitly run in GitHub Actions with profiling enabled
+- ✓ **Snapshot diffing**: Improved error messages show line-by-line diffs with context
 - **Documentation validation**: Cross-check that all documented keybindings have corresponding tests
 - **Additional fixtures**: Consider fixtures for:
     - LSP keybindings (go to definition, hover, rename)

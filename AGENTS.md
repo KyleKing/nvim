@@ -77,6 +77,9 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.runner').ru
 # Update snapshots (creates new, updates changed, prunes stale)
 UPDATE_SNAPSHOTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
 
+# Profile fixture performance (shows timing per fixture/grammar/test)
+PROFILE_TESTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
+
 # Generate documentation (auto-runs in pre-commit)
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.generator').generate_all()" +qall
 ```

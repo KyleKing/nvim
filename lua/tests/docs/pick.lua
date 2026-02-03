@@ -143,5 +143,90 @@ return {
                 },
             },
         },
+        {
+            pattern = "<leader>fh",
+            desc = "Find in nvim help",
+            tests = {
+                {
+                    name = "help picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>fh")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fh keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>fk",
+            desc = "Find keymaps",
+            tests = {
+                {
+                    name = "keymaps picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>fk")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fk keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>fr",
+            desc = "Find registers",
+            tests = {
+                {
+                    name = "registers picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>fr")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fr keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>f'",
+            desc = "Find marks",
+            tests = {
+                {
+                    name = "marks picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>f'")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>f' keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>fl",
+            desc = "Find in quickfix/location lists",
+            tests = {
+                {
+                    name = "quickfix picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>fl")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fl keymap")
+                        end,
+                    },
+                },
+            },
+        },
     },
 }

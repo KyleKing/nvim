@@ -39,6 +39,13 @@ jobs:
             -c "lua vim.wait(1000, function() return false end)" \
             -c "qall!"
 
+      - name: Run fixture tests (documentation-driven)
+        run: |
+          # Run fixture tests with profiling enabled
+          MINI_DEPS_LATER_AS_NOW=1 PROFILE_TESTS=1 nvim --headless \
+            -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" \
+            -c "qall!"
+
       - name: Run all tests (parallel)
         id: parallel-tests
         run: |

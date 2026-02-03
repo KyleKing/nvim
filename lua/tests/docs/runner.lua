@@ -2,6 +2,95 @@ local M = {}
 
 local helpers = require("tests.helpers")
 
+-- Profiling state
+M.profiling = {
+    enabled = vim.env.PROFILE_TESTS == "1",
+    results = {},
+}
+
+--- Format duration in milliseconds to human-readable string
+local function format_duration(ms)
+    if ms < 1 then
+        return string.format("%.2fμs", ms * 1000)
+    elseif ms < 1000 then
+        return string.format("%.2fms", ms)
+    else
+        return string.format("%.2fs", ms / 1000)
+    end
+end
+
+--- Create detailed diff message for snapshot mismatch
+local function create_snapshot_diff(actual, expected, snap_key)
+    local lines = { "Snapshot mismatch: " .. snap_key, "" }
+
+    -- Compare lines
+    if not vim.deep_equal(actual.after, expected.after) then
+        table.insert(lines, "Lines differ:")
+        table.insert(lines, "  Expected:")
+        for _, line in ipairs(expected.after or {}) do
+            table.insert(lines, "    " .. line)
+        end
+        table.insert(lines, "  Actual:")
+        for _, line in ipairs(actual.after or {}) do
+            table.insert(lines, "    " .. line)
+        end
+        table.insert(lines, "")
+    end
+
+    -- Compare cursor positions
+    if not vim.deep_equal(actual.cursor_after, expected.cursor_after) then
+        table.insert(
+            lines,
+            string.format(
+                "Cursor position differs: expected [%d, %d], got [%d, %d]",
+                expected.cursor_after[1],
+                expected.cursor_after[2],
+                actual.cursor_after[1],
+                actual.cursor_after[2]
+            )
+        )
+        table.insert(lines, "")
+    end
+
+    -- Compare highlights
+    if not vim.deep_equal(actual.highlights, expected.highlights) then
+        table.insert(lines, "Highlights differ:")
+        table.insert(lines, "  Expected:")
+        for _, hl in ipairs(expected.highlights or {}) do
+            table.insert(
+                lines,
+                string.format(
+                    "    %s at [[%d,%d], [%d,%d]]",
+                    hl.group,
+                    hl.range[1][1],
+                    hl.range[1][2],
+                    hl.range[2][1],
+                    hl.range[2][2]
+                )
+            )
+        end
+        table.insert(lines, "  Actual:")
+        for _, hl in ipairs(actual.highlights or {}) do
+            table.insert(
+                lines,
+                string.format(
+                    "    %s at [[%d,%d], [%d,%d]]",
+                    hl.group,
+                    hl.range[1][1],
+                    hl.range[1][2],
+                    hl.range[2][1],
+                    hl.range[2][2]
+                )
+            )
+        end
+        table.insert(lines, "")
+    end
+
+    table.insert(lines, "Run with UPDATE_SNAPSHOTS=1 to update this snapshot.")
+
+    return table.concat(lines, "\n")
+end
+
 --- Parse cursor format "[row, col]"
 local function parse_cursor(str)
     local row, col = str:match("%[(%d+), (%d+)%]")
@@ -191,6 +280,7 @@ end
 function M.run_test(test, grammar_pattern, snapshots, update_mode)
     local MiniTest = require("mini.test")
     local snap_key = grammar_pattern .. " > " .. test.name
+    local start_time = M.profiling.enabled and vim.uv.hrtime() or nil
 
     -- Handle tests without before (for tests that use expect.fn only)
     local bufnr
@@ -237,27 +327,69 @@ function M.run_test(test, grammar_pattern, snapshots, update_mode)
         else
             local expected = snapshots[snap_key]
             if expected == nil then error("Missing snapshot for: " .. snap_key .. "\nRun with UPDATE_SNAPSHOTS=1") end
-            MiniTest.expect.equality(actual, expected, "Snapshot mismatch: " .. snap_key)
+
+            -- Use detailed diff for better error messages
+            if not vim.deep_equal(actual, expected) then
+                local diff_msg = create_snapshot_diff(actual, expected, snap_key)
+                error(diff_msg)
+            end
             snapshots._used[snap_key] = true
         end
     end
 
     if bufnr then helpers.delete_buffer(bufnr) end
+
+    -- Record profiling data
+    if M.profiling.enabled and start_time then
+        local duration_ns = vim.uv.hrtime() - start_time
+        local duration_ms = duration_ns / 1e6
+        return { duration_ms = duration_ms }
+    end
 end
 
 --- Run all tests in a fixture
 function M.run_fixture(fixture_path)
+    local fixture_start = M.profiling.enabled and vim.uv.hrtime() or nil
     local fixture = dofile(fixture_path)
     local snapshots = M.load_snapshots(fixture_path)
     snapshots._used = {}
     snapshots._dirty = false
 
     local update_mode = vim.env.UPDATE_SNAPSHOTS == "1"
+    local profile_data = {
+        fixture = vim.fn.fnamemodify(fixture_path, ":t:r"),
+        grammars = {},
+        total_tests = 0,
+        total_duration_ms = 0,
+    }
 
     for _, grammar in ipairs(fixture.grammars) do
+        local grammar_start = M.profiling.enabled and vim.uv.hrtime() or nil
+        local grammar_data = {
+            pattern = grammar.pattern,
+            tests = {},
+            duration_ms = 0,
+        }
+
         for _, test in ipairs(grammar.tests) do
-            M.run_test(test, grammar.pattern, snapshots, update_mode)
+            local test_profile = M.run_test(test, grammar.pattern, snapshots, update_mode)
+            profile_data.total_tests = profile_data.total_tests + 1
+
+            if M.profiling.enabled and test_profile then
+                table.insert(grammar_data.tests, {
+                    name = test.name,
+                    duration_ms = test_profile.duration_ms,
+                })
+                grammar_data.duration_ms = grammar_data.duration_ms + test_profile.duration_ms
+            end
         end
+
+        if M.profiling.enabled and grammar_start then
+            local actual_duration_ns = vim.uv.hrtime() - grammar_start
+            grammar_data.duration_ms = actual_duration_ns / 1e6
+        end
+
+        if M.profiling.enabled then table.insert(profile_data.grammars, grammar_data) end
     end
 
     -- Prune unused snapshots in update mode
@@ -267,6 +399,71 @@ function M.run_fixture(fixture_path)
         end
         M.save_snapshots(fixture_path, snapshots)
     end
+
+    -- Calculate total fixture duration
+    if M.profiling.enabled and fixture_start then
+        local fixture_duration_ns = vim.uv.hrtime() - fixture_start
+        profile_data.total_duration_ms = fixture_duration_ns / 1e6
+        table.insert(M.profiling.results, profile_data)
+    end
+
+    return profile_data
+end
+
+--- Print profiling summary
+function M.print_profiling_summary()
+    if not M.profiling.enabled or #M.profiling.results == 0 then return end
+
+    print("\n=== Fixture Performance Profile ===\n")
+
+    -- Sort fixtures by duration (slowest first)
+    local sorted_fixtures = vim.deepcopy(M.profiling.results)
+    table.sort(sorted_fixtures, function(a, b) return a.total_duration_ms > b.total_duration_ms end)
+
+    local total_time_ms = 0
+    local total_test_count = 0
+
+    for _, fixture in ipairs(sorted_fixtures) do
+        total_time_ms = total_time_ms + fixture.total_duration_ms
+        total_test_count = total_test_count + fixture.total_tests
+
+        print(
+            string.format(
+                "%s: %s (%d tests)",
+                fixture.fixture,
+                format_duration(fixture.total_duration_ms),
+                fixture.total_tests
+            )
+        )
+
+        -- Show slowest grammars in this fixture
+        local sorted_grammars = vim.deepcopy(fixture.grammars)
+        table.sort(sorted_grammars, function(a, b) return a.duration_ms > b.duration_ms end)
+
+        for _, grammar in ipairs(sorted_grammars) do
+            if grammar.duration_ms > 10 then -- Only show grammars taking > 10ms
+                print(
+                    string.format(
+                        "  %s: %s (%d tests)",
+                        grammar.pattern,
+                        format_duration(grammar.duration_ms),
+                        #grammar.tests
+                    )
+                )
+            end
+        end
+        print("")
+    end
+
+    print(
+        string.format(
+            "Total: %s across %d tests in %d fixtures",
+            format_duration(total_time_ms),
+            total_test_count,
+            #sorted_fixtures
+        )
+    )
+    print(string.format("Average per test: %s", format_duration(total_time_ms / total_test_count)))
 end
 
 return M

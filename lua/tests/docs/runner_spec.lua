@@ -5,6 +5,10 @@ local runner = require("tests.docs.runner")
 local T = MiniTest.new_set({
     hooks = {
         pre_case = function() helpers.wait_for_plugins() end,
+        post_once = function()
+            -- Print profiling summary after all tests complete
+            runner.print_profiling_summary()
+        end,
     },
 })
 

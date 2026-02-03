@@ -180,5 +180,55 @@ return {
                 },
             },
         },
+        {
+            pattern = "<leader>r[yYpP]",
+            desc = "Register operations (* and + clipboards)",
+            tests = {
+                {
+                    name = "yank to * register",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>ry")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>ry keymap")
+                        end,
+                    },
+                },
+                {
+                    name = "paste from * register",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>rp")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>rp keymap")
+                        end,
+                    },
+                },
+                {
+                    name = "yank to + register",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>rY")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>rY keymap")
+                        end,
+                    },
+                },
+                {
+                    name = "paste from + register",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("n", "<leader>rP")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>rP keymap")
+                        end,
+                    },
+                },
+            },
+        },
     },
 }
