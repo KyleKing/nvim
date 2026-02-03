@@ -1,0 +1,85 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        nvim-version: ["stable", "nightly"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.nvim-version }}
+
+      - name: Verify Neovim version
+        run: nvim --version
+
+      - name: Bootstrap mini.nvim
+        run: |
+          # Let nvim auto-install mini.nvim on first run
+          nvim --headless -c "lua vim.wait(2000, function() return false end)" -c "qall!" || true
+
+      - name: Run smoke test
+        run: |
+          # Verify config loads without errors
+          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+            -c "lua vim.wait(1000, function() return false end)" \
+            -c "qall!"
+
+      - name: Run all tests (parallel)
+        id: parallel-tests
+        run: |
+          # Run tests in parallel for speed
+          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+            -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
+            -c "sleep 15" \
+            -c "qall!"
+        continue-on-error: true
+
+      - name: Run all tests (sequential fallback)
+        if: steps.parallel-tests.outcome == 'failure'
+        run: |
+          # Fallback to sequential if parallel fails
+          echo "Parallel tests failed, trying sequential..."
+          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+            -c "lua MiniTest.run()" \
+            -c "qall!"
+
+      - name: Run tests in random order (detect dependencies)
+        run: |
+          # Detect test interdependencies
+          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+            -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" \
+            -c "sleep 10" \
+            -c "qall!"
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install pre-commit
+        run: pip install pre-commit
+
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files

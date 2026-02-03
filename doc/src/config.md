@@ -67,25 +67,69 @@ See also: `lsp-completion`, `ins-completion`
 
 ## Testing
 
-Tests use mini.test. Test files live in `lua/tests/` and follow `*_spec.lua`
-naming. Commands and keymaps are only available when cwd is the config
-directory.
+Tests use mini.test with parallel workers for speed. Test files live in
+`lua/tests/` and follow `*_spec.lua` naming. Commands and keymaps are only
+available when cwd is the config directory.
 
-    <leader>ta      Run all tests
-    <leader>tf      Run failed tests from last run
-    :RunAllTests    Run all mini.test test files
-    :RunFailedTests Run only failed tests from last run
+### Interactive Commands
 
-From the command line:
+    <leader>ta              Run all tests (sequential, optimized)
+    <leader>tf              Run failed tests from last run
+    <leader>tp              Run tests in parallel (fastest, recommended)
+    <leader>tr              Run tests in random order
 
-    nvim --headless -c "lua MiniTest.run()" -c "qall!"
-    nvim --headless -c "lua MiniTest.run_file('lua/tests/core/smoke_spec.lua')" -c "qall!"
+    :RunAllTests            Sequential with optimizations (~20s)
+    :RunFailedTests         Re-run only failed tests
+    :RunTestsParallel       Parallel workers (~6-8s, 7-8x faster)
+    :RunTestsRandom [seed]  Random order, detects dependencies
+    :RunTestsParallelRandom [seed]  Parallel + random
 
-Test results display in a floating window (80% of screen). Press `q` or
-`<Esc>` to close. Failed tests are tracked for re-running with
-`:RunFailedTests`.
+### Command Line
 
-Test file pattern:
+Single test file (fastest, ~1-2 seconds):
+
+    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+      -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" \
+      -c "qall!"
+
+Parallel execution (recommended, ~6-8 seconds):
+
+    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+      -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
+      -c "sleep 10" -c "qall!"
+
+Sequential fallback (~20 seconds):
+
+    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+      -c "lua MiniTest.run()" -c "qall!"
+
+Random order (detect test dependencies):
+
+    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+      -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" \
+      -c "qall!"
+
+### Performance
+
+`MINI_DEPS_LATER_AS_NOW=1` makes plugins load synchronously during tests,
+reducing waits from 1000ms to 10ms. Parallel workers spawn N nvim instances
+(auto-detects CPU cores), each running tests sequentially with state cleanup
+between tests. All workers run concurrently.
+
+Performance comparison:
+
+    Original (async)        45+ seconds     1x
+    Optimized (sync)        ~20 seconds     2.2x
+    Parallel workers        ~6-8 seconds    7-8x
+
+### Random Order
+
+Like pytest-randomly, random test order detects test interdependencies and
+state leakage. Use the seed argument to reproduce failures:
+
+    :RunTestsRandom 12345
+
+### Test File Pattern
 
 ```lua
 local MiniTest = require("mini.test")
@@ -101,6 +145,10 @@ if ... == nil then MiniTest.run() end
 return T
 ```
 
-Source: `lua/kyleking/setup-deps.lua`
+Test results display in a floating window. Press `q` or `<Esc>` to close.
+Failed tests are tracked for re-running with `:RunFailedTests`.
 
-See also: `MiniTest`
+Source: `lua/kyleking/setup-deps.lua`, `lua/kyleking/utils/test_runner.lua`,
+`lua/tests/helpers.lua`
+
+See also: `MiniTest`, `TEST-PERFORMANCE-README.md`

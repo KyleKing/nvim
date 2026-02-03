@@ -2,6 +2,30 @@
 
 ## Commands
 
+### Documentation generation
+
+**IMPORTANT**: Never edit `doc/kyleking-neovim.txt` directly. It is auto-generated.
+
+The vimdoc help file is generated from markdown sources using panvimdoc:
+
+```bash
+# Edit source files in doc/src/*.md
+# Then regenerate vimdoc:
+prek run panvimdoc --all-files
+
+# The vimdoc is also regenerated automatically by pre-commit hooks
+```
+
+**Source files**:
+
+- `doc/src/main.md` - Entry point (includes other files)
+- `doc/src/config.md` - Configuration, commands, testing
+- `doc/src/plugins.md` - Plugin guides
+- `doc/src/vim-essentials.md` - Vim fundamentals
+- `doc/src/notes.md` - Learning notes
+
+**Generated output**: `doc/kyleking-neovim.txt` (accessible via `:h kyleking-neovim`)
+
 ### Linting and formatting
 
 ```bash
@@ -13,17 +37,31 @@ prek run selene --all-files   # Run only Selene linter
 ### Running tests
 
 ```bash
-# All tests
-nvim --headless -c "lua MiniTest.run()" -c "qall!"
+# Single test file (fastest, ~1-2 seconds)
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" -c "qall!"
 
-# Single test file
-nvim --headless -c "lua MiniTest.run_file('lua/tests/core/smoke_spec.lua')" -c "qall!"
+# All tests - parallel workers (recommended, ~6-8 seconds)
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" -c "sleep 10" -c "qall!"
 
-# Tests with synchronous plugin loading (later() behaves like now())
+# All tests - sequential (fallback, ~20 seconds)
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"
+
+# Random order - detect test dependencies (useful for finding state leakage)
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" -c "qall!"
+
+# Without MINI_DEPS_LATER_AS_NOW (slow, ~45+ seconds)
+nvim --headless -c "lua MiniTest.run()" -c "qall!"
 ```
 
-From within nvim (only when cwd is config directory): `:RunAllTests`, `:RunFailedTests`, `<leader>ta`, `<leader>tf`.
+**Interactive commands** (only when cwd is config directory):
+
+| Command                          | Keybind      | Description                   |
+| -------------------------------- | ------------ | ----------------------------- |
+| `:RunAllTests`                   | `<leader>ta` | Sequential with optimizations |
+| `:RunFailedTests`                | `<leader>tf` | Re-run only failed tests      |
+| `:RunTestsParallel`              | `<leader>tp` | Parallel workers (fastest)    |
+| `:RunTestsRandom [seed]`         | `<leader>tr` | Random order sequential       |
+| `:RunTestsParallelRandom [seed]` | -            | Parallel + random order       |
 
 ### Startup validation
 

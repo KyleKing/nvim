@@ -69,3 +69,41 @@ Any missing CLI tools should be flagged by running `:checkhealth` in `nvim`
 ## Documentation
 
 Plugin usage guides are available via `:h kyleking-neovim` within nvim.
+
+## Testing
+
+This config includes comprehensive tests using mini.test with parallel execution for speed.
+
+### Quick Start
+
+```vim
+" In nvim (when cwd is config directory)
+:RunTestsParallel        " Parallel workers (fastest, ~6-8 seconds)
+<leader>tp               " Same as above
+```
+
+### Command Line
+
+```bash
+# Parallel execution (recommended)
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
+    -c "sleep 10" -c "qall!"
+
+# Single test file
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" \
+    -c "qall!"
+```
+
+### Commands
+
+| Command                          | Keybind      | Speed        |
+| -------------------------------- | ------------ | ------------ |
+| `:RunTestsParallel`              | `<leader>tp` | ~6-8s (7-8x) |
+| `:RunAllTests`                   | `<leader>ta` | ~20s (2x)    |
+| `:RunFailedTests`                | `<leader>tf` | Variable     |
+| `:RunTestsRandom [seed]`         | `<leader>tr` | ~20s         |
+| `:RunTestsParallelRandom [seed]` | -            | ~6-8s        |
+
+See `:h kyleking-neovim-testing` for complete documentation.
