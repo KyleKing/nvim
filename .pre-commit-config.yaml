@@ -110,12 +110,12 @@ repos:
         language: system
         types: [lua]
       - id: lua-diagnostics
-        name: Lua LSP Diagnostics
-        description: Check for Lua/Neovim API deprecations and errors using LSP
-        entry: bash -c 'cd ~/.config/nvim && nvim --headless --clean +"lua dofile(\"scripts/check-lua-diagnostics-minimal.lua\")" "$@"' --
+        name: Lua LSP Diagnostics (Direct - No nvim, ~2s for all files)
+        description: Check for Lua/Neovim API deprecations using lua-language-server directly
+        entry: scripts/check-lua-lsp.sh
         language: system
         types: [lua]
-        pass_filenames: true
+        pass_filenames: false  # Checks entire workspace
         stages: [pre-push]
       - id: helptags
         name: Generate helptags

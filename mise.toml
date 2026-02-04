@@ -67,8 +67,8 @@ run = "prek run stylua-system --all-files"
 
 # Diagnostic tasks
 [tasks."lint:lua"]
-description = "Check for Lua/Neovim API deprecations and diagnostics"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless +"lua dofile(\"scripts/check-lua-diagnostics.lua\")" +qall lua/**/*.lua'
+description = "Check for Lua/Neovim API deprecations using lua-language-server directly (~2s)"
+run = 'scripts/check-lua-lsp.sh'
 
 # Utility tasks
 [tasks.measure]
