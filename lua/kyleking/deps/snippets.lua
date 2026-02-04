@@ -42,9 +42,12 @@ later(function()
             snippets.session.jump("next")
         else
             -- Try to expand at cursor
-            local expanded = pcall(snippets.expand)
-            if not expanded then
-                -- No snippet at cursor, insert Tab
+            local ok, err = pcall(snippets.expand)
+            if not ok then
+                -- No snippet at cursor or expansion failed - log unexpected errors
+                if err and not err:match("No snippet") then
+                    vim.notify("Snippet expansion failed: " .. tostring(err), vim.log.levels.WARN)
+                end
                 return "<Tab>"
             end
         end

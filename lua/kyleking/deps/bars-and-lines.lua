@@ -47,9 +47,10 @@ if not is_temp_session then
         local project_tools = require("find-relative-executable")
 
         -- Statusline section cache with configurable TTLs
+        -- Balance UI responsiveness with avoiding stale data
         local section_cache = {}
-        local SECTION_CACHE_TTL_MS = 1000 -- Default: 1 second
-        local BRANCH_CACHE_TTL_MS = 300000 -- Branch metadata: 5 minutes (changes infrequently)
+        local SECTION_CACHE_TTL_MS = 1000 -- Default sections: 1s (LSP, diagnostics change frequently)
+        local BRANCH_CACHE_TTL_MS = 300000 -- Branch metadata: 5min (git operations are expensive, branches change slowly)
 
         local function cache_section(key, compute_fn, ttl_ms)
             ttl_ms = ttl_ms or SECTION_CACHE_TTL_MS
@@ -65,7 +66,7 @@ if not is_temp_session then
         -- Profile system: compact (minimal) vs info-dense (full context)
         local current_profile = "compact"
         local info_dense_timer = nil
-        local INFO_DENSE_TIMEOUT_MS = 300000 -- 5 minutes
+        local INFO_DENSE_TIMEOUT_MS = 300000 -- Auto-revert info-dense: 5min (prevent cluttered statusline long-term)
 
         local profiles = {
             compact = {
@@ -138,97 +139,141 @@ if not is_temp_session then
 
         -- Enhanced branch metadata: branch name, PR info, ahead/behind, stash
         -- Supports both git and jj with GitHub PRs via gh CLI
+        -- Uses async updates to prevent UI blocking
         local function branch_metadata_section()
             local vcs = project_tools.get_vcs_root(vim.api.nvim_buf_get_name(0))
             if not vcs then return "" end
 
-            -- Cache key by branch name (not cwd) for better cache hits
-            local cache_key_prefix = "branch_meta:" .. vcs.type .. ":" .. vcs.root
+            local cache_key = "branch_meta:" .. vcs.type .. ":" .. vcs.root
+            local cached = section_cache[cache_key]
+            local now_ts = vim.uv.hrtime() / 1000000
 
-            return cache_section(cache_key_prefix, function()
-                local parts = {}
+            -- Return cached value immediately if still valid
+            if cached and (now_ts - cached.timestamp) < BRANCH_CACHE_TTL_MS then return cached.value end
 
-                if vcs.type == "git" then
-                    -- Get current branch name
-                    local branch_result = vim.system({ "git", "branch", "--show-current" }, { cwd = vcs.root }):wait()
-                    if branch_result.code == 0 and branch_result.stdout then
-                        local branch = vim.trim(branch_result.stdout)
-                        if branch ~= "" then
-                            table.insert(parts, " " .. branch)
+            -- Start async update if cache is stale or missing
+            if not cached or (now_ts - cached.timestamp) >= BRANCH_CACHE_TTL_MS then
+                -- Return stale cache immediately (non-blocking)
+                local stale_value = cached and cached.value or ""
 
-                            -- Get PR info via gh CLI
-                            local pr_result = vim.system(
-                                { "gh", "pr", "view", "--json", "number,title" },
-                                { cwd = vcs.root }
-                            )
-                                :wait()
-                            if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
-                                local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
-                                if ok and pr_data.number then
-                                    local title = pr_data.title:sub(1, 20)
-                                    if #pr_data.title > 20 then title = title .. "…" end
-                                    table.insert(parts, string.format("PR#%d:%s", pr_data.number, title))
+                -- Update cache asynchronously
+                vim.schedule(function()
+                    local parts = {}
+
+                    if vcs.type == "git" then
+                        -- Get current branch name
+                        vim.system({ "git", "branch", "--show-current" }, { cwd = vcs.root }, function(branch_result)
+                            if branch_result.code == 0 and branch_result.stdout then
+                                local branch = vim.trim(branch_result.stdout)
+                                if branch ~= "" then
+                                    table.insert(parts, " " .. branch)
+
+                                    -- Get PR info via gh CLI (async)
+                                    vim.system(
+                                        { "gh", "pr", "view", "--json", "number,title" },
+                                        { cwd = vcs.root },
+                                        function(pr_result)
+                                            if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
+                                                local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
+                                                if ok and pr_data.number then
+                                                    local title = pr_data.title:sub(1, 20)
+                                                    if #pr_data.title > 20 then title = title .. "…" end
+                                                    table.insert(
+                                                        parts,
+                                                        string.format("PR#%d:%s", pr_data.number, title)
+                                                    )
+                                                end
+                                            end
+                                        end
+                                    )
+
+                                    -- Get ahead/behind counts (async)
+                                    vim.system(
+                                        { "git", "rev-list", "--left-right", "--count", "HEAD...@{u}" },
+                                        { cwd = vcs.root },
+                                        function(ahead_behind_result)
+                                            if ahead_behind_result.code == 0 and ahead_behind_result.stdout then
+                                                local output = vim.trim(ahead_behind_result.stdout)
+                                                local ahead, behind = output:match("(%d+)%s+(%d+)")
+                                                if ahead and behind then
+                                                    ahead, behind = tonumber(ahead), tonumber(behind)
+                                                    if ahead > 0 then table.insert(parts, "↑" .. ahead) end
+                                                    if behind > 0 then table.insert(parts, "↓" .. behind) end
+                                                end
+                                            end
+                                        end
+                                    )
+
+                                    -- Get stash count (async)
+                                    vim.system({ "git", "stash", "list" }, { cwd = vcs.root }, function(stash_result)
+                                        if stash_result.code == 0 and stash_result.stdout then
+                                            local stash_count = 0
+                                            for _ in stash_result.stdout:gmatch("[^\n]+") do
+                                                stash_count = stash_count + 1
+                                            end
+                                            if stash_count > 0 then table.insert(parts, "󰆓" .. stash_count) end
+                                        end
+
+                                        -- Update cache after all async operations complete
+                                        vim.schedule(function()
+                                            section_cache[cache_key] = {
+                                                value = #parts > 0 and table.concat(parts, " ") or "",
+                                                timestamp = vim.uv.hrtime() / 1000000,
+                                            }
+                                            vim.cmd.redrawstatus()
+                                        end)
+                                    end)
                                 end
                             end
+                        end)
+                    elseif vcs.type == "jj" then
+                        -- Get jj change ID (async)
+                        vim.system(
+                            { "jj", "log", "-r", "@", "--no-graph", "-T", "change_id.short()" },
+                            { cwd = vcs.root },
+                            function(change_result)
+                                if change_result.code == 0 and change_result.stdout then
+                                    local change_id = vim.trim(change_result.stdout)
+                                    if change_id ~= "" then
+                                        table.insert(parts, "jj:" .. change_id)
 
-                            -- Get ahead/behind counts
-                            local ahead_behind_result = vim.system(
-                                { "git", "rev-list", "--left-right", "--count", "HEAD...@{u}" },
-                                {
-                                    cwd = vcs.root,
-                                }
-                            ):wait()
-                            if ahead_behind_result.code == 0 and ahead_behind_result.stdout then
-                                local output = vim.trim(ahead_behind_result.stdout)
-                                local ahead, behind = output:match("(%d+)%s+(%d+)")
-                                if ahead and behind then
-                                    ahead, behind = tonumber(ahead), tonumber(behind)
-                                    if ahead > 0 then table.insert(parts, "↑" .. ahead) end
-                                    if behind > 0 then table.insert(parts, "↓" .. behind) end
+                                        -- Try to get PR info via gh CLI (async)
+                                        vim.system(
+                                            { "gh", "pr", "view", "--json", "number,title" },
+                                            { cwd = vcs.root },
+                                            function(pr_result)
+                                                if
+                                                    pr_result.code == 0
+                                                    and pr_result.stdout
+                                                    and pr_result.stdout ~= ""
+                                                then
+                                                    local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
+                                                    if ok and pr_data.number then
+                                                        table.insert(parts, string.format("PR#%d", pr_data.number))
+                                                    end
+                                                end
+
+                                                -- Update cache after async operations
+                                                vim.schedule(function()
+                                                    section_cache[cache_key] = {
+                                                        value = #parts > 0 and table.concat(parts, " ") or "",
+                                                        timestamp = vim.uv.hrtime() / 1000000,
+                                                    }
+                                                    vim.cmd.redrawstatus()
+                                                end)
+                                            end
+                                        )
+                                    end
                                 end
                             end
-
-                            -- Get stash count
-                            local stash_result = vim.system({ "git", "stash", "list" }, { cwd = vcs.root }):wait()
-                            if stash_result.code == 0 and stash_result.stdout then
-                                local stash_count = 0
-                                for _ in stash_result.stdout:gmatch("[^\n]+") do
-                                    stash_count = stash_count + 1
-                                end
-                                if stash_count > 0 then table.insert(parts, "󰆓" .. stash_count) end
-                            end
-                        end
-                    end
-                elseif vcs.type == "jj" then
-                    -- Get jj change ID (equivalent to branch)
-                    local change_result = vim.system(
-                        { "jj", "log", "-r", "@", "--no-graph", "-T", "change_id.short()" },
-                        {
-                            cwd = vcs.root,
-                        }
-                    )
-                        :wait()
-                    if change_result.code == 0 and change_result.stdout then
-                        local change_id = vim.trim(change_result.stdout)
-                        if change_id ~= "" then table.insert(parts, "jj:" .. change_id) end
-
-                        -- Try to get PR info via gh CLI (if jj change has GitHub PR)
-                        local pr_result = vim.system(
-                            { "gh", "pr", "view", "--json", "number,title" },
-                            { cwd = vcs.root }
                         )
-                            :wait()
-                        if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
-                            local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
-                            if ok and pr_data.number then
-                                table.insert(parts, string.format("PR#%d", pr_data.number))
-                            end
-                        end
                     end
-                end
+                end)
 
-                return #parts > 0 and table.concat(parts, " ") or ""
-            end, BRANCH_CACHE_TTL_MS)
+                return stale_value
+            end
+
+            return cached.value
         end
 
         -- VCS section: shows git or jj status (cached)

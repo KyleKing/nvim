@@ -21,27 +21,42 @@ local function _get_tool_command(tool_name, tool_path)
     return { tool_path }
 end
 
--- Detect projects by marker file in a directory tree
----@param root_dir string Root directory to search
----@param marker string Marker file name (e.g., "pyproject.toml", "package.json")
----@param max_depth number|nil Maximum search depth (default: 3)
----@return string[] project_roots List of detected project directories
+-- Maximum depth for project discovery (balance between thoroughness and performance)
+local MAX_PROJECT_DEPTH = 3
+
+---@param root_dir string
+---@param marker string Marker file (e.g., "pyproject.toml")
+---@param max_depth number|nil
+---@return string[]
 local function _find_projects_by_marker(root_dir, marker, max_depth)
-    max_depth = max_depth or 3
+    max_depth = max_depth or MAX_PROJECT_DEPTH
 
-    -- Use find command for better performance on large repos
-    local cmd = string.format(
-        "find %s -maxdepth %d -name %s -not -path '*/.venv/*' -not -path '*/node_modules/*' -not -path '*/__pycache__/*'",
-        vim.fn.shellescape(root_dir),
-        max_depth,
-        vim.fn.shellescape(marker)
-    )
+    -- Validate inputs to prevent command injection
+    if not root_dir or root_dir == "" or marker == "" then return {} end
 
-    local result = vim.fn.system(cmd)
-    if vim.v.shell_error ~= 0 then return {} end
+    -- Use vim.system for safer command execution (no shell interpolation)
+    local result = vim.system({
+        "find",
+        root_dir,
+        "-maxdepth",
+        tostring(max_depth),
+        "-name",
+        marker,
+        "-not",
+        "-path",
+        "*/.venv/*",
+        "-not",
+        "-path",
+        "*/node_modules/*",
+        "-not",
+        "-path",
+        "*/__pycache__/*",
+    }, { text = true }):wait()
+
+    if result.code ~= 0 or not result.stdout then return {} end
 
     local projects = {}
-    for line in result:gmatch("[^\n]+") do
+    for line in result.stdout:gmatch("[^\n]+") do
         if line ~= "" then
             local project_root = vim.fn.fnamemodify(line, ":h")
             table.insert(projects, project_root)
@@ -52,32 +67,28 @@ local function _find_projects_by_marker(root_dir, marker, max_depth)
     return projects
 end
 
--- Detect Python projects in a directory tree
----@param root_dir string Root directory to search
----@param max_depth number|nil Maximum search depth (default: 3)
----@return string[] project_roots List of detected Python project directories
+---@param root_dir string
+---@param max_depth number|nil
+---@return string[]
 local function _find_python_projects(root_dir, max_depth)
     return _find_projects_by_marker(root_dir, "pyproject.toml", max_depth)
 end
 
--- Detect Node/TypeScript projects in a directory tree
----@param root_dir string Root directory to search
----@param max_depth number|nil Maximum search depth (default: 3)
----@return string[] project_roots List of detected Node project directories
+---@param root_dir string
+---@param max_depth number|nil
+---@return string[]
 local function _find_node_projects(root_dir, max_depth)
     return _find_projects_by_marker(root_dir, "package.json", max_depth)
 end
 
--- Detect Go projects in a directory tree
----@param root_dir string Root directory to search
----@param max_depth number|nil Maximum search depth (default: 3)
----@return string[] project_roots List of detected Go project directories
+---@param root_dir string
+---@param max_depth number|nil
+---@return string[]
 local function _find_go_projects(root_dir, max_depth) return _find_projects_by_marker(root_dir, "go.mod", max_depth) end
 
--- Detect projects for a tool's ecosystem
----@param root_dir string Root directory to search
----@param tool_name string Tool name (to determine ecosystem)
----@return string[] project_roots List of detected project directories
+---@param root_dir string
+---@param tool_name string
+---@return string[]
 local function _find_projects_for_tool(root_dir, tool_name)
     -- Tool to ecosystem mapping (from find-relative-executable)
     local ecosystems = {
@@ -118,11 +129,10 @@ local function _find_projects_for_tool(root_dir, tool_name)
     end
 end
 
--- Run tool in a project directory and collect output
----@param tool_name string Tool to run (e.g., "mypy", "pyright")
----@param project_root string Project directory
----@param args string[]|nil Additional arguments (appended after tool-specific args)
----@return string|nil output Command output or nil if tool not found
+---@param tool_name string
+---@param project_root string
+---@param args string[]|nil
+---@return string|nil
 local function _run_tool_in_project(tool_name, project_root, args)
     local tool_path = fre.resolve(tool_name, project_root)
     if not tool_path or vim.fn.executable(tool_path) ~= 1 then return nil end
@@ -133,6 +143,14 @@ local function _run_tool_in_project(tool_name, project_root, args)
     table.insert(cmd, ".")
 
     local result = vim.system(cmd, { cwd = project_root, text = true }):wait()
+
+    -- Check for errors first (non-zero exit codes typically indicate failure)
+    if result.code ~= 0 and result.stderr and result.stderr ~= "" then
+        vim.notify(string.format("%s error in %s: %s", tool_name, project_root, result.stderr), vim.log.levels.WARN)
+        return nil
+    end
+
+    -- Return stdout if available, otherwise stderr (some tools write diagnostics to stderr)
     return result.stdout and result.stdout ~= "" and result.stdout or result.stderr
 end
 
@@ -155,8 +173,15 @@ function M.run_in_projects(tool_name, projects, args, callback)
 
     for _, project_root in ipairs(projects) do
         vim.schedule(function()
-            local output = _run_tool_in_project(tool_name, project_root, args)
-            if output then table.insert(outputs, output) end
+            local ok, output = pcall(_run_tool_in_project, tool_name, project_root, args)
+            if ok and output then
+                table.insert(outputs, output)
+            elseif not ok then
+                vim.notify(
+                    string.format("%s failed in %s: %s", tool_name, project_root, tostring(output)),
+                    vim.log.levels.ERROR
+                )
+            end
 
             completed = completed + 1
             if completed == total then
@@ -423,8 +448,9 @@ function M.qf._apply_batch_fixes(qf_items, filter)
                     vim.api.nvim_win_set_cursor(0, { item.lnum, math.max(0, item.col - 1) })
 
                     local params = vim.lsp.util.make_range_params()
-                    params.context =
-                        { diagnostics = vim.lsp.diagnostic.get_line_diagnostics(item.bufnr, item.lnum - 1) }
+                    -- Get diagnostics for the current line (nvim 0.11+ API)
+                    local line_diagnostics = vim.diagnostic.get(item.bufnr, { lnum = item.lnum - 1, severity = nil })
+                    params.context = { diagnostics = line_diagnostics }
 
                     local results = vim.lsp.buf_request_sync(item.bufnr, "textDocument/codeAction", params, 1000)
                     if not results then return end
@@ -464,7 +490,9 @@ local function _get_code_actions_for_item(item)
             vim.api.nvim_win_set_cursor(0, { item.lnum, math.max(0, item.col - 1) })
 
             local params = vim.lsp.util.make_range_params()
-            params.context = { diagnostics = vim.lsp.diagnostic.get_line_diagnostics(item.bufnr, item.lnum - 1) }
+            -- Get diagnostics for the current line (nvim 0.11+ API)
+            local line_diagnostics = vim.diagnostic.get(item.bufnr, { lnum = item.lnum - 1, severity = nil })
+            params.context = { diagnostics = line_diagnostics }
 
             local results = vim.lsp.buf_request_sync(item.bufnr, "textDocument/codeAction", params, 1000)
             if results then

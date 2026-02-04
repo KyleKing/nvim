@@ -61,16 +61,18 @@ local canonical_names = {
 local cache = {}
 
 -- Cache for project roots and VCS detection with TTL
+-- Root detection cache: balance between freshness and performance
+-- (project changes are infrequent but tooling depends on correct roots)
 local root_cache = {}
 local vcs_cache = {}
-local CACHE_TTL_MS = 5000 -- 5 second TTL for root detection
+local CACHE_TTL_MS = 5000 -- Root detection: 5s (catches most project switches)
 
 local function _find_local_bin(tool_name, buf_dir)
     local eco = ecosystems[tool_name]
     if not eco then return nil end
 
     local strategy = strategies[eco]
-    if not strategy then return nil end
+    if not strategy or not strategy.bin_dir then return nil end
 
     local found = vim.fs.find(strategy.marker, { upward = true, path = buf_dir })
     if #found == 0 then return nil end
@@ -259,15 +261,29 @@ end
 ---@return string[] available List of available formatters
 function M.detect_formatters(candidates, buf_path)
     local available = {}
+
+    -- Check if any candidate has explicit config (indicates project preference)
+    local has_any_config = false
+    for _, tool in ipairs(candidates) do
+        if _has_config(tool, buf_path) then
+            has_any_config = true
+            break
+        end
+    end
+
     for _, tool in ipairs(candidates) do
         local resolved = M.resolve(tool, buf_path)
         local is_executable = vim.fn.executable(resolved) == 1
-        local has_config = _has_config(tool, buf_path)
-        local no_biome = not _has_config("biome", buf_path)
-        local no_prettier = not _has_config("prettier", buf_path)
 
-        -- Include tool if either: (1) has config in project, or (2) is executable and no conflicting config
-        if is_executable and (has_config or (no_biome and no_prettier)) then table.insert(available, tool) end
+        if is_executable then
+            if has_any_config then
+                -- If ANY tool has config, only include tools with explicit config (respect project choice)
+                if _has_config(tool, buf_path) then table.insert(available, tool) end
+            else
+                -- No configs found - include all executable tools (priority order determines winner)
+                table.insert(available, tool)
+            end
+        end
     end
     return available
 end
