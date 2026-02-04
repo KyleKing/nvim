@@ -89,10 +89,12 @@ Performance benchmarks track startup time, terminal performance, and other criti
 mise run bench              # Run all performance benchmarks
 mise run bench:startup      # Run startup performance benchmarks (startup time, plugin loading, large files)
 mise run bench:terminal     # Run terminal performance benchmarks (creation, statusline, mode changes)
-mise run measure            # Measure nvim startup time using external script
+mise run measure            # Measure nvim startup time (automated, appends to BENCHMARKS.md)
 ```
 
 Benchmarks are located in `lua/tests/performance/` and use MiniTest with timing assertions.
+
+**Performance tracking**: `scripts/measure_nvim.sh` runs automatically on pre-push and appends results to `BENCHMARKS.md` with timestamps and git commit info. Manual runs: `mise run measure`.
 
 ### Documentation-driven tests
 
