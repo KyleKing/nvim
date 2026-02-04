@@ -40,7 +40,10 @@ prek run selene --all-files   # Run only Selene linter
 # Single test file (fastest, ~1-2 seconds)
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" -c "qall!"
 
-# All tests - parallel workers (recommended, ~6-8 seconds)
+# CI tests - no external tool dependencies (fast, ~3-5 seconds)
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_ci_tests()" -c "qall!"
+
+# All tests - parallel workers (recommended, ~6-8 seconds, requires stylua/ruff/etc.)
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" -c "sleep 10" -c "qall!"
 
 # All tests - sequential (fallback, ~20 seconds)
@@ -48,9 +51,6 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"
 
 # Random order - detect test dependencies (useful for finding state leakage)
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" -c "qall!"
-
-# Without MINI_DEPS_LATER_AS_NOW (slow, ~45+ seconds)
-nvim --headless -c "lua MiniTest.run()" -c "qall!"
 
 # Coverage tracking (requires luacov: luarocks install luacov)
 ./scripts/run_tests_with_coverage.sh custom  # Custom modules only (fast)
@@ -63,13 +63,14 @@ cat .luacov.report.out
 
 **Interactive commands** (only when cwd is config directory):
 
-| Command                          | Keybind      | Description                   |
-| -------------------------------- | ------------ | ----------------------------- |
-| `:RunAllTests`                   | `<leader>ta` | Sequential with optimizations |
-| `:RunFailedTests`                | `<leader>tf` | Re-run only failed tests      |
-| `:RunTestsParallel`              | `<leader>tp` | Parallel workers (fastest)    |
-| `:RunTestsRandom [seed]`         | `<leader>tr` | Random order sequential       |
-| `:RunTestsParallelRandom [seed]` | -            | Parallel + random order       |
+| Command                          | Keybind      | Description                            |
+| -------------------------------- | ------------ | -------------------------------------- |
+| `:RunTestCI`                     | -            | CI-safe tests (no external tools)      |
+| `:RunAllTests`                   | `<leader>ta` | Sequential with optimizations          |
+| `:RunFailedTests`                | `<leader>tf` | Re-run only failed tests               |
+| `:RunTestsParallel`              | `<leader>tp` | Parallel workers (requires ext. tools) |
+| `:RunTestsRandom [seed]`         | `<leader>tr` | Random order sequential                |
+| `:RunTestsParallelRandom [seed]` | -            | Parallel + random order                |
 
 ### Documentation-driven tests
 

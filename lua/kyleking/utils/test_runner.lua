@@ -485,4 +485,62 @@ function M.run_tests_parallel(shuffle, seed)
     return results
 end
 
+--- Run CI-safe tests (tests that don't require external tools)
+--- These tests only require Neovim and plugins installed via mini.deps
+--- @return table Test results
+function M.run_ci_tests()
+    local MiniTest = require("mini.test")
+
+    -- CI-safe test files: no external tool dependencies (stylua, ruff, selene, etc.)
+    local ci_safe_patterns = {
+        -- Core tests
+        "lua/tests/core/smoke_spec.lua",
+
+        -- All custom utility tests
+        "lua/tests/custom/*_spec.lua",
+
+        -- Doc fixture tests
+        "lua/tests/docs/runner_spec.lua",
+
+        -- Plugin tests that only check config/keymaps
+        "lua/tests/plugins/keybinding_spec.lua",
+        "lua/tests/plugins/mini_ai_spec.lua",
+
+        -- UI tests
+        "lua/tests/ui/temp_statusline_spec.lua",
+        "lua/tests/ui/picker_config_spec.lua",
+
+        -- Integration tests that don't need external tools
+        "lua/tests/integration/clue_keymap_integration_spec.lua",
+        "lua/tests/integration/mini_files_operations_spec.lua",
+        "lua/tests/integration/git_hunks_spec.lua", -- git usually available in CI
+
+        -- Performance tests
+        "lua/tests/performance/startup_spec.lua",
+    }
+
+    -- Expand glob patterns and collect test files
+    local test_files = {}
+    for _, pattern in ipairs(ci_safe_patterns) do
+        if pattern:match("%*") then
+            -- Glob pattern
+            local expanded = vim.fn.glob(pattern, false, true)
+            vim.list_extend(test_files, expanded)
+        else
+            -- Direct file path
+            if vim.fn.filereadable(pattern) == 1 then table.insert(test_files, pattern) end
+        end
+    end
+
+    -- Run tests sequentially
+    print("Running CI-safe tests (" .. #test_files .. " files)...")
+    for i, test_file in ipairs(test_files) do
+        local relative = test_file:match("lua/tests/(.+)$") or test_file
+        print(string.format("[%d/%d] %s", i, #test_files, relative))
+        MiniTest.run_file(test_file, { verbose = false })
+    end
+
+    print("\nCI tests completed!")
+end
+
 return M

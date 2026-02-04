@@ -39,38 +39,12 @@ jobs:
             -c "lua vim.wait(1000, function() return false end)" \
             -c "qall!"
 
-      - name: Run fixture tests (documentation-driven)
+      - name: Run CI tests
         run: |
-          # Run fixture tests with profiling enabled
-          MINI_DEPS_LATER_AS_NOW=1 PROFILE_TESTS=1 nvim --headless \
-            -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" \
-            -c "qall!"
-
-      - name: Run all tests (parallel)
-        id: parallel-tests
-        run: |
-          # Run tests in parallel for speed
+          # Run only tests that don't require external tools (stylua, ruff, etc.)
+          # This matches the local :RunTestCI command
           MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
-            -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
-            -c "sleep 15" \
-            -c "qall!"
-        continue-on-error: true
-
-      - name: Run all tests (sequential fallback)
-        if: steps.parallel-tests.outcome == 'failure'
-        run: |
-          # Fallback to sequential if parallel fails
-          echo "Parallel tests failed, trying sequential..."
-          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
-            -c "lua MiniTest.run()" \
-            -c "qall!"
-
-      - name: Run tests in random order (detect dependencies)
-        run: |
-          # Detect test interdependencies
-          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
-            -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" \
-            -c "sleep 10" \
+            -c "lua require('kyleking.utils.test_runner').run_ci_tests()" \
             -c "qall!"
 
   lint:

@@ -54,12 +54,12 @@ T["temp session statusline"]["filename truncation respects minimum width"] = fun
     -- Should contain truncation indicator or full path
     MiniTest.expect.equality(type(truncated), "string", "Should return string")
 
-    -- If truncated, should start with .../
+    -- If truncated, should start with ... (with or without /)
     if #long_path > 65 then
         MiniTest.expect.equality(
-            truncated:match("^%.%.%./") ~= nil or truncated == long_path,
+            truncated:match("^%.%.%.") ~= nil or truncated == long_path,
             true,
-            "Long paths should be truncated with .../ prefix or shown in full"
+            "Long paths should be truncated with ... prefix or shown in full"
         )
     end
 

@@ -96,6 +96,12 @@ now(function()
             test_runner.run_tests_parallel(true, seed)
         end, { nargs = "?", desc = "Run tests in parallel with random order (optional seed)" })
 
+        vim.api.nvim_create_user_command(
+            "RunTestCI",
+            function() test_runner.run_ci_tests() end,
+            { desc = "Run CI-safe tests (no external tool dependencies)" }
+        )
+
         -- Add keymaps to run tests
         vim.keymap.set(
             "n",
