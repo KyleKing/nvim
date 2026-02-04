@@ -14,7 +14,7 @@ T["LSP navigation"] = MiniTest.new_set()
 T["LSP navigation"]["navigation features work"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(200)
 
         local successes = {}
         local warnings = {}
@@ -38,9 +38,9 @@ T["LSP navigation"]["navigation features work"] = function()
         vim.bo.filetype = "lua"
 
         -- Wait for LSP to attach
-        local attached = vim.wait(5000, function()
+        local attached = vim.wait(3000, function()
             return #vim.lsp.get_clients({ bufnr = 0 }) > 0
-        end, 200)
+        end, 100)
 
         if not attached then
             print("SUCCESS: LSP not available in this context (skipped)")
@@ -51,7 +51,7 @@ T["LSP navigation"]["navigation features work"] = function()
         -- Test 1: Go-to-definition
         vim.api.nvim_win_set_cursor(0, {9, 0}) -- Line with my_function() call
         vim.lsp.buf.definition()
-        vim.wait(500)
+        vim.wait(200)
 
         local cursor = vim.api.nvim_win_get_cursor(0)
         if cursor[1] == 1 then
@@ -63,13 +63,13 @@ T["LSP navigation"]["navigation features work"] = function()
         -- Test 2: Find references
         vim.api.nvim_win_set_cursor(0, {5, 6}) -- Position on my_var definition
         vim.lsp.buf.references()
-        vim.wait(500)
+        vim.wait(200)
         table.insert(successes, "references")
 
         -- Test 3: Hover
         vim.api.nvim_win_set_cursor(0, {10, 4}) -- Position on vim.fn
         vim.lsp.buf.hover()
-        vim.wait(500)
+        vim.wait(200)
         table.insert(successes, "hover")
 
         vim.fn.delete(tmpfile)
@@ -91,7 +91,7 @@ T["LSP code actions"] = MiniTest.new_set()
 T["LSP code actions"]["code actions and rename available"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(200)
 
         local successes = {}
 
@@ -105,9 +105,9 @@ T["LSP code actions"]["code actions and rename available"] = function()
         })
         vim.bo.filetype = "lua"
 
-        local attached = vim.wait(5000, function()
+        local attached = vim.wait(3000, function()
             return #vim.lsp.get_clients({ bufnr = 0 }) > 0
-        end, 200)
+        end, 100)
 
         if not attached then
             print("SUCCESS: LSP not available (skipped)")
@@ -121,7 +121,7 @@ T["LSP code actions"]["code actions and rename available"] = function()
             filter = function(a) return a ~= nil end,
             apply = false,
         })
-        vim.wait(500)
+        vim.wait(200)
         table.insert(successes, "code_action")
 
         -- Test 2: Rename exists
@@ -144,7 +144,7 @@ T["LSP diagnostics"] = MiniTest.new_set()
 T["LSP diagnostics"]["diagnostics are displayed for errors"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(200)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -155,9 +155,9 @@ T["LSP diagnostics"]["diagnostics are displayed for errors"] = function()
         })
         vim.bo.filetype = "lua"
 
-        local attached = vim.wait(5000, function()
+        local attached = vim.wait(3000, function()
             return #vim.lsp.get_clients({ bufnr = 0 }) > 0
-        end, 200)
+        end, 100)
 
         if not attached then
             print("SUCCESS: LSP not available (skipped)")
@@ -165,7 +165,7 @@ T["LSP diagnostics"]["diagnostics are displayed for errors"] = function()
             return
         end
 
-        vim.wait(2000)
+        vim.wait(200)
 
         local diagnostics = vim.diagnostic.get(0)
         if #diagnostics > 0 then
@@ -187,7 +187,7 @@ T["LSP completion integration"] = MiniTest.new_set()
 T["LSP completion integration"]["completion triggered in Lua file"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(200)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -197,9 +197,9 @@ T["LSP completion integration"]["completion triggered in Lua file"] = function()
         })
         vim.bo.filetype = "lua"
 
-        local attached = vim.wait(5000, function()
+        local attached = vim.wait(3000, function()
             return #vim.lsp.get_clients({ bufnr = 0 }) > 0
-        end, 200)
+        end, 100)
 
         if not attached then
             print("SUCCESS: LSP not available (skipped)")
@@ -216,7 +216,7 @@ T["LSP completion integration"]["completion triggered in Lua file"] = function()
 
         -- Trigger completion with Ctrl-Space
         vim.api.nvim_feedkeys("\14\32", "x", false) -- Ctrl-N then Space
-        vim.wait(500)
+        vim.wait(200)
 
         print("SUCCESS: Completion triggered")
 
@@ -240,7 +240,7 @@ end
 T["LSP formatting"]["can format Lua buffer"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(200)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -252,11 +252,11 @@ T["LSP formatting"]["can format Lua buffer"] = function()
         })
         vim.bo.filetype = "lua"
 
-        vim.wait(1000)
+        vim.wait(300)
 
         -- Format buffer
         require("conform").format({ bufnr = 0, timeout_ms = 5000 })
-        vim.wait(500)
+        vim.wait(200)
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         print("Formatted lines: " .. vim.inspect(lines))

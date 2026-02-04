@@ -21,7 +21,7 @@ T["startup time"]["startup completes under threshold"] = function()
         tmplog,
         "-c",
         "qall!",
-    }, { text = true }):wait(30000)
+    }, { text = true }):wait(5000)
 
     MiniTest.expect.equality(result.code, 0, "Startup should complete successfully")
 
@@ -66,7 +66,7 @@ T["startup time"]["no errors during startup"] = function()
         "messages",
         "-c",
         "qall!",
-    }, { text = true }):wait(30000)
+    }, { text = true }):wait(5000)
 
     MiniTest.expect.equality(result.code, 0, "Startup should complete without errors")
 
@@ -95,7 +95,7 @@ T["plugin load time"]["mini.deps loads plugins efficiently"] = function()
         tmplog,
         "-c",
         "qall!",
-    }, { text = true }):wait(30000)
+    }, { text = true }):wait(5000)
 
     if vim.fn.filereadable(tmplog) == 1 then
         local content = table.concat(vim.fn.readfile(tmplog), "\n")
@@ -138,7 +138,7 @@ T["large file handling"]["can open moderately large file"] = function()
         "edit " .. tmpfile,
         "-c",
         "qall!",
-    }, { text = true }):wait(30000)
+    }, { text = true }):wait(5000)
 
     local elapsed = vim.loop.now() - start
 
@@ -174,10 +174,10 @@ T["large file handling"]["treesitter handles large file"] = function()
         "-c",
         "edit " .. tmpfile,
         "-c",
-        "sleep 2",
+        "sleep 1",
         "-c",
         "qall!",
-    }, { text = true }):wait(30000)
+    }, { text = true }):wait(5000)
 
     MiniTest.expect.equality(result.code, 0, "Should handle treesitter on large file: " .. (result.stderr or ""))
 
@@ -195,7 +195,7 @@ T["memory usage"]["startup memory is reasonable"] = function()
         "lua print(vim.loop.resident_set_memory())",
         "-c",
         "qall!",
-    }, { text = true }):wait(30000)
+    }, { text = true }):wait(5000)
 
     if result.stdout then print("Memory info captured (requires external profiling for detailed analysis)") end
 

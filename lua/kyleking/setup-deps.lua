@@ -102,6 +102,12 @@ now(function()
             { desc = "Run CI-safe tests (no external tool dependencies)" }
         )
 
+        vim.api.nvim_create_user_command(
+            "RunTestFast",
+            function() test_runner.run_fast_tests() end,
+            { desc = "Run fast tests (excludes subprocess-heavy tests, ~10-15s)" }
+        )
+
         -- Add keymaps to run tests
         vim.keymap.set(
             "n",
@@ -110,6 +116,12 @@ now(function()
             { desc = "Run all tests" }
         )
         vim.keymap.set("n", "<leader>tf", function() test_runner.run_failed_tests() end, { desc = "Run failed tests" })
+        vim.keymap.set(
+            "n",
+            "<leader>tq",
+            function() test_runner.run_fast_tests() end,
+            { desc = "Run fast tests (quick)" }
+        )
         vim.keymap.set(
             "n",
             "<leader>tp",

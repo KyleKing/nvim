@@ -231,11 +231,11 @@ function WorkerPool:start()
         }
 
         -- Wait for socket to be ready
-        local max_wait = 5000
+        local max_wait = 2000
         local start = vim.uv.now()
         while vim.uv.now() - start < max_wait do
             if vim.uv.fs_stat(socket) then break end
-            vim.wait(15)
+            vim.wait(10)
         end
     end
 end
@@ -380,7 +380,7 @@ function M.run_tests_parallel(shuffle, seed)
 
         table.insert(script_content, "local MiniTest = require('mini.test')")
         table.insert(script_content, "local helpers = require('tests.helpers')")
-        table.insert(script_content, "vim.wait(20)") -- Brief wait for plugins (MINI_DEPS_LATER_AS_NOW makes this fast)
+        table.insert(script_content, "vim.wait(10)") -- Brief wait for plugins (MINI_DEPS_LATER_AS_NOW makes this fast)
 
         for _, test_file in ipairs(file_chunk) do
             local file_name = vim.fn.fnamemodify(test_file, ":t")
@@ -459,7 +459,7 @@ function M.run_tests_parallel(shuffle, seed)
                 append_line(string.format("[Worker %d] Completed", worker_id))
             end
         end
-        if not all_complete then vim.wait(100) end
+        if not all_complete then vim.wait(25) end
     end
 
     -- Parse results from log files
@@ -483,6 +483,55 @@ function M.run_tests_parallel(shuffle, seed)
 
     pool:shutdown()
     return results
+end
+
+--- Run fast tests (excludes subprocess-heavy and slow integration tests)
+--- Designed for rapid development feedback (~10-15 seconds)
+--- @return table Test results
+function M.run_fast_tests()
+    local MiniTest = require("mini.test")
+
+    -- Fast test files: no subprocess spawning, minimal external dependencies
+    local fast_test_patterns = {
+        -- Core tests (excluding subprocess smoke test)
+        -- "lua/tests/core/smoke_spec.lua", -- Excluded: spawns subprocess
+
+        -- All custom utility tests (fast, pure Lua)
+        "lua/tests/custom/constants_spec.lua",
+        "lua/tests/custom/noqa_spec.lua",
+        "lua/tests/custom/utils_spec.lua",
+        "lua/tests/custom/window_focus_spec.lua",
+        "lua/tests/custom/list_editing_spec.lua",
+        "lua/tests/custom/ui_spec.lua",
+        "lua/tests/custom/clue_help_spec.lua",
+        "lua/tests/custom/health_spec.lua",
+
+        -- Plugin config tests (no external tools)
+        "lua/tests/plugins/keybinding_spec.lua",
+        "lua/tests/plugins/mini_ai_spec.lua",
+
+        -- UI tests (fast config validation)
+        "lua/tests/ui/temp_statusline_spec.lua",
+        "lua/tests/ui/picker_config_spec.lua",
+
+        -- Fast integration tests
+        "lua/tests/integration/clue_keymap_integration_spec.lua",
+        "lua/tests/integration/mini_files_operations_spec.lua",
+    }
+
+    local test_files = {}
+    for _, pattern in ipairs(fast_test_patterns) do
+        if vim.fn.filereadable(pattern) == 1 then table.insert(test_files, pattern) end
+    end
+
+    print("Running fast tests (" .. #test_files .. " files)...")
+    for i, test_file in ipairs(test_files) do
+        local relative = test_file:match("lua/tests/(.+)$") or test_file
+        print(string.format("[%d/%d] %s", i, #test_files, relative))
+        MiniTest.run_file(test_file, { verbose = false })
+    end
+
+    print("\nFast tests completed!")
 end
 
 --- Run CI-safe tests (tests that don't require external tools)

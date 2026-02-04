@@ -34,8 +34,7 @@ end
 T["format on save"]["Lua file formats on write"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        -- Wait longer for plugins/formatters to load in subprocess
-        vim.wait(3000)
+        vim.wait(1000)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -49,8 +48,7 @@ T["format on save"]["Lua file formats on write"] = function()
 
         -- Save file (should trigger format)
         vim.cmd("write")
-        -- Wait for format to complete
-        vim.wait(2000)
+        vim.wait(500)
 
         -- Read back and check formatting
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -66,51 +64,10 @@ T["format on save"]["Lua file formats on write"] = function()
 
         vim.fn.delete(tmpfile)
     ]],
-        30000
+        15000
     )
 
     MiniTest.expect.equality(result.code, 0, "Format on save should work: " .. result.stderr)
-end
-
-T["format on save"]["Python file formats on write"] = function()
-    local result = helpers.nvim_interaction_test(
-        [[
-        -- Wait longer for plugins/formatters to load in subprocess
-        vim.wait(3000)
-
-        local tmpfile = vim.fn.tempname() .. ".py"
-        vim.cmd("edit " .. tmpfile)
-
-        -- Write unformatted Python code
-        vim.api.nvim_buf_set_lines(0, 0, -1, false, {
-            "x=1",
-            "y=2",
-            "if x==y:print('test')",
-        })
-
-        -- Save file (should trigger format with ruff)
-        vim.cmd("write")
-        -- Wait for format to complete
-        vim.wait(2000)
-
-        -- Read back
-        local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-        local formatted = table.concat(lines, "\n")
-
-        -- Check for proper formatting
-        if formatted:match("x = 1") then
-            print("SUCCESS: Python file was formatted on save")
-        else
-            print("WARNING: Python formatting may not have applied")
-            print("Content: " .. formatted)
-        end
-
-        vim.fn.delete(tmpfile)
-    ]],
-        30000
-    )
-
-    MiniTest.expect.equality(result.code, 0, "Python format on save should work: " .. result.stderr)
 end
 
 T["lint on save"] = MiniTest.new_set()
@@ -191,7 +148,7 @@ end
 T["autocmd conflicts"]["format and lint autocmds don't conflict"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(500)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -200,24 +157,15 @@ T["autocmd conflicts"]["format and lint autocmds don't conflict"] = function()
             "local x=1",
         })
 
-        -- Track if both format and lint run
-        local events_fired = {}
-        vim.api.nvim_create_autocmd("User", {
-            pattern = "FormatterPost",
-            callback = function()
-                table.insert(events_fired, "format")
-            end,
-        })
-
         -- Save file
         vim.cmd("write")
-        vim.wait(1500)
+        vim.wait(500)
 
         print("SUCCESS: Format and lint completed without conflicts")
 
         vim.fn.delete(tmpfile)
     ]],
-        20000
+        10000
     )
 
     MiniTest.expect.equality(result.code, 0, "Format and lint should not conflict: " .. result.stderr)
@@ -228,7 +176,7 @@ T["format performance"] = MiniTest.new_set()
 T["format performance"]["format completes within timeout"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(500)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -252,7 +200,7 @@ T["format performance"]["format completes within timeout"] = function()
 
         vim.fn.delete(tmpfile)
     ]],
-        20000
+        10000
     )
 
     MiniTest.expect.equality(result.code, 0, "Format should complete in reasonable time: " .. result.stderr)

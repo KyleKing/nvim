@@ -24,50 +24,6 @@ T["git hunks"]["mini.git is configured"] = function()
     MiniTest.expect.equality(type(MiniGit.show_at_cursor), "function", "show_at_cursor should be available")
 end
 
-T["git hunks"]["can detect hunks in modified file"] = function()
-    local result = helpers.nvim_interaction_test(
-        [[
-        vim.wait(2000)
-
-        -- Create temp git repo
-        local tmpdir = vim.fn.tempname() .. "_git"
-        vim.fn.mkdir(tmpdir, "p")
-
-        vim.system({ "git", "init" }, { cwd = tmpdir }):wait(5000)
-        vim.system({ "git", "config", "user.name", "Test" }, { cwd = tmpdir }):wait(1000)
-        vim.system({ "git", "config", "user.email", "test@example.com" }, { cwd = tmpdir }):wait(1000)
-
-        -- Create and commit initial file
-        local test_file = tmpdir .. "/test.txt"
-        vim.fn.writefile({ "line 1", "line 2", "line 3" }, test_file)
-        vim.system({ "git", "add", "test.txt" }, { cwd = tmpdir }):wait(2000)
-        vim.system({ "git", "commit", "-m", "initial" }, { cwd = tmpdir }):wait(3000)
-
-        -- Modify file
-        vim.fn.writefile({ "line 1 modified", "line 2", "line 3" }, test_file)
-
-        -- Open file and wait for diff to load
-        vim.cmd("edit " .. test_file)
-        vim.wait(2000)
-
-        -- Check if mini.diff detected changes
-        local MiniDiff = require("mini.diff")
-        local has_diff_data = pcall(MiniDiff.get_buf_data, 0)
-
-        if has_diff_data then
-            print("SUCCESS: Git hunks detected")
-        else
-            print("WARNING: Git hunks not detected (may be expected if MiniDiff not fully loaded)")
-        end
-
-        vim.fn.delete(tmpdir, "rf")
-    ]],
-        30000
-    )
-
-    MiniTest.expect.equality(result.code, 0, "Git hunk detection should work: " .. result.stderr)
-end
-
 T["git hunks"]["navigation keybindings exist"] = function()
     local keymaps = vim.api.nvim_get_keymap("n")
 

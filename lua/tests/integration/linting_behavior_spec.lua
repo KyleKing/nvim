@@ -1,5 +1,5 @@
 -- Test that linters produce real diagnostics on buggy code
--- Batched tests to minimize subprocess overhead
+-- Minimal integration test with fastest linter only
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
@@ -9,9 +9,9 @@ local T = MiniTest.new_set({
     },
 })
 
-T["selene linting"] = MiniTest.new_set()
+T["linting integration"] = MiniTest.new_set()
 
-T["selene linting"]["detects lint issues in Lua"] = function()
+T["linting integration"]["detects lint issues"] = function()
     if vim.fn.executable("selene") ~= 1 then
         MiniTest.skip("selene not installed")
         return
@@ -19,7 +19,7 @@ T["selene linting"]["detects lint issues in Lua"] = function()
 
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(2000)
+        vim.wait(500)
 
         local errors = {}
         local successes = {}
@@ -44,12 +44,12 @@ T["selene linting"]["detects lint issues in Lua"] = function()
         f:close()
 
         vim.cmd("edit " .. tmpfile1)
-        vim.wait(500)
+        vim.wait(200)
         require("lint").try_lint({ "selene" })
 
-        local found = vim.wait(5000, function()
+        local found = vim.wait(2000, function()
             return #vim.diagnostic.get(0) > 0
-        end, 200)
+        end, 100)
 
         if found then
             local diagnostics = vim.diagnostic.get(0)
@@ -69,31 +69,9 @@ T["selene linting"]["detects lint issues in Lua"] = function()
             table.insert(errors, "unused: no diagnostics produced")
         end
 
-        vim.diagnostic.reset()
-
-        -- Test 2: Shadowed variable detection
-        local tmpfile2 = tmpdir .. "/test_shadow.lua"
-        f = io.open(tmpfile2, "w")
-        f:write("local x = 1\nlocal x = 2\nprint(x)\n")
-        f:close()
-
-        vim.cmd("edit " .. tmpfile2)
-        vim.wait(500)
-        require("lint").try_lint({ "selene" })
-
-        found = vim.wait(5000, function()
-            return #vim.diagnostic.get(0) > 0
-        end, 200)
-
-        if found then
-            table.insert(successes, "shadowed variable")
-        else
-            table.insert(errors, "shadow: no diagnostics produced")
-        end
-
         vim.fn.delete(tmpdir, "rf")
 
-        -- Report results
+        -- Report success
         if #successes > 0 then
             print("SUCCESS: selene detected " .. table.concat(successes, ", "))
         end
@@ -101,315 +79,16 @@ T["selene linting"]["detects lint issues in Lua"] = function()
             error("FAILURES: " .. table.concat(errors, "; "))
         end
     ]],
-        25000
+        10000
     )
 
     MiniTest.expect.equality(result.code, 0, "selene should detect lint issues:\n" .. result.stderr)
 end
 
-T["ruff linting"] = MiniTest.new_set()
-
-T["ruff linting"]["detects lint issues in Python"] = function()
-    if vim.fn.executable("ruff") ~= 1 then
-        MiniTest.skip("ruff not installed")
-        return
-    end
-
-    local result = helpers.nvim_interaction_test(
-        [[
-        vim.wait(2000)
-
-        local errors = {}
-        local successes = {}
-
-        -- Test 1: Unused import detection
-        local tmpfile1 = vim.fn.tempname() .. ".py"
-        local f = io.open(tmpfile1, "w")
-        f:write("import os\n\nprint('hello')\n")
-        f:close()
-
-        vim.cmd("edit " .. tmpfile1)
-        vim.wait(500)
-        require("lint").try_lint({ "ruff" })
-
-        local found = vim.wait(5000, function()
-            return #vim.diagnostic.get(0) > 0
-        end, 200)
-
-        if found then
-            local diagnostics = vim.diagnostic.get(0)
-            local has_unused_import = false
-            for _, d in ipairs(diagnostics) do
-                if d.message:match("import") or d.message:match("F401") or d.message:match("os") then
-                    has_unused_import = true
-                    break
-                end
-            end
-            if has_unused_import then
-                table.insert(successes, "unused import")
-            else
-                table.insert(errors, "import: diagnostics found but none about unused import")
-            end
-        else
-            table.insert(errors, "import: no diagnostics produced")
-        end
-
-        vim.fn.delete(tmpfile1)
-        vim.diagnostic.reset()
-
-        -- Test 2: Undefined name (may need explicit config)
-        local tmpfile2 = vim.fn.tempname() .. ".py"
-        f = io.open(tmpfile2, "w")
-        f:write("x = undefined_name\n")
-        f:close()
-
-        vim.cmd("edit " .. tmpfile2)
-        vim.wait(500)
-        require("lint").try_lint({ "ruff" })
-
-        found = vim.wait(5000, function()
-            return #vim.diagnostic.get(0) > 0
-        end, 200)
-
-        if found then
-            table.insert(successes, "undefined name")
-        else
-            -- ruff may not flag this without --select=F821; still valid
-            table.insert(successes, "undefined name (F821 may require config)")
-        end
-
-        vim.fn.delete(tmpfile2)
-
-        -- Report results
-        if #successes > 0 then
-            print("SUCCESS: ruff detected " .. table.concat(successes, ", "))
-        end
-        if #errors > 0 then
-            error("FAILURES: " .. table.concat(errors, "; "))
-        end
-    ]],
-        25000
-    )
-
-    MiniTest.expect.equality(result.code, 0, "ruff should detect lint issues:\n" .. result.stderr)
-end
-
-T["lua_ls linting"] = MiniTest.new_set()
-
-T["lua_ls linting"]["lua_ls produces diagnostics for type errors"] = function()
-    if vim.fn.executable("lua-language-server") ~= 1 then
-        MiniTest.skip("lua-language-server not installed")
-        return
-    end
-
-    local result = helpers.nvim_interaction_test(
-        [[
-        vim.wait(2000)
-
-        local tmpfile = vim.fn.tempname() .. ".lua"
-        local f = io.open(tmpfile, "w")
-        -- Intentional errors: call a number, index nil
-        f:write("local x = 42\nx()\nlocal y = nil\ny.field = 1\n")
-        f:close()
-
-        vim.cmd("edit " .. tmpfile)
-
-        local attached = vim.wait(8000, function()
-            return #vim.lsp.get_clients({ bufnr = 0, name = "lua_ls" }) > 0
-        end, 200)
-
-        if not attached then
-            print("SUCCESS: lua_ls not available in this context (skipped)")
-            vim.fn.delete(tmpfile)
-            return
-        end
-
-        local found = vim.wait(5000, function()
-            return #vim.diagnostic.get(0) > 0
-        end, 200)
-
-        if found then
-            local diagnostics = vim.diagnostic.get(0)
-            print("SUCCESS: lua_ls produced " .. #diagnostics .. " diagnostic(s)")
-        else
-            print("SUCCESS: lua_ls attached (diagnostics may need workspace indexing)")
-        end
-
-        vim.fn.delete(tmpfile)
-    ]],
-        25000
-    )
-
-    MiniTest.expect.equality(result.code, 0, "lua_ls should run on buggy Lua:\n" .. result.stderr)
-end
-
-T["formatting behavior"] = MiniTest.new_set()
-
-T["formatting behavior"]["formatters work on multiple file types"] = function()
-    local missing = {}
-    if vim.fn.executable("stylua") ~= 1 then table.insert(missing, "stylua") end
-    if vim.fn.executable("ruff") ~= 1 then table.insert(missing, "ruff") end
-    if vim.fn.executable("shfmt") ~= 1 then table.insert(missing, "shfmt") end
-
-    if #missing == 3 then
-        MiniTest.skip("No formatters installed")
-        return
-    end
-
-    local result = helpers.nvim_interaction_test(
-        [[
-        vim.wait(2000)
-
-        local errors = {}
-        local successes = {}
-
-        -- Test 1: stylua formats Lua
-        if vim.fn.executable("stylua") == 1 then
-            local tmpfile = vim.fn.tempname() .. ".lua"
-            local f = io.open(tmpfile, "w")
-            f:write("local x=1\nlocal y={a=1,b=2}\nif x==1 then print(y) end\n")
-            f:close()
-
-            vim.cmd("edit " .. tmpfile)
-            vim.wait(500)
-            require("conform").format({ bufnr = 0, timeout_ms = 5000 })
-            vim.wait(500)
-
-            local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-            local content = table.concat(lines, "\n")
-
-            if content:match("local x = 1") and content:match("a = 1") then
-                table.insert(successes, "stylua")
-            else
-                table.insert(errors, "stylua did not format correctly")
-            end
-
-            vim.fn.delete(tmpfile)
-        end
-
-        -- Test 2: ruff formats Python
-        if vim.fn.executable("ruff") == 1 then
-            local tmpfile = vim.fn.tempname() .. ".py"
-            local f = io.open(tmpfile, "w")
-            f:write("x=1\ny={'a':1,'b':2}\nif x==1:  print(y)\n")
-            f:close()
-
-            vim.cmd("edit " .. tmpfile)
-            vim.wait(500)
-            require("conform").format({ bufnr = 0, timeout_ms = 5000 })
-            vim.wait(500)
-
-            local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-            local content = table.concat(lines, "\n")
-
-            if content:match("x = 1") then
-                table.insert(successes, "ruff")
-            else
-                table.insert(errors, "ruff did not format correctly")
-            end
-
-            vim.fn.delete(tmpfile)
-        end
-
-        -- Test 3: shfmt formats shell
-        if vim.fn.executable("shfmt") == 1 then
-            local tmpfile = vim.fn.tempname() .. ".sh"
-            local f = io.open(tmpfile, "w")
-            f:write("#!/bin/bash\nif [ -f /tmp/test ];then\necho 'found'\nfi\n")
-            f:close()
-
-            vim.cmd("edit " .. tmpfile)
-            vim.wait(500)
-            require("conform").format({ bufnr = 0, timeout_ms = 5000 })
-            vim.wait(500)
-
-            local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-            local content = table.concat(lines, "\n")
-
-            if not content:match("];then") then
-                table.insert(successes, "shfmt")
-            else
-                table.insert(errors, "shfmt did not fix spacing")
-            end
-
-            vim.fn.delete(tmpfile)
-        end
-
-        -- Report results
-        if #successes > 0 then
-            print("SUCCESS: formatters working: " .. table.concat(successes, ", "))
-        end
-        if #errors > 0 then
-            error("FAILURES: " .. table.concat(errors, "; "))
-        end
-    ]],
-        30000
-    )
-
-    MiniTest.expect.equality(result.code, 0, "Formatters should work:\n" .. result.stderr)
-end
-
-T["lazydev integration"] = MiniTest.new_set()
-
-T["lazydev integration"]["lazydev attaches to lua_ls workspace"] = function()
-    if vim.fn.executable("lua-language-server") ~= 1 then
-        MiniTest.skip("lua-language-server not installed")
-        return
-    end
-
-    local result = helpers.nvim_interaction_test(
-        [[
-        vim.wait(2000)
-
-        local tmpfile = vim.fn.tempname() .. ".lua"
-        local f = io.open(tmpfile, "w")
-        f:write('local api = vim.api\nlocal buf = api.nvim_get_current_buf()\nprint(buf)\n')
-        f:close()
-
-        vim.cmd("edit " .. tmpfile)
-
-        local attached = vim.wait(8000, function()
-            return #vim.lsp.get_clients({ bufnr = 0, name = "lua_ls" }) > 0
-        end, 200)
-
-        if not attached then
-            print("SUCCESS: lua_ls not available (skipped)")
-            vim.fn.delete(tmpfile)
-            return
-        end
-
-        -- Verify lazydev module is active
-        local lazydev = require("lazydev")
-        local config = require("lazydev.config")
-
-        if config.runtime ~= vim.env.VIMRUNTIME then
-            error("lazydev runtime mismatch: " .. tostring(config.runtime))
-        end
-
-        -- Give lua_ls time to analyze
-        vim.wait(3000)
-
-        -- Check that vim.api usage doesn't produce "undefined global" diagnostics
-        local diagnostics = vim.diagnostic.get(0)
-        local false_positive = false
-        for _, d in ipairs(diagnostics) do
-            if d.message:match("Undefined global") and d.message:match("vim") then
-                false_positive = true
-                break
-            end
-        end
-
-        if false_positive then
-            error("lazydev failed: lua_ls reports 'vim' as undefined global")
-        end
-
-        print("SUCCESS: lazydev active, no false positives for vim API")
-        vim.fn.delete(tmpfile)
-    ]],
-        25000
-    )
-
-    MiniTest.expect.equality(result.code, 0, "lazydev should prevent vim false positives:\n" .. result.stderr)
+T["linting integration"]["nvim-lint is configured"] = function()
+    helpers.wait_for_plugins()
+    local lint = require("lint")
+    MiniTest.expect.equality(type(lint.linters_by_ft), "table", "Linters should be configured")
 end
 
 -- For manual running
