@@ -64,3 +64,10 @@ jobs:
 
       - name: Run pre-commit hooks
         run: pre-commit run --all-files
+        env:
+          # Skip hooks requiring tools not available in CI:
+          # - stylua-system/selene: needs system binaries installed
+          # - panvimdoc: path issues, docs generated locally
+          # - generate-plugin-docs/helptags: needs nvim
+          # - mini-test: already runs in test job
+          SKIP: stylua-system,selene,panvimdoc,generate-plugin-docs,helptags,mini-test
