@@ -66,6 +66,26 @@ nvim
 
 Any missing CLI tools should be flagged by running `:checkhealth` in `nvim`
 
+## External Tools
+
+LSP servers, linters, and formatters are required. Quick install with mise:
+
+```sh
+# LSP servers
+mise use -g npm:vscode-langservers-extracted npm:typescript-language-server \
+    npm:pyright npm:yaml-language-server npm:bash-language-server \
+    npm:dockerfile-language-server-nodejs npm:@microsoft/compose-language-service
+mise use -g go:golang.org/x/tools/gopls cargo:taplo-cli
+brew install lua-language-server hashicorp/tap/terraform-ls
+
+# Linters and formatters
+mise use -g npm:prettier npm:@fsouza/prettierd npm:oxlint npm:stylelint
+mise use -g cargo:selene cargo:stylua cargo:typos-cli
+brew install shellcheck shfmt
+```
+
+See `:h kyleking-neovim` for the complete list.
+
 ## Documentation
 
 Plugin usage guides are available via `:h kyleking-neovim` within nvim.
@@ -95,15 +115,5 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
     -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" \
     -c "qall!"
 ```
-
-### Commands
-
-| Command                          | Keybind      | Speed        |
-| -------------------------------- | ------------ | ------------ |
-| `:RunTestsParallel`              | `<leader>tp` | ~6-8s (7-8x) |
-| `:RunAllTests`                   | `<leader>ta` | ~20s (2x)    |
-| `:RunFailedTests`                | `<leader>tf` | Variable     |
-| `:RunTestsRandom [seed]`         | `<leader>tr` | ~20s         |
-| `:RunTestsParallelRandom [seed]` | -            | ~6-8s        |
 
 See `:h kyleking-neovim-testing` for complete documentation.

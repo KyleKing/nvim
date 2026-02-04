@@ -25,7 +25,7 @@ end)
 
 later(function()
     add({
-        source = "https://gitlab.com/itaranto/preview.nvim",
+        source = "https://gitlab.com/itaranto/preview.nvim.git",
         depends = { "aklt/plantuml-syntax" }, -- Required for plantuml filetype
     })
     -- Adapted from: https://github.com/ariefra/ar.nvim/blob/1444607e70a6639c68271e38603008f06859c5ae/lua/base/preview.lua

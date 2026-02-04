@@ -1,0 +1,66 @@
+--- Startup times for process: Primary (or UI client) ---
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.000  000.000: --- NVIM STARTING ---
+000.045  000.044: event init
+000.347  000.302: early init
+000.558  000.211: locale set
+000.578  000.020: init first window
+000.877  000.299: inits 1
+000.885  000.008: window checked
+000.888  000.003: parsing arguments
+001.344  000.022  000.022: require('vim.shared')
+001.390  000.019  000.019: require('vim.inspect')
+001.412  000.017  000.017: require('vim._options')
+001.413  000.067  000.031: require('vim._editor')
+001.414  000.106  000.017: require('vim._init_packages')
+001.415  000.421: init lua interpreter
+002.753  001.338: expanding arguments
+002.762  000.009: inits 2
+002.917  000.154: init highlight
+002.929  000.012: clear screen
+003.006  000.007  000.007: require('vim.keymap')
+003.576  000.107  000.107: sourcing nvim_exec2()
+003.738  000.807  000.693: require('vim._defaults')
+003.739  000.003: init default mappings & autocommands
+004.031  000.030  000.030: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/ftplugin.vim
+004.087  000.016  000.016: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/indent.vim
+004.091  000.306: sourcing vimrc file(s)
+004.215  000.013  000.013: sourcing nvim_exec2() called at /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/filetype.lua:0
+004.217  000.085  000.072: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/filetype.lua
+004.348  000.041  000.041: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/syntax/synload.vim
+004.403  000.141  000.100: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/syntax/syntax.vim
+005.072  000.094  000.094: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/gzip.vim
+005.498  000.092  000.092: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/pack/dist/opt/matchit/plugin/matchit.vim
+005.519  000.414  000.322: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/matchit.vim
+005.626  000.074  000.074: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/matchparen.vim
+006.071  000.119  000.119: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/pack/dist/opt/netrw/plugin/netrwPlugin.vim
+006.092  000.431  000.312: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/netrwPlugin.vim
+006.156  000.025  000.025: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/rplugin.vim
+006.238  000.046  000.046: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/shada.vim
+006.289  000.009  000.009: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/spellfile.vim
+006.371  000.043  000.043: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/tarPlugin.vim
+006.419  000.009  000.009: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/tutor.vim
+006.519  000.062  000.062: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/zipPlugin.vim
+006.607  000.047  000.047: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/editorconfig.lua
+006.712  000.066  000.066: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/man.lua
+006.823  000.071  000.071: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/osc52.lua
+006.895  000.033  000.033: sourcing /opt/homebrew/Cellar/neovim/0.11.6/share/nvim/runtime/plugin/tohtml.lua
+006.914  001.173: loading rtp plugins
+006.992  000.077: loading packages
+007.168  000.176: loading after plugins
+007.174  000.006: inits 3
+007.177  000.003: reading ShaDa
+008.040  000.803  000.803: require('vim.filetype')
+009.125  000.894  000.894: require('vim.filetype.detect')
+009.170  000.296: reading stdin
+009.184  000.014: opening buffers
+009.191  000.007: BufEnter autocommands
+009.192  000.001: editing files in windows
+009.255  000.063: VimEnter autocommands
+009.256  000.001: before starting main loop
+009.352  000.097: first screen update
+009.353  000.001: --- NVIM STARTED ---

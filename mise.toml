@@ -1,0 +1,98 @@
+# mise configuration for kyleking-neovim
+# Run tasks with: mise run <task>
+# List tasks with: mise tasks
+
+[tasks.check]
+depends = ["fmt", "test"]
+description = "Run all checks (format + test)"
+
+[tasks."doc:helptags"]
+description = "Generate helptags"
+run = 'nvim --headless -c "helptags doc" -c "qall!"'
+
+[tasks."doc:plugin"]
+description = "Generate plugin documentation from test fixtures"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"tests.docs.generator\").generate_all()" +qall'
+
+# Documentation tasks
+[tasks."doc:vimdoc"]
+description = "Generate vimdoc from markdown sources using panvimdoc"
+run = "prek run panvimdoc --all-files"
+
+[tasks."fixture:profile"]
+description = "Profile fixture performance"
+run = 'PROFILE_TESTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
+
+# Fixture testing tasks
+[tasks."fixture:test"]
+description = "Run all fixture tests"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
+
+[tasks."fixture:update"]
+description = "Update snapshots (creates new, updates changed, prunes stale)"
+run = 'UPDATE_SNAPSHOTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
+
+[tasks.fmt]
+description = "Run all pre-commit hooks (stylua, selene, prettier, mdformat, etc.)"
+run = "prek run --all-files"
+
+[tasks."fmt:mdformat"]
+description = "Run only mdformat"
+run = "prek run mdformat --all-files"
+
+[tasks."fmt:prettier"]
+description = "Run only Prettier formatter"
+run = "prek run prettier --all-files"
+
+[tasks."fmt:selene"]
+description = "Run only Selene linter"
+run = "prek run selene --all-files"
+
+[tasks."fmt:stylua"]
+description = "Run only StyLua formatter"
+run = "prek run stylua-system --all-files"
+
+# Utility tasks
+[tasks.measure]
+description = "Measure nvim startup time"
+run = "./scripts/measure_nvim.sh"
+
+# Test tasks
+[tasks.test]
+description = "Run CI tests (no external tool dependencies, fast ~3-5 seconds)"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_ci_tests()" -c "qall!"'
+
+[tasks."test:all"]
+description = "Run all tests sequentially (fallback, ~20 seconds)"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"'
+
+[tasks."test:coverage"]
+description = "Run tests with coverage tracking (custom modules)"
+run = "./scripts/run_tests_with_coverage.sh custom"
+
+[tasks."test:coverage:all"]
+description = "Run all tests with coverage tracking"
+run = "./scripts/run_tests_with_coverage.sh all"
+
+[tasks."test:coverage:report"]
+description = "View coverage report"
+run = "cat .luacov.report.out"
+
+[tasks."test:file"]
+description = "Run a single test file (usage: mise run test:file FILE=<path>)"
+run = '''
+if [ -z "${FILE:-}" ]; then
+  echo "Error: Please provide a test file path"
+  echo "Usage: mise run test:file FILE=lua/tests/custom/constants_spec.lua"
+  exit 1
+fi
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"${FILE}\")" -c "qall!"
+'''
+
+[tasks."test:parallel"]
+description = "Run all tests with parallel workers (recommended, ~6-8 seconds)"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_tests_parallel()" -c "sleep 10" -c "qall!"'
+
+[tasks."test:random"]
+description = "Run tests in random order to detect dependencies"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_all_tests(false, true, 12345)" -c "qall!"'

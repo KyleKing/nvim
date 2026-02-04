@@ -19,6 +19,64 @@ related plugins by functionality.
 - `later()` for everything else (deferred loading)
 - Plugin keymaps live in their respective `deps/*.lua` file
 
+## External Tools
+
+This config requires external LSP servers, linters, and formatters. Install
+with mise or your preferred package manager.
+
+### LSP Servers
+
+    # npm-based servers
+    mise use -g npm:bash-language-server
+    mise use -g npm:dockerfile-language-server-nodejs
+    mise use -g npm:pyright
+    mise use -g npm:typescript
+    mise use -g npm:typescript-language-server
+    mise use -g npm:vscode-langservers-extracted  # cssls, html, jsonls
+    mise use -g npm:yaml-language-server
+    mise use -g npm:@microsoft/compose-language-service
+
+    # Other package managers
+    mise use -g go:golang.org/x/tools/gopls
+    mise use -g cargo:taplo-cli  # TOML
+    brew install hashicorp/tap/terraform-ls
+    brew install lua-language-server
+
+### Linters
+
+    # npm
+    mise use -g npm:oxlint
+    mise use -g npm:stylelint
+
+    # pip/uv (or use project-local)
+    uv tool install ruff
+    uv tool install yamllint
+
+    # Other
+    mise use -g cargo:selene  # Lua
+    brew install shellcheck
+
+### Formatters
+
+    # npm
+    mise use -g npm:prettier
+    mise use -g npm:@fsouza/prettierd
+
+    # pip/uv
+    uv tool install beautysh
+    uv tool install mdformat
+
+    # go
+    mise use -g go:github.com/golangci/golangci-lint/cmd/golangci-lint
+    mise use -g go:github.com/segmentio/golines
+
+    # Other
+    mise use -g cargo:stylua
+    mise use -g cargo:typos-cli
+    brew install shfmt
+
+Source: `lua/kyleking/deps/lsp.lua`, `lua/kyleking/deps/formatting.lua`
+
 ## Directory Layout
 
     lua/kyleking/core/      Core settings (options, keymaps, autocmds, lsp)

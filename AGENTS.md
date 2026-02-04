@@ -2,6 +2,24 @@
 
 ## Commands
 
+### Task runner (mise)
+
+This project uses [mise](https://mise.jdx.dev/) for task management. List all available tasks:
+
+```bash
+mise tasks  # List all available tasks with descriptions
+mise run <task>  # Run a specific task
+```
+
+Common tasks:
+
+- `mise run fmt` - Run all pre-commit hooks (linting + formatting)
+- `mise run test` - Run CI tests (fast, no external dependencies)
+- `mise run check` - Run all checks (format + test)
+- `mise run doc:vimdoc` - Generate vimdoc from markdown sources
+
+See `.mise.toml` for all available tasks or run `mise tasks`.
+
 ### Documentation generation
 
 **IMPORTANT**: Never edit `doc/kyleking-neovim.txt` directly. It is auto-generated.
@@ -11,7 +29,8 @@ The vimdoc help file is generated from markdown sources using panvimdoc:
 ```bash
 # Edit source files in doc/src/*.md
 # Then regenerate vimdoc:
-prek run panvimdoc --all-files
+mise run doc:vimdoc
+# Or directly: prek run panvimdoc --all-files
 
 # The vimdoc is also regenerated automatically by pre-commit hooks
 ```
@@ -22,43 +41,42 @@ prek run panvimdoc --all-files
 - `doc/src/config.md` - Configuration, commands, testing
 - `doc/src/plugins.md` - Plugin guides
 - `doc/src/vim-essentials.md` - Vim fundamentals
-- `doc/src/notes.md` - Learning notes
 
 **Generated output**: `doc/kyleking-neovim.txt` (accessible via `:h kyleking-neovim`)
 
 ### Linting and formatting
 
 ```bash
-prek run --all-files          # Run all pre-commit hooks (stylua, selene, prettier, mdformat, etc.)
-prek run stylua --all-files   # Run only StyLua
+# Using mise (recommended):
+mise run fmt              # Run all pre-commit hooks (stylua, selene, prettier, mdformat, etc.)
+mise run fmt:stylua       # Run only StyLua
+mise run fmt:selene       # Run only Selene linter
+
+# Or directly with prek:
+prek run --all-files          # Run all pre-commit hooks
+prek run stylua-system --all-files   # Run only StyLua
 prek run selene --all-files   # Run only Selene linter
 ```
 
 ### Running tests
 
 ```bash
-# Single test file (fastest, ~1-2 seconds)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" -c "qall!"
-
-# CI tests - no external tool dependencies (fast, ~3-5 seconds)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_ci_tests()" -c "qall!"
-
-# All tests - parallel workers (recommended, ~6-8 seconds, requires stylua/ruff/etc.)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" -c "sleep 10" -c "qall!"
-
-# All tests - sequential (fallback, ~20 seconds)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"
-
-# Random order - detect test dependencies (useful for finding state leakage)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" -c "qall!"
+# Using mise (recommended):
+mise run test                              # CI tests - no external tool dependencies (fast, ~3-5 seconds)
+mise run test:all                          # All tests sequential (~20 seconds)
+mise run test:parallel                     # All tests parallel (~6-8 seconds, requires stylua/ruff/etc.)
+mise run test:random                       # Random order - detect test dependencies
+FILE=lua/tests/custom/constants_spec.lua mise run test:file  # Single test file
 
 # Coverage tracking (requires luacov: luarocks install luacov)
-./scripts/run_tests_with_coverage.sh custom  # Custom modules only (fast)
-./scripts/run_tests_with_coverage.sh all     # All tests with coverage
-./scripts/run_tests_with_coverage.sh lua/tests/custom/ui_spec.lua  # Specific file
+mise run test:coverage                     # Custom modules only (fast)
+mise run test:coverage:all                 # All tests with coverage
+mise run test:coverage:report              # View coverage report
 
-# View coverage report
-cat .luacov.report.out
+# Or run directly:
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_ci_tests()" -c "qall!"
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"
+MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" -c "sleep 10" -c "qall!"
 ```
 
 **Interactive commands** (only when cwd is config directory):
@@ -77,20 +95,16 @@ cat .luacov.report.out
 Plugin documentation is auto-generated from test fixtures in `lua/tests/docs/`. Each fixture defines both behavioral tests and the documentation for that plugin.
 
 ```bash
-# Run all fixture tests
+# Using mise (recommended):
+mise run fixture:test          # Run all fixture tests
+mise run fixture:update        # Update snapshots (creates new, updates changed, prunes stale)
+mise run fixture:profile       # Profile fixture performance (shows timing per fixture/grammar/test)
+mise run doc:plugin            # Generate documentation (auto-runs in pre-commit)
+
+# Or run directly:
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
-
-# Run single fixture
 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.runner').run_fixture('lua/tests/docs/surround.lua')" -c "qall!"
-
-# Update snapshots (creates new, updates changed, prunes stale)
 UPDATE_SNAPSHOTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
-
-# Profile fixture performance (shows timing per fixture/grammar/test)
-PROFILE_TESTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
-
-# Generate documentation (auto-runs in pre-commit)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.generator').generate_all()" +qall
 ```
 
 **Hybrid testing approach**:
@@ -102,7 +116,53 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.generator')
 
 See `ACTUALLY_GOOD_TESTS.md` for fixture schema and architecture.
 
-See `REGRESSION_TEST_GUIDE.md` for quick reference on adding tests for bugs.
+### Adding regression tests
+
+When bugs are discovered, add tests before fixing (TDD approach):
+
+**Custom utility bugs** (`lua/tests/custom/*_spec.lua`):
+
+```lua
+T["function_name"]["reproduces bug #123"] = function()
+    local result = module.function_name("edge case input")
+    MiniTest.expect.equality(result, "expected output")
+end
+```
+
+**Plugin keybinding bugs** (add to `lua/tests/docs/<plugin>.lua` fixture or `lua/tests/plugins/*_spec.lua`):
+
+```lua
+-- Simple keys: add to fixture
+{
+    name = "reproduces bug #456",
+    before = { "content", "before" },
+    cursor = { 1, 0 },
+    keys = "keybinding",
+    expect = { lines = { "expected", "output" } },
+}
+
+-- Complex keys: use API calls
+T["plugin_command"]["reproduces bug #456"] = function()
+    local bufnr = helpers.create_test_buffer({ "original" }, "lua")
+    require("plugin").command()
+    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+    MiniTest.expect.equality(lines, { "expected" })
+    helpers.delete_buffer(bufnr)
+end
+```
+
+**LSP/formatting/linting bugs** (`lua/tests/integration/*_spec.lua`):
+
+```lua
+T["lsp_feature"]["reproduces bug #789"] = function()
+    local bufnr = helpers.create_test_buffer({ "code" }, "python")
+    vim.wait(2000, function()
+        return #vim.lsp.get_clients({ bufnr = bufnr }) > 0
+    end)
+    MiniTest.expect.equality(#vim.lsp.get_clients({ bufnr = bufnr }) > 0, true)
+    helpers.delete_buffer(bufnr)
+end
+```
 
 ### Startup validation
 

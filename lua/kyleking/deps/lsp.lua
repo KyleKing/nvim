@@ -126,10 +126,15 @@ later(function()
 
     vim.lsp.enable({
         "bashls",
+        "cssls",
+        "docker_compose_language_service",
+        "dockerls",
         "gopls",
+        "html",
         "jsonls",
         "lua_ls",
         "pyright",
+        "taplo",
         "terraformls",
         "ts_ls",
         "yamlls",

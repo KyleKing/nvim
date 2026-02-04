@@ -63,14 +63,34 @@ T["LSP navigation"]["navigation features work"] = function()
         -- Test 2: Find references
         vim.api.nvim_win_set_cursor(0, {5, 6}) -- Position on my_var definition
         vim.lsp.buf.references()
-        vim.wait(200)
-        table.insert(successes, "references")
+        vim.wait(1000)
+
+        local qf = vim.fn.getqflist()
+        if #qf >= 2 then
+            table.insert(successes, "references (found " .. #qf .. " refs)")
+        else
+            table.insert(warnings, "references: expected >=2, got " .. #qf)
+        end
 
         -- Test 3: Hover
         vim.api.nvim_win_set_cursor(0, {10, 4}) -- Position on vim.fn
         vim.lsp.buf.hover()
-        vim.wait(200)
-        table.insert(successes, "hover")
+        vim.wait(500)
+
+        local hover_found = false
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            local buf = vim.api.nvim_win_get_buf(win)
+            if vim.bo[buf].filetype == "markdown" then
+                hover_found = true
+                break
+            end
+        end
+
+        if hover_found then
+            table.insert(successes, "hover (window opened)")
+        else
+            table.insert(warnings, "hover: window not found")
+        end
 
         vim.fn.delete(tmpfile)
 
