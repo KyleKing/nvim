@@ -51,7 +51,17 @@ if not is_temp_session then
             return name ~= "" and "󱧼 " .. name or ""
         end
 
-        -- PLANNED: Add lint progress indicator when nvim-lint tracking is implemented (lsp.lua:94-95)
+        -- Lint progress indicator
+        local function lint_section()
+            local ok, lint = pcall(require, "lint")
+            if not ok then return "" end
+
+            local running = lint.get_running(0)
+            if #running == 0 then return "" end
+
+            -- Show running linter count
+            return "󱉶 " .. #running
+        end
 
         MiniStatusline.setup({
             content = {
@@ -60,6 +70,7 @@ if not is_temp_session then
                     local git = MiniStatusline.section_git({ trunc_width = 75 })
                     local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
                     local workspace = workspace_section()
+                    local lint_info = lint_section()
 
                     -- Compact filename: just tail, relative to project root when possible
                     local filename_section = function()
@@ -90,11 +101,12 @@ if not is_temp_session then
                     local filename = filename_section()
                     local location = MiniStatusline.section_location({ trunc_width = 75 })
 
-                    -- Combine devinfo: git, diagnostics, workspace
+                    -- Combine devinfo: git, diagnostics, workspace, lint
                     local devinfo_parts = {}
                     if git ~= "" then table.insert(devinfo_parts, git) end
                     if diagnostics ~= "" then table.insert(devinfo_parts, diagnostics) end
                     if workspace ~= "" then table.insert(devinfo_parts, workspace) end
+                    if lint_info ~= "" then table.insert(devinfo_parts, lint_info) end
                     local devinfo = table.concat(devinfo_parts, " ")
 
                     return MiniStatusline.combine_groups({
