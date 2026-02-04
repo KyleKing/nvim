@@ -112,7 +112,7 @@ repos:
       - id: lua-diagnostics
         name: Lua LSP Diagnostics
         description: Check for Lua/Neovim API deprecations and errors using LSP
-        entry: bash -c 'cd ~/.config/nvim && MINI_DEPS_LATER_AS_NOW=1 nvim --headless +"lua dofile(\"scripts/check-lua-diagnostics.lua\")" "$@"' --
+        entry: bash -c 'cd ~/.config/nvim && nvim --headless --clean +"lua dofile(\"scripts/check-lua-diagnostics-minimal.lua\")" "$@"' --
         language: system
         types: [lua]
         pass_filenames: true
