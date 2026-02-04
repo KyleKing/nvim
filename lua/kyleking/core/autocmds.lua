@@ -99,3 +99,58 @@ create_autocmd("ColorScheme", {
         end
     end,
 })
+
+-- Resize floating windows on nvim window resize
+create_autocmd("VimResized", {
+    group = augroup,
+    callback = function()
+        local ui = require("kyleking.utils.ui")
+        local constants = require("kyleking.utils.constants")
+
+        -- Resize tracked TUI terminal floating windows
+        local term_module = require("kyleking.deps.terminal-integration")
+        for _, term in pairs(term_module.tui_terminals) do
+            if term.winid and vim.api.nvim_win_is_valid(term.winid) then
+                local win_config = vim.api.nvim_win_get_config(term.winid)
+                if win_config.relative ~= "" then
+                    local new_config = ui.create_centered_window({
+                        ratio = constants.WINDOW.LARGE,
+                        relative = "editor",
+                        style = "minimal",
+                    })
+                    vim.api.nvim_win_set_config(term.winid, new_config)
+                end
+            end
+        end
+
+        -- Resize other centered floating windows (test runner, etc.)
+        for _, winid in ipairs(vim.api.nvim_list_wins()) do
+            if vim.api.nvim_win_is_valid(winid) then
+                local win_config = vim.api.nvim_win_get_config(winid)
+                -- Check if it's a centered floating window (relative to editor, style minimal)
+                if win_config.relative == "editor" and win_config.style == "minimal" then
+                    -- Skip if it's already a tracked TUI terminal (handled above)
+                    local is_tui_terminal = false
+                    for _, term in pairs(term_module.tui_terminals) do
+                        if term.winid == winid then
+                            is_tui_terminal = true
+                            break
+                        end
+                    end
+
+                    if not is_tui_terminal then
+                        -- Determine ratio from current dimensions relative to screen
+                        local current_ratio =
+                            math.min(win_config.width / vim.o.columns, win_config.height / vim.o.lines)
+                        local new_config = ui.create_centered_window({
+                            ratio = current_ratio,
+                            relative = "editor",
+                            style = "minimal",
+                        })
+                        vim.api.nvim_win_set_config(winid, new_config)
+                    end
+                end
+            end
+        end
+    end,
+})
