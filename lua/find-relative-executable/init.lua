@@ -121,6 +121,44 @@ function M.clear_cache()
     vcs_cache = {}
 end
 
+-- Autocmd-based cache invalidation (hybrid TTL + event-driven approach)
+local cache_augroup = vim.api.nvim_create_augroup("project_tools_cache", { clear = true })
+
+-- Invalidate on marker file writes (project structure may have changed)
+vim.api.nvim_create_autocmd("BufWritePost", {
+    group = cache_augroup,
+    callback = function(args)
+        local filename = vim.fn.fnamemodify(args.file, ":t")
+        local marker_files = {
+            "pyproject.toml",
+            "package.json",
+            "go.mod",
+            "Cargo.toml",
+            "Gemfile",
+            ".terraform",
+            "selene.toml",
+        }
+        for _, marker in ipairs(marker_files) do
+            if filename == marker then
+                M.clear_cache()
+                return
+            end
+        end
+    end,
+})
+
+-- Invalidate on directory changes (workspace navigation)
+vim.api.nvim_create_autocmd("DirChanged", {
+    group = cache_augroup,
+    callback = function() M.clear_cache() end,
+})
+
+-- Invalidate on VimResume (external changes may have occurred)
+vim.api.nvim_create_autocmd("VimResume", {
+    group = cache_augroup,
+    callback = function() M.clear_cache() end,
+})
+
 -- Check if cache entry is still valid
 local function _is_cache_valid(entry)
     if not entry then return false end
