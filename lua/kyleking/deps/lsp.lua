@@ -91,8 +91,8 @@ later(function()
         end,
     })
 
-    -- PLANNED: track which linters are being run with:
-    --  https://github.com/mfussenegger/nvim-lint#get-the-current-running-linters-for-your-buffer
+    -- NOTE: Linter progress is tracked in statusline (bars-and-lines.lua) using lint.get_running()
+    -- See: https://github.com/mfussenegger/nvim-lint#get-the-current-running-linters-for-your-buffer
 
     vim.keymap.set(
         "n",
