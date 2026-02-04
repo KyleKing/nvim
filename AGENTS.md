@@ -249,11 +249,26 @@ LSP configuration is split across three locations:
     - To add new LSP: create `lsp/<server>.lua` following existing patterns
 1. **Plugin integration** (`lua/kyleking/deps/lsp.lua`): Linters (nvim-lint), formatting (conform.nvim), signature help, plugin-dependent servers (jsonls/yamlls with SchemaStore)
 
-### Tool resolution (find-relative-executable)
+### Tool resolution and workspace detection (project-tools)
 
-Resolves project-local binaries (`.venv/bin/`, `node_modules/.bin/`) for linters/formatters. Walks upward from buffer, caches by project root, falls back to `$PATH`.
+**Module**: `find-relative-executable` (to be renamed to `project-tools`)
 
-API: `resolve`, `command_for`, `cmd_for`, `clear_cache`
+Provides unified project/workspace detection and tool resolution:
+
+**Workspace detection**:
+
+- `get_project_root(buf_path, ecosystem)` - Find project root for specific ecosystem (python, node, go, rust, ruby, terraform)
+- `get_current_project_root()` - Auto-detect project root for current buffer
+- `lsp_root_for(ecosystems_list)` - Generate LSP `root_dir` function
+
+**Tool resolution**:
+
+- `resolve(tool_name, buf_path)` - Resolve project-local binary (e.g., `.venv/bin/ruff`, `node_modules/.bin/prettier`)
+- `command_for(tool_name)` - Generate command function for conform.nvim
+- `cmd_for(tool_name)` - Generate command function for nvim-lint
+- `clear_cache()` - Clear resolution cache
+
+Walks upward from buffer to find marker files, caches by project root, falls back to `$PATH`.
 
 ### Key conventions
 

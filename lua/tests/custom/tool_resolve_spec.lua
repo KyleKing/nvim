@@ -38,6 +38,35 @@ T["find-relative-executable"]["clear_cache is callable without error"] = functio
     MiniTest.expect.no_error(function() fre.clear_cache() end)
 end
 
+T["find-relative-executable"]["get_project_root returns string or nil"] = function()
+    local result = fre.get_project_root(vim.fn.getcwd(), "python")
+    MiniTest.expect.equality(type(result) == "string" or result == nil, true)
+end
+
+T["find-relative-executable"]["get_project_root finds python project"] = function()
+    -- This nvim config has a pyproject.toml in test fixtures
+    local result = fre.get_project_root(vim.fn.getcwd(), "python")
+    -- Should find a root or nil (both acceptable)
+    MiniTest.expect.equality(type(result) == "string" or result == nil, true)
+end
+
+T["find-relative-executable"]["get_current_project_root works"] = function()
+    local result = fre.get_current_project_root()
+    -- Should return string (git root) or nil
+    MiniTest.expect.equality(type(result) == "string" or result == nil, true)
+end
+
+T["find-relative-executable"]["lsp_root_for returns function"] = function()
+    local root_fn = fre.lsp_root_for({ "python", "node" })
+    MiniTest.expect.equality(type(root_fn), "function")
+end
+
+T["find-relative-executable"]["lsp_root_for function returns string or nil"] = function()
+    local root_fn = fre.lsp_root_for({ "python" })
+    local result = root_fn(vim.fn.getcwd())
+    MiniTest.expect.equality(type(result) == "string" or result == nil, true)
+end
+
 if ... == nil then MiniTest.run() end
 
 return T

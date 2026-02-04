@@ -38,6 +38,20 @@ local is_temp_session = utils.detect_temp_session()
 if not is_temp_session then
     later(function()
         local MiniStatusline = require("mini.statusline")
+        local project_tools = require("find-relative-executable")
+
+        -- Workspace/project root display
+        local function workspace_section()
+            -- Try LSP client root first (most accurate for current buffer)
+            local clients = vim.lsp.get_clients({ bufnr = 0 })
+            local root = clients[1] and clients[1].root_dir or project_tools.get_current_project_root()
+            if not root then return "" end
+
+            local name = vim.fn.fnamemodify(root, ":t")
+            return name ~= "" and "󱧼 " .. name or ""
+        end
+
+        -- PLANNED: Add lint progress indicator when nvim-lint tracking is implemented (lsp.lua:94-95)
 
         MiniStatusline.setup({
             content = {
@@ -45,54 +59,47 @@ if not is_temp_session then
                     local mode, mode_hl = MiniStatusline.section_mode({ trunc_width = 120 })
                     local git = MiniStatusline.section_git({ trunc_width = 75 })
                     local diagnostics = MiniStatusline.section_diagnostics({ trunc_width = 75 })
+                    local workspace = workspace_section()
 
-                    -- Custom filename section with dynamic width calculation
+                    -- Compact filename: just tail, relative to project root when possible
                     local filename_section = function()
                         local path = vim.fn.expand("%:p")
                         if path == "" then return "[No Name]" end
 
-                        local filename = vim.fn.expand("%:t")
-                        local dir = vim.fn.expand("%:h")
+                        local root = project_tools.get_current_project_root()
+                        local display_path
 
-                        -- Calculate available space
-                        local constants = require("kyleking.utils.constants")
-                        local mode_width = vim.fn.strdisplaywidth(mode)
-                        local git_width = vim.fn.strdisplaywidth(git)
-                        local diag_width = vim.fn.strdisplaywidth(diagnostics)
-                        local available = vim.o.columns
-                            - (mode_width + git_width + diag_width + constants.CHAR_LIMIT.PATH_PADDING)
-
-                        -- Max width for path (reserve space for filename)
-                        local max_path =
-                            math.max(constants.CHAR_LIMIT.FILENAME_MIN, available - constants.CHAR_LIMIT.FILENAME_MIN)
-                        local full_path = dir .. "/" .. filename
-
-                        -- Truncate from left if too long
-                        if vim.fn.strdisplaywidth(full_path) > max_path then
-                            local dir_space = max_path
-                                - vim.fn.strdisplaywidth(filename)
-                                - constants.CHAR_LIMIT.TRUNCATION_INDICATOR
-                            if dir_space > 0 then
-                                local truncated_dir = string.sub(dir, -dir_space)
-                                return ".../" .. truncated_dir .. "/" .. filename
-                            else
-                                return ".../" .. filename
-                            end
+                        if root and vim.startswith(path, root) then
+                            -- Show path relative to project root
+                            display_path = path:sub(#root + 2) -- +2 to skip leading slash
+                        else
+                            -- Fallback to tail + parent dir
+                            local filename = vim.fn.expand("%:t")
+                            local parent = vim.fn.fnamemodify(vim.fn.expand("%:h"), ":t")
+                            display_path = parent ~= "." and parent .. "/" .. filename or filename
                         end
 
-                        -- File status indicators
-                        local modified = vim.bo.modified and " [+]" or ""
-                        local readonly = vim.bo.readonly and " []" or ""
+                        -- File status indicators (compact)
+                        local modified = vim.bo.modified and "+" or ""
+                        local readonly = vim.bo.readonly and "" or ""
+                        local status = (modified ~= "" or readonly ~= "") and " [" .. modified .. readonly .. "]" or ""
 
-                        return full_path .. modified .. readonly
+                        return display_path .. status
                     end
 
                     local filename = filename_section()
                     local location = MiniStatusline.section_location({ trunc_width = 75 })
 
+                    -- Combine devinfo: git, diagnostics, workspace
+                    local devinfo_parts = {}
+                    if git ~= "" then table.insert(devinfo_parts, git) end
+                    if diagnostics ~= "" then table.insert(devinfo_parts, diagnostics) end
+                    if workspace ~= "" then table.insert(devinfo_parts, workspace) end
+                    local devinfo = table.concat(devinfo_parts, " ")
+
                     return MiniStatusline.combine_groups({
                         { hl = mode_hl, strings = { mode } },
-                        { hl = "MiniStatuslineDevinfo", strings = { git, diagnostics } },
+                        { hl = "MiniStatuslineDevinfo", strings = { devinfo } },
                         "%<", -- Mark truncation point
                         { hl = "MiniStatuslineFilename", strings = { filename } },
                         "%=", -- End left alignment
