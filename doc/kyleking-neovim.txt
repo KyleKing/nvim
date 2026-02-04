@@ -27,7 +27,13 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Keymaps                                          |kyleking-neovim-keymaps|
   - Custom Commands                          |kyleking-neovim-custom-commands|
   - Testing                                          |kyleking-neovim-testing|
-2. Plugin Guides                               |kyleking-neovim-plugin-guides|
+2. Motion Models: Helix vs Vim with Flash.nvim|kyleking-neovim-motion-models:-helix-vs-vim-with-flash.nvim|
+  - Overview                                        |kyleking-neovim-overview|
+  - The Two Models                            |kyleking-neovim-the-two-models|
+  - Trade-offs                                    |kyleking-neovim-trade-offs|
+  - Current Configuration: Hybrid Approach|kyleking-neovim-current-configuration:-hybrid-approach|
+  - Recommendation                            |kyleking-neovim-recommendation|
+3. Plugin Guides                               |kyleking-neovim-plugin-guides|
   - Text Objects (mini.ai)            |kyleking-neovim-text-objects-(mini.ai)|
   - See also: MiniAi, text-objects|kyleking-neovim-see-also:-miniai,-text-objects|
   - Buffer Jump Navigation (bufjump.nvim)|kyleking-neovim-buffer-jump-navigation-(bufjump.nvim)|
@@ -64,10 +70,14 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - See also: MiniOperators          |kyleking-neovim-see-also:-minioperators|
   - Fuzzy Finding (mini.pick)      |kyleking-neovim-fuzzy-finding-(mini.pick)|
   - See also: MiniPick, MiniExtra|kyleking-neovim-see-also:-minipick,-miniextra|
+  - Snippets (mini.snippets)        |kyleking-neovim-snippets-(mini.snippets)|
+  - See also: mini.snippets, vim.snippet|kyleking-neovim-see-also:-mini.snippets,-vim.snippet|
   - Surround (mini.surround)        |kyleking-neovim-surround-(mini.surround)|
   - See also: MiniSurround            |kyleking-neovim-see-also:-minisurround|
   - Terminal Integration                |kyleking-neovim-terminal-integration|
   - Source: lua/kyleking/deps/terminal-integration.lua|kyleking-neovim-source:-lua/kyleking/deps/terminal-integration.lua|
+  - Treesitter Text Objects          |kyleking-neovim-treesitter-text-objects|
+  - See also: nvim-treesitter-textobjects|kyleking-neovim-see-also:-nvim-treesitter-textobjects|
   - Utilities                                      |kyleking-neovim-utilities|
   - Source: lua/kyleking/deps/utility.lua|kyleking-neovim-source:-lua/kyleking/deps/utility.lua|
   - Native Vim Search                      |kyleking-neovim-native-vim-search|
@@ -716,7 +726,168 @@ See also: `MiniTest`, `TEST-PERFORMANCE-README.md`
 
 
 ==============================================================================
-2. Plugin Guides                               *kyleking-neovim-plugin-guides*
+2. Motion Models: Helix vs Vim with Flash.nvim*kyleking-neovim-motion-models:-helix-vs-vim-with-flash.nvim*
+
+
+OVERVIEW                                            *kyleking-neovim-overview*
+
+This document compares Helix’s select-then-act model with Vim’s
+action-target model enhanced by flash.nvim, and explains why the current
+configuration provides the best of both worlds.
+
+
+THE TWO MODELS                                *kyleking-neovim-the-two-models*
+
+
+HELIX: SELECT-THEN-ACT ~
+
+Helix uses a selection-first paradigm where you:
+
+1. **Select** what you want to change (visual selection becomes primary)
+2. **Act** on the selection with a command
+
+**Example workflow:**
+
+>
+    # Delete a function
+    1. Navigate to function: ]f
+    2. Select function: mf (select function text object)
+    3. Delete: d
+    
+    # Change text in quotes
+    1. Navigate near quotes: w w w
+    2. Select inside quotes: mi"
+    3. Change: c
+<
+
+**Key insight**Every operation starts with a selection, making the visual mode
+the primary interface. Commands act on whatever is selected.
+
+
+VIM: ACTION-TARGET (WITH FLASH.NVIM) ~
+
+Vim uses an action-first paradigm where you:
+
+1. **Specify action** (delete, change, yank, etc.)
+2. **Specify target** (motion, text object, or search)
+
+Flash.nvim enhances this by making the target specification instant and visual.
+
+**Example workflow:**
+
+>
+    # Delete a function
+    1. d<Alt-s>  (delete + flash jump)
+    2. Type function name characters
+    3. Select label to delete from cursor to that point
+       OR: d]m (delete to next method start via treesitter)
+       OR: daf (delete around function via mini.ai/treesitter)
+    
+    # Change text in quotes
+    1. ci"  (change inside quotes)
+       OR: c<Alt-s> then select quote position
+<
+
+**Key insight**Action and target are composed. You can combine any action
+(d/c/y/v) with any target (motion/text-object/flash-jump).
+
+
+TRADE-OFFS                                        *kyleking-neovim-trade-offs*
+
+  -------------------------------------------------------------------------------
+  Aspect            Helix Select-Then-Act       Vim Action-Target + Flash
+  ----------------- --------------------------- ---------------------------------
+  Visual feedback   Selection shown before      Flash labels show targets,
+                    action                      selection happens simultaneously
+                                                with action
+
+  Cognitive load    Lower - see before you act  Slightly higher - must visualize
+                                                result
+
+  Composability     Limited - commands work on  High - any action × any target
+                    selection                   
+
+  Efficiency        3 steps (select, refine,    2 steps (action+target) or 1
+                    act)                        (single motion)
+
+  Discoverability   Better - see what will      Requires understanding operators
+                    change                      
+
+  Precision         Requires correct selection  Can iterate with . or u
+                    first                       
+
+  Muscle memory     Differs from Vim/Kakoune    Builds on Vim fundamentals
+  -------------------------------------------------------------------------------
+
+CURRENT CONFIGURATION: HYBRID APPROACH*kyleking-neovim-current-configuration:-hybrid-approach*
+
+This config uses Vim’s action-target model as the foundation but incorporates
+Helix-inspired features:
+
+
+VIM FOUNDATION ~
+
+- **Operators**`d`, `c`, `y`, `v` compose with all targets
+- **Text objects**mini.ai provides extensive a/i text objects
+- **Motions**Standard Vim motions plus treesitter navigation
+- **Repeat**`.` repeats the last action+target combination
+
+
+HELIX-INSPIRED ENHANCEMENTS ~
+
+- **Flash.nvim** (`<Alt-s>`): Jump to visible locations instantly
+- **Flash Treesitter** (`<Alt-S>`): Select syntax nodes visually first
+- **Treesitter textobjects**Navigate code structure (]m, ]z, ]k)
+- **mini.clue**Show available operations and targets
+- **Extended text objects**mini.ai’s function calls, assignments, key-value pairs, numbers, etc.
+
+
+WHY THIS IS OPTIMAL ~
+
+1. **Best of both worlds**Use action-target for known operations (`ci"`, `daw`), use flash/treesitter-select for exploration
+2. **Composability preserved**All enhancements work with Vim operators
+3. **Efficiency**Quick operations are faster (ci” vs select-inside-quotes then delete)
+4. **Exploratory power**`<Alt-S>` provides Helix-like "explore then select" when needed
+5. **Ecosystem compatibility**Works with existing Vim plugins, workflows, and muscle memory
+
+
+EXAMPLE: WHEN TO USE EACH ~
+
+**Use direct action-target (Vim style):** - Known targets: `ci"`, `daw`, `yap`,
+`gUiw` - Simple motions: `d$`, `c2w`, `y5j` - Treesitter navigation: `]m`, `]z`
++ operators
+
+**Use flash-enhanced (exploratory):** - Distant targets: `d<Alt-s>` then jump
+to label - Visual selection: `<Alt-S>` to select syntax node, then `d`/`c`/`y`
+- Uncertain target: Flash to explore, then select
+
+**Use mini.ai text objects (semantic):** - Function calls: `dif` (delete inside
+function call) - Assignments: `cia` (change inside assignment) - Key-value
+pairs: `dak` (delete around key-value)
+
+
+RECOMMENDATION                                *kyleking-neovim-recommendation*
+
+**Keep the current flash.nvim + Vim model.** The configuration already
+provides:
+
+- Helix’s visual exploration through Flash Treesitter (`<Alt-S>`)
+- Helix’s code-aware navigation through treesitter textobjects
+- Vim’s composability and efficiency
+- Extensive text objects through mini.ai
+- Visual feedback through flash labels
+
+Switching to pure Helix-style select-then-act would **lose** -Operator
+composition (can’t create custom operators that work with all targets) -
+Repeat with `.` (fundamental to Vim efficiency) - Two-character operations like
+`ci"`, `daw` - Ecosystem compatibility
+
+The hybrid approach provides Helix’s discoverability and visual feedback
+while preserving Vim’s compositional power.
+
+
+==============================================================================
+3. Plugin Guides                               *kyleking-neovim-plugin-guides*
 
 
 TEXT OBJECTS (MINI.AI)                *kyleking-neovim-text-objects-(mini.ai)*
@@ -1508,6 +1679,38 @@ Source: `lua/kyleking/deps/fuzzy-finder.lua`
 SEE ALSO: MINIPICK, MINIEXTRA  *kyleking-neovim-see-also:-minipick,-miniextra*
 
 
+SNIPPETS (MINI.SNIPPETS)            *kyleking-neovim-snippets-(mini.snippets)*
+
+Snippet expansion and navigation with LSP integration.
+
+Operator grammar:
+
+>
+    <Tab>                Expand snippet or jump next
+    <S-Tab>              Jump to previous snippet position
+    <C-c>                Stop snippet session
+<
+
+`<Tab>` Expand snippet or jump to next position (insert mode)
+
+`<S-Tab>` Jump to previous snippet position (insert mode)
+
+`<C-c>` Stop snippet session (insert mode)
+
+LSP snippets automatically available through nvim 0.11+ completion.
+
+Tab behavior conditional on completion menu state (no conflicts).
+
+Custom snippets can be added to setup configuration.
+
+Snippet capability advertised in `lua/kyleking/core/lsp.lua`.
+
+Source: `lua/kyleking/deps/snippets.lua`
+
+
+SEE ALSO: MINI.SNIPPETS, VIM.SNIPPET*kyleking-neovim-see-also:-mini.snippets,-vim.snippet*
+
+
 SURROUND (MINI.SURROUND)            *kyleking-neovim-surround-(mini.surround)*
 
 Add, delete, find, and replace surrounding pairs.
@@ -1578,6 +1781,60 @@ resolved relative to the terminal’s working directory, not nvim’s cwd.
 
 
 SOURCE: LUA/KYLEKING/DEPS/TERMINAL-INTEGRATION.LUA*kyleking-neovim-source:-lua/kyleking/deps/terminal-integration.lua*
+
+
+TREESITTER TEXT OBJECTS              *kyleking-neovim-treesitter-text-objects*
+
+Navigate and manipulate code using treesitter-aware text objects.
+
+Operator grammar:
+
+>
+    ]m / [m              Navigate methods/functions
+    ]z / [z              Navigate arguments/parameters
+    ]k / [k              Navigate blocks
+    am / im              Select method/function text object
+    az / iz              Select argument text object
+    >M / <M              Swap functions
+<
+
+Keybindings remapped to avoid conflicts with nap.nvim:
+
+- nap.nvim uses: ]a (tabs), ]f (files), ]b (buffers)
+- treesitter uses: ]m (methods), ]z (arguments), ]k (blocks)
+
+**Movement** (normal mode):
+
+- `]m` / `[m` - Next/previous **m**ethod/function start
+- `]M` / `[M` - Next/previous **m**ethod/function end
+- `]z` / `[z` - Next/previous ar**z** (argument/parameter) start
+- `]Z` / `[Z` - Next/previous ar**z** (argument/parameter) end
+- `]k` / `[k` - Next/previous bloc**k** start
+- `]K` / `[K` - Next/previous bloc**k** end
+
+**Selection** (visual/operator-pending):
+
+- `am` / `im` - around/inside method/function
+- `az` / `iz` - around/inside argument
+- `ak` / `ik` - around/inside block
+- `ac` / `ic` - around/inside class
+- `a?` / `i?` - around/inside conditional
+- `ao` / `io` - around/inside loop
+
+**Swap** (normal mode):
+
+- `>M` / `<M` - Swap with next/previous function
+- `>Z` / `<Z` - Swap with next/previous argument
+- `>K` / `<K` - Swap with next/previous block
+
+Works with any language that has treesitter grammar installed.
+
+Automatically jumps forward to next text object (lookahead enabled).
+
+Source: `lua/kyleking/deps/syntax.lua`
+
+
+SEE ALSO: NVIM-TREESITTER-TEXTOBJECTS*kyleking-neovim-see-also:-nvim-treesitter-textobjects*
 
 
 UTILITIES                                          *kyleking-neovim-utilities*
