@@ -1,6 +1,5 @@
-- Better completions/omnifunc/etc.
-- Effective LSP Folding (and not, like in :healthcheck)?
 - Trouble/Quick Fix in ./irm
-- Tab Completions?
+- Better completions/omnifunc/etc. / Tab Completions?
+- Effective LSP Folding (and in :healthcheck)?
 - Builtin hlargs: https://github.com/m-demare/hlargs.nvim
 - Expand Spaghetti Code.nvim with trails/callgraphs (if not already?): https://github.com/nvim-mini/mini.nvim/discussions/1698

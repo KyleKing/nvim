@@ -1,3 +1,5 @@
+-- Test workspace_diagnostics module (split into submodules in lua/kyleking/utils/workspace_diagnostics/)
+-- All tests use the main module which re-exports from init.lua for backward compatibility
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 

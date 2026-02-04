@@ -2,7 +2,7 @@ return {
     title = "Workspace Diagnostics",
     see_also = { "diagnostic", "quickfix", "lsp" },
     desc = "Project-wide type checking, linting, and quickfix batch operations.",
-    source = "lua/kyleking/deps/lsp.lua, lua/kyleking/utils/workspace_diagnostics.lua",
+    source = "lua/kyleking/deps/lsp.lua, lua/kyleking/utils/workspace_diagnostics/",
 
     notes = {
         "**Workspace-wide type checking** (runs project-local tools across all projects):",

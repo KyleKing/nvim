@@ -147,3 +147,18 @@ later(function()
         },
     })
 end)
+
+later(function()
+    -- Smart sorting with treesitter awareness and indentation fallback
+    local sorting = require("kyleking.utils.sorting")
+    local K = vim.keymap.set
+
+    -- Visual selection sorting (gS in visual mode)
+    K("x", "gS", function() sorting.sort_visual() end, { desc = "Sort selection (smart)" })
+
+    -- Operator mode sorting (gSS for line, gS{motion} for motion)
+    K("n", "gS", function() sorting.sort_operator() end, { desc = "Sort operator (smart)" })
+
+    -- Sort entire file
+    K("n", "gSF", function() sorting.sort_file() end, { desc = "Sort file (smart)" })
+end)
