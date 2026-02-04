@@ -47,21 +47,14 @@ mise run doc:vimdoc
 ### Linting and formatting
 
 ```bash
-# Using mise (recommended):
 mise run fmt              # Run all pre-commit hooks (stylua, selene, prettier, mdformat, etc.)
 mise run fmt:stylua       # Run only StyLua
 mise run fmt:selene       # Run only Selene linter
-
-# Or directly with prek:
-prek run --all-files          # Run all pre-commit hooks
-prek run stylua-system --all-files   # Run only StyLua
-prek run selene --all-files   # Run only Selene linter
 ```
 
 ### Running tests
 
 ```bash
-# Using mise (recommended):
 mise run test                              # CI tests - no external tool dependencies (fast, ~3-5 seconds)
 mise run test:all                          # All tests sequential (~20 seconds)
 mise run test:parallel                     # All tests parallel (~6-8 seconds, requires stylua/ruff/etc.)
@@ -72,12 +65,9 @@ FILE=lua/tests/custom/constants_spec.lua mise run test:file  # Single test file
 mise run test:coverage                     # Custom modules only (fast)
 mise run test:coverage:all                 # All tests with coverage
 mise run test:coverage:report              # View coverage report
-
-# Or run directly:
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_ci_tests()" -c "qall!"
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" -c "sleep 10" -c "qall!"
 ```
+
+**Note**: All mise tasks can be run directly with nvim commands. See `.mise.toml` for command mappings.
 
 **Interactive commands** (only when cwd is config directory):
 
@@ -95,16 +85,10 @@ MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('kyleking.utils.test_ru
 Plugin documentation is auto-generated from test fixtures in `lua/tests/docs/`. Each fixture defines both behavioral tests and the documentation for that plugin.
 
 ```bash
-# Using mise (recommended):
 mise run fixture:test          # Run all fixture tests
 mise run fixture:update        # Update snapshots (creates new, updates changed, prunes stale)
 mise run fixture:profile       # Profile fixture performance (shows timing per fixture/grammar/test)
 mise run doc:plugin            # Generate documentation (auto-runs in pre-commit)
-
-# Or run directly:
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require('tests.docs.runner').run_fixture('lua/tests/docs/surround.lua')" -c "qall!"
-UPDATE_SNAPSHOTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file('lua/tests/docs/runner_spec.lua')" -c "qall!"
 ```
 
 **Hybrid testing approach**:
@@ -238,36 +222,21 @@ See `lua/tests/helpers.lua` for available test utilities (`nvim_interaction_test
 
 ### Test quality guidelines
 
-Tests should verify **behavior**, not **existence**. The subprocess smoke test (`smoke_spec.lua`) already catches plugin load failures.
+Tests verify **behavior**, not **existence**. The smoke test catches plugin load failures.
 
-**Do write tests that:**
+**Write tests that:**
 
-- Verify custom code produces expected output (Tier 1)
-- Verify plugin configuration produces expected behavior (Tier 2)
-- Test edge cases, error paths, and regressions
+- Verify custom code output (Tier 1)
+- Verify plugin configuration behavior (Tier 2)
+- Test edge cases, error paths, regressions
 
-**Do not write tests that only:**
+**Avoid tests that only:**
 
 - Check `is_plugin_loaded("X")` or `type(X.func) == "function"`
-- Verify a keymap exists without testing what it does
-- Spawn a subprocess, call `pcall(function() end)`, and check exit code 0
-- Assert `true == true` to unconditionally pass
+- Verify keymap existence without testing behavior
+- Assert trivial conditions
 
-When testing plugin configuration, prefer asserting config values or behavioral outcomes:
-
-```lua
--- Good: tests config value
-MiniTest.expect.equality(MiniAi.config.n_lines, 500)
-
--- Good: tests behavior
-vim.cmd("normal gcc")
-local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
-MiniTest.expect.equality(line:match("^%s*%-%-") ~= nil, true)
-
--- Bad: tests existence only
-MiniTest.expect.equality(helpers.is_plugin_loaded("mini.comment"), true)
-MiniTest.expect.equality(type(flash.jump), "function")
-```
+Prefer config values or behavioral outcomes over existence checks.
 
 ### LSP configuration (nvim 0.11+)
 
@@ -282,9 +251,9 @@ LSP configuration is split across three locations:
 
 ### Tool resolution (find-relative-executable)
 
-`lua/find-relative-executable/init.lua` resolves project-local binaries for linters/formatters. Walks upward from buffer to find `pyproject.toml` (-> `.venv/bin/`) or `package.json` (-> `node_modules/.bin/`), caches by project root, falls back to `$PATH`. Used in `deps/lsp.lua` and `deps/formatting.lua`.
+Resolves project-local binaries (`.venv/bin/`, `node_modules/.bin/`) for linters/formatters. Walks upward from buffer, caches by project root, falls back to `$PATH`.
 
-See `lua/find-relative-executable/init.lua` for API (`resolve`, `command_for`, `cmd_for`, `clear_cache`).
+API: `resolve`, `command_for`, `cmd_for`, `clear_cache`
 
 ### Key conventions
 
