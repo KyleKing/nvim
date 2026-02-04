@@ -49,6 +49,9 @@ end
 create_autocmd({ "VimEnter", "BufEnter" }, {
     group = augroup,
     callback = function()
+        -- Skip terminal buffers
+        if vim.bo.buftype == "terminal" then return end
+
         local utils = require("kyleking.utils")
         local is_temp_session, session_type, highlight_group = utils.detect_temp_session()
 
@@ -73,6 +76,9 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
 create_autocmd("ModeChanged", {
     group = augroup,
     callback = function()
+        -- Skip terminal buffers (handled by minimal statusline in mini.statusline)
+        if vim.bo.buftype == "terminal" then return end
+
         -- Only update if this is a temp session buffer
         if vim.b.temp_session_type and vim.b.temp_session_hl_group then
             local utils = require("kyleking.utils")

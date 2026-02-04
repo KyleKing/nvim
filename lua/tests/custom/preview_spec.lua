@@ -162,10 +162,32 @@ T["integration"]["works with real markdown file"] = function()
     local preview = require("kyleking.utils.preview")
     preview.setup()
 
-    -- This will attempt to open browser, which we can't test in headless
-    -- But we can verify the file operations don't error
+    -- Mock vim.fn.system to prevent actually opening browser
+    local original_system = vim.fn.system
+    local system_calls = {}
+    vim.fn.system = function(cmd)
+        table.insert(system_calls, cmd)
+        -- If it's a markdown conversion call, actually run it
+        if type(cmd) == "table" and (cmd[1] == "pandoc" or cmd[1]:match("python")) then return original_system(cmd) end
+        -- If it's an "open" command, just record it
+        return ""
+    end
+
     local ok = pcall(preview.preview)
     MiniTest.expect.equality(ok, true, "Should not error with real file")
+
+    -- Verify browser open was attempted
+    local had_open_call = false
+    for _, call in ipairs(system_calls) do
+        if type(call) == "table" and (call[1] == "open" or call[1] == "xdg-open" or call[1] == "start") then
+            had_open_call = true
+            break
+        end
+    end
+    MiniTest.expect.equality(had_open_call, true, "Should attempt to open browser")
+
+    -- Restore original function
+    vim.fn.system = original_system
 
     -- Cleanup
     vim.fn.delete(temp_file)

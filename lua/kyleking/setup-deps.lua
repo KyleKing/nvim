@@ -109,32 +109,9 @@ now(function()
             { desc = "Run fast tests (excludes subprocess-heavy tests, ~10-15s)" }
         )
 
-        -- Add keymaps to run tests
-        vim.keymap.set(
-            "n",
-            "<leader>ta",
-            function() test_runner.run_all_tests(false, false) end,
-            { desc = "Run all tests" }
-        )
+        -- Test keybindings: Only <leader>tf for re-running failures
+        -- For full test runs, use mise: `mise run test`, `mise run test:parallel`, etc.
         vim.keymap.set("n", "<leader>tf", function() test_runner.run_failed_tests() end, { desc = "Run failed tests" })
-        vim.keymap.set(
-            "n",
-            "<leader>tq",
-            function() test_runner.run_fast_tests() end,
-            { desc = "Run fast tests (quick)" }
-        )
-        vim.keymap.set(
-            "n",
-            "<leader>tp",
-            function() test_runner.run_tests_parallel(false) end,
-            { desc = "Run tests parallel" }
-        )
-        vim.keymap.set(
-            "n",
-            "<leader>tr",
-            function() test_runner.run_all_tests(false, true, os.time()) end,
-            { desc = "Run tests random" }
-        )
     end
 end)
 

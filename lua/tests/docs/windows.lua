@@ -35,7 +35,11 @@ return {
         "- `<C-w>x` - Exchange current window with next",
         "",
         "**Custom keybindings**:",
-        "- `<leader>wf` - Toggle focused/equal window layout (maximize current or equalize all)",
+        "- `<leader>wz` - Zoom window (open in new tab)",
+        "- `<leader>wm` - Maximize window (close all others)",
+        "- `<leader>w=` - Equalize window sizes",
+        "- `<leader>w|` - Maximize window width",
+        "- `<leader>w_` - Maximize window height",
     },
 
     grammars = {
@@ -103,18 +107,22 @@ return {
             },
         },
         {
-            pattern = "<leader>wf",
-            desc = "Toggle focused/equal layout",
+            pattern = "<leader>w[zm=|_]",
+            desc = "Window management shortcuts",
             tests = {
                 {
-                    name = "custom toggle function exists",
+                    name = "window management keybindings",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
 
-                            -- Verify the toggle function exists
-                            local utils = require("kyleking.utils")
-                            MiniTest.expect.equality(type(utils.toggle_window_focus), "function")
+                            -- Verify window management keymaps exist
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wz"), true, "zoom window")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wm"), true, "maximize window")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w="), true, "equalize windows")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w|"), true, "maximize width")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w_"), true, "maximize height")
                         end,
                     },
                 },

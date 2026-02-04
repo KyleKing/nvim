@@ -27,7 +27,6 @@ return {
         "- `<Esc><Esc>` - Exit terminal mode (double escape)",
         "",
         "**File operations**:",
-        "- `<C-s>` - Save if modified (normal and insert mode)",
         "- `<C-q>` - Force quit without saving",
         "- `<leader>q` - Quit with confirmation",
         "- `<leader>Q` - Quit all with confirmation",
@@ -46,6 +45,16 @@ return {
         "**UI toggles**:",
         "- `<leader>us` - Toggle spellcheck",
         "- `<leader>uw` - Toggle line wrap",
+        "- `<leader>ud` - Toggle diagnostics",
+        "- `<leader>uc` - Toggle conceallevel (0 ↔ 2)",
+        "- `<leader>ub` - Toggle background (dark ↔ light)",
+        "",
+        "**Window management**:",
+        "- `<leader>wz` - Zoom window (open in new tab)",
+        "- `<leader>wm` - Maximize window (close all others)",
+        "- `<leader>w=` - Equalize window sizes",
+        "- `<leader>w|` - Maximize window width",
+        "- `<leader>w_` - Maximize window height",
     },
 
     grammars = {
@@ -137,24 +146,52 @@ return {
             },
         },
         {
-            pattern = "<C-s>",
-            desc = "Save if modified",
+            pattern = "<leader>u[dscwb]",
+            desc = "UI toggles",
             tests = {
                 {
-                    name = "save keybindings exist",
+                    name = "ui toggle keybindings exist",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
 
-                            -- Verify <C-s> is mapped in normal mode
-                            local keymaps_n = vim.api.nvim_get_keymap("n")
-                            local ctrl_s_n = vim.tbl_filter(function(m) return m.lhs == "<C-S>" end, keymaps_n)[1]
-                            MiniTest.expect.equality(ctrl_s_n ~= nil, true, "Should have <C-s> in normal mode")
+                            -- Check core UI toggles exist
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>ud"),
+                                true,
+                                "diagnostics toggle"
+                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>us"), true, "spellcheck toggle")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uw"), true, "wrap toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>uc"),
+                                true,
+                                "conceallevel toggle"
+                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ub"), true, "background toggle")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>w[zm=|_]",
+            desc = "Window management",
+            tests = {
+                {
+                    name = "window management keybindings exist",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
 
-                            -- Verify <C-s> is mapped in insert mode
-                            local keymaps_i = vim.api.nvim_get_keymap("i")
-                            local ctrl_s_i = vim.tbl_filter(function(m) return m.lhs == "<C-S>" end, keymaps_i)[1]
-                            MiniTest.expect.equality(ctrl_s_i ~= nil, true, "Should have <C-s> in insert mode")
+                            -- Check window management keybindings
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wz"), true, "zoom window")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wm"), true, "maximize window")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w="), true, "equalize windows")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w|"), true, "maximize width")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w_"), true, "maximize height")
                         end,
                     },
                 },

@@ -9,19 +9,43 @@ local M = {}
 
 -- Tool name to ecosystem mapping (for executable resolution)
 local ecosystems = {
+    -- Python
     beautysh = "python",
-    oxlint = "node",
-    prettier = "node",
-    prettierd = "node",
+    black = "python",
+    isort = "python",
+    mdformat = "python",
+    mypy = "python",
+    pyright = "python",
     ruff = "python",
     ruff_fix = "python",
     ruff_format = "python",
+    ty = "python",
+    -- JavaScript/TypeScript
+    biome = "node",
+    deno = "node",
+    dprint = "node",
+    eslint = "node",
+    eslint_d = "node",
+    oxlint = "node",
+    prettier = "node",
+    prettierd = "node",
     stylelint = "node",
+    -- Go
+    gofmt = "go",
+    gofumpt = "go",
+    goimports = "go",
+    golangcilint = "go",
+    -- Rust
+    rustfmt = "rust",
+    -- Lua (global tools, no ecosystem bin dir)
+    selene = "lua",
+    stylua = "lua",
 }
 
 -- Ecosystem strategies: markers for root detection + optional bin directory
 local strategies = {
     go = { marker = "go.mod", bin_dir = nil },
+    lua = { marker = "selene.toml", bin_dir = nil },
     node = { marker = "package.json", bin_dir = { "node_modules", ".bin" } },
     python = { marker = "pyproject.toml", bin_dir = { ".venv", "bin" } },
     ruby = { marker = "Gemfile", bin_dir = nil },
@@ -35,6 +59,11 @@ local canonical_names = {
 }
 
 local cache = {}
+
+-- Cache for project roots and VCS detection with TTL
+local root_cache = {}
+local vcs_cache = {}
+local CACHE_TTL_MS = 5000 -- 5 second TTL for root detection
 
 local function _find_local_bin(tool_name, buf_dir)
     local eco = ecosystems[tool_name]
@@ -84,7 +113,31 @@ function M.cmd_for(tool_name)
     return function() return M.resolve(tool_name, vim.api.nvim_buf_get_name(0)) end
 end
 
-function M.clear_cache() cache = {} end
+function M.clear_cache()
+    cache = {}
+    root_cache = {}
+    vcs_cache = {}
+end
+
+-- Check if cache entry is still valid
+local function _is_cache_valid(entry)
+    if not entry then return false end
+    local now = vim.uv.hrtime() / 1000000 -- Convert to milliseconds
+    return (now - entry.timestamp) < CACHE_TTL_MS
+end
+
+-- Get cached value or compute and cache it
+local function _get_or_compute(cache_table, key, compute_fn)
+    local entry = cache_table[key]
+    if _is_cache_valid(entry) then return entry.value end
+
+    local value = compute_fn()
+    cache_table[key] = {
+        value = value,
+        timestamp = vim.uv.hrtime() / 1000000,
+    }
+    return value
+end
 
 -- Get project root directory for a given ecosystem
 ---@param buf_path string|nil Buffer path (defaults to current buffer)
@@ -101,24 +154,52 @@ function M.get_project_root(buf_path, ecosystem)
     return vim.fn.fnamemodify(found[1], ":h")
 end
 
--- Get project root for current buffer by detecting ecosystem
+-- Get project root for current buffer by detecting ecosystem (cached)
 ---@return string|nil project_root The project root directory or nil
 function M.get_current_project_root()
     local buf_path = vim.api.nvim_buf_get_name(0)
     if buf_path == "" then return nil end
 
-    -- Try each ecosystem in priority order
-    local priority = { "python", "node", "go", "rust", "ruby", "terraform" }
-    for _, eco in ipairs(priority) do
-        local root = M.get_project_root(buf_path, eco)
-        if root then return root end
-    end
+    return _get_or_compute(root_cache, buf_path, function()
+        -- Try each ecosystem in priority order (closest to furthest from editor)
+        local priority = { "lua", "python", "node", "go", "rust", "ruby", "terraform" }
+        for _, eco in ipairs(priority) do
+            local root = M.get_project_root(buf_path, eco)
+            if root then return root end
+        end
 
-    -- Fallback to git root
-    local git_root = vim.fs.find(".git", { upward = true, path = vim.fn.fnamemodify(buf_path, ":h") })
-    if #git_root > 0 then return vim.fn.fnamemodify(git_root[1], ":h") end
+        -- Fallback to VCS root (jj > git)
+        local buf_dir = vim.fn.fnamemodify(buf_path, ":h")
+        local jj_root = vim.fs.find(".jj", { upward = true, path = buf_dir, stop = vim.uv.os_homedir() })
+        if #jj_root > 0 then return vim.fn.fnamemodify(jj_root[1], ":h") end
 
-    return nil
+        local git_root = vim.fs.find(".git", { upward = true, path = buf_dir, stop = vim.uv.os_homedir() })
+        if #git_root > 0 then return vim.fn.fnamemodify(git_root[1], ":h") end
+
+        return nil
+    end)
+end
+
+-- Get VCS workspace root (jj or git) with caching
+---@param buf_path string|nil Buffer path (defaults to current buffer)
+---@return {type: "jj"|"git", root: string}|nil vcs_info VCS type and root path
+function M.get_vcs_root(buf_path)
+    local path = buf_path or vim.api.nvim_buf_get_name(0)
+    if path == "" then path = vim.fn.getcwd() end
+
+    return _get_or_compute(vcs_cache, path, function()
+        local buf_dir = vim.fn.fnamemodify(path, ":h")
+
+        -- Check jj first (priority over git in colocated repos)
+        local jj_root = vim.fs.find(".jj", { upward = true, path = buf_dir, stop = vim.uv.os_homedir() })
+        if #jj_root > 0 then return { type = "jj", root = vim.fn.fnamemodify(jj_root[1], ":h") } end
+
+        -- Fallback to git
+        local git_root = vim.fs.find(".git", { upward = true, path = buf_dir, stop = vim.uv.os_homedir() })
+        if #git_root > 0 then return { type = "git", root = vim.fn.fnamemodify(git_root[1], ":h") } end
+
+        return nil
+    end)
 end
 
 -- Create LSP root_dir function for given ecosystems
@@ -130,9 +211,65 @@ function M.lsp_root_for(ecosystems_list)
             local root = M.get_project_root(fname, eco)
             if root then return root end
         end
-        -- Fallback to git root
-        return vim.fs.root(fname, ".git")
+        -- Fallback to VCS root (jj > git)
+        return vim.fs.root(fname, { ".jj", ".git" })
     end
+end
+
+-- Tool configuration file markers (indicates project uses this tool)
+local config_markers = {
+    -- JavaScript/TypeScript
+    biome = { "biome.json", "biome.jsonc" },
+    deno = { "deno.json", "deno.jsonc" },
+    dprint = { "dprint.json", ".dprint.json", ".dprintrc.json" },
+    eslint = { ".eslintrc", ".eslintrc.js", ".eslintrc.json", ".eslintrc.yml", "eslint.config.js" },
+    oxlint = { "oxlintrc.json", ".oxlintrc.json" },
+    prettier = { ".prettierrc", ".prettierrc.js", ".prettierrc.json", "prettier.config.js" },
+    -- Markdown
+    mdformat = { ".mdformat.toml", "pyproject.toml" }, -- mdformat config in [tool.mdformat]
+    -- Python
+    ruff = { "pyproject.toml", "ruff.toml", ".ruff.toml" },
+    -- Go
+    gofumpt = { ".golangci.yml", ".golangci.yaml" },
+    goimports = { ".golangci.yml", ".golangci.yaml" },
+    -- Rust
+    rustfmt = { "rustfmt.toml", ".rustfmt.toml" },
+}
+
+-- Check if project has configuration for a tool
+---@param tool_name string Tool name to check
+---@param buf_path string|nil Buffer path (defaults to current buffer)
+---@return boolean has_config True if config file exists in project
+local function _has_config(tool_name, buf_path)
+    local markers = config_markers[tool_name]
+    if not markers then return false end
+
+    local buf_dir = buf_path and vim.fn.fnamemodify(buf_path, ":h") or vim.fn.getcwd()
+    for _, marker in ipairs(markers) do
+        local found = vim.fs.find(marker, { upward = true, path = buf_dir, stop = vim.uv.os_homedir() })
+        if #found > 0 then return true end
+    end
+    return false
+end
+
+-- Detect available formatters from a priority list
+-- Checks both executable presence AND project configuration
+---@param candidates string[] List of formatter names in priority order
+---@param buf_path string|nil Buffer path for resolution (defaults to current buffer)
+---@return string[] available List of available formatters
+function M.detect_formatters(candidates, buf_path)
+    local available = {}
+    for _, tool in ipairs(candidates) do
+        local resolved = M.resolve(tool, buf_path)
+        local is_executable = vim.fn.executable(resolved) == 1
+        local has_config = _has_config(tool, buf_path)
+        local no_biome = not _has_config("biome", buf_path)
+        local no_prettier = not _has_config("prettier", buf_path)
+
+        -- Include tool if either: (1) has config in project, or (2) is executable and no conflicting config
+        if is_executable and (has_config or (no_biome and no_prettier)) then table.insert(available, tool) end
+    end
+    return available
 end
 
 return M

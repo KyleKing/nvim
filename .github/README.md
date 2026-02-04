@@ -48,6 +48,7 @@ My preference is for opinionated plugins that require minimal configuration.
     - [ts-comments](https://github.com/KyleKing/nvim/commit/17cb743) with `mini.comment`
     - [vim-sandwich](https://github.com/KyleKing/nvim/commit/17cb743) with `mini.surround`
     - [which-key](https://github.com/KyleKing/nvim/commit/2712f73) with `mini.clue`
+- Formatting: [conform.nvim](https://github.com/stevearc/conform.nvim) selected over [guard.nvim](https://github.com/nvimdev/guard.nvim) and [formatter.nvim](https://github.com/mhartington/formatter.nvim)
 - And migrated from `Lazy.nvim` to `Mini.Deps` between <https://github.com/KyleKing/nvim/commit/97a2460d0d1090118908fee387eb68a1caae7665> and <https://github.com/KyleKing/nvim/commit/58d2cd4a18b0d5edd6c3091ffae95552faf9091f>
 
 ## MacOS (and Linux) Install

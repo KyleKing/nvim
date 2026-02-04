@@ -5,9 +5,17 @@
         ]
     },
     "runtime": {
+        "path": [
+            "?.lua",
+            "?/init.lua"
+        ],
         "version": "LuaJIT"
     },
     "workspace": {
-        "checkThirdParty": false
+        "checkThirdParty": false,
+        "library": [
+            "${3rd}/luv/library",
+            "${3rd}/busted/library"
+        ]
     }
 }

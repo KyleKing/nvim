@@ -15,10 +15,11 @@ Common tasks:
 
 - `mise run fmt` - Run all pre-commit hooks (linting + formatting)
 - `mise run test` - Run CI tests (fast, no external dependencies)
+- `mise run bench` - Run all performance benchmarks
 - `mise run check` - Run all checks (format + test)
 - `mise run doc:vimdoc` - Generate vimdoc from markdown sources
 
-See `.mise.toml` for all available tasks or run `mise tasks`.
+See `mise.toml` for all available tasks or run `mise tasks`.
 
 ### Documentation generation
 
@@ -79,6 +80,19 @@ mise run test:coverage:report              # View coverage report
 | `:RunTestsParallel`              | `<leader>tp` | Parallel workers (requires ext. tools) |
 | `:RunTestsRandom [seed]`         | `<leader>tr` | Random order sequential                |
 | `:RunTestsParallelRandom [seed]` | -            | Parallel + random order                |
+
+### Running benchmarks
+
+Performance benchmarks track startup time, terminal performance, and other critical operations.
+
+```bash
+mise run bench              # Run all performance benchmarks
+mise run bench:startup      # Run startup performance benchmarks (startup time, plugin loading, large files)
+mise run bench:terminal     # Run terminal performance benchmarks (creation, statusline, mode changes)
+mise run measure            # Measure nvim startup time using external script
+```
+
+Benchmarks are located in `lua/tests/performance/` and use MiniTest with timing assertions.
 
 ### Documentation-driven tests
 

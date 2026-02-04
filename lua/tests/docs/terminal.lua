@@ -5,10 +5,9 @@ return {
     source = "lua/kyleking/deps/terminal-integration.lua",
 
     notes = {
-        "`<leader>tt` Toggle shell tab (normal and terminal mode)",
-        "`<C-'>` Toggle shell tab (alternative binding)",
-        "`<leader>gg` lazygit (respects git worktrees)",
-        "`<leader>gj` lazyjj",
+        "`<C-'>` Toggle shell tab (normal and terminal mode)",
+        "`<leader>gg` Smart VCS launcher (auto-detects jj/git, launches lazyjj/lazygit)",
+        "`<leader>gj` lazyjj (explicit)",
         "`<leader>td` lazydocker",
         "",
         "The shell tab preserves its buffer across toggles. TUI floats use 90% of the screen with rounded borders. When the TUI process exits, the float closes and cleans up.",
@@ -31,7 +30,7 @@ return {
 
     grammars = {
         {
-            pattern = "<leader>tt",
+            pattern = "<C-'>",
             desc = "Toggle shell terminal tab",
             tests = {
                 {

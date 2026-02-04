@@ -12,8 +12,10 @@ local lsp_binaries = {
 }
 
 local fre_tools = {
-    python = { "beautysh", "ruff" },
-    node = { "oxlint", "prettier", "prettierd", "stylelint" },
+    python = { "beautysh", "black", "isort", "ruff" },
+    node = { "biome", "eslint", "eslint_d", "oxlint", "prettier", "prettierd", "stylelint" },
+    go = { "gofmt", "gofumpt", "goimports" },
+    rust = { "rustfmt" },
 }
 
 local system_tools = {

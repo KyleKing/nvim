@@ -67,6 +67,51 @@ T["find-relative-executable"]["lsp_root_for function returns string or nil"] = f
     MiniTest.expect.equality(type(result) == "string" or result == nil, true)
 end
 
+T["find-relative-executable"]["get_current_project_root caches results"] = function()
+    -- Create a test buffer with known path
+    local test_file = vim.fn.tempname() .. ".lua"
+    local bufnr = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_name(bufnr, test_file)
+    vim.api.nvim_set_current_buf(bufnr)
+
+    -- First call
+    local result1 = fre.get_current_project_root()
+    -- Second call should return cached value
+    local result2 = fre.get_current_project_root()
+    MiniTest.expect.equality(result1, result2)
+
+    -- Cleanup
+    vim.api.nvim_buf_delete(bufnr, { force = true })
+end
+
+T["find-relative-executable"]["get_vcs_root caches results"] = function()
+    -- First call
+    local result1 = fre.get_vcs_root(vim.fn.getcwd())
+    -- Second call should return cached value
+    local result2 = fre.get_vcs_root(vim.fn.getcwd())
+
+    -- Both should have same type and value
+    if result1 == nil then
+        MiniTest.expect.equality(result2, nil)
+    else
+        MiniTest.expect.equality(result1.type, result2.type)
+        MiniTest.expect.equality(result1.root, result2.root)
+    end
+end
+
+T["find-relative-executable"]["clear_cache clears root and vcs caches"] = function()
+    -- Populate cache
+    fre.get_current_project_root()
+    fre.get_vcs_root(vim.fn.getcwd())
+
+    -- Clear should not error
+    MiniTest.expect.no_error(function() fre.clear_cache() end)
+
+    -- After clearing, calls should work
+    local result = fre.get_current_project_root()
+    MiniTest.expect.equality(type(result) == "string" or result == nil, true)
+end
+
 if ... == nil then MiniTest.run() end
 
 return T

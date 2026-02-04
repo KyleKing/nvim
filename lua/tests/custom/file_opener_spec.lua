@@ -201,7 +201,7 @@ T["open_from_terminal"]["opens absolute path from terminal"] = function()
     vim.fn.writefile({ "test content" }, temp_file)
 
     vim.cmd("tabnew")
-    local _ = vim.fn.termopen(vim.o.shell)
+    local _ = vim.fn.termopen({ vim.o.shell })
     vim.wait(500)
 
     local initial_tab_count = vim.fn.tabpagenr("$")
@@ -223,7 +223,7 @@ T["open_from_terminal"]["opens relative path from terminal cwd"] = function()
     vim.fn.writefile({ "test content" }, temp_file)
 
     vim.cmd("tabnew")
-    local term_bufnr = vim.fn.termopen(vim.o.shell)
+    local term_bufnr = vim.fn.termopen({ vim.o.shell })
     vim.wait(500)
 
     vim.b[term_bufnr].terminal_job_cwd = temp_dir
@@ -245,7 +245,7 @@ T["open_from_terminal"]["opens path with line number"] = function()
     vim.fn.writefile({ "line 1", "line 2", "line 3" }, temp_file)
 
     vim.cmd("tabnew")
-    local _ = vim.fn.termopen(vim.o.shell)
+    local _ = vim.fn.termopen({ vim.o.shell })
     vim.wait(500)
 
     file_opener.open_from_terminal(temp_file .. ":2")
@@ -263,7 +263,7 @@ T["open_from_terminal"]["opens path with line and column"] = function()
     vim.fn.writefile({ "line 1", "line 2 with text", "line 3" }, temp_file)
 
     vim.cmd("tabnew")
-    local _ = vim.fn.termopen(vim.o.shell)
+    local _ = vim.fn.termopen({ vim.o.shell })
     vim.wait(500)
 
     file_opener.open_from_terminal(temp_file .. ":2:8")
@@ -279,7 +279,7 @@ end
 
 T["open_from_terminal"]["shows warning for non-existent file"] = function()
     vim.cmd("tabnew")
-    local _ = vim.fn.termopen(vim.o.shell)
+    local _ = vim.fn.termopen({ vim.o.shell })
     vim.wait(500)
 
     local initial_tab_count = vim.fn.tabpagenr("$")

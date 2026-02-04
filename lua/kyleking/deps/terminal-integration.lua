@@ -83,7 +83,7 @@ local function toggle_shell_tab()
     vim.cmd("tabnew")
     shell_term.tabnr = vim.api.nvim_get_current_tabpage()
     local bufnr = vim.api.nvim_get_current_buf()
-    vim.fn.termopen(vim.o.shell, { on_exit = _on_shell_exit })
+    vim.fn.termopen({ vim.o.shell }, { on_exit = _on_shell_exit })
     shell_term.bufnr = bufnr
     vim.cmd("startinsert")
 end
@@ -122,7 +122,7 @@ local function toggle_tui_float(opts)
 
     local chan_id = vim.b[term.bufnr].terminal_job_id
     if not chan_id or vim.fn.jobwait({ chan_id }, 0)[1] == -1 then
-        vim.fn.termopen(opts.cmd, {
+        vim.fn.termopen({ vim.o.shell, "-c", opts.cmd }, {
             on_exit = function()
                 vim.schedule(function()
                     if tui_terminals[term_id] then
@@ -144,20 +144,31 @@ end
 
 local K = vim.keymap.set
 
-K({ "n", "t" }, "<leader>tt", toggle_shell_tab, { desc = "Terminal: toggle tab" })
 K({ "n", "t" }, "<C-'>", toggle_shell_tab, { desc = "Toggle terminal" })
 
+-- Smart VCS launcher: auto-detects jj or git and launches appropriate tool
 K("n", "<leader>gg", function()
     local worktree = require("kyleking.utils.fs_utils").file_worktree()
-    local flags = worktree and ("--work-tree=%s --git-dir=%s"):format(worktree.toplevel, worktree.gitdir) or ""
-    toggle_tui_float({ cmd = "lazygit " .. flags, term_id = "lazygit" })
-end, { desc = "Terminal: lazygit" })
+    if not worktree then
+        toggle_tui_float({ cmd = "lazygit", term_id = "lazygit" })
+        return
+    end
+
+    if worktree.vcs == "jj" then
+        -- jj workspace: launch lazyjj in workspace root
+        toggle_tui_float({ cmd = "lazyjj", term_id = "lazyjj", cwd = worktree.toplevel })
+    else
+        -- git worktree: launch lazygit with worktree flags
+        local flags = ("--work-tree=%s --git-dir=%s"):format(worktree.toplevel, worktree.gitdir)
+        toggle_tui_float({ cmd = "lazygit " .. flags, term_id = "lazygit" })
+    end
+end, { desc = "Terminal: smart VCS (jj/git)" })
 
 K(
     "n",
     "<leader>gj",
     function() toggle_tui_float({ cmd = "lazyjj", term_id = "lazyjj" }) end,
-    { desc = "Terminal: lazyjj" }
+    { desc = "Terminal: lazyjj (explicit)" }
 )
 
 K(

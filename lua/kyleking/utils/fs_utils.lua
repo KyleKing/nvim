@@ -11,13 +11,20 @@ function M.path_exists(path)
     return false
 end
 
---- Get the first worktree that a file belongs to
+--- Get the first worktree that a file belongs to (git or jj)
 ---@param file string? the file to check, defaults to the current file
----@return table<string, string>|nil # a table specifying the `toplevel` and `gitdir` of a worktree or nil if not found
+---@return table<string, string>|nil # a table specifying the `toplevel` and `gitdir`/`jjdir` of a worktree or nil if not found
 function M.file_worktree(file)
+    file = file or vim.fn.expand("%") --[[@as string]]
+
+    -- Check jj workspace first
+    local fre = require("find-relative-executable")
+    local vcs = fre.get_vcs_root(file)
+    if vcs and vcs.type == "jj" then return { toplevel = vcs.root, jjdir = vcs.root .. "/.jj", vcs = "jj" } end
+
+    -- Check git worktrees (user-configured list)
     local worktrees = vim.g.git_worktrees
     if not worktrees then return end
-    file = file or vim.fn.expand("%") --[[@as string]]
     for _, worktree in ipairs(worktrees) do
         if
             M.cmd({
@@ -30,8 +37,8 @@ function M.file_worktree(file)
                 "--error-unmatch",
                 file,
             }, false)
-            -- PLANNED: jj workspace root support when no local git directory
         then
+            worktree.vcs = "git"
             return worktree
         end
     end

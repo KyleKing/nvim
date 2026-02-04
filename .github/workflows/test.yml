@@ -70,4 +70,4 @@ jobs:
           # - panvimdoc: path issues, docs generated locally
           # - generate-plugin-docs/helptags: needs nvim
           # - mini-test: already runs in test job
-          SKIP: stylua-system,selene,panvimdoc,generate-plugin-docs,helptags,mini-test
+          SKIP: generate-plugin-docs,helptags,lua-diagnostics,mini-test,panvimdoc,selene,stylua-system

@@ -90,7 +90,8 @@ later(function()
             enable = true,
             disable = function(_, bufnr) return vim.b[bufnr].large_buf end,
         },
-        -- PLANNED: Review how to use these keybinds or consider switching!
+        -- Note: <c-space> shared with LSP completion (insert mode only, no conflict)
+        -- <c-s> now available (removed from save operations for this use)
         incremental_selection = {
             enable = true,
             keymaps = {

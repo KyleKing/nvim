@@ -46,7 +46,7 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - See also: MiniComment              |kyleking-neovim-see-also:-minicomment|
   - Core Keybindings                        |kyleking-neovim-core-keybindings|
   - Source: lua/kyleking/core/keymaps.lua|kyleking-neovim-source:-lua/kyleking/core/keymaps.lua|
-  - Git (mini.diff, mini.git, diffview)|kyleking-neovim-git-(mini.diff,-mini.git,-diffview)|
+  - VCS Integration (git/jj)        |kyleking-neovim-vcs-integration-(git/jj)|
   - See also: MiniDiff, MiniGit  |kyleking-neovim-see-also:-minidiff,-minigit|
   - File Explorer (mini.files)    |kyleking-neovim-file-explorer-(mini.files)|
   - See also: MiniFiles                  |kyleking-neovim-see-also:-minifiles|
@@ -1060,7 +1060,8 @@ Operator grammar:
     j / k                Enhanced up/down movement
     dd                   Smart line deletion
     A                    Whole buffer text object
-    <C-s>                Save if modified
+    <leader>u[dscwb]     UI toggles
+    <leader>w[zm=|_]     Window management
     <Esc>                Clear search highlighting
     <leader>r[yYpP]      Register operations (* and + clipboards)
 <
@@ -1093,8 +1094,7 @@ Operator grammar:
 
 **File operations**
 
-- `<C-s>`- Save if modified (normal and insert mode)
-- `<C-q>` - Force quit without saving
+- `<C-q>`- Force quit without saving
 - `<leader>q` - Quit with confirmation
 - `<leader>Q` - Quit all with confirmation
 - `<leader>n` - New file
@@ -1115,31 +1115,63 @@ Operator grammar:
 
 - `<leader>us`- Toggle spellcheck
 - `<leader>uw` - Toggle line wrap
+- `<leader>ud` - Toggle diagnostics
+- `<leader>uc` - Toggle conceallevel (0 2)
+- `<leader>ub` - Toggle background (dark light)
+
+**Window management**
+
+- `<leader>wz`- Zoom window (open in new tab)
+- `<leader>wm` - Maximize window (close all others)
+- `<leader>w=` - Equalize window sizes
+- `<leader>w|` - Maximize window width
+- `<leader>w_` - Maximize window height
 
 
 SOURCE: LUA/KYLEKING/CORE/KEYMAPS.LUA*kyleking-neovim-source:-lua/kyleking/core/keymaps.lua*
 
 
-GIT (MINI.DIFF, MINI.GIT, DIFFVIEW)*kyleking-neovim-git-(mini.diff,-mini.git,-diffview)*
+VCS INTEGRATION (GIT/JJ)            *kyleking-neovim-vcs-integration-(git/jj)*
 
-Inline diff signs in the sign column (mini.diff), statusline git branch
-(mini.git), and side-by-side diff viewing (diffview.nvim).
+VCS-agnostic operations (auto-detects jj or git): inline diff signs, hunk
+operations, status/log/blame/commit commands. Works seamlessly in both git and
+jj repositories.
 
 Operator grammar:
 
 >
+    <leader>gh[ar]       Hunk operations
+    <leader>g[slbdhc]    VCS commands
     <leader>ugd          Toggle diff overlay
 <
 
-`<leader>ugd` Toggle git diff overlay (full inline diff)
+**Hunk operations** (work in both git and jj):
 
-`:DiffviewOpen` Open side-by-side diff viewer
+- `<leader>gha` - Apply hunk (stage changes)
+- `<leader>ghr` - Reset hunk (discard changes)
+- `]h` / `[h` - Jump to next/previous hunk
+- `]H` / `[H` - Jump to last/first hunk
 
-`:DiffviewClose` Close diffview
+**VCS commands** (auto-detect git or jj):
 
-Shows added (green), deleted (red), and modified (yellow) lines in sign column.
+- `<leader>gs` - Status (git status / jj status)
+- `<leader>gl` - Log (git log / jj log)
+- `<leader>gb` - Blame/show at cursor
+- `<leader>gh` - Range history
+- `<leader>gd` - Diff
+- `<leader>gc` - Commit message prompt (git commit / jj describe)
 
-Statusline displays current git branch from mini.git.
+**Display toggles**
+
+- `<leader>ugd`- Toggle diff overlay (full inline diff)
+
+**Diffview plugin**
+
+- `:DiffviewOpen`- Side-by-side diff viewer
+- `:DiffviewClose` - Close diffview
+
+Diff signs: added (green), deleted (red), modified (yellow). Statusline shows
+VCS type and branch/workspace.
 
 Source: `lua/kyleking/deps/git.lua`
 
@@ -1149,13 +1181,14 @@ SEE ALSO: MINIDIFF, MINIGIT      *kyleking-neovim-see-also:-minidiff,-minigit*
 
 FILE EXPLORER (MINI.FILES)        *kyleking-neovim-file-explorer-(mini.files)*
 
-Miller-column file explorer with preview. Navigate, create, rename, and delete
-files directly.
+Miller-column file explorer with preview, git status integration, and dynamic
+bookmarks. Navigate, create, rename, and delete files directly.
 
 Operator grammar:
 
 >
     <leader>e            Toggle file explorer
+    g.                   Toggle hidden files
 <
 
 `<leader>e` Toggle explorer (opens at current file)
@@ -1164,17 +1197,38 @@ Operator grammar:
 
 - `h`/`l`Navigate up/into directories
 - `=` Synchronize (applies pending changes)
-- `w` Bookmark to cwd
+- `g.` Toggle hidden files (dotfiles)
+
+**Dynamic bookmarks** (press bookmark key to jump):
+
+- `h` - Home directory
+- `c` - Nvim config
+- `w` - Working directory (cwd)
+- `v` - VCS root (git/jj, auto-detected)
+- `p` - Projects directory (~/projects if exists)
+- Monorepo directories: `p` (packages/), `a` (apps/), `s` (services/), `l`
+    (libs/), `m` (modules/), `c` (crates/), `w` (workspaces/)
 
 **Edit workflow**
 
 Editfiles by typing a new filename (create), deleting a line (delete), or
 editing the name in place (rename). Press `=` to apply.
 
+**Git status integration**
+
+Filesshow visual indicators: `+` (added), `✹` (modified), `�� ` (modified
+both), `→` (renamed), `-` (deleted), `?` (untracked). Cached for performance.
+
 **Filtered entries**
 
 `.git`,`.venv`, `node_modules`, `__pycache__`, and other common non-project
-directories are hidden.
+directories are hidden by default. Use `g.` to show/hide dotfiles.
+
+**Note on alternatives**
+
+oil.nvimwas evaluated but mini.files was chosen for: column view (better
+spatial awareness), identical edit-as-buffer semantics, native mini.nvim
+integration, and bookmarks.
 
 Source: `lua/kyleking/deps/file-explorer.lua`
 
@@ -1743,16 +1797,14 @@ Shell terminal runs in a dedicated tab. TUI apps run in floating windows.
 Operator grammar:
 
 >
-    <leader>tt           Toggle shell terminal tab
+    <C-'>                Toggle shell terminal tab
 <
 
-`<leader>tt` Toggle shell tab (normal and terminal mode)
+`<C-'>` Toggle shell tab (normal and terminal mode)
 
-`<C-'>` Toggle shell tab (alternative binding)
+`<leader>gg` Smart VCS launcher (auto-detects jj/git, launches lazyjj/lazygit)
 
-`<leader>gg` lazygit (respects git worktrees)
-
-`<leader>gj` lazyjj
+`<leader>gj` lazyjj (explicit)
 
 `<leader>td` lazydocker
 
@@ -1962,7 +2014,7 @@ Operator grammar:
     <C-w>h/j/k/l         Navigate between windows
     <C-w>s/v             Split window horizontal/vertical
     <C-w>=               Equalize window sizes
-    <leader>wf           Toggle focused/equal layout
+    <leader>w[zm=|_]     Window management shortcuts
 <
 
 **Navigation**
@@ -2001,7 +2053,11 @@ Operator grammar:
 
 **Custom keybindings**
 
-- `<leader>wf`- Toggle focused/equal window layout (maximize current or equalize all)
+- `<leader>wz`- Zoom window (open in new tab)
+- `<leader>wm` - Maximize window (close all others)
+- `<leader>w=` - Equalize window sizes
+- `<leader>w|` - Maximize window width
+- `<leader>w_` - Maximize window height
 
 Source: `lua/kyleking/core/keymaps.lua`
 

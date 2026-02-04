@@ -2,6 +2,19 @@
 # Run tasks with: mise run <task>
 # List tasks with: mise tasks
 
+# Benchmark tasks
+[tasks.bench]
+description = "Run all performance benchmarks"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/startup_spec.lua\"); MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
+
+[tasks."bench:startup"]
+description = "Run startup performance benchmarks"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/startup_spec.lua\")" -c "qall!"'
+
+[tasks."bench:terminal"]
+description = "Run terminal performance benchmarks"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
+
 [tasks.check]
 depends = ["fmt", "test"]
 description = "Run all checks (format + test)"
@@ -51,6 +64,11 @@ run = "prek run selene --all-files"
 [tasks."fmt:stylua"]
 description = "Run only StyLua formatter"
 run = "prek run stylua-system --all-files"
+
+# Diagnostic tasks
+[tasks."lint:lua"]
+description = "Check for Lua/Neovim API deprecations and diagnostics"
+run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless +"lua dofile(\"scripts/check-lua-diagnostics.lua\")" +qall lua/**/*.lua'
 
 # Utility tasks
 [tasks.measure]

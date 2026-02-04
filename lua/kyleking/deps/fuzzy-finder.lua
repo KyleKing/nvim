@@ -119,7 +119,36 @@ later(function()
     K("n", "<leader>fh", builtin.help, { desc = "Find in nvim help" })
     K("n", "<leader>fH", MiniExtra.pickers.history, { desc = "Find in command/search history" })
     K("n", "<leader>fk", MiniExtra.pickers.keymaps, { desc = "Find keymaps" })
-    K("n", "<leader>fl", MiniExtra.pickers.list, { desc = "Find in quickfix/location lists" })
+    -- Quickfix/location list with enhanced preview (±5 lines context)
+    K("n", "<leader>fl", function()
+        MiniExtra.pickers.list({ scope = "quickfix" }, {
+            source = {
+                name = "Quickfix",
+                preview = function(_, item)
+                    if not item then return end
+                    local qf = vim.fn.getqflist()
+                    local idx = tonumber(item:match("^%s*(%d+)"))
+                    if not idx or not qf[idx] then return end
+
+                    local entry = qf[idx]
+                    if entry.bufnr == 0 then return end
+
+                    local filename = vim.fn.bufname(entry.bufnr)
+                    local lnum = entry.lnum
+
+                    -- Show context: 5 lines before, current line, 5 lines after
+                    return { filename, math.max(1, lnum - 5), { lnum, math.max(0, entry.col - 1) } }
+                end,
+            },
+        })
+    end, { desc = "Find in quickfix" })
+
+    K(
+        "n",
+        "<leader>fL",
+        function() MiniExtra.pickers.list({ scope = "location" }, { source = { name = "Location List" } }) end,
+        { desc = "Find in location list" }
+    )
     K("n", "<leader>fr", MiniExtra.pickers.registers, { desc = "Find registers" })
 
     K("n", "<leader>fw", function() builtin.grep_live() end, { desc = "Find word in files (live grep)" })
