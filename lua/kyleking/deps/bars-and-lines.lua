@@ -41,26 +41,16 @@ end)
 require("kyleking.deps.statusline")
 
 later(function()
-    local MiniTabline = require("mini.tabline")
+    -- Use native tabline to show only tabs (no buffer list)
+    -- Buffers accessible via mini.pick (<leader>fb) or :ls
+    vim.opt.showtabline = 1 -- Show tabline only when multiple tabs exist
 
-    MiniTabline.setup({
-        show_icons = true,
-        set_vim_settings = true,
-        tabpage_section = "right",
-    })
-
-    -- Apply nightfly-inspired theme colors
+    -- Apply nightfly-inspired theme colors for native tabline
     local colors = require("kyleking.theme").get_colors()
 
-    -- Tabline colors matching statusline theme
-    vim.api.nvim_set_hl(0, "MiniTablineCurrent", { fg = colors.fg1, bg = colors.bg2, bold = true })
-    vim.api.nvim_set_hl(0, "MiniTablineVisible", { fg = colors.fg2, bg = colors.bg1 })
-    vim.api.nvim_set_hl(0, "MiniTablineHidden", { fg = colors.fg3, bg = colors.bg0 })
-    vim.api.nvim_set_hl(0, "MiniTablineModifiedCurrent", { fg = colors.orange, bg = colors.bg2, bold = true })
-    vim.api.nvim_set_hl(0, "MiniTablineModifiedVisible", { fg = colors.orange, bg = colors.bg1 })
-    vim.api.nvim_set_hl(0, "MiniTablineModifiedHidden", { fg = colors.orange, bg = colors.bg0 })
-    vim.api.nvim_set_hl(0, "MiniTablineFill", { bg = colors.bg0 })
-    vim.api.nvim_set_hl(0, "MiniTablineTabpagesection", { fg = colors.fg1, bg = colors.bg2, bold = true })
+    vim.api.nvim_set_hl(0, "TabLine", { fg = colors.fg3, bg = colors.bg0 })
+    vim.api.nvim_set_hl(0, "TabLineSel", { fg = colors.fg1, bg = colors.bg2, bold = true })
+    vim.api.nvim_set_hl(0, "TabLineFill", { bg = colors.bg0 })
 end)
 
 later(function()

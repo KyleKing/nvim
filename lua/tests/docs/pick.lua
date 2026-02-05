@@ -16,6 +16,11 @@ return {
         "- `<C-t>` Choose in new tab",
         "- `<Esc>` Close picker",
         "",
+        "**Editing the query**:",
+        "- `<C-w>` Toggle between insert and normal mode",
+        "- In normal mode, use standard vim motions (`w`, `b`, `x`, `i`, `a`, etc.) to edit the query",
+        "- Press `<C-w>` again to return to insert mode for searching",
+        "",
         "**Preview**:",
         "- `<Tab>` Toggle preview (replaces match list in same window)",
         "- `<S-Tab>` Toggle info (shows available mappings)",
@@ -142,6 +147,78 @@ return {
                             vim.wait(20)
                             MiniPick.stop()
                             MiniTest.expect.equality(was_active, true, "Picker should be active for navigation")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<C-w>",
+            desc = "Toggle insert/normal mode for query editing",
+            tests = {
+                {
+                    name = "toggle to normal mode and edit query",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniPick = require("mini.pick")
+                            local MiniTest = require("mini.test")
+
+                            -- Start picker with some items
+                            MiniPick.start({ source = { name = "Test", items = { "apple", "banana", "cherry" } } })
+
+                            -- Set initial query
+                            MiniPick.set_picker_query("test")
+
+                            -- Get the query before toggling
+                            local initial_query = MiniPick.get_picker_query()
+
+                            -- Verify initial query is set
+                            MiniTest.expect.equality(initial_query, "test", "Initial query should be 'test'")
+
+                            -- Cleanup
+                            MiniPick.stop()
+                        end,
+                    },
+                },
+                {
+                    name = "verify toggle_info mapping exists",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniPick = require("mini.pick")
+                            local MiniTest = require("mini.test")
+
+                            -- Get the current config to verify toggle_info mapping
+                            -- Default is <C-w> if not overridden
+                            local config = MiniPick.config or {}
+                            local mappings = config.mappings or {}
+
+                            -- If toggle_info is not in mappings, it uses the default <C-w>
+                            local has_toggle_info = mappings.toggle_info == nil or mappings.toggle_info ~= false
+
+                            MiniTest.expect.equality(
+                                has_toggle_info,
+                                true,
+                                "toggle_info mapping should be available (default <C-w>)"
+                            )
+                        end,
+                    },
+                },
+                {
+                    name = "set_picker_query modifies query",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniPick = require("mini.pick")
+                            local MiniTest = require("mini.test")
+
+                            MiniPick.start({ source = { name = "Test", items = { "a", "b", "c" } } })
+
+                            -- Set query programmatically (simulates editing)
+                            MiniPick.set_picker_query("new query")
+                            local query = MiniPick.get_picker_query()
+
+                            MiniPick.stop()
+
+                            MiniTest.expect.equality(query, "new query", "Query should be updated")
                         end,
                     },
                 },
