@@ -5,6 +5,11 @@ local M = {}
 
 -- Detect if current line is a list item
 -- Returns: marker, indent_len, content (or nil if not a list)
+---@param line string
+---@return string|nil marker
+---@return integer|nil indent_len
+---@return string|nil content
+---@return string|nil list_type
 local function parse_list_line(line)
     -- Unordered lists: -, *, +
     local indent, marker, space, content = line:match("^(%s*)([%-%*%+])(%s+)(.*)$")
@@ -29,6 +34,10 @@ function M.handle_return()
         -- Not in a list, default behavior
         return "<CR>"
     end
+
+    -- At this point, marker is truthy so indent_len is guaranteed to be integer
+    ---@cast indent_len integer
+    ---@cast content string
 
     -- Empty list item - stop the list
     if content == "" or is_blank(content) then

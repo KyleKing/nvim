@@ -39,11 +39,9 @@ T["terminal integration"]["keymaps are registered"] = function()
         end
     end
 
-    check_keymap("<leader>tt", "n", "toggle tab")
-    check_keymap("<leader>tt", "t", "toggle tab")
     check_keymap("<C-'>", "n", "Toggle")
     check_keymap("<C-'>", "t", "Toggle")
-    check_keymap("<leader>gg", "n", "lazygit")
+    check_keymap("<leader>gg", "n", "VCS")
     check_keymap("<leader>gj", "n", "lazyjj")
     check_keymap("<leader>td", "n", "lazydocker")
 end

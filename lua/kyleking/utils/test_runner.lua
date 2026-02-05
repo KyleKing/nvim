@@ -487,7 +487,6 @@ end
 
 --- Run fast tests (excludes subprocess-heavy and slow integration tests)
 --- Designed for rapid development feedback (~10-15 seconds)
---- @return table Test results
 function M.run_fast_tests()
     local MiniTest = require("mini.test")
 
@@ -536,7 +535,6 @@ end
 
 --- Run CI-safe tests (tests that don't require external tools)
 --- These tests only require Neovim and plugins installed via mini.deps
---- @return table Test results
 function M.run_ci_tests()
     local MiniTest = require("mini.test")
 

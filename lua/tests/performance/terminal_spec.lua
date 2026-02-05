@@ -191,6 +191,7 @@ T["terminal performance"]["vcs detection uses cache"] = function()
     if result1 == nil then
         MiniTest.expect.equality(result2, nil)
     else
+        assert(result2, "result2 should not be nil when result1 is not nil")
         MiniTest.expect.equality(result1.type, result2.type)
         MiniTest.expect.equality(result1.root, result2.root)
     end

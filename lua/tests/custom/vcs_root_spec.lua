@@ -30,6 +30,7 @@ T["get_vcs_root"]["caches results across calls"] = function()
     local result2 = fre.get_vcs_root(vim.fn.getcwd())
 
     if result1 then
+        assert(result2, "result2 should not be nil when result1 is not nil")
         MiniTest.expect.equality(result1.type, result2.type)
         MiniTest.expect.equality(result1.root, result2.root)
     else
@@ -49,6 +50,7 @@ T["get_vcs_root"]["cache respects TTL"] = function()
 
     -- Both should have same value (even if recomputed)
     if result1 then
+        assert(result2, "result2 should not be nil when result1 is not nil")
         MiniTest.expect.equality(result1.type, result2.type)
         MiniTest.expect.equality(result1.root, result2.root)
     else

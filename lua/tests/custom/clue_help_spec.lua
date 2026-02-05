@@ -54,7 +54,9 @@ T["show_menu"]["provides trigger menu"] = function()
     MiniTest.expect.equality(#triggers_arg > 0, true)
 
     -- Verify trigger structure
+    ---@diagnostic disable-next-line: need-check-nil
     local first_trigger = triggers_arg[1]
+    assert(first_trigger, "Expected at least one trigger")
     MiniTest.expect.equality(type(first_trigger.name), "string")
     MiniTest.expect.equality(type(first_trigger.keys), "string")
 end

@@ -19,6 +19,7 @@ T["parse_file_location"]["parses simple file path"] = function()
 
     local result = file_opener.parse_file_location(temp_file)
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing valid file path")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, nil)
     MiniTest.expect.equality(result.col, nil)
@@ -32,6 +33,7 @@ T["parse_file_location"]["parses file path with line number"] = function()
 
     local result = file_opener.parse_file_location(temp_file .. ":42")
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing file path with line number")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, 42)
     MiniTest.expect.equality(result.col, nil)
@@ -45,6 +47,7 @@ T["parse_file_location"]["parses file path with line and column"] = function()
 
     local result = file_opener.parse_file_location(temp_file .. ":42:10")
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing file path with line and column")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, 42)
     MiniTest.expect.equality(result.col, 10)
@@ -66,6 +69,7 @@ T["parse_file_location"]["expands relative paths"] = function()
 
     local result = file_opener.parse_file_location(basename, cwd)
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing relative path")
     MiniTest.expect.equality(result.path, temp_file)
 
     vim.fn.delete(temp_file)
@@ -124,6 +128,7 @@ T["parse_file_location"]["handles relative paths with line and column"] = functi
 
     local result = file_opener.parse_file_location(basename .. ":10:5", cwd)
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing relative path with line and column")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, 10)
     MiniTest.expect.equality(result.col, 5)
@@ -141,6 +146,7 @@ T["parse_file_location"]["handles nested relative paths"] = function()
 
     local result = file_opener.parse_file_location("subdir/test.lua", temp_dir)
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing nested relative path")
     MiniTest.expect.equality(result.path, temp_file)
 
     vim.fn.delete(temp_dir, "rf")
@@ -157,6 +163,7 @@ T["parse_file_location"]["handles absolute path with tilde"] = function()
 
         local result = file_opener.parse_file_location(expanded)
         MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+        assert(result, "result should not be nil after parsing path with tilde")
         MiniTest.expect.equality(result.path, temp_file)
     end
 
@@ -171,6 +178,7 @@ T["parse_file_location"]["handles path with spaces"] = function()
 
     local result = file_opener.parse_file_location(temp_file)
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing path with spaces")
     MiniTest.expect.equality(result.path, temp_file)
 
     vim.fn.delete(temp_dir, "rf")
@@ -186,6 +194,7 @@ T["parse_file_location"]["handles path with dots"] = function()
 
     local result = file_opener.parse_file_location("subdir/../subdir/test.lua", temp_dir)
     MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    assert(result, "result should not be nil after parsing path with dots")
 
     local normalized_result = vim.fn.resolve(vim.fn.fnamemodify(result.path, ":p"))
     local normalized_expected = vim.fn.resolve(vim.fn.fnamemodify(temp_file, ":p"))

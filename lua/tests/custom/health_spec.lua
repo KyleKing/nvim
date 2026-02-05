@@ -86,6 +86,7 @@ T["_check_lsp_configs"]["existing configs report correctly"] = function()
     end
 
     MiniTest.expect.equality(lua_ls_result ~= nil, true)
+    assert(lua_ls_result, "lua_ls_result should not be nil after finding it in results")
     MiniTest.expect.equality(lua_ls_result.exists, true)
 end
 
@@ -163,6 +164,7 @@ T["_check_core_plugins"]["mini.deps is required and loaded"] = function()
     end
 
     MiniTest.expect.equality(mini_deps ~= nil, true)
+    assert(mini_deps, "mini_deps should not be nil after finding it in results")
     MiniTest.expect.equality(mini_deps.required, true)
     MiniTest.expect.equality(mini_deps.loaded, true)
 end

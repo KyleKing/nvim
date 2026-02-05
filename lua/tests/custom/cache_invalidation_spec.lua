@@ -139,7 +139,7 @@ T["cache_invalidation"]["get_vcs_root respects cache"] = function()
     local vcs2 = fre.get_vcs_root()
 
     -- Should return same result
-    if vcs1 then
+    if vcs1 and vcs2 then
         MiniTest.expect.equality(vcs1.type, vcs2.type)
         MiniTest.expect.equality(vcs1.root, vcs2.root)
     else

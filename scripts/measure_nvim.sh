@@ -15,7 +15,6 @@ pf() {
 # Run benchmarks and capture output
 OUTPUT_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/nvim/BENCHMARKS.md"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
-GIT_COMMIT=$(git -C "${XDG_CONFIG_HOME:-$HOME/.config}/nvim" rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 # Initialize file if it doesn't exist
 if [ ! -f "$OUTPUT_FILE" ]; then
@@ -61,13 +60,13 @@ fi
 
 # Append results to markdown file
 cat >>"$OUTPUT_FILE" <<EOF
-### $TIMESTAMP (commit: $GIT_COMMIT)
+
+### $TIMESTAMP
 
 - No config: ${TIME_NO_CONFIG}ms
 - With config: ${TIME_WITH_CONFIG}ms
 - Opening init.lua: ${TIME_INIT_LUA}ms
 - Opening Python file: ${TIME_PYTHON}ms
-
 EOF
 
 echo ""

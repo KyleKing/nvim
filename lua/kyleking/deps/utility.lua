@@ -35,6 +35,7 @@ later(function()
     -- Optional preview.nvim integration with graceful degradation
     local preview_ok, preview = pcall(require, "preview")
     if preview_ok then
+        ---@diagnostic disable-next-line: redundant-parameter
         preview.setup({
             previewers_by_ft = {
                 plantuml = {
