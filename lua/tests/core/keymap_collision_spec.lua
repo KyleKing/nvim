@@ -93,7 +93,7 @@ T["collision detection"]["no prefix collisions in normal mode"] = function()
 
             -- Check if one is a prefix of the other
             if is_prefix(lhs1, lhs2) then
-                local acceptable, reason = is_acceptable_overlap("n", lhs1)
+                local acceptable = is_acceptable_overlap("n", lhs1)
                 if not acceptable then
                     table.insert(prefix_conflicts, {
                         prefix = lhs1,
@@ -103,7 +103,7 @@ T["collision detection"]["no prefix collisions in normal mode"] = function()
                     })
                 end
             elseif is_prefix(lhs2, lhs1) then
-                local acceptable, reason = is_acceptable_overlap("n", lhs2)
+                local acceptable = is_acceptable_overlap("n", lhs2)
                 if not acceptable then
                     table.insert(prefix_conflicts, {
                         prefix = lhs2,
@@ -205,6 +205,6 @@ T["collision detection"]["no direct collisions in insert mode"] = function()
 end
 
 -- Run tests if executed directly
-if vim.fn.expand("%") == vim.fn.expand("<sfile>") or _G.MINITEST_EXECUTING then MiniTest.run() end
+if vim.fn.expand("%") == vim.fn.expand("<sfile>") then MiniTest.run() end
 
 return T

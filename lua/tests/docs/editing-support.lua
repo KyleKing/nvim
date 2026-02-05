@@ -36,7 +36,7 @@ return {
                             )
 
                             -- Test multiple toggle cycles
-                            local ok, MiniTrailspace = pcall(require, "mini.trailspace")
+                            local ok = pcall(require, "mini.trailspace")
                             if ok then
                                 -- Get the keymap function
                                 local keymaps = vim.api.nvim_get_keymap("n")
