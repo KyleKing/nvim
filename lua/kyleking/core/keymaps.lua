@@ -15,12 +15,19 @@ local K = vim.keymap.set
 K("t", "<C-\\><C-n>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 K("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode (double escape)" })
 
--- Convenience functions for yanking/putting to difference registers
--- PLANNED: also consider 0p, but figure out how these can be useful first
-K("n", "<leader>ry", "*y", { desc = "Yank to *" })
-K("n", "<leader>rp", "*p", { desc = "Yank from *" })
-K("n", "<leader>rY", "+y", { desc = "Yank to +" })
-K("n", "<leader>rP", "+p", { desc = "Paste from +" })
+-- Clipboard operations (hybrid approach)
+-- Normal yank/delete uses vim registers, leader keys for system clipboard
+K({ "n", "x" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
+K({ "n", "x" }, "<leader>Y", '"+Y', { desc = "Yank line to clipboard" })
+K({ "n", "x" }, "<leader>p", '"+p', { desc = "Paste from clipboard" })
+K({ "n", "x" }, "<leader>P", '"+P', { desc = "Paste before from clipboard" })
+
+-- Delete without yanking (black hole register)
+K({ "n", "x" }, "<leader>d", '"_d', { desc = "Delete without yank" })
+K({ "n", "x" }, "<leader>D", '"_D', { desc = "Delete to EOL without yank" })
+
+-- Insert mode clipboard paste
+K("i", "<C-v>", "<C-r>+", { desc = "Paste from clipboard" })
 
 -- Keep the register clean when using `dd`
 K("n", "dd", function()

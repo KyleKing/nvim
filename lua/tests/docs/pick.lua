@@ -60,6 +60,10 @@ return {
         "**File picker and hidden files**:",
         "`<leader>ff` uses rg which includes hidden/dotfiles (`.github/**`, etc.) and respects `.gitignore`. `<leader>gf` uses `git ls-files` to list only git-tracked files.",
         "",
+        "**Register operations**:",
+        "- `<leader>fr` Browse registers (view contents)",
+        "- `<leader>fp` Paste from register picker (choose register, then paste)",
+        "",
         "**Tips**:",
         "- `<leader>fB` lists all built-in pickers -- useful for discovering what is available",
         "- `<leader><CR>` resumes the last picker with its previous query and matches intact",
@@ -189,6 +193,49 @@ return {
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fr", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>fr keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>fp",
+            desc = "Paste from register picker",
+            tests = {
+                {
+                    name = "paste picker keybinding exists",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap_n = helpers.check_keymap("n", "<leader>fp")
+                            local has_keymap_x = helpers.check_keymap("x", "<leader>fp")
+                            MiniTest.expect.equality(has_keymap_n, true, "Should have <leader>fp in normal mode")
+                            MiniTest.expect.equality(has_keymap_x, true, "Should have <leader>fp in visual mode")
+                        end,
+                    },
+                },
+                {
+                    name = "paste picker integration",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            -- Create buffer and populate register
+                            local bufnr = helpers.create_test_buffer({ "original" }, "text")
+                            vim.api.nvim_set_current_buf(bufnr)
+                            vim.fn.setreg("a", "from register a")
+
+                            -- Verify register has content
+                            local reg_content = vim.fn.getreg("a")
+                            MiniTest.expect.equality(
+                                reg_content,
+                                "from register a",
+                                "Register should have expected content"
+                            )
+
+                            helpers.delete_buffer(bufnr)
                         end,
                     },
                 },

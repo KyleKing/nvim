@@ -150,6 +150,26 @@ later(function()
         { desc = "Find in location list" }
     )
     K("n", "<leader>fr", MiniExtra.pickers.registers, { desc = "Find registers" })
+    K({ "n", "x" }, "<leader>fp", function()
+        MiniExtra.pickers.registers({}, {
+            source = {
+                choose = function(item)
+                    if not item then return end
+                    -- Extract register name (first character after whitespace trim)
+                    local reg = item:match("^%s*(%S)")
+                    if reg then
+                        -- Paste from selected register
+                        local mode = vim.fn.mode()
+                        if mode == "n" then
+                            vim.cmd('normal! "' .. reg .. "p")
+                        elseif mode == "v" or mode == "V" or mode == "\22" then
+                            vim.cmd('normal! gv"' .. reg .. "p")
+                        end
+                    end
+                end,
+            },
+        })
+    end, { desc = "Paste from register picker" })
 
     K("n", "<leader>fw", function() builtin.grep_live() end, { desc = "Find word in files (live grep)" })
 

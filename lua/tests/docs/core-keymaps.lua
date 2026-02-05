@@ -28,28 +28,45 @@ return {
         "",
         "**File operations**:",
         "- `<C-q>` - Force quit without saving",
-        "- `<leader>q` - Quit with confirmation",
-        "- `<leader>Q` - Quit all with confirmation",
-        "- `<leader>n` - New file",
         "",
         "**Buffer operations**:",
         "- `<leader>bw` - Wipeout buffer (delete including marks)",
         "- `<leader>bW` - Wipeout all buffers",
         "",
-        "**Register operations**:",
-        "- `<leader>ry` - Yank to `*` register (selection clipboard)",
-        "- `<leader>rp` - Paste from `*` register",
-        "- `<leader>rY` - Yank to `+` register (system clipboard)",
-        "- `<leader>rP` - Paste from `+` register",
+        "**Clipboard operations** (hybrid approach):",
+        "- `<leader>y` - Yank to system clipboard (works in visual mode)",
+        "- `<leader>Y` - Yank line to system clipboard",
+        "- `<leader>p` - Paste from system clipboard (works in visual mode)",
+        "- `<leader>P` - Paste before from system clipboard",
+        "- `<leader>d` - Delete without yanking (black hole register)",
+        "- `<leader>D` - Delete to EOL without yanking",
+        "- `<C-v>` (insert mode) - Paste from system clipboard",
+        "",
+        "**Named registers** (use with y/p/d operators):",
+        "- `\"ay` - Yank to register a (a-z for named registers)",
+        "- `\"ap` - Paste from register a",
+        "- `\"_d` - Delete to black hole register (no yank)",
+        "- `\"0p` - Paste from yank register (ignores deletes)",
+        "- `<leader>fr` - Browse registers with picker (see fuzzy-finder)",
         "",
         "**UI toggles**:",
-        "- `<leader>us` - Toggle spellcheck",
-        "- `<leader>uw` - Toggle line wrap",
-        "- `<leader>ud` - Toggle diagnostics",
+        "- `<leader>ub` - Set dark background",
+        "- `<leader>uB` - Set light background",
         "- `<leader>uc` - Toggle conceallevel (0 ↔ 2)",
-        "- `<leader>ub` - Toggle background (dark ↔ light)",
+        "- `<leader>ud` - Toggle diagnostics",
+        "- `<leader>ui` - Toggle indent scope",
+        "- `<leader>ul` - Toggle list chars",
+        "- `<leader>un` - Toggle line numbers",
+        "- `<leader>up` - Toggle paste mode",
+        "- `<leader>uN` - Toggle relative numbers",
+        "- `<leader>us` - Toggle spellcheck",
+        "- `<leader>ut` - Toggle trailing whitespace (see editing-support)",
+        "- `<leader>uT` - Toggle treesitter",
+        "- `<leader>uw` - Toggle line wrap",
+        "- `<leader>uy` - Toggle syntax highlight",
         "",
         "**Window management**:",
+        "- `<leader>wf` - Toggle focused/equal window layout",
         "- `<leader>wz` - Zoom window (open in new tab)",
         "- `<leader>wm` - Maximize window (close all others)",
         "- `<leader>w=` - Equalize window sizes",
@@ -146,7 +163,7 @@ return {
             },
         },
         {
-            pattern = "<leader>u[dscwb]",
+            pattern = "<leader>u[a-z]",
             desc = "UI toggles",
             tests = {
                 {
@@ -156,27 +173,73 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
 
-                            -- Check core UI toggles exist
+                            -- Background
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>ud"),
+                                helpers.check_keymap("n", "<leader>ub"),
                                 true,
-                                "diagnostics toggle"
+                                "dark background"
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>us"), true, "spellcheck toggle")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uw"), true, "wrap toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>uB"),
+                                true,
+                                "light background"
+                            )
+                            -- Toggles
                             MiniTest.expect.equality(
                                 helpers.check_keymap("n", "<leader>uc"),
                                 true,
                                 "conceallevel toggle"
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ub"), true, "background toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>ud"),
+                                true,
+                                "diagnostics toggle"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>ui"),
+                                true,
+                                "indent scope toggle"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>ul"),
+                                true,
+                                "list chars toggle"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>un"),
+                                true,
+                                "line numbers toggle"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>up"),
+                                true,
+                                "paste mode toggle"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>uN"),
+                                true,
+                                "relative numbers toggle"
+                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>us"), true, "spellcheck toggle")
+                            -- Note: <leader>ut is for trailspace toggle (checked in editing-support.lua)
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>uT"),
+                                true,
+                                "treesitter toggle"
+                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uw"), true, "wrap toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>uy"),
+                                true,
+                                "syntax highlight toggle"
+                            )
                         end,
                     },
                 },
             },
         },
         {
-            pattern = "<leader>w[zm=|_]",
+            pattern = "<leader>w[a-z=|_]",
             desc = "Window management",
             tests = {
                 {
@@ -187,6 +250,11 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Check window management keybindings
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>wf"),
+                                true,
+                                "toggle window focus"
+                            )
                             MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wz"), true, "zoom window")
                             MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wm"), true, "maximize window")
                             MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w="), true, "equalize windows")
@@ -206,61 +274,303 @@ return {
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
 
-                            -- Verify Esc is mapped in normal mode
-                            local keymaps = vim.api.nvim_get_keymap("n")
-                            local esc_map = vim.tbl_filter(function(m) return m.lhs == "<Esc>" end, keymaps)[1]
-                            MiniTest.expect.equality(esc_map ~= nil, true, "Esc keymap should exist")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<Esc>"), true, "Esc keymap should exist")
                         end,
                     },
                 },
             },
         },
         {
-            pattern = "<leader>r[yYpP]",
-            desc = "Register operations (* and + clipboards)",
+            pattern = "Terminal mode escapes",
+            desc = "Exit terminal mode",
             tests = {
                 {
-                    name = "yank to * register",
+                    name = "terminal mode escapes exist",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>ry")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>ry keymap")
+
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("t", "<C-\\><C-n>"),
+                                true,
+                                "terminal mode escape with C-\\C-n"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("t", "<Esc><Esc>"),
+                                true,
+                                "terminal mode escape with double Esc"
+                            )
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<C-q>",
+            desc = "Force quit without saving",
+            tests = {
+                {
+                    name = "force quit keymap exists",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<C-q>"), true, "force quit keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>b[wW]",
+            desc = "Buffer operations",
+            tests = {
+                {
+                    name = "buffer wipeout keymaps exist",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>bw"),
+                                true,
+                                "wipeout buffer keymap"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>bW"),
+                                true,
+                                "wipeout all buffers keymap"
+                            )
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>[yYpPdD]",
+            desc = "Clipboard and black hole register operations",
+            tests = {
+                {
+                    name = "clipboard yank keymaps",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>y"),
+                                true,
+                                "Should have <leader>y keymap"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("x", "<leader>y"),
+                                true,
+                                "Should have <leader>y in visual mode"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>Y"),
+                                true,
+                                "Should have <leader>Y keymap"
+                            )
                         end,
                     },
                 },
                 {
-                    name = "paste from * register",
+                    name = "clipboard paste keymaps",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>rp")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>rp keymap")
+
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>p"),
+                                true,
+                                "Should have <leader>p keymap"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("x", "<leader>p"),
+                                true,
+                                "Should have <leader>p in visual mode"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>P"),
+                                true,
+                                "Should have <leader>P keymap"
+                            )
                         end,
                     },
                 },
                 {
-                    name = "yank to + register",
+                    name = "black hole delete keymaps",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>rY")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>rY keymap")
+
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<leader>d"),
+                                true,
+                                "Should have <leader>d keymap"
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("x", "<leader>d"),
+                                true,
+                                "Should have <leader>d in visual mode"
+                            )
                         end,
                     },
                 },
                 {
-                    name = "paste from + register",
+                    name = "insert mode clipboard paste",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("n", "<leader>rP")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>rP keymap")
+
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("i", "<C-v>"),
+                                true,
+                                "Should have <C-v> in insert mode"
+                            )
+                        end,
+                    },
+                },
+                {
+                    name = "clipboard yank behavior",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            -- Create buffer with test content
+                            local bufnr = helpers.create_test_buffer({ "test line" }, "text")
+                            vim.api.nvim_set_current_buf(bufnr)
+                            vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+                            -- Clear clipboard
+                            vim.fn.setreg("+", "")
+
+                            -- Yank with <leader>y (simulated via API call)
+                            vim.cmd('normal! "+yy')
+
+                            -- Check clipboard has content
+                            local clipboard_content = vim.fn.getreg("+")
+                            MiniTest.expect.equality(
+                                clipboard_content:match("test line") ~= nil,
+                                true,
+                                "Clipboard should contain yanked text"
+                            )
+
+                            helpers.delete_buffer(bufnr)
+                        end,
+                    },
+                },
+                {
+                    name = "black hole delete behavior",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            -- Create buffer
+                            local bufnr = helpers.create_test_buffer({ "delete me", "keep this" }, "text")
+                            vim.api.nvim_set_current_buf(bufnr)
+                            vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+                            -- Clear registers
+                            vim.fn.setreg('"', "previous content")
+
+                            -- Delete to black hole register
+                            vim.cmd('normal! "_dd')
+
+                            -- Check default register still has previous content
+                            local reg_content = vim.fn.getreg('"')
+                            MiniTest.expect.equality(
+                                reg_content,
+                                "previous content",
+                                "Default register should not be affected by black hole delete"
+                            )
+
+                            helpers.delete_buffer(bufnr)
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "\"[a-z0-9]",
+            desc = "Named register usage guide",
+            tests = {
+                {
+                    name = "named register yank and paste",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            -- Create buffer
+                            local bufnr = helpers.create_test_buffer({ "register content", "other line" }, "text")
+                            vim.api.nvim_set_current_buf(bufnr)
+                            vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+                            -- Yank to register 'a'
+                            vim.cmd('normal! "ayy')
+
+                            -- Move to second line
+                            vim.api.nvim_win_set_cursor(0, { 2, 0 })
+
+                            -- Paste from register 'a'
+                            vim.cmd('normal! "ap')
+
+                            -- Check result
+                            local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+                            MiniTest.expect.equality(
+                                lines[3]:match("register content") ~= nil,
+                                true,
+                                "Should paste content from named register"
+                            )
+
+                            helpers.delete_buffer(bufnr)
+                        end,
+                    },
+                },
+                {
+                    name = "yank register (0) preserves yanks",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+
+                            -- Create buffer
+                            local bufnr = helpers.create_test_buffer({ "yank me", "delete me", "" }, "text")
+                            vim.api.nvim_set_current_buf(bufnr)
+
+                            -- Yank line 1
+                            vim.api.nvim_win_set_cursor(0, { 1, 0 })
+                            vim.cmd("normal! yy")
+
+                            -- Delete line 2 (pollutes default register)
+                            vim.api.nvim_win_set_cursor(0, { 2, 0 })
+                            vim.cmd("normal! dd")
+
+                            -- Paste from yank register (0) should get yanked content
+                            vim.api.nvim_win_set_cursor(0, { 2, 0 })
+                            vim.cmd('normal! "0p')
+
+                            -- Check result
+                            local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+                            MiniTest.expect.equality(
+                                lines[3]:match("yank me") ~= nil,
+                                true,
+                                "Yank register (0) should preserve yank despite delete"
+                            )
+
+                            helpers.delete_buffer(bufnr)
                         end,
                     },
                 },
