@@ -46,8 +46,8 @@ function M.run_all_tests(only_failed, shuffle, seed)
         if not last_test_run.has_failures then
             append_line("No failed tests from previous run.")
             append_line("Press 'q' or <Esc> to close this window.")
-            vim.api.nvim_buf_set_keymap(buf, "n", "q", ":close<CR>", { noremap = true, silent = true })
-            vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", ":close<CR>", { noremap = true, silent = true })
+            vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
+            vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
             return
         end
         append_line("Re-running failed tests from last run...")
@@ -89,8 +89,8 @@ function M.run_all_tests(only_failed, shuffle, seed)
     if #test_files == 0 then
         append_line("No test files found" .. (only_failed and " in last failed run." or " in " .. test_dir))
         append_line("Press 'q' or <Esc> to close this window.")
-        vim.api.nvim_buf_set_keymap(buf, "n", "q", ":close<CR>", { noremap = true, silent = true })
-        vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", ":close<CR>", { noremap = true, silent = true })
+        vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
+        vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
         return
     end
 
@@ -179,8 +179,8 @@ function M.run_all_tests(only_failed, shuffle, seed)
     end
 
     -- Add keymaps to close the window
-    vim.api.nvim_buf_set_keymap(buf, "n", "q", ":close<CR>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", ":close<CR>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
 
     -- Update last test run status for future failed test runs
     last_test_run.results = test_results
@@ -478,8 +478,8 @@ function M.run_tests_parallel(shuffle, seed)
     append_line("All tests completed!")
     append_line("Press 'q' or <Esc> to close")
 
-    vim.api.nvim_buf_set_keymap(buf, "n", "q", ":close<CR>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", ":close<CR>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
+    vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
 
     pool:shutdown()
     return results

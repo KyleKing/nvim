@@ -67,7 +67,7 @@ create_autocmd({ "VimEnter", "BufEnter" }, {
             vim.opt.statusline = utils.build_temp_statusline(session_type, highlight_group)
 
             -- Add easy quit mapping
-            vim.keymap.set("n", "<leader>q", ":wq<CR>", { buffer = true, desc = "Save and quit" })
+            vim.keymap.set("n", "<leader>q", "<Cmd>wq<CR>", { buffer = true, desc = "Save and quit" })
         end
     end,
 })

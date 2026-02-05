@@ -11,8 +11,6 @@ vim.api.nvim_set_keymap("", "<Space>", "<Nop>", { noremap = true, silent = true 
 
 local K = vim.keymap.set
 
-K("n", "<Esc>", ":nohlsearch<CR>") -- Clear last search highlighting
-
 -- Terminal mode escape
 K("t", "<C-\\><C-n>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 K("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode (double escape)" })
@@ -30,29 +28,27 @@ K("n", "dd", function()
     return "dd"
 end, { expr = true })
 
--- Remap for dealing with word wrap
+-- Move up and down visually, even with word wrap
 K("n", "k", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true, desc = "Move cursor up" })
 K("n", "j", "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true, desc = "Move cursor down" })
 
 -- Standard Operations
-K("n", "<leader>q", "<Cmd>confirm q<CR>", { desc = "Quit" })
-K("n", "<leader>Q", "<Cmd>confirm qall<CR>", { desc = "Quit all" })
-K("n", "<leader>n", "<Cmd>new<CR>", { desc = "New File" })
+K("n", "<Esc>", "<Cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 K("n", "<C-q>", "<Cmd>q!<CR>", { desc = "Force quit" })
--- Note: <C-s> removed to avoid conflict with treesitter scope increment
--- Use :w or :update directly, or <leader>w for save operations
 
 -- Use operator pending mode to visually select the whole buffer
 --  e.g. dA = delete buffer ALL, yA = copy whole buffer ALL
 -- Based on: https://github.com/numToStr/dotfiles/blob/c8dcb7bea3c1cc64d74559804071c861dae6e851/neovim/.config/nvim/lua/numToStr/keybinds.lua#L48C1-L51
+-- Note: Uses :<C-U> instead of <Cmd> because <C-U> clears the auto-inserted visual range ('< ,'>)
+--       which is necessary for operator-pending/visual mode mappings executing normal! commands
 K("o", "A", ":<C-U>normal! mzggVG<CR>`z", { desc = "Select whole buffer" })
 K("x", "A", ":<C-U>normal! ggVG<CR>", { desc = "Select whole buffer" })
 
 -- Buffer management
 -- Navigation: ]b/[b (nap.nvim), <C-^> (alternate buffer)
 -- See: :h kyleking-neovim (navigation section)
-K("n", "<leader>bw", ":bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
-K("n", "<leader>bW", ":%bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
+K("n", "<leader>bw", "<Cmd>bwipeout<CR>", { desc = "Wipeout buffer (including marks)" })
+K("n", "<leader>bW", "<Cmd>%bwipeout<CR>", { desc = "Wipeout all buffers (including marks)" })
 
 -- Window (split) management
 -- Navigation: <C-w>h/j/k/l, creation: <C-w>s/v, resizing: <C-w>=/+/-/_/|
