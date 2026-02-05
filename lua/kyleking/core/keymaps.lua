@@ -94,7 +94,7 @@ K("n", "<leader>up", function()
 end, { desc = "Toggle paste mode" })
 K("n", "<leader>uN", "<Cmd>set relativenumber!<CR>", { desc = "Toggle relative numbers" })
 K("n", "<leader>us", "<Cmd>setlocal spell!<CR>", { desc = "Toggle spellcheck" })
-K("n", "<leader>ut", function()
+K("n", "<leader>uT", function()
     if vim.b.ts_highlight then
         vim.treesitter.stop()
         vim.notify("Treesitter off")

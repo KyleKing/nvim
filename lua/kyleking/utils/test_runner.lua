@@ -542,6 +542,7 @@ function M.run_ci_tests()
     local ci_safe_patterns = {
         -- Core tests
         "lua/tests/core/smoke_spec.lua",
+        "lua/tests/core/keymap_collision_spec.lua",
 
         -- All custom utility tests
         "lua/tests/custom/*_spec.lua",
