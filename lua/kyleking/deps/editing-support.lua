@@ -103,8 +103,9 @@ later(function()
     -- Toggle trailspace highlighting
     local K = vim.keymap.set
     K("n", "<leader>ut", function()
-        local autocmds = vim.api.nvim_get_autocmds({ group = "MiniTrailspace" })
-        if #autocmds > 0 then
+        -- Safely check if augroup exists (returns empty table if not)
+        local ok, autocmds = pcall(vim.api.nvim_get_autocmds, { group = "MiniTrailspace" })
+        if ok and #autocmds > 0 then
             -- Disable: clear autocmds and unhighlight
             vim.api.nvim_del_augroup_by_name("MiniTrailspace")
             MiniTrailspace.unhighlight()
