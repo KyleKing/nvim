@@ -43,10 +43,10 @@ return {
         "- `<C-v>` (insert mode) - Paste from system clipboard",
         "",
         "**Named registers** (use with y/p/d operators):",
-        "- `\"ay` - Yank to register a (a-z for named registers)",
-        "- `\"ap` - Paste from register a",
-        "- `\"_d` - Delete to black hole register (no yank)",
-        "- `\"0p` - Paste from yank register (ignores deletes)",
+        '- `"ay` - Yank to register a (a-z for named registers)',
+        '- `"ap` - Paste from register a',
+        '- `"_d` - Delete to black hole register (no yank)',
+        '- `"0p` - Paste from yank register (ignores deletes)',
         "- `<leader>fr` - Browse registers with picker (see fuzzy-finder)",
         "",
         "**UI toggles**:",
@@ -174,16 +174,8 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Background
-                            MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>ub"),
-                                true,
-                                "dark background"
-                            )
-                            MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>uB"),
-                                true,
-                                "light background"
-                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ub"), true, "dark background")
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uB"), true, "light background")
                             -- Toggles
                             MiniTest.expect.equality(
                                 helpers.check_keymap("n", "<leader>uc"),
@@ -200,21 +192,13 @@ return {
                                 true,
                                 "indent scope toggle"
                             )
-                            MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>ul"),
-                                true,
-                                "list chars toggle"
-                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ul"), true, "list chars toggle")
                             MiniTest.expect.equality(
                                 helpers.check_keymap("n", "<leader>un"),
                                 true,
                                 "line numbers toggle"
                             )
-                            MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>up"),
-                                true,
-                                "paste mode toggle"
-                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>up"), true, "paste mode toggle")
                             MiniTest.expect.equality(
                                 helpers.check_keymap("n", "<leader>uN"),
                                 true,
@@ -222,11 +206,7 @@ return {
                             )
                             MiniTest.expect.equality(helpers.check_keymap("n", "<leader>us"), true, "spellcheck toggle")
                             -- Note: <leader>ut is for trailspace toggle (checked in editing-support.lua)
-                            MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>uT"),
-                                true,
-                                "treesitter toggle"
-                            )
+                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uT"), true, "treesitter toggle")
                             MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uw"), true, "wrap toggle")
                             MiniTest.expect.equality(
                                 helpers.check_keymap("n", "<leader>uy"),
@@ -276,7 +256,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
 
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<Esc>"), true, "Esc keymap should exist")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("n", "<Esc>"),
+                                true,
+                                "Esc keymap should exist"
+                            )
                         end,
                     },
                 },
@@ -503,7 +487,7 @@ return {
             },
         },
         {
-            pattern = "\"[a-z0-9]",
+            pattern = '"[a-z0-9]',
             desc = "Named register usage guide",
             tests = {
                 {

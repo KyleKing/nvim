@@ -254,6 +254,57 @@ Tests verify **behavior**, not **existence**. The smoke test catches plugin load
 
 Prefer config values or behavioral outcomes over existence checks.
 
+### Test maintenance and critical patterns
+
+**When making changes, always update tests:**
+
+1. **Add tests** for new functionality (features, keymaps, commands)
+1. **Update tests** when behavior changes (ensure they still verify correct behavior)
+1. **Remove tests** for deleted functionality (keep test suite focused)
+1. **Merge tests** when consolidating related functionality
+
+**Critical patterns requiring thorough testing:**
+
+**Augroup deletion/recreation** - Test multiple toggle cycles:
+
+```lua
+-- Pattern: vim.api.nvim_del_augroup_by_name() followed by recreation
+-- Risk: Querying deleted augroup throws error on subsequent calls
+-- Test: Call toggle 3+ times, verify no errors
+
+tests = {
+    {
+        name = "toggle survives multiple calls",
+        expect = {
+            fn = function(_ctx)
+                local _, keymap = helpers.check_keymap("<leader>xy", "n")
+                if keymap.callback then
+                    for i = 1, 3 do
+                        local ok, err = pcall(keymap.callback)
+                        MiniTest.expect.equality(ok, true, "Toggle " .. i .. " failed: " .. tostring(err))
+                    end
+                end
+            end,
+        },
+    },
+}
+```
+
+**State-dependent toggles** - Verify state isolation:
+
+- Per-buffer toggles: test multiple buffers independently
+- Global toggles: test enabling/disabling doesn't leak state
+- Persistent toggles: verify state survives reloads
+
+**Async operations** - Use `vim.wait()` for eventual consistency:
+
+```lua
+-- Pattern: Plugin highlights/LSP attach/async initialization
+vim.wait(2000, function()
+    return condition_met()
+end, 100)
+```
+
 ### LSP configuration (nvim 0.11+)
 
 LSP configuration is split across three locations:

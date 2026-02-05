@@ -128,13 +128,11 @@ T["collision detection"]["no prefix collisions in normal mode"] = function()
                     conflict.compound_desc
                 )
         end
-        msg = msg
-            .. "\nPrefix collisions create UX delays: vim waits 'timeoutlen' after direct binding\n"
+        msg = msg .. "\nPrefix collisions create UX delays: vim waits 'timeoutlen' after direct binding\n"
         msg = msg .. "to see if user wants the compound binding. Either:\n"
         msg = msg .. "  1. Remove the direct binding if compound bindings are more important\n"
         msg = msg .. "  2. Use different prefix for compound bindings\n"
-        msg = msg
-            .. "  3. Add to ACCEPTABLE_PREFIX_OVERLAPS if intentional (e.g., mini.clue shows submenu)\n"
+        msg = msg .. "  3. Add to ACCEPTABLE_PREFIX_OVERLAPS if intentional (e.g., mini.clue shows submenu)\n"
 
         MiniTest.expect.equality(#prefix_conflicts, 0, msg)
     end

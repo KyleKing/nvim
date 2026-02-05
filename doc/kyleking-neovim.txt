@@ -48,6 +48,8 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Source: lua/kyleking/core/keymaps.lua|kyleking-neovim-source:-lua/kyleking/core/keymaps.lua|
   - VCS Integration (git/jj)        |kyleking-neovim-vcs-integration-(git/jj)|
   - See also: MiniDiff, MiniGit  |kyleking-neovim-see-also:-minidiff,-minigit|
+  - Editing Support Utilities      |kyleking-neovim-editing-support-utilities|
+  - See also: operators, surround, ai, move|kyleking-neovim-see-also:-operators,-surround,-ai,-move|
   - File Explorer (mini.files)    |kyleking-neovim-file-explorer-(mini.files)|
   - See also: MiniFiles                  |kyleking-neovim-see-also:-minifiles|
   - Flash (motion/jumping)            |kyleking-neovim-flash-(motion/jumping)|
@@ -59,7 +61,7 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - LSP Advanced Features              |kyleking-neovim-lsp-advanced-features|
   - See also: lsp, diagnostic, nvim-lint|kyleking-neovim-see-also:-lsp,-diagnostic,-nvim-lint|
   - LSP Completion Keybindings    |kyleking-neovim-lsp-completion-keybindings|
-  - See also: ins-completion, nvim-cmp|kyleking-neovim-see-also:-ins-completion,-nvim-cmp|
+  - See also: ins-completion, vim.lsp.completion|kyleking-neovim-see-also:-ins-completion,-vim.lsp.completion|
   - Markdown/Djot Editing              |kyleking-neovim-markdown/djot-editing|
   - See also: markdown, djot        |kyleking-neovim-see-also:-markdown,-djot|
   - Move (mini.move)                        |kyleking-neovim-move-(mini.move)|
@@ -1062,10 +1064,14 @@ Operator grammar:
     j / k                Enhanced up/down movement
     dd                   Smart line deletion
     A                    Whole buffer text object
-    <leader>u[dscwb]     UI toggles
-    <leader>w[zm=|_]     Window management
+    <leader>u[a-z]       UI toggles
+    <leader>w[a-z=|_]    Window management
     <Esc>                Clear search highlighting
-    <leader>r[yYpP]      Register operations (* and + clipboards)
+    Terminal mode escapes Exit terminal mode
+    <C-q>                Force quit without saving
+    <leader>b[wW]        Buffer operations
+    <leader>[yYpPdD]     Clipboard and black hole register operations
+    "[a-z0-9]            Named register usage guide
 <
 
 **Leaders**
@@ -1097,33 +1103,51 @@ Operator grammar:
 **File operations**
 
 - `<C-q>`- Force quit without saving
-- `<leader>q` - Quit with confirmation
-- `<leader>Q` - Quit all with confirmation
-- `<leader>n` - New file
 
 **Buffer operations**
 
 - `<leader>bw`- Wipeout buffer (delete including marks)
 - `<leader>bW` - Wipeout all buffers
 
-**Register operations**
+**Clipboard operations** (hybrid approach):
 
-- `<leader>ry`- Yank to `*` register (selection clipboard)
-- `<leader>rp` - Paste from `*` register
-- `<leader>rY` - Yank to `+` register (system clipboard)
-- `<leader>rP` - Paste from `+` register
+- `<leader>y` - Yank to system clipboard (works in visual mode)
+- `<leader>Y` - Yank line to system clipboard
+- `<leader>p` - Paste from system clipboard (works in visual mode)
+- `<leader>P` - Paste before from system clipboard
+- `<leader>d` - Delete without yanking (black hole register)
+- `<leader>D` - Delete to EOL without yanking
+- `<C-v>` (insert mode) - Paste from system clipboard
+
+**Named registers** (use with y/p/d operators):
+
+- `"ay` - Yank to register a (a-z for named registers)
+- `"ap` - Paste from register a
+- `"_d` - Delete to black hole register (no yank)
+- `"0p` - Paste from yank register (ignores deletes)
+- `<leader>fr` - Browse registers with picker (see fuzzy-finder)
 
 **UI toggles**
 
-- `<leader>us`- Toggle spellcheck
-- `<leader>uw` - Toggle line wrap
-- `<leader>ud` - Toggle diagnostics
+- `<leader>ub`- Set dark background
+- `<leader>uB` - Set light background
 - `<leader>uc` - Toggle conceallevel (0 2)
-- `<leader>ub` - Toggle background (dark light)
+- `<leader>ud` - Toggle diagnostics
+- `<leader>ui` - Toggle indent scope
+- `<leader>ul` - Toggle list chars
+- `<leader>un` - Toggle line numbers
+- `<leader>up` - Toggle paste mode
+- `<leader>uN` - Toggle relative numbers
+- `<leader>us` - Toggle spellcheck
+- `<leader>ut` - Toggle trailing whitespace (see editing-support)
+- `<leader>uT` - Toggle treesitter
+- `<leader>uw` - Toggle line wrap
+- `<leader>uy` - Toggle syntax highlight
 
 **Window management**
 
-- `<leader>wz`- Zoom window (open in new tab)
+- `<leader>wf`- Toggle focused/equal window layout
+- `<leader>wz` - Zoom window (open in new tab)
 - `<leader>wm` - Maximize window (close all others)
 - `<leader>w=` - Equalize window sizes
 - `<leader>w|` - Maximize window width
@@ -1179,6 +1203,36 @@ Source: `lua/kyleking/deps/git.lua`
 
 
 SEE ALSO: MINIDIFF, MINIGIT      *kyleking-neovim-see-also:-minidiff,-minigit*
+
+
+EDITING SUPPORT UTILITIES          *kyleking-neovim-editing-support-utilities*
+
+Trailing whitespace highlighting, list editing, preview, and other editing
+utilities.
+
+Operator grammar:
+
+>
+    <leader>ut           Toggle trailing whitespace highlighting
+<
+
+**Trailing whitespace**
+
+- `<leader>ut`- Toggle trailing whitespace highlighting
+- `:Trim` - Remove trailing whitespace from buffer
+
+**List editing**
+
+Customutilities for markdown/djot list continuation and manipulation.
+
+**Preview**
+
+CLI-basedmarkdown/djot preview in browser using pandoc or djot CLI.
+
+Source: `lua/kyleking/deps/editing-support.lua`
+
+
+SEE ALSO: OPERATORS, SURROUND, AI, MOVE*kyleking-neovim-see-also:-operators,-surround,-ai,-move*
 
 
 FILE EXPLORER (MINI.FILES)        *kyleking-neovim-file-explorer-(mini.files)*
@@ -1349,20 +1403,22 @@ SEE ALSO: GD, GR, LSP                  *kyleking-neovim-see-also:-gd,-gr,-lsp*
 
 LSP ADVANCED FEATURES                  *kyleking-neovim-lsp-advanced-features*
 
-Additional LSP features: signature help and manual linting.
+Additional LSP features: native signature help and manual linting.
 
 Operator grammar:
 
 >
-    <leader>ks           Toggle signature help
+    <leader>ks           Show signature help
     <leader>ll           Manual lint trigger
 <
 
-**Signature help** (lsp_signature.nvim):
+**Signature help** (native LSP):
 
-- `<leader>ks` - Toggle floating signature help window (normal and insert mode)
+- `<leader>ks` - Show/hide signature help floating window (normal and insert mode)
 
-Shows function signatures with parameter documentation while typing.
+Uses Neovim’s built-in `vim.lsp.buf.signature_help()` with rounded borders.
+
+Shows function signatures with parameter documentation.
 
 Useful when calling functions with multiple parameters to see which parameter
 you’re on.
@@ -1409,40 +1465,50 @@ SEE ALSO: LSP, DIAGNOSTIC, NVIM-LINT*kyleking-neovim-see-also:-lsp,-diagnostic,-
 
 LSP COMPLETION KEYBINDINGS        *kyleking-neovim-lsp-completion-keybindings*
 
-Keybindings for LSP completion in insert mode, including navigation and
-acceptance.
+Keybindings for LSP completion in insert mode, including navigation,
+acceptance, and mode toggling.
 
 Operator grammar:
 
 >
+    <leader>ca           Toggle completion mode (manual/auto)
     <C-Space>            Trigger completion
     <C-j> / <C-k>        Navigate completion items (buffer-local)
+    <C-CR>               Accept completion
 <
+
+**Toggle completion mode**
+
+- `<leader>ca`- Toggle between manual and auto-trigger completion (normal mode)
+
+**Completion modes**
+
+- **Manualmode** (default): Requires `<C-Space>` to show completions
+- **Auto mode**Completions appear automatically as you type
 
 **Trigger completion**
 
-- `<C-Space>`- Manually trigger completion menu
+- `<C-Space>`- Manually trigger completion menu (works in both modes)
 
 **Navigate completion menu**
 
 - `<C-j>`- Select next completion item
 - `<C-k>` - Select previous completion item
 
-**Accept completion**
+**Accept/dismiss completion**
 
 - `<C-CR>`- Accept selected completion item
-- `<CR>` - Accept completion if menu is visible and item is selected, otherwise
-    insert newline
+- `<CR>` - Dismiss completion menu and insert newline
 
 **Completion behavior**
 
-Thecompletion system uses nvim’s built-in LSP completion with
-`vim.lsp.completion.trigger()`.
+Thecompletion system uses Neovim’s built-in LSP completion
+(`vim.lsp.completion.enable()`).
 
-Completion menu appears automatically as you type when LSP is active.
+State is tracked per-buffer, so each buffer remembers its completion mode
+independently.
 
-The `<CR>` key intelligently handles both completion acceptance and normal
-newline insertion.
+A notification shows the current mode when toggled.
 
 **LSP navigation** (buffer-local when LSP attaches):
 
@@ -1452,7 +1518,7 @@ other LSP features.
 Source: `lua/kyleking/core/lsp.lua`
 
 
-SEE ALSO: INS-COMPLETION, NVIM-CMP*kyleking-neovim-see-also:-ins-completion,-nvim-cmp*
+SEE ALSO: INS-COMPLETION, VIM.LSP.COMPLETION*kyleking-neovim-see-also:-ins-completion,-vim.lsp.completion*
 
 
 MARKDOWN/DJOT EDITING                  *kyleking-neovim-markdown/djot-editing*
@@ -1561,17 +1627,28 @@ keys.
 Operator grammar:
 
 >
+    Native vim tabline   Tabline shows tabs only (no buffers)
+    ]b / [b              Navigate buffers (primary method, nap.nvim)
     ]a / [a              Navigate tabs (nap.nvim)
     gt / gT              Standard vim tab navigation
     <C-^>                Alternate buffer
 <
 
-nap.nvim provides `]`/`[` prefix keys for jumping to next/previous items:
+**Tabline behavior**
 
-**Navigation operators**
+Nativevim tabline displays tabs only (no buffer list). Appears when 2+ tabs
+exist.
 
-- `]a`/ `[a` - Tabs (next/previous)
-- `]b` / `[b` - Buffers
+**Buffer navigation** (buffers not visible in tabline):
+
+- `]b` / `[b` - Cycle through buffers (nap.nvim)
+- `<leader>fb` - Fuzzy find buffers (mini.pick)
+- `<C-^>` - Toggle alternate buffer
+- `:ls` - List all buffers
+
+**Other navigation operators** (nap.nvim):
+
+- `]a` / `[a` - Tabs
 - `]d` / `[d` - Diagnostics
 - `]q` / `[q` - Quickfix items
 - `]l` / `[l` - Location list items
@@ -1581,23 +1658,23 @@ nap.nvim provides `]`/`[` prefix keys for jumping to next/previous items:
 - `]z` / `[z` - Folds
 - `]'` / `['` - Marks
 
-**Rapid repeat keys**
+**Rapid repeat**
 
-Afterinitial jump, use `<C-n>` (next) or `<C-p>` (previous) to cycle quickly
-without retyping the prefix.
+Afterinitial `]`/`[` jump, use `<C-n>` (next) or `<C-p>` (previous) to cycle
+without retyping.
 
-**Example workflows**
+**Recommended workflows**
 
-- Press`]b` to jump to next buffer, then `<C-n>` repeatedly to cycle through all
-    buffers
-- Press `]d` to jump to next diagnostic, then `<C-n>` to cycle through diagnostic
-    list
-- Press `]q` to jump to next quickfix item, then `<C-n>` to navigate results
+- **Quickbuffer scan**`]b` then `<C-n><C-n><C-n>` to cycle rapidly
+- **Named buffer**`<leader>fb` to fuzzy search by filename
+- **Recent buffer**`<C-^>` to toggle between last two buffers
+- **Tab navigation**`]a` then `<C-n>` to cycle tabs (or `gt`/`gT`)
+- **Diagnostic flow**`]d` then `<C-n>` to step through errors
 
 **Standard vim alternatives**
 
-- Tabs:`gt` (next tab), `gT` (previous tab), `:tabnew` (create tab)
-- Buffers: `<C-^>` (alternate buffer)
+- Tabs:`gt` (next), `gT` (previous), `:tabnew` (create)
+- Buffers: `:bnext`, `:bprev`, `<C-^>` (alternate)
 - Windows: `<C-w>h/j/k/l` (navigate), `<C-w>s/v` (split)
 
 
@@ -1643,9 +1720,11 @@ Operator grammar:
     <leader>;            Buffer picker
     <leader><leader>     Resume last picker
     <C-j> / <C-k>        Navigate picker items
+    <C-w>                Toggle insert/normal mode for query editing
     <leader>fh           Find in nvim help
     <leader>fk           Find keymaps
     <leader>fr           Find registers
+    <leader>fp           Paste from register picker
     <leader>f'           Find marks
     <leader>fl           Find in quickfix/location lists
 <
@@ -1661,6 +1740,13 @@ Operator grammar:
 - `<C-v>` Choose in vertical split
 - `<C-t>` Choose in new tab
 - `<Esc>` Close picker
+
+**Editing the query**
+
+- `<C-w>`Toggle between insert and normal mode
+- In normal mode, use standard vim motions (`w`, `b`, `x`, `i`, `a`, etc.) to
+    edit the query
+- Press `<C-w>` again to return to insert mode for searching
 
 **Preview**
 
@@ -1721,6 +1807,11 @@ stacked. Only supported with rg and git tools.
 `<leader>ff`uses rg which includes hidden/dotfiles (`.github/**`, etc.) and
 respects `.gitignore`. `<leader>gf` uses `git ls-files` to list only
 git-tracked files.
+
+**Register operations**
+
+- `<leader>fr`Browse registers (view contents)
+- `<leader>fp` Paste from register picker (choose register, then paste)
 
 **Tips**
 
@@ -2158,8 +2249,7 @@ Session management:
 
 See |workspace-diagnostics| for detailed examples and workflows.
 
-Source: `lua/kyleking/deps/lsp.lua,
-lua/kyleking/utils/workspace_diagnostics.lua`
+Source: `lua/kyleking/deps/lsp.lua, lua/kyleking/utils/workspace_diagnostics/`
 
 See also: `diagnostic`, `quickfix`, `lsp`
 

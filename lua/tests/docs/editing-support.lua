@@ -51,13 +51,25 @@ return {
                                 if toggle_map and toggle_map.callback then
                                     -- Call toggle multiple times - should not error
                                     local success1, err1 = pcall(toggle_map.callback)
-                                    MiniTest.expect.equality(success1, true, "First toggle call should succeed: " .. tostring(err1))
+                                    MiniTest.expect.equality(
+                                        success1,
+                                        true,
+                                        "First toggle call should succeed: " .. tostring(err1)
+                                    )
 
                                     local success2, err2 = pcall(toggle_map.callback)
-                                    MiniTest.expect.equality(success2, true, "Second toggle call should succeed: " .. tostring(err2))
+                                    MiniTest.expect.equality(
+                                        success2,
+                                        true,
+                                        "Second toggle call should succeed: " .. tostring(err2)
+                                    )
 
                                     local success3, err3 = pcall(toggle_map.callback)
-                                    MiniTest.expect.equality(success3, true, "Third toggle call should succeed: " .. tostring(err3))
+                                    MiniTest.expect.equality(
+                                        success3,
+                                        true,
+                                        "Third toggle call should succeed: " .. tostring(err3)
+                                    )
                                 end
                             end
                         end,
