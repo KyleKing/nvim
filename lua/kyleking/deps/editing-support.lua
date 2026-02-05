@@ -96,7 +96,27 @@ later(function()
     })
 end)
 
-later(function() require("mini.trailspace").setup() end)
+later(function()
+    local MiniTrailspace = require("mini.trailspace")
+    MiniTrailspace.setup()
+
+    -- Toggle trailspace highlighting
+    local K = vim.keymap.set
+    K("n", "<leader>ut", function()
+        local autocmds = vim.api.nvim_get_autocmds({ group = "MiniTrailspace" })
+        if #autocmds > 0 then
+            -- Disable: clear autocmds and unhighlight
+            vim.api.nvim_del_augroup_by_name("MiniTrailspace")
+            MiniTrailspace.unhighlight()
+            vim.notify("Trailspace highlighting disabled", vim.log.levels.INFO)
+        else
+            -- Re-enable: recreate autocmds and highlight
+            MiniTrailspace.setup()
+            MiniTrailspace.highlight()
+            vim.notify("Trailspace highlighting enabled", vim.log.levels.INFO)
+        end
+    end, { desc = "Toggle trailing whitespace highlighting" })
+end)
 
 later(function()
     local hipatterns = require("mini.hipatterns")

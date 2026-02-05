@@ -2,20 +2,8 @@ local MiniDeps = require("mini.deps")
 local deps_utils = require("kyleking.deps_utils")
 local add, later = MiniDeps.add, deps_utils.maybe_later
 
--- PLANNED: Configure keymaps and settings: https://github.com/ray-x/lsp_signature.nvim?tab=readme-ov-file#keymap
-later(function()
-    add("ray-x/lsp_signature.nvim")
-    local signature = require("lsp_signature")
-    signature.setup({
-        bind = false,
-        hint_enable = false,
-        handler_opts = { border = "rounded" },
-    })
-
-    local K = vim.keymap.set
-    local toggle_signature = function() signature.toggle_float_win() end
-    K({ "n", "i" }, "<leader>ks", toggle_signature, { desc = "Toggle signature help" })
-end)
+-- Configure signature help border globally
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 
 later(function()
     add("mfussenegger/nvim-lint")

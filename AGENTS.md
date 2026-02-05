@@ -200,7 +200,7 @@ end)
 
 ### mini.nvim ecosystem
 
-This config uses mini.nvim modules heavily instead of standalone plugins: mini.pick (fuzzy finder), mini.files (file explorer), mini.diff/mini.git (git), mini.hipatterns (keyword highlights), mini.surround, mini.ai (enhanced text objects), mini.move, mini.clue (which-key), mini.comment, mini.trailspace, mini.icons (Nerd Font icons), mini.statusline, mini.tabline, and more.
+This config uses mini.nvim modules heavily instead of standalone plugins: mini.pick (fuzzy finder), mini.files (file explorer), mini.diff/mini.git (git), mini.hipatterns (keyword highlights), mini.surround, mini.ai (enhanced text objects), mini.move, mini.clue (which-key), mini.comment, mini.trailspace (toggleable trailing whitespace highlighting), mini.icons (Nerd Font icons), mini.statusline, mini.tabline, and more.
 
 For mini.ai text object bindings and custom specs, see `:help mini.ai` and `lua/kyleking/deps/editing.lua`.
 

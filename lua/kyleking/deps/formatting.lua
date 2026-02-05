@@ -85,7 +85,7 @@ later(function()
             typescript = ts_like,
             typescriptreact = ts_like,
             yaml = prettier,
-            ["*"] = { "typos" },
+            ["*"] = { "trim_whitespace", "trim_newlines", "typos" },
         },
         formatters = {
             beautysh = { command = fre.command_for("beautysh") },

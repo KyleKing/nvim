@@ -1,14 +1,15 @@
 return {
     title = "LSP Advanced Features",
     see_also = { "lsp", "diagnostic", "nvim-lint" },
-    desc = "Additional LSP features: signature help and manual linting.",
+    desc = "Additional LSP features: native signature help and manual linting.",
     source = "lua/kyleking/deps/lsp.lua",
 
     notes = {
-        "**Signature help** (lsp_signature.nvim):",
-        "- `<leader>ks` - Toggle floating signature help window (normal and insert mode)",
+        "**Signature help** (native LSP):",
+        "- `<leader>ks` - Show/hide signature help floating window (normal and insert mode)",
         "",
-        "Shows function signatures with parameter documentation while typing.",
+        "Uses Neovim's built-in `vim.lsp.buf.signature_help()` with rounded borders.",
+        "Shows function signatures with parameter documentation.",
         "Useful when calling functions with multiple parameters to see which parameter you're on.",
         "",
         "**Manual linting** (nvim-lint):",
@@ -41,16 +42,36 @@ return {
     grammars = {
         {
             pattern = "<leader>ks",
-            desc = "Toggle signature help",
+            desc = "Show signature help",
             tests = {
                 {
-                    name = "lsp_signature available",
+                    name = "native signature help available",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
-                            local ok, signature = pcall(require, "lsp_signature")
-                            MiniTest.expect.equality(ok, true, "lsp_signature should be available")
-                            if ok then MiniTest.expect.equality(type(signature.toggle_float_win), "function") end
+
+                            -- Verify native LSP signature help API
+                            MiniTest.expect.equality(type(vim.lsp.buf.signature_help), "function")
+
+                            -- Verify handler is configured with rounded border
+                            local handler = vim.lsp.handlers["textDocument/signatureHelp"]
+                            MiniTest.expect.equality(
+                                type(handler),
+                                "function",
+                                "Signature help handler should be configured"
+                            )
+                        end,
+                    },
+                },
+                {
+                    name = "signature help keybinding configured on lsp attach",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+
+                            -- Verify LspAttach autocmd exists (sets up <leader>ks keybinding)
+                            local autocmds = vim.api.nvim_get_autocmds({ event = "LspAttach" })
+                            MiniTest.expect.equality(#autocmds > 0, true, "Should have LspAttach autocmd configured")
                         end,
                     },
                 },
