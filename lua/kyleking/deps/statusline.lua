@@ -35,8 +35,7 @@ if not is_temp_session then
 
         local profiles = {
             compact = {
-                git_status = true,
-                branch_metadata = false,
+                git_status = true, -- Unified: PR/branch, file status, ahead/behind, stash
                 workspace = false,
                 lsp = false,
                 lint = false,
@@ -44,7 +43,6 @@ if not is_temp_session then
             },
             ["info-dense"] = {
                 git_status = true,
-                branch_metadata = true,
                 workspace = true,
                 lsp = true,
                 lint = true,
@@ -53,24 +51,32 @@ if not is_temp_session then
         }
 
         -- Filetype-specific profile overrides (applied on top of base profile)
+        -- Presets define common patterns, reducing repetition
+        local presets = {
+            minimal = { workspace = false, lsp = false, lint = false }, -- Writing/documentation
+            development = { workspace = true, lsp = true, lint = true }, -- Code editing with full context
+            git_focused = { workspace = false, lsp = false }, -- Git operations, VCS takes precedence
+            config_files = { workspace = true }, -- Config editing, show project context
+        }
+
         local filetype_adjustments = {
             -- Writing/documentation: minimal distraction
-            markdown = { workspace = false, lsp = false, lint = false, branch_metadata = false },
-            text = { workspace = false, lsp = false, lint = false, branch_metadata = false },
+            markdown = presets.minimal,
+            text = presets.minimal,
             -- Development: full context
-            python = { branch_metadata = true, workspace = true, lsp = true, lint = true },
-            lua = { branch_metadata = true, workspace = true, lsp = true, lint = true },
-            go = { branch_metadata = true, workspace = true, lsp = true, lint = true },
-            rust = { branch_metadata = true, workspace = true, lsp = true, lint = true },
-            typescript = { branch_metadata = true, workspace = true, lsp = true, lint = true },
-            javascript = { branch_metadata = true, workspace = true, lsp = true, lint = true },
-            -- Git operations: emphasize branch/PR
-            gitcommit = { branch_metadata = true, workspace = false, lsp = false },
-            gitrebase = { branch_metadata = true, workspace = false, lsp = false },
+            lua = presets.development,
+            python = presets.development,
+            go = presets.development,
+            rust = presets.development,
+            typescript = presets.development,
+            javascript = presets.development,
+            -- Git operations: emphasize VCS
+            gitcommit = presets.git_focused,
+            gitrebase = presets.git_focused,
             -- Config files: show workspace for context
-            json = { workspace = true },
-            yaml = { workspace = true },
-            toml = { workspace = true },
+            json = presets.config_files,
+            yaml = presets.config_files,
+            toml = presets.config_files,
         }
 
         local function get_active_sections()
@@ -102,38 +108,163 @@ if not is_temp_session then
             end)
         end
 
-        -- Enhanced branch metadata: branch name, PR info, ahead/behind, stash
-        -- Supports both git and jj with GitHub PRs via gh CLI
-        -- Uses async updates to prevent UI blocking
-        local function branch_metadata_section()
+        -- Unified VCS section: PR (precedence) or branch, file status, ahead/behind, stash
+        -- Format: "#123: Fix bug +2 ~1 ↑3" or "main +2 ~1 ↑3"
+        -- LazyGit-style: +added ~modified -deleted
+        -- Async with 5min cache, returns stale immediately while updating
+        local function vcs_section()
             local vcs = project_tools.get_vcs_root(vim.api.nvim_buf_get_name(0))
             if not vcs then return "" end
 
-            local cache_key = "branch_meta:" .. vcs.type .. ":" .. vcs.root
+            local cache_key = "vcs:" .. vcs.type .. ":" .. vcs.root
             local cached = section_cache[cache_key]
             local now_ts = vim.uv.hrtime() / 1000000
 
             -- Return cached value immediately if still valid
             if cached and (now_ts - cached.timestamp) < BRANCH_CACHE_TTL_MS then return cached.value end
 
-            -- Start async update if cache is stale or missing
-            if not cached or (now_ts - cached.timestamp) >= BRANCH_CACHE_TTL_MS then
-                -- Return stale cache immediately (non-blocking)
-                local stale_value = cached and cached.value or ""
+            -- Return stale cache immediately (non-blocking), start async update
+            local stale_value = cached and cached.value or ""
 
-                -- Update cache asynchronously
-                vim.schedule(function()
-                    local parts = {}
+            vim.schedule(function()
+                local parts = {}
 
-                    if vcs.type == "git" then
-                        -- Get current branch name
-                        vim.system({ "git", "branch", "--show-current" }, { cwd = vcs.root }, function(branch_result)
-                            if branch_result.code == 0 and branch_result.stdout then
-                                local branch = vim.trim(branch_result.stdout)
-                                if branch ~= "" then
-                                    table.insert(parts, " " .. branch)
+                if vcs.type == "git" then
+                    -- Get branch, PR, file status, ahead/behind, stash (all async, parallel)
+                    local result_data = { pr = nil, branch = "", file_status = "", ahead_behind = "", stash = "" }
+                    local completed =
+                        { branch = false, pr = false, status = false, ahead_behind = false, stash = false }
 
-                                    -- Get PR info via gh CLI (async)
+                    local function try_update_cache()
+                        -- Only update when all async operations complete
+                        if
+                            not (
+                                completed.branch
+                                and completed.pr
+                                and completed.status
+                                and completed.ahead_behind
+                                and completed.stash
+                            )
+                        then
+                            return
+                        end
+
+                        -- Build display: PR takes precedence over branch
+                        local display_parts = {}
+                        if result_data.pr then
+                            table.insert(display_parts, result_data.pr)
+                        elseif result_data.branch ~= "" then
+                            table.insert(display_parts, " " .. result_data.branch)
+                        end
+                        if result_data.file_status ~= "" then table.insert(display_parts, result_data.file_status) end
+                        if result_data.ahead_behind ~= "" then table.insert(display_parts, result_data.ahead_behind) end
+                        if result_data.stash ~= "" then table.insert(display_parts, result_data.stash) end
+
+                        vim.schedule(function()
+                            section_cache[cache_key] = {
+                                value = table.concat(display_parts, " "),
+                                timestamp = vim.uv.hrtime() / 1000000,
+                            }
+                            vim.cmd.redrawstatus()
+                        end)
+                    end
+
+                    -- Get current branch
+                    vim.system({ "git", "branch", "--show-current" }, { cwd = vcs.root }, function(branch_result)
+                        if branch_result.code == 0 and branch_result.stdout then
+                            result_data.branch = vim.trim(branch_result.stdout)
+                        end
+                        completed.branch = true
+                        try_update_cache()
+                    end)
+
+                    -- Get PR info (takes precedence)
+                    vim.system({ "gh", "pr", "view", "--json", "number,title" }, { cwd = vcs.root }, function(pr_result)
+                        if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
+                            local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
+                            if ok and pr_data.number then
+                                local title = pr_data.title:sub(1, 25)
+                                if #pr_data.title > 25 then title = title .. "…" end
+                                result_data.pr = string.format("#%d: %s", pr_data.number, title)
+                            end
+                        end
+                        completed.pr = true
+                        try_update_cache()
+                    end)
+
+                    -- Get file status counts (LazyGit-style: +added ~modified -deleted)
+                    vim.system({ "git", "status", "--porcelain" }, { cwd = vcs.root }, function(status_result)
+                        if status_result.code == 0 and status_result.stdout then
+                            local added, modified, deleted = 0, 0, 0
+                            for line in status_result.stdout:gmatch("[^\n]+") do
+                                local status_code = line:sub(1, 2)
+                                -- Index status (first char) + worktree status (second char)
+                                if status_code:match("[AM]") then
+                                    if status_code:match("^A") or status_code:match("^%?") then
+                                        added = added + 1
+                                    elseif status_code:match("^M") or status_code:match("^[^%s]M") then
+                                        modified = modified + 1
+                                    end
+                                elseif status_code:match("D") then
+                                    deleted = deleted + 1
+                                end
+                            end
+
+                            local status_parts = {}
+                            if added > 0 then table.insert(status_parts, "+" .. added) end
+                            if modified > 0 then table.insert(status_parts, "~" .. modified) end
+                            if deleted > 0 then table.insert(status_parts, "-" .. deleted) end
+                            result_data.file_status = table.concat(status_parts, " ")
+                        end
+                        completed.status = true
+                        try_update_cache()
+                    end)
+
+                    -- Get ahead/behind counts
+                    vim.system(
+                        { "git", "rev-list", "--left-right", "--count", "HEAD...@{u}" },
+                        { cwd = vcs.root },
+                        function(ahead_behind_result)
+                            if ahead_behind_result.code == 0 and ahead_behind_result.stdout then
+                                local output = vim.trim(ahead_behind_result.stdout)
+                                local ahead, behind = output:match("(%d+)%s+(%d+)")
+                                if ahead and behind then
+                                    ahead, behind = tonumber(ahead), tonumber(behind)
+                                    local ab_parts = {}
+                                    if ahead > 0 then table.insert(ab_parts, "↑" .. ahead) end
+                                    if behind > 0 then table.insert(ab_parts, "↓" .. behind) end
+                                    result_data.ahead_behind = table.concat(ab_parts, " ")
+                                end
+                            end
+                            completed.ahead_behind = true
+                            try_update_cache()
+                        end
+                    )
+
+                    -- Get stash count
+                    vim.system({ "git", "stash", "list" }, { cwd = vcs.root }, function(stash_result)
+                        if stash_result.code == 0 and stash_result.stdout then
+                            local stash_count = 0
+                            for _ in stash_result.stdout:gmatch("[^\n]+") do
+                                stash_count = stash_count + 1
+                            end
+                            if stash_count > 0 then result_data.stash = "󰆓" .. stash_count end
+                        end
+                        completed.stash = true
+                        try_update_cache()
+                    end)
+                elseif vcs.type == "jj" then
+                    -- Get jj change ID + PR info
+                    vim.system(
+                        { "jj", "log", "-r", "@", "--no-graph", "-T", "change_id.short()" },
+                        { cwd = vcs.root },
+                        function(change_result)
+                            if change_result.code == 0 and change_result.stdout then
+                                local change_id = vim.trim(change_result.stdout)
+                                if change_id ~= "" then
+                                    table.insert(parts, "jj:" .. change_id)
+
+                                    -- Try to get PR info
                                     vim.system(
                                         { "gh", "pr", "view", "--json", "number,title" },
                                         { cwd = vcs.root },
@@ -141,120 +272,29 @@ if not is_temp_session then
                                             if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
                                                 local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
                                                 if ok and pr_data.number then
-                                                    local title = pr_data.title:sub(1, 20)
-                                                    if #pr_data.title > 20 then title = title .. "…" end
-                                                    table.insert(
-                                                        parts,
-                                                        string.format("PR#%d:%s", pr_data.number, title)
-                                                    )
+                                                    local title = pr_data.title:sub(1, 25)
+                                                    if #pr_data.title > 25 then title = title .. "…" end
+                                                    table.insert(parts, string.format("#%d: %s", pr_data.number, title))
                                                 end
                                             end
+
+                                            vim.schedule(function()
+                                                section_cache[cache_key] = {
+                                                    value = table.concat(parts, " "),
+                                                    timestamp = vim.uv.hrtime() / 1000000,
+                                                }
+                                                vim.cmd.redrawstatus()
+                                            end)
                                         end
                                     )
-
-                                    -- Get ahead/behind counts (async)
-                                    vim.system(
-                                        { "git", "rev-list", "--left-right", "--count", "HEAD...@{u}" },
-                                        { cwd = vcs.root },
-                                        function(ahead_behind_result)
-                                            if ahead_behind_result.code == 0 and ahead_behind_result.stdout then
-                                                local output = vim.trim(ahead_behind_result.stdout)
-                                                local ahead, behind = output:match("(%d+)%s+(%d+)")
-                                                if ahead and behind then
-                                                    ahead, behind = tonumber(ahead), tonumber(behind)
-                                                    if ahead > 0 then table.insert(parts, "↑" .. ahead) end
-                                                    if behind > 0 then table.insert(parts, "↓" .. behind) end
-                                                end
-                                            end
-                                        end
-                                    )
-
-                                    -- Get stash count (async)
-                                    vim.system({ "git", "stash", "list" }, { cwd = vcs.root }, function(stash_result)
-                                        if stash_result.code == 0 and stash_result.stdout then
-                                            local stash_count = 0
-                                            for _ in stash_result.stdout:gmatch("[^\n]+") do
-                                                stash_count = stash_count + 1
-                                            end
-                                            if stash_count > 0 then table.insert(parts, "󰆓" .. stash_count) end
-                                        end
-
-                                        -- Update cache after all async operations complete
-                                        vim.schedule(function()
-                                            section_cache[cache_key] = {
-                                                value = #parts > 0 and table.concat(parts, " ") or "",
-                                                timestamp = vim.uv.hrtime() / 1000000,
-                                            }
-                                            vim.cmd.redrawstatus()
-                                        end)
-                                    end)
                                 end
                             end
-                        end)
-                    elseif vcs.type == "jj" then
-                        -- Get jj change ID (async)
-                        vim.system(
-                            { "jj", "log", "-r", "@", "--no-graph", "-T", "change_id.short()" },
-                            { cwd = vcs.root },
-                            function(change_result)
-                                if change_result.code == 0 and change_result.stdout then
-                                    local change_id = vim.trim(change_result.stdout)
-                                    if change_id ~= "" then
-                                        table.insert(parts, "jj:" .. change_id)
-
-                                        -- Try to get PR info via gh CLI (async)
-                                        vim.system(
-                                            { "gh", "pr", "view", "--json", "number,title" },
-                                            { cwd = vcs.root },
-                                            function(pr_result)
-                                                if
-                                                    pr_result.code == 0
-                                                    and pr_result.stdout
-                                                    and pr_result.stdout ~= ""
-                                                then
-                                                    local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
-                                                    if ok and pr_data.number then
-                                                        table.insert(parts, string.format("PR#%d", pr_data.number))
-                                                    end
-                                                end
-
-                                                -- Update cache after async operations
-                                                vim.schedule(function()
-                                                    section_cache[cache_key] = {
-                                                        value = #parts > 0 and table.concat(parts, " ") or "",
-                                                        timestamp = vim.uv.hrtime() / 1000000,
-                                                    }
-                                                    vim.cmd.redrawstatus()
-                                                end)
-                                            end
-                                        )
-                                    end
-                                end
-                            end
-                        )
-                    end
-                end)
-
-                return stale_value
-            end
-
-            return cached.value
-        end
-
-        -- VCS section: shows git or jj status (cached)
-        local function vcs_section(args)
-            return cache_section("vcs:" .. vim.api.nvim_get_current_buf(), function()
-                local vcs = project_tools.get_vcs_root(vim.api.nvim_buf_get_name(0))
-                if not vcs then return "" end
-
-                if vcs.type == "jj" then
-                    -- jj indicator (mini.git doesn't support jj, so just show icon)
-                    return "jj"
-                else
-                    -- git status via mini.statusline
-                    return MiniStatusline.section_git(args)
+                        end
+                    )
                 end
             end)
+
+            return stale_value
         end
 
         -- Lint progress indicator (cached)
@@ -354,8 +394,7 @@ if not is_temp_session then
 
                     -- Compute sections (respecting active profile + filetype adjustments)
                     local active_sections = get_active_sections()
-                    local git = active_sections.git_status and vcs_section({ trunc_width = 75 }) or ""
-                    local branch_meta = active_sections.branch_metadata and branch_metadata_section() or ""
+                    local vcs = active_sections.git_status and vcs_section() or ""
                     local diagnostics = active_sections.diagnostics
                             and MiniStatusline.section_diagnostics({ trunc_width = 75 })
                         or ""
@@ -395,10 +434,9 @@ if not is_temp_session then
                     local filename = filename_section()
                     local location = MiniStatusline.section_location({ trunc_width = 75 })
 
-                    -- Combine devinfo: branch metadata, git status, diagnostics, workspace, lsp, lint
+                    -- Combine devinfo: vcs (git/jj with PR, file status, ahead/behind), diagnostics, workspace, lsp, lint
                     local devinfo_parts = {}
-                    if branch_meta ~= "" then table.insert(devinfo_parts, branch_meta) end
-                    if git ~= "" then table.insert(devinfo_parts, git) end
+                    if vcs ~= "" then table.insert(devinfo_parts, vcs) end
                     if diagnostics ~= "" then table.insert(devinfo_parts, diagnostics) end
                     if workspace ~= "" then table.insert(devinfo_parts, workspace) end
                     if lsp_info ~= "" then table.insert(devinfo_parts, lsp_info) end

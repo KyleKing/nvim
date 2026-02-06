@@ -40,3 +40,10 @@ Target: <150ms with config (threshold: 300ms)
 - With config: 037.634ms
 - Opening init.lua: 048.829ms
 - Opening Python file: 166.999ms
+
+### 2026-02-06 02:11:26
+
+- No config: 019.305ms
+- With config: 040.594ms
+- Opening init.lua: 044.846ms
+- Opening Python file: 100.879ms
