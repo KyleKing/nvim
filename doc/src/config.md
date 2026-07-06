@@ -115,6 +115,24 @@ Source: `lua/kyleking/core/lsp.lua`
 
 See also: `lsp-completion`, `ins-completion`
 
+### LSP Navigation
+
+The nvim 0.11 defaults (`gd`, `grr`, `gri`) are intentionally disabled
+in favor of picker UIs, which handle multiple results better:
+
+    <leader>lgd     Definitions (picker)
+    <leader>lgi     Implementations (picker)
+    <leader>lgr     References (picker)
+    <leader>lgt     Type definitions (picker)
+    <leader>lgs     Document symbols (picker)
+    K               Hover documentation
+
+In monorepos, "definition" may land on a re-export barrel file instead
+of the actual source; use `<leader>lgi` (implementation) to bypass
+re-exports.
+
+Source: `lua/kyleking/deps/fuzzy-finder.lua`, `lua/kyleking/deps/lsp.lua`
+
 ## Custom Commands
 
     :RunAllTests        Run all mini.test test files (floating window)

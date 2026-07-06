@@ -108,15 +108,46 @@ Usage:
     <C-r>a          Insert register a in Insert/Command mode
     :reg            Show all register contents
 
-This config maps:
+Recipes:
 
-    <leader>ry      Yank to * register
-    <leader>rp      Paste from * register
-    <leader>rY      Yank to + register
-    <leader>rP      Paste from + register
-    <leader>fr      Find registers (picker)
+    "ayy ... "Ayy   Collect scattered lines: yank first into a, append rest with A
+    "_dd            Delete without clobbering any register
+    "0p             Paste the last yank after a delete overwrote ""
+    :reg abc        Inspect only registers a, b, c
 
 See also: `registers`, `:reg`
+
+## Clipboard Workflow
+
+This config keeps vim registers and the system clipboard separate
+(`clipboard=unnamedplus` is intentionally NOT set). Plain `y`/`d`/`p` stay
+fast and never touch other apps; leader-prefixed keys bridge to the OS.
+
+    <leader>y       Yank to clipboard (normal or visual)
+    <leader>Y       Yank line to clipboard
+    <leader>p       Paste from clipboard
+    <leader>P       Paste before from clipboard
+    <C-v> (insert)  Paste clipboard while typing
+    <leader>fr      Find registers (picker)
+
+Recipe -- move misplaced Python imports to the top of the file:
+
+    1. On the import line: Vj (extend selection over the block)
+    2. d               Delete (default register; clipboard untouched)
+    3. gg then P       Paste above the first line
+    4. gv then <       Reselect pasted block, dedent (repeat < as needed)
+    5. <C-o><C-o>      Jump back to where you were editing
+
+For several scattered imports, delete each block with "Add (append to
+register a with capital A after the first "add), then paste once at the
+top with "ap.
+
+Debugging clipboard issues:
+
+    :let @+ = "test"        Write clipboard directly, paste in another app
+    :checkhealth provider   Verify the clipboard provider is working
+
+See also: `quoteplus`, `clipboard`
 
 ## Marks
 
@@ -141,6 +172,31 @@ Automatic marks:
 
 See also: `mark-motions`, `:marks`
 
+## Jumplist & Changelist
+
+Vim records where you have been (jumplist) and where you have edited
+(changelist). Both are per-window/per-buffer histories you can walk.
+
+    <C-o> / <C-i>   Older / newer position in jumplist
+    g; / g,         Older / newer position in changelist
+    gi              Insert mode at last insert position
+    :jumps          Show the jumplist
+    :changes        Show the changelist
+
+Motions that add a jumplist entry: `G`, `gg`, `/`, `?`, `n`, `N`, `%`,
+`{`, `}`, marks, and `:e`. Plain `j`/`k`/`w` do not.
+
+This config adds bufjump.nvim to separate cross-file from in-file jumps:
+
+    <leader>bn / <leader>bp     Jump forward/back to a different buffer
+    <leader>bN / <leader>bP     Jump forward/back within this buffer
+
+Recipe: after `gd` (or a search) takes you somewhere to read, `<C-o>`
+returns you to the edit site. `g;` is often better: it goes to the last
+change even if you never set a mark.
+
+See also: `jump-motions`, `changelist`
+
 ## Macros
 
 Record a sequence of commands, replay it any number of times.
@@ -156,7 +212,35 @@ Tips:
 - Use `0` or `^` at the start to ensure consistent cursor position
 - End with `j` to move to the next line for line-wise repetition
 - `5@a` runs macro `a` five times
+- Record with `qA` (capital) to append more keystrokes to macro `a`
 - Edit a macro: `"ap` to paste, edit text, `"ayy` to re-yank
+
+A macro is just text in a register, recorded as you edit one instance.
+Make the recording position-independent (start with `0`, use `f`/`t`/`w`
+instead of counting `l`), then replay it everywhere.
+
+Recipe -- convert a list of names to function calls:
+
+    Buffer:             Goal:
+    alpha               check("alpha")
+    beta                check("beta")
+
+    qa                  Record into a
+    0                   Normalize cursor position
+    ciw check("<C-r>-") Wrap word (<C-r>- inserts what ciw deleted)
+    <Esc>j              Back to normal, move down
+    q                   Stop recording
+    @a then @@          Replay on next line, repeat
+    99@a                Or finish the whole list at once
+
+Recipe -- apply a macro to matching lines only:
+
+    :g/TODO/normal @a       Run macro a on every line containing TODO
+    :'<,'>normal @a         Run macro a on each visually selected line
+
+If a step fails (e.g. `f"` finds nothing), the macro stops on that line,
+which is a feature: replay with a large count and it halts at the first
+line that does not match the expected shape.
 
 See also: `recording`, `@`, `q`
 
@@ -205,7 +289,19 @@ Picker:
 
     <leader>fl      Find in quickfix/location lists
 
-See also: `quickfix`, `location-list`, `:cdo`
+Recipe -- project-wide rename without LSP:
+
+    :grep old_name          Populate quickfix from ripgrep
+    :cdo s/old_name/new_name/g | update
+
+`:cdo` runs on every entry; `:cfdo` runs once per file (better for
+`%s///` or formatting). `| update` writes each changed buffer.
+
+This config adds a full quickfix suite under `<leader>q` (filter, dedupe,
+stats, batch code actions, sessions). See the Diagnostics Workflows
+section: `kyleking-neovim-diagnostics-workflows`.
+
+See also: `quickfix`, `location-list`, `:cdo`, `:cfdo`
 
 ## Folds
 
@@ -257,6 +353,15 @@ repeatable units: use text objects, avoid extra motions inside a change.
     ciw{new}<Esc>   Change word. Now n. repeats on next match.
     A;{Esc}         Append semicolon. Now j. repeats on next line.
 
+The "dot formula": one keystroke to move, one keystroke to act.
+
+    *               Search word under cursor (moves to next match)
+    ciwnewname<Esc> Change it once
+    n.n.n.          Review each match, dot to apply, n to skip
+
+This is often better than `:%s//newname/g` because you approve each
+change in context, and better than a macro for single-edit repetition.
+
 See also: `single-repeat`
 
 ## Undo Tree
@@ -274,3 +379,51 @@ undo then make a new edit.
 This config highlights undo/redo changes with `highlight-undo.nvim`.
 
 See also: `undo-tree`, `:earlier`, `:undolist`
+
+## Practice Exercises
+
+Self-checks that combine the topics above. Try each in a scratch buffer
+before reading the answer.
+
+1. On `x = "one" .. "two"` with the cursor at start of line, change
+   `two` without moving the cursor first.
+
+   Answer: `cin"` (mini.ai "change inside next quote"). Plain `ci"`
+   would target `one`.
+
+2. Delete a line without losing the text you yanked a moment ago.
+
+   Answer: `"_dd` (black hole), or just `dd` and later paste the yank
+   with `"0p`.
+
+3. You changed a word deep in the file, then scrolled far away. Return
+   to the edit and continue typing where you left off.
+
+   Answer: `g;` jumps to the last change; `gi` re-enters insert at the
+   last insert point directly.
+
+4. Add a trailing comma to every line of a 40-line block.
+
+   Answer: `V` select the block, then `:normal A,` (runs on each line).
+   Macro alternative: `qa A,<Esc>j q` then `39@a`. Dot alternative:
+   `A,<Esc>` then `j.` repeated.
+
+5. Uppercase every occurrence of a variable name, one decision at a
+   time.
+
+   Answer: `*` on the word, `gUiw`, then `n.` for each match you want.
+
+6. Delete every line in the file containing `DEBUG`.
+
+   Answer: `:g/DEBUG/d`
+
+7. Rename a symbol across all files that `:grep` finds, then write the
+   changes.
+
+   Answer: `:grep old_name` then `:cfdo %s/old_name/new_name/gc | update`
+
+8. Record a macro that fails halfway through on one line. How do you
+   fix the macro without re-recording it?
+
+   Answer: paste it with `"ap`, edit the keystrokes as text, yank it
+   back with `"ayy` (or `qA` to append missing keystrokes at the end).

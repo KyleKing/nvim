@@ -1,4 +1,4 @@
-*kyleking-neovim.txt*            For             Last change: 2026 February 04
+*kyleking-neovim.txt*              For               Last change: 2026 July 06
 
 ==============================================================================
 Table of Contents                          *kyleking-neovim-table-of-contents*
@@ -10,7 +10,9 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Motions & Text Objects            |kyleking-neovim-motions-&-text-objects|
   - Operators                                      |kyleking-neovim-operators|
   - Registers                                      |kyleking-neovim-registers|
+  - Clipboard Workflow                    |kyleking-neovim-clipboard-workflow|
   - Marks                                              |kyleking-neovim-marks|
+  - Jumplist & Changelist              |kyleking-neovim-jumplist-&-changelist|
   - Macros                                            |kyleking-neovim-macros|
   - Visual Mode                                  |kyleking-neovim-visual-mode|
   - Quickfix & Location Lists      |kyleking-neovim-quickfix-&-location-lists|
@@ -18,6 +20,7 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Substitute & Global                  |kyleking-neovim-substitute-&-global|
   - The Dot Command                          |kyleking-neovim-the-dot-command|
   - Undo Tree                                      |kyleking-neovim-undo-tree|
+  - Practice Exercises                    |kyleking-neovim-practice-exercises|
   - This Config                                  |kyleking-neovim-this-config|
   - Boot Sequence                              |kyleking-neovim-boot-sequence|
   - Plugin Management                      |kyleking-neovim-plugin-management|
@@ -27,13 +30,16 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - Keymaps                                          |kyleking-neovim-keymaps|
   - Custom Commands                          |kyleking-neovim-custom-commands|
   - Testing                                          |kyleking-neovim-testing|
-2. Motion Models: Helix vs Vim with Flash.nvim|kyleking-neovim-motion-models:-helix-vs-vim-with-flash.nvim|
-  - Overview                                        |kyleking-neovim-overview|
-  - The Two Models                            |kyleking-neovim-the-two-models|
-  - Trade-offs                                    |kyleking-neovim-trade-offs|
-  - Current Configuration: Hybrid Approach|kyleking-neovim-current-configuration:-hybrid-approach|
-  - Recommendation                            |kyleking-neovim-recommendation|
-3. Plugin Guides                               |kyleking-neovim-plugin-guides|
+  - Choosing a Motion                      |kyleking-neovim-choosing-a-motion|
+  - When to Use Each                        |kyleking-neovim-when-to-use-each|
+  - Background: Two Motion Models|kyleking-neovim-background:-two-motion-models|
+  - Diagnostics Workflows              |kyleking-neovim-diagnostics-workflows|
+  - Running Checkers                        |kyleking-neovim-running-checkers|
+  - Reviewing Results                      |kyleking-neovim-reviewing-results|
+  - Fixing: Three Batch Modes      |kyleking-neovim-fixing:-three-batch-modes|
+  - Example: Monorepo Type-Check Sweep|kyleking-neovim-example:-monorepo-type-check-sweep|
+  - Sessions                                        |kyleking-neovim-sessions|
+2. Plugin Guides                               |kyleking-neovim-plugin-guides|
   - Text Objects (mini.ai)            |kyleking-neovim-text-objects-(mini.ai)|
   - See also: MiniAi, text-objects|kyleking-neovim-see-also:-miniai,-text-objects|
   - Buffer Jump Navigation (bufjump.nvim)|kyleking-neovim-buffer-jump-navigation-(bufjump.nvim)|
@@ -261,17 +267,54 @@ Usage:
     :reg            Show all register contents
 <
 
-This config maps:
+Recipes:
 
 >
-    <leader>ry      Yank to * register
-    <leader>rp      Paste from * register
-    <leader>rY      Yank to + register
-    <leader>rP      Paste from + register
-    <leader>fr      Find registers (picker)
+    "ayy ... "Ayy   Collect scattered lines: yank first into a, append rest with A
+    "_dd            Delete without clobbering any register
+    "0p             Paste the last yank after a delete overwrote ""
+    :reg abc        Inspect only registers a, b, c
 <
 
 See also: `registers`, `:reg`
+
+
+CLIPBOARD WORKFLOW                        *kyleking-neovim-clipboard-workflow*
+
+This config keeps vim registers and the system clipboard separate
+(`clipboard=unnamedplus` is intentionally NOT set). Plain `y`/`d`/`p` stay fast
+and never touch other apps; leader-prefixed keys bridge to the OS.
+
+>
+    <leader>y       Yank to clipboard (normal or visual)
+    <leader>Y       Yank line to clipboard
+    <leader>p       Paste from clipboard
+    <leader>P       Paste before from clipboard
+    <C-v> (insert)  Paste clipboard while typing
+    <leader>fr      Find registers (picker)
+<
+
+Recipe – move misplaced Python imports to the top of the file:
+
+>
+    1. On the import line: Vj (extend selection over the block)
+    2. d               Delete (default register; clipboard untouched)
+    3. gg then P       Paste above the first line
+    4. gv then <       Reselect pasted block, dedent (repeat < as needed)
+    5. <C-o><C-o>      Jump back to where you were editing
+<
+
+For several scattered imports, delete each block with "Add (append to register
+a with capital A after the first"add), then paste once at the top with “ap.
+
+Debugging clipboard issues:
+
+>
+    :let @+ = "test"        Write clipboard directly, paste in another app
+    :checkhealth provider   Verify the clipboard provider is working
+<
+
+See also: `quoteplus`, `clipboard`
 
 
 MARKS                                                  *kyleking-neovim-marks*
@@ -302,6 +345,36 @@ Automatic marks:
 See also: `mark-motions`, `:marks`
 
 
+JUMPLIST & CHANGELIST                  *kyleking-neovim-jumplist-&-changelist*
+
+Vim records where you have been (jumplist) and where you have edited
+(changelist). Both are per-window/per-buffer histories you can walk.
+
+>
+    <C-o> / <C-i>   Older / newer position in jumplist
+    g; / g,         Older / newer position in changelist
+    gi              Insert mode at last insert position
+    :jumps          Show the jumplist
+    :changes        Show the changelist
+<
+
+Motions that add a jumplist entry: `G`, `gg`, `/`, `?`, `n`, `N`, `%`, `{`,
+`}`, marks, and `:e`. Plain `j`/`k`/`w` do not.
+
+This config adds bufjump.nvim to separate cross-file from in-file jumps:
+
+>
+    <leader>bn / <leader>bp     Jump forward/back to a different buffer
+    <leader>bN / <leader>bP     Jump forward/back within this buffer
+<
+
+Recipe: after `gd` (or a search) takes you somewhere to read, `<C-o>` returns
+you to the edit site. `g;` is often better: it goes to the last change even if
+you never set a mark.
+
+See also: `jump-motions`, `changelist`
+
+
 MACROS                                                *kyleking-neovim-macros*
 
 Record a sequence of commands, replay it any number of times.
@@ -319,7 +392,39 @@ Tips:
 - Use `0` or `^` at the start to ensure consistent cursor position
 - End with `j` to move to the next line for line-wise repetition
 - `5@a` runs macro `a` five times
+- Record with `qA` (capital) to append more keystrokes to macro `a`
 - Edit a macro: `"ap` to paste, edit text, `"ayy` to re-yank
+
+A macro is just text in a register, recorded as you edit one instance. Make the
+recording position-independent (start with `0`, use `f`/`t`/`w` instead of
+counting `l`), then replay it everywhere.
+
+Recipe – convert a list of names to function calls:
+
+>
+    Buffer:             Goal:
+    alpha               check("alpha")
+    beta                check("beta")
+    
+    qa                  Record into a
+    0                   Normalize cursor position
+    ciw check("<C-r>-") Wrap word (<C-r>- inserts what ciw deleted)
+    <Esc>j              Back to normal, move down
+    q                   Stop recording
+    @a then @@          Replay on next line, repeat
+    99@a                Or finish the whole list at once
+<
+
+Recipe – apply a macro to matching lines only:
+
+>
+    :g/TODO/normal @a       Run macro a on every line containing TODO
+    :'<,'>normal @a         Run macro a on each visually selected line
+<
+
+If a step fails (e.g.� `f"` finds nothing), the macro stops on that line, which
+is a feature: replay with a large count and it halts at the first line that
+does not match the expected shape.
 
 See also: `recording`, `@`, `q`
 
@@ -380,7 +485,21 @@ Picker:
     <leader>fl      Find in quickfix/location lists
 <
 
-See also: `quickfix`, `location-list`, `:cdo`
+Recipe – project-wide rename without LSP:
+
+>
+    :grep old_name          Populate quickfix from ripgrep
+    :cdo s/old_name/new_name/g | update
+<
+
+`:cdo` runs on every entry; `:cfdo` runs once per file (better for `%s///` or
+formatting). `| update` writes each changed buffer.
+
+This config adds a full quickfix suite under `<leader>q` (filter, dedupe,
+stats, batch code actions, sessions). See the Diagnostics Workflows section:
+`kyleking-neovim-diagnostics-workflows`.
+
+See also: `quickfix`, `location-list`, `:cdo`, `:cfdo`
 
 
 FOLDS                                                  *kyleking-neovim-folds*
@@ -449,6 +568,17 @@ units: use text objects, avoid extra motions inside a change.
     A;{Esc}         Append semicolon. Now j. repeats on next line.
 <
 
+The "dot formula"one keystroke to move, one keystroke to act.
+
+>
+    *               Search word under cursor (moves to next match)
+    ciwnewname<Esc> Change it once
+    n.n.n.          Review each match, dot to apply, n to skip
+<
+
+This is often better than `:%s//newname/g` because you approve each change in
+context, and better than a macro for single-edit repetition.
+
 See also: `single-repeat`
 
 
@@ -469,6 +599,61 @@ make a new edit.
 This config highlights undo/redo changes with `highlight-undo.nvim`.
 
 See also: `undo-tree`, `:earlier`, `:undolist`
+
+
+PRACTICE EXERCISES                        *kyleking-neovim-practice-exercises*
+
+Self-checks that combine the topics above. Try each in a scratch buffer before
+reading the answer.
+
+1. On `x = "one" .. "two"` with the cursor at start of line, change `two` without
+moving the cursor first.
+
+Answer: `cin"` (mini.ai "change inside next quote"). Plain `ci"` would target
+`one`.
+
+
+2. Delete a line without losing the text you yanked a moment ago.
+
+Answer: `"_dd` (black hole), or just `dd` and later paste the yank with `"0p`.
+
+
+3. You changed a word deep in the file, then scrolled far away. Return to the edit
+and continue typing where you left off.
+
+Answer: `g;` jumps to the last change; `gi` re-enters insert at the last insert
+point directly.
+
+
+4. Add a trailing comma to every line of a 40-line block.
+
+Answer: `V` select the block, then `:normal A,` (runs on each line). Macro
+alternative: `qa A,<Esc>j q` then `39@a`. Dot alternative: `A,<Esc>` then `j.`
+repeated.
+
+
+5. Uppercase every occurrence of a variable name, one decision at a time.
+
+Answer: `*` on the word, `gUiw`, then `n.` for each match you want.
+
+
+6. Delete every line in the file containing `DEBUG`.
+
+Answer: `:g/DEBUG/d`
+
+
+7. Rename a symbol across all files that `:grep` finds, then write the changes.
+
+Answer: `:grep old_name` then `:cfdo %s/old_name/new_name/gc | update`
+
+
+8. Record a macro that fails halfway through on one line. How do you fix the macro
+without re-recording it?
+
+Answer: paste it with `"ap`, edit the keystrokes as text, yank it back with
+`"ayy` (or `qA` to append missing keystrokes at the end).
+
+
 
 
 THIS CONFIG                                      *kyleking-neovim-this-config*
@@ -610,6 +795,26 @@ Source: `lua/kyleking/core/lsp.lua`
 See also: `lsp-completion`, `ins-completion`
 
 
+LSP NAVIGATION ~
+
+The nvim 0.11 defaults (`gd`, `grr`, `gri`) are intentionally disabled in favor
+of picker UIs, which handle multiple results better:
+
+>
+    <leader>lgd     Definitions (picker)
+    <leader>lgi     Implementations (picker)
+    <leader>lgr     References (picker)
+    <leader>lgt     Type definitions (picker)
+    <leader>lgs     Document symbols (picker)
+    K               Hover documentation
+<
+
+In monorepos, "definition" may land on a re-export barrel file instead of the
+actual source; use `<leader>lgi` (implementation) to bypass re-exports.
+
+Source: `lua/kyleking/deps/fuzzy-finder.lua`, `lua/kyleking/deps/lsp.lua`
+
+
 CUSTOM COMMANDS                              *kyleking-neovim-custom-commands*
 
 >
@@ -729,169 +934,146 @@ Source: `lua/kyleking/setup-deps.lua`, `lua/kyleking/utils/test_runner.lua`,
 See also: `MiniTest`, `TEST-PERFORMANCE-README.md`
 
 
-==============================================================================
-2. Motion Models: Helix vs Vim with Flash.nvim*kyleking-neovim-motion-models:-helix-vs-vim-with-flash.nvim*
+CHOOSING A MOTION                          *kyleking-neovim-choosing-a-motion*
 
+This config layers several targeting tools on top of Vim’s operator grammar.
+This section is a decision guide for which to reach for.
 
-OVERVIEW                                            *kyleking-neovim-overview*
-
-This document compares Helix’s select-then-act model with Vim’s
-action-target model enhanced by flash.nvim, and explains why the current
-configuration provides the best of both worlds.
-
-
-THE TWO MODELS                                *kyleking-neovim-the-two-models*
-
-
-HELIX: SELECT-THEN-ACT ~
-
-Helix uses a selection-first paradigm where you:
-
-1. **Select** what you want to change (visual selection becomes primary)
-2. **Act** on the selection with a command
-
-**Example workflow:**
+Quick reference:
 
 >
-    # Delete a function
-    1. Navigate to function: ]f
-    2. Select function: mf (select function text object)
-    3. Delete: d
-    
-    # Change text in quotes
-    1. Navigate near quotes: w w w
-    2. Select inside quotes: mi"
-    3. Change: c
+    ci" daw yap     Known target near cursor: plain text objects
+    cin" dil(       Next/last variant when cursor is outside the target
+    d]m y]z         Structural motion: treesitter next method/fold/class
+    d<A-s>{chars}   Distant visible target: flash jump as operator target
+    <A-S> then d    Explore first: flash treesitter selects a syntax node
+    daf dac         Semantic object: mini.ai function call / class
 <
 
-**Key insight**Every operation starts with a selection, making the visual mode
-the primary interface. Commands act on whatever is selected.
+
+WHEN TO USE EACH                            *kyleking-neovim-when-to-use-each*
+
+Plain text objects (`i`/`a` + object) when you are inside or on the target:
+`ci"`, `daw`, `yap`, `gUiw`. Fastest, and `.`-repeatable.
+
+Next/last text objects (mini.ai) when the target is visible but the cursor is
+not in it: `cin"` (change inside next quote), `dil(` (delete inside last
+paren). Saves a motion.
+
+Flash jump (`<A-s>`) when the target is far but visible: type a couple of
+characters, pick the label. Composes with operators, so `d<A-s>` deletes from
+cursor to the labeled position.
+
+Flash treesitter (`<A-S>`) when you want Helix-style select-then-act: labels
+appear on syntax nodes (expression, block, function), you pick one to select
+it, then apply `d`/`c`/`y`. Best when you are not sure of the exact text object
+name.
+
+Treesitter motions (`]m`, `[m`, etc. via nap.nvim and textobjects) for moving
+between structural units, and as operator targets: `d]m` deletes to the next
+method start.
 
 
-VIM: ACTION-TARGET (WITH FLASH.NVIM) ~
+BACKGROUND: TWO MOTION MODELS  *kyleking-neovim-background:-two-motion-models*
 
-Vim uses an action-first paradigm where you:
+Helix/Kakoune use select-then-act: every operation starts from a visible
+selection. Vim uses action-target: operators compose with any motion or text
+object, which enables `.` repeat and two-keystroke edits but gives no preview
+of what will change.
 
-1. **Specify action** (delete, change, yank, etc.)
-2. **Specify target** (motion, text object, or search)
+This config keeps Vim’s model as the foundation (composability, dot repeat,
+muscle memory) and adds the main benefit of the Helix model through flash
+treesitter (`<A-S>`): visual confirmation of the selection before acting, for
+the cases where you would otherwise guess at a text object.
 
-Flash.nvim enhances this by making the target specification instant and visual.
+See also: `MiniAi`, `flash.nvim`, `text-objects`
 
-**Example workflow:**
+
+DIAGNOSTICS WORKFLOWS                  *kyleking-neovim-diagnostics-workflows*
+
+Project-wide type checking and linting with quickfix batch operations. Keymap
+tables live in the Workspace Diagnostics plugin guide; this section covers
+end-to-end workflows.
+
+
+RUNNING CHECKERS                            *kyleking-neovim-running-checkers*
+
+`<leader>lw{ecosystem}{tool}` runs a project-local tool (`.venv/bin/`,
+`node_modules/.bin/`) across every project under the VCS root and sends results
+to quickfix. `<leader>lwi` previews what projects are detected; `<leader>lwd`
+collects LSP diagnostics from open buffers instead.
 
 >
-    # Delete a function
-    1. d<Alt-s>  (delete + flash jump)
-    2. Type function name characters
-    3. Select label to delete from cursor to that point
-       OR: d]m (delete to next method start via treesitter)
-       OR: daf (delete around function via mini.ai/treesitter)
-    
-    # Change text in quotes
-    1. ci"  (change inside quotes)
-       OR: c<Alt-s> then select quote position
+    <leader>lwpm / lwpp / lwpr / lwpt   Python: mypy / pyright / ruff / ty
+    <leader>lwte / lwto                 TS/JS: eslint / oxlint
+    <leader>lwgg                        Go: golangci-lint
+    <leader>lwll                        Lua: selene
 <
 
-**Key insight**Action and target are composed. You can combine any action
-(d/c/y/v) with any target (motion/text-object/flash-jump).
+
+REVIEWING RESULTS                          *kyleking-neovim-reviewing-results*
+
+>
+    <leader>qs      Stats (count, by-file, by-type)
+    <leader>qd      Dedupe entries
+    <leader>qS      Sort by file + line
+    <leader>qf      Filter: keep regex matches (e.g. error.*type, src/api/)
+    <leader>qF      Filter: remove matches (e.g. test_.*\.py)
+    <leader>qt      Filter by severity (interactive menu)
+    <leader>fl      Picker, flat view (preview with context)
+    <leader>qg      Picker, grouped by file
+    <leader>qo/qO   Open all affected files (edit / vsplit)
+<
 
 
-TRADE-OFFS                                        *kyleking-neovim-trade-offs*
+FIXING: THREE BATCH MODES          *kyleking-neovim-fixing:-three-batch-modes*
 
-  -------------------------------------------------------------------------------
-  Aspect            Helix Select-Then-Act       Vim Action-Target + Flash
-  ----------------- --------------------------- ---------------------------------
-  Visual feedback   Selection shown before      Flash labels show targets,
-                    action                      selection happens simultaneously
-                                                with action
+All three apply LSP code actions to quickfix items.
 
-  Cognitive load    Lower - see before you act  Slightly higher - must visualize
-                                                result
+Auto (`<leader>qb`): one confirmation, applies the first matching action to
+every item. Use for bulk trusted fixes; filter first with `<leader>qf` or
+`<leader>qt`. Undo is per-buffer with `u`.
 
-  Composability     Limited - commands work on  High - any action × any target
-                    selection                   
+Interactive (`<leader>qB`): reviews each fix with Apply | Skip | Apply to all
+remaining | Cancel. After the same action type is applied twice, "Apply to all
+remaining" auto-applies the rest of that pattern. Use when learning what a tool
+suggests or for mixed error types.
 
-  Efficiency        3 steps (select, refine,    2 steps (action+target) or 1
-                    act)                        (single motion)
-
-  Discoverability   Better - see what will      Requires understanding operators
-                    change                      
-
-  Precision         Requires correct selection  Can iterate with . or u
-                    first                       
-
-  Muscle memory     Differs from Vim/Kakoune    Builds on Vim fundamentals
-  -------------------------------------------------------------------------------
-
-CURRENT CONFIGURATION: HYBRID APPROACH*kyleking-neovim-current-configuration:-hybrid-approach*
-
-This config uses Vim’s action-target model as the foundation but incorporates
-Helix-inspired features:
+Navigate (`<leader>qn`): opens every affected buffer, jumps to the first item,
+and shows an instruction window. Move with `]q`/`[q`, fix at the cursor with
+`<leader>ca`, and optionally batch-apply the remainder when confident. Use for
+changes that need surrounding context.
 
 
-VIM FOUNDATION ~
+EXAMPLE: MONOREPO TYPE-CHECK SWEEP*kyleking-neovim-example:-monorepo-type-check-sweep*
 
-- **Operators**`d`, `c`, `y`, `v` compose with all targets
-- **Text objects**mini.ai provides extensive a/i text objects
-- **Motions**Standard Vim motions plus treesitter navigation
-- **Repeat**`.` repeats the last action+target combination
-
-
-HELIX-INSPIRED ENHANCEMENTS ~
-
-- **Flash.nvim** (`<Alt-s>`): Jump to visible locations instantly
-- **Flash Treesitter** (`<Alt-S>`): Select syntax nodes visually first
-- **Treesitter textobjects**Navigate code structure (]m, ]z, ]k)
-- **mini.clue**Show available operations and targets
-- **Extended text objects**mini.ai’s function calls, assignments, key-value pairs, numbers, etc.
+>
+    <leader>lwi     15 Python projects, 4 Node projects detected
+    <leader>lwpm    mypy across all Python projects
+    <leader>qs      Total: 147 | Files: 23 | Errors: 89 | Warnings: 58
+    <leader>qt      Keep errors only
+    <leader>qB      Review fixes; "Apply to all remaining" on repeats
+<
 
 
-WHY THIS IS OPTIMAL ~
+SESSIONS                                            *kyleking-neovim-sessions*
 
-1. **Best of both worlds**Use action-target for known operations (`ci"`, `daw`), use flash/treesitter-select for exploration
-2. **Composability preserved**All enhancements work with Vim operators
-3. **Efficiency**Quick operations are faster (ci” vs select-inside-quotes then delete)
-4. **Exploratory power**`<Alt-S>` provides Helix-like "explore then select" when needed
-5. **Ecosystem compatibility**Works with existing Vim plugins, workflows, and muscle memory
+>
+    <leader>qw      Save quickfix list to a file (e.g. .qf_mypy)
+    <leader>qr      Load a saved list
+<
 
+Useful for resuming a large cleanup the next day, or comparing results across
+runs.
 
-EXAMPLE: WHEN TO USE EACH ~
+Developer documentation (Lua API, custom code-action filters, adding new tools)
+is in `doc/workspace-diagnostics.md` in the repo.
 
-**Use direct action-target (Vim style):** - Known targets: `ci"`, `daw`, `yap`,
-`gUiw` - Simple motions: `d$`, `c2w`, `y5j` - Treesitter navigation: `]m`, `]z`
-+ operators
-
-**Use flash-enhanced (exploratory):** - Distant targets: `d<Alt-s>` then jump
-to label - Visual selection: `<Alt-S>` to select syntax node, then `d`/`c`/`y`
-- Uncertain target: Flash to explore, then select
-
-**Use mini.ai text objects (semantic):** - Function calls: `dif` (delete inside
-function call) - Assignments: `cia` (change inside assignment) - Key-value
-pairs: `dak` (delete around key-value)
-
-
-RECOMMENDATION                                *kyleking-neovim-recommendation*
-
-**Keep the current flash.nvim + Vim model.** The configuration already
-provides:
-
-- Helix’s visual exploration through Flash Treesitter (`<Alt-S>`)
-- Helix’s code-aware navigation through treesitter textobjects
-- Vim’s composability and efficiency
-- Extensive text objects through mini.ai
-- Visual feedback through flash labels
-
-Switching to pure Helix-style select-then-act would **lose** -Operator
-composition (can’t create custom operators that work with all targets) -
-Repeat with `.` (fundamental to Vim efficiency) - Two-character operations like
-`ci"`, `daw` - Ecosystem compatibility
-
-The hybrid approach provides Helix’s discoverability and visual feedback
-while preserving Vim’s compositional power.
+See also: `quickfix`, `:cdo`, `diagnostic`
 
 
 ==============================================================================
-3. Plugin Guides                               *kyleking-neovim-plugin-guides*
+2. Plugin Guides                               *kyleking-neovim-plugin-guides*
 
 
 TEXT OBJECTS (MINI.AI)                *kyleking-neovim-text-objects-(mini.ai)*

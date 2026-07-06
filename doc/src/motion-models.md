@@ -1,126 +1,50 @@
-# Motion Models: Helix vs Vim with Flash.nvim
+## Choosing a Motion
 
-## Overview
+This config layers several targeting tools on top of Vim's operator
+grammar. This section is a decision guide for which to reach for.
 
-This document compares Helix's select-then-act model with Vim's action-target model enhanced by flash.nvim, and explains why the current configuration provides the best of both worlds.
+Quick reference:
 
-## The Two Models
+    ci" daw yap     Known target near cursor: plain text objects
+    cin" dil(       Next/last variant when cursor is outside the target
+    d]m y]z         Structural motion: treesitter next method/fold/class
+    d<A-s>{chars}   Distant visible target: flash jump as operator target
+    <A-S> then d    Explore first: flash treesitter selects a syntax node
+    daf dac         Semantic object: mini.ai function call / class
 
-### Helix: Select-Then-Act
+## When to Use Each
 
-Helix uses a selection-first paradigm where you:
+Plain text objects (`i`/`a` + object) when you are inside or on the
+target: `ci"`, `daw`, `yap`, `gUiw`. Fastest, and `.`-repeatable.
 
-1. **Select** what you want to change (visual selection becomes primary)
-2. **Act** on the selection with a command
+Next/last text objects (mini.ai) when the target is visible but the
+cursor is not in it: `cin"` (change inside next quote), `dil(` (delete
+inside last paren). Saves a motion.
 
-**Example workflow:**
-```
-# Delete a function
-1. Navigate to function: ]f
-2. Select function: mf (select function text object)
-3. Delete: d
+Flash jump (`<A-s>`) when the target is far but visible: type a couple
+of characters, pick the label. Composes with operators, so `d<A-s>`
+deletes from cursor to the labeled position.
 
-# Change text in quotes
-1. Navigate near quotes: w w w
-2. Select inside quotes: mi"
-3. Change: c
-```
+Flash treesitter (`<A-S>`) when you want Helix-style select-then-act:
+labels appear on syntax nodes (expression, block, function), you pick
+one to select it, then apply `d`/`c`/`y`. Best when you are not sure of
+the exact text object name.
 
-**Key insight**: Every operation starts with a selection, making the visual mode the primary interface. Commands act on whatever is selected.
+Treesitter motions (`]m`, `[m`, etc. via nap.nvim and textobjects) for
+moving between structural units, and as operator targets: `d]m` deletes
+to the next method start.
 
-### Vim: Action-Target (with Flash.nvim)
+## Background: Two Motion Models
 
-Vim uses an action-first paradigm where you:
+Helix/Kakoune use select-then-act: every operation starts from a visible
+selection. Vim uses action-target: operators compose with any motion or
+text object, which enables `.` repeat and two-keystroke edits but gives
+no preview of what will change.
 
-1. **Specify action** (delete, change, yank, etc.)
-2. **Specify target** (motion, text object, or search)
+This config keeps Vim's model as the foundation (composability, dot
+repeat, muscle memory) and adds the main benefit of the Helix model
+through flash treesitter (`<A-S>`): visual confirmation of the selection
+before acting, for the cases where you would otherwise guess at a text
+object.
 
-Flash.nvim enhances this by making the target specification instant and visual.
-
-**Example workflow:**
-```
-# Delete a function
-1. d<Alt-s>  (delete + flash jump)
-2. Type function name characters
-3. Select label to delete from cursor to that point
-   OR: d]m (delete to next method start via treesitter)
-   OR: daf (delete around function via mini.ai/treesitter)
-
-# Change text in quotes
-1. ci"  (change inside quotes)
-   OR: c<Alt-s> then select quote position
-```
-
-**Key insight**: Action and target are composed. You can combine any action (d/c/y/v) with any target (motion/text-object/flash-jump).
-
-## Trade-offs
-
-| Aspect | Helix Select-Then-Act | Vim Action-Target + Flash |
-|--------|----------------------|---------------------------|
-| **Visual feedback** | Selection shown before action | Flash labels show targets, selection happens simultaneously with action |
-| **Cognitive load** | Lower - see before you act | Slightly higher - must visualize result |
-| **Composability** | Limited - commands work on selection | High - any action × any target |
-| **Efficiency** | 3 steps (select, refine, act) | 2 steps (action+target) or 1 (single motion) |
-| **Discoverability** | Better - see what will change | Requires understanding operators |
-| **Precision** | Requires correct selection first | Can iterate with `.` or `u` |
-| **Muscle memory** | Differs from Vim/Kakoune | Builds on Vim fundamentals |
-
-## Current Configuration: Hybrid Approach
-
-This config uses Vim's action-target model as the foundation but incorporates Helix-inspired features:
-
-### Vim Foundation
-- **Operators**: `d`, `c`, `y`, `v` compose with all targets
-- **Text objects**: mini.ai provides extensive a/i text objects
-- **Motions**: Standard Vim motions plus treesitter navigation
-- **Repeat**: `.` repeats the last action+target combination
-
-### Helix-Inspired Enhancements
-- **Flash.nvim** (`<Alt-s>`): Jump to visible locations instantly
-- **Flash Treesitter** (`<Alt-S>`): Select syntax nodes visually first
-- **Treesitter textobjects**: Navigate code structure (]m, ]z, ]k)
-- **mini.clue**: Show available operations and targets
-- **Extended text objects**: mini.ai's function calls, assignments, key-value pairs, numbers, etc.
-
-### Why This Is Optimal
-
-1. **Best of both worlds**: Use action-target for known operations (`ci"`, `daw`), use flash/treesitter-select for exploration
-2. **Composability preserved**: All enhancements work with Vim operators
-3. **Efficiency**: Quick operations are faster (ci" vs select-inside-quotes then delete)
-4. **Exploratory power**: `<Alt-S>` provides Helix-like "explore then select" when needed
-5. **Ecosystem compatibility**: Works with existing Vim plugins, workflows, and muscle memory
-
-### Example: When to Use Each
-
-**Use direct action-target (Vim style):**
-- Known targets: `ci"`, `daw`, `yap`, `gUiw`
-- Simple motions: `d$`, `c2w`, `y5j`
-- Treesitter navigation: `]m`, `]z` + operators
-
-**Use flash-enhanced (exploratory):**
-- Distant targets: `d<Alt-s>` then jump to label
-- Visual selection: `<Alt-S>` to select syntax node, then `d`/`c`/`y`
-- Uncertain target: Flash to explore, then select
-
-**Use mini.ai text objects (semantic):**
-- Function calls: `dif` (delete inside function call)
-- Assignments: `cia` (change inside assignment)
-- Key-value pairs: `dak` (delete around key-value)
-
-## Recommendation
-
-**Keep the current flash.nvim + Vim model.** The configuration already provides:
-
-- Helix's visual exploration through Flash Treesitter (`<Alt-S>`)
-- Helix's code-aware navigation through treesitter textobjects
-- Vim's composability and efficiency
-- Extensive text objects through mini.ai
-- Visual feedback through flash labels
-
-Switching to pure Helix-style select-then-act would **lose**:
-- Operator composition (can't create custom operators that work with all targets)
-- Repeat with `.` (fundamental to Vim efficiency)
-- Two-character operations like `ci"`, `daw`
-- Ecosystem compatibility
-
-The hybrid approach provides Helix's discoverability and visual feedback while preserving Vim's compositional power.
+See also: `MiniAi`, `flash.nvim`, `text-objects`
