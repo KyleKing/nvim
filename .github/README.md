@@ -76,8 +76,8 @@ LSP servers, linters, and formatters are required. Quick install with mise:
 mise use -g npm:vscode-langservers-extracted npm:typescript-language-server \
     npm:pyright npm:yaml-language-server npm:bash-language-server \
     npm:dockerfile-language-server-nodejs npm:@microsoft/compose-language-service
-mise use -g go:golang.org/x/tools/gopls cargo:taplo-cli
-brew install lua-language-server hashicorp/tap/terraform-ls
+mise use -g go:golang.org/x/tools/gopls
+brew install lua-language-server hashicorp/tap/terraform-ls tombi
 
 # Linters and formatters
 mise use -g npm:prettier npm:@fsouza/prettierd npm:oxlint npm:stylelint

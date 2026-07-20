@@ -81,7 +81,7 @@ later(function()
             rust = rust,
             scss = prettier,
             sh = { "shfmt" },
-            -- toml = { "taplo" }, -- PLANNED: consider toml-sort or alternative that doesn't conflict with pre-commit
+            -- toml: no conform formatter entry needed; tombi LSP formats via the lsp_format = "fallback" path below
             typescript = ts_like,
             typescriptreact = ts_like,
             yaml = prettier,

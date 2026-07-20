@@ -1,4 +1,4 @@
--- Tab-based shell terminal + floating TUI apps (lazygit, lazyjj, lazydocker)
+-- Tab-based shell terminal + floating TUI apps (lazygit, lazyjj, lazydocker, hunk)
 
 ---@type {bufnr: number|nil, tabnr: number|nil, prev_tabnr: number|nil}
 local shell_term = { bufnr = nil, tabnr = nil, prev_tabnr = nil }
@@ -176,6 +176,20 @@ K(
     "<leader>td",
     function() toggle_tui_float({ cmd = "lazydocker", term_id = "lazydocker" }) end,
     { desc = "Terminal: lazydocker" }
+)
+
+K(
+    "n",
+    "<leader>th",
+    function() toggle_tui_float({ cmd = "hunk diff", term_id = "hunk_diff" }) end,
+    { desc = "Terminal: hunk diff (working tree)" }
+)
+
+K(
+    "n",
+    "<leader>ts",
+    function() toggle_tui_float({ cmd = "hunk show", term_id = "hunk_show" }) end,
+    { desc = "Terminal: hunk show (commit)" }
 )
 
 K("t", "gf", function() require("kyleking.utils.file_opener").open_from_terminal() end, {

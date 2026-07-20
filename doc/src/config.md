@@ -38,7 +38,7 @@ with mise or your preferred package manager.
 
     # Other package managers
     mise use -g go:golang.org/x/tools/gopls
-    mise use -g cargo:taplo-cli  # TOML
+    brew install tombi  # TOML
     brew install hashicorp/tap/terraform-ls
     brew install lua-language-server
 

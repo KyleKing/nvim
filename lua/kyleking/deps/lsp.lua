@@ -136,8 +136,8 @@ later(function()
         "jsonls",
         "lua_ls",
         python_lsp,
-        "taplo",
         "terraformls",
+        "tombi",
         "ts_ls",
         "yamlls",
     })

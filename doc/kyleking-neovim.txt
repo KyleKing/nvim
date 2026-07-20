@@ -1,4 +1,4 @@
-*kyleking-neovim.txt*              For               Last change: 2026 July 06
+*kyleking-neovim.txt*              For               Last change: 2026 July 20
 
 ==============================================================================
 Table of Contents                          *kyleking-neovim-table-of-contents*
@@ -701,7 +701,7 @@ LSP SERVERS ~
     
     # Other package managers
     mise use -g go:golang.org/x/tools/gopls
-    mise use -g cargo:taplo-cli  # TOML
+    brew install tombi  # TOML
     brew install hashicorp/tap/terraform-ls
     brew install lua-language-server
 <
