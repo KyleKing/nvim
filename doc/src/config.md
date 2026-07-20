@@ -167,30 +167,30 @@ available when cwd is the config directory.
 
 Single test file (fastest, ~1-2 seconds):
 
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" \
       -c "qall!"
 
 Parallel execution (recommended, ~6-8 seconds):
 
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
       -c "sleep 10" -c "qall!"
 
 Sequential fallback (~20 seconds):
 
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua MiniTest.run()" -c "qall!"
 
 Random order (detect test dependencies):
 
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" \
       -c "qall!"
 
 ### Performance
 
-`MINI_DEPS_LATER_AS_NOW=1` makes plugins load synchronously during tests,
+`NVIM_TEST_SYNC=1` makes plugins load synchronously during tests,
 reducing waits from 1000ms to 10ms (the name is retained from the mini.deps era;
 it now drives the `pack.now`/`pack.later` switch). Parallel workers spawn N nvim instances
 (auto-detects CPU cores), each running tests sequentially with state cleanup

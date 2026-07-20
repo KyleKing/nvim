@@ -69,6 +69,10 @@ return {
         "- `<leader>fr` Browse registers (view contents)",
         "- `<leader>fp` Paste from register picker (choose register, then paste)",
         "",
+        "**Inspect editor state**:",
+        "- `<leader>fi` Browse active highlight patterns from mini.hipatterns",
+        "- `<leader>fo` Browse and edit vim options interactively",
+        "",
         "**Tips**:",
         "- `<leader>fB` lists all built-in pickers -- useful for discovering what is available",
         "- `<leader><CR>` resumes the last picker with its previous query and matches intact",
@@ -253,6 +257,40 @@ return {
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fk", "n")
                             MiniTest.expect.equality(has_keymap, true, "Should have <leader>fk keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>fi",
+            desc = "Find highlight patterns (hipatterns)",
+            tests = {
+                {
+                    name = "hipatterns picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("<leader>fi", "n")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fi keymap")
+                        end,
+                    },
+                },
+            },
+        },
+        {
+            pattern = "<leader>fo",
+            desc = "Find and edit vim options",
+            tests = {
+                {
+                    name = "options picker keybinding",
+                    expect = {
+                        fn = function(_ctx)
+                            local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
+                            local has_keymap = helpers.check_keymap("<leader>fo", "n")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fo keymap")
                         end,
                     },
                 },

@@ -271,7 +271,7 @@ function M.nvim_interaction_test(lua_code, timeout_ms)
     timeout_ms = timeout_ms or 15000
     local tmpfile = vim.fn.tempname() .. "_interaction_test.lua"
 
-    local sync_mode = vim.env.MINI_DEPS_LATER_AS_NOW ~= nil
+    local sync_mode = vim.env.NVIM_TEST_SYNC ~= nil
     local pre_delay = sync_mode and 100 or 2000
     local post_delay = sync_mode and 50 or 500
 
@@ -291,7 +291,7 @@ function M.nvim_interaction_test(lua_code, timeout_ms)
     local cmd = { "nvim", "--headless", "-c", "luafile " .. tmpfile }
     local opts = { text = true }
 
-    if vim.env.MINI_DEPS_LATER_AS_NOW then cmd = { "env", "MINI_DEPS_LATER_AS_NOW=1", unpack(cmd) } end
+    if vim.env.NVIM_TEST_SYNC then cmd = { "env", "NVIM_TEST_SYNC=1", unpack(cmd) } end
 
     local result = vim.system(cmd, opts):wait(timeout_ms)
 

@@ -220,7 +220,7 @@ function WorkerPool:start()
             socket,
         }
 
-        if vim.env.MINI_DEPS_LATER_AS_NOW then cmd = { "env", "MINI_DEPS_LATER_AS_NOW=1", unpack(cmd) } end
+        if vim.env.NVIM_TEST_SYNC then cmd = { "env", "NVIM_TEST_SYNC=1", unpack(cmd) } end
 
         local job = vim.system(cmd, { detach = true })
         self.workers[i] = {
@@ -380,7 +380,7 @@ function M.run_tests_parallel(shuffle, seed)
 
         table.insert(script_content, "local MiniTest = require('mini.test')")
         table.insert(script_content, "local helpers = require('tests.helpers')")
-        table.insert(script_content, "vim.wait(10)") -- Brief wait for plugins (MINI_DEPS_LATER_AS_NOW makes this fast)
+        table.insert(script_content, "vim.wait(10)") -- Brief wait for plugins (NVIM_TEST_SYNC makes this fast)
 
         for _, test_file in ipairs(file_chunk) do
             local file_name = vim.fn.fnamemodify(test_file, ":t")
@@ -424,7 +424,7 @@ function M.run_tests_parallel(shuffle, seed)
             string.format("luafile %s", script_path),
         }
 
-        if vim.env.MINI_DEPS_LATER_AS_NOW then cmd = { "env", "MINI_DEPS_LATER_AS_NOW=1", unpack(cmd) } end
+        if vim.env.NVIM_TEST_SYNC then cmd = { "env", "NVIM_TEST_SYNC=1", unpack(cmd) } end
 
         -- Redirect output to log file
         local log_file = io.open(log_path, "w")

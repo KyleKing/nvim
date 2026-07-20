@@ -107,12 +107,12 @@ This config includes comprehensive tests using mini.test with parallel execution
 
 ```bash
 # Parallel execution (recommended)
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+NVIM_TEST_SYNC=1 nvim --headless \
     -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
     -c "sleep 10" -c "qall!"
 
 # Single test file
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+NVIM_TEST_SYNC=1 nvim --headless \
     -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" \
     -c "qall!"
 ```

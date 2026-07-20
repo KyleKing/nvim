@@ -10,10 +10,12 @@ local wd = require("kyleking.utils.workspace_diagnostics")
 T["qf"] = MiniTest.new_set()
 
 T["qf"]["filter keeps matches"] = function()
+    local bufnr = helpers.create_test_buffer({ "line1", "line2", "line3" })
+
     vim.fn.setqflist({
-        { bufnr = 1, lnum = 1, text = "error: something" },
-        { bufnr = 1, lnum = 2, text = "warning: other" },
-        { bufnr = 1, lnum = 3, text = "error: another" },
+        { bufnr = bufnr, lnum = 1, text = "error: something" },
+        { bufnr = bufnr, lnum = 2, text = "warning: other" },
+        { bufnr = bufnr, lnum = 3, text = "error: another" },
     })
 
     wd.qf.filter("error", true)
@@ -22,13 +24,17 @@ T["qf"]["filter keeps matches"] = function()
     MiniTest.expect.equality(#qf, 2)
     MiniTest.expect.equality(qf[1].text, "error: something")
     MiniTest.expect.equality(qf[2].text, "error: another")
+
+    helpers.delete_buffer(bufnr)
 end
 
 T["qf"]["filter removes matches"] = function()
+    local bufnr = helpers.create_test_buffer({ "line1", "line2", "line3" })
+
     vim.fn.setqflist({
-        { bufnr = 1, lnum = 1, text = "error: something" },
-        { bufnr = 1, lnum = 2, text = "warning: other" },
-        { bufnr = 1, lnum = 3, text = "error: another" },
+        { bufnr = bufnr, lnum = 1, text = "error: something" },
+        { bufnr = bufnr, lnum = 2, text = "warning: other" },
+        { bufnr = bufnr, lnum = 3, text = "error: another" },
     })
 
     wd.qf.filter("error", false)
@@ -36,6 +42,8 @@ T["qf"]["filter removes matches"] = function()
     local qf = vim.fn.getqflist()
     MiniTest.expect.equality(#qf, 1)
     MiniTest.expect.equality(qf[1].text, "warning: other")
+
+    helpers.delete_buffer(bufnr)
 end
 
 T["qf"]["dedupe removes duplicates"] = function()

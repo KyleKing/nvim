@@ -171,11 +171,11 @@ later(function()
         })
     end, { desc = "Paste from register picker" })
 
+    K("n", "<leader>fi", MiniExtra.pickers.hipatterns, { desc = "Find highlight patterns (hipatterns)" })
+    K("n", "<leader>fo", MiniExtra.pickers.options, { desc = "Find and edit vim options" })
     K("n", "<leader>fw", function() builtin.grep_live() end, { desc = "Find word in files (live grep)" })
 
     -- Additional mini.extra pickers (uncomment to enable):
-    -- MiniExtra.pickers.hipatterns - Browse active highlight patterns from mini.hipatterns
-    -- MiniExtra.pickers.options - Browse and modify vim options interactively
     -- MiniExtra.pickers.spellsuggest - Spelling suggestions for word under cursor
     -- MiniExtra.pickers.visit_labels - Browse mini.visit labels (requires mini.visit)
     -- MiniExtra.pickers.visit_paths - Browse mini.visit paths (requires mini.visit)
@@ -185,7 +185,7 @@ end)
 later(function()
     _add({
         source = "KyleKing/codanna.nvim",
-        depends = { "echasnovski/mini.nvim" },
+        depends = { "nvim-mini/mini.nvim" },
     })
 
     require("codanna").setup({

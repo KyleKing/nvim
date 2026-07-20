@@ -147,12 +147,10 @@ end
 T["integration"] = MiniTest.new_set()
 
 T["integration"]["works with real markdown file"] = function()
-    -- Skip if no tools available
-    local has_pandoc = vim.fn.executable("pandoc") == 1
-    local has_python = vim.fn.executable("python3") == 1 or vim.fn.executable("python") == 1
-
-    if not has_pandoc and not has_python then
-        MiniTest.skip("No markdown converter available")
+    -- Exercise the pandoc path only: the Python fallback needs the importable
+    -- `markdown` module, which is not guaranteed even when python3 is on PATH.
+    if vim.fn.executable("pandoc") ~= 1 then
+        MiniTest.skip("pandoc not available for markdown preview integration test")
         return
     end
 

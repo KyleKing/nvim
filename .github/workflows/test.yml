@@ -35,7 +35,7 @@ jobs:
       - name: Run smoke test
         run: |
           # Verify config loads without errors
-          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+          NVIM_TEST_SYNC=1 nvim --headless \
             -c "lua vim.wait(1000, function() return false end)" \
             -c "qall!"
 
@@ -43,7 +43,7 @@ jobs:
         run: |
           # Run only tests that don't require external tools (stylua, ruff, etc.)
           # This matches the local :RunTestCI command
-          MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+          NVIM_TEST_SYNC=1 nvim --headless \
             -c "lua require('kyleking.utils.test_runner').run_ci_tests()" \
             -c "qall!"
 

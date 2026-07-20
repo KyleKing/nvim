@@ -194,7 +194,7 @@ end)
 
 - `now()` for plugins needed at startup (colorscheme, mini.test)
 - `later()` for everything else (deferred loading)
-- Set `MINI_DEPS_LATER_AS_NOW=1` to make `later()` behave like `now()` (useful for testing)
+- Set `NVIM_TEST_SYNC=1` to make `later()` behave like `now()` (useful for testing)
 - Plugin keymaps belong in their respective `deps/*.lua` file, not in `core/keymaps.lua`
 - Wrap plugin function calls in keymaps with anonymous functions to prevent nil-rhs errors when the plugin hasn't loaded yet
 

@@ -101,7 +101,7 @@ repos:
       - id: generate-plugin-docs
         name: Generate plugin docs from fixtures
         description: Auto-generate doc/generated/plugins.md from test fixtures
-        entry: bash -c 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"tests.docs.generator\").generate_all()" +qall'
+        entry: bash -c 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"tests.docs.generator\").generate_all()" +qall'
         language: system
         files: ^lua/tests/docs/.*\.lua$
         pass_filenames: false
@@ -135,7 +135,7 @@ repos:
       - id: mini-test
         name: Run Mini.test
         description: Run neovim tests with synchronous plugin loading
-        entry: bash -c 'cd ~/.config/nvim && MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_ci_tests()" -c "qall!"'
+        entry: bash -c 'cd ~/.config/nvim && NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_ci_tests()" -c "qall!"'
         language: system
         pass_filenames: false
         stages: [pre-push]

@@ -863,7 +863,7 @@ COMMAND LINE ~
 Single test file (fastest, ~1-2 seconds):
 
 >
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua MiniTest.run_file('lua/tests/custom/constants_spec.lua')" \
       -c "qall!"
 <
@@ -871,7 +871,7 @@ Single test file (fastest, ~1-2 seconds):
 Parallel execution (recommended, ~6-8 seconds):
 
 >
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua require('kyleking.utils.test_runner').run_tests_parallel()" \
       -c "sleep 10" -c "qall!"
 <
@@ -879,14 +879,14 @@ Parallel execution (recommended, ~6-8 seconds):
 Sequential fallback (~20 seconds):
 
 >
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua MiniTest.run()" -c "qall!"
 <
 
 Random order (detect test dependencies):
 
 >
-    MINI_DEPS_LATER_AS_NOW=1 nvim --headless \
+    NVIM_TEST_SYNC=1 nvim --headless \
       -c "lua require('kyleking.utils.test_runner').run_all_tests(false, true, 12345)" \
       -c "qall!"
 <
@@ -894,11 +894,11 @@ Random order (detect test dependencies):
 
 PERFORMANCE ~
 
-`MINI_DEPS_LATER_AS_NOW=1` makes plugins load synchronously during tests,
-reducing waits from 1000ms to 10ms (the name is retained from the mini.deps
-era; it now drives the `pack.now`/`pack.later` switch). Parallel workers spawn
-N nvim instances (auto-detects CPU cores), each running tests sequentially with
-state cleanup between tests. All workers run concurrently.
+`NVIM_TEST_SYNC=1` makes plugins load synchronously during tests, reducing
+waits from 1000ms to 10ms (the name is retained from the mini.deps era; it now
+drives the `pack.now`/`pack.later` switch). Parallel workers spawn N nvim
+instances (auto-detects CPU cores), each running tests sequentially with state
+cleanup between tests. All workers run concurrently.
 
 Performance comparison:
 
@@ -1184,6 +1184,15 @@ COMMAND LINE (MINI.CMDLINE)      *kyleking-neovim-command-line-(mini.cmdline)*
 Command-line ergonomics: autocomplete, autocorrect, and autopeek.
 
 **Autocomplete**wildmenu-style suggestions appear as you type a `:` command.
+
+Requires `wildmode = "noselect,full"` (set in `core/options.lua`) so
+suggestions
+
+show without inserting text into the command line. If `wildmode` is set to a
+
+non-`noselect` mode before this plugin’s `setup()` runs, autocomplete will
+
+silently insert the first match as you type instead of just previewing it.
 
 **Autocorrect**non-existing commands and options are corrected automatically.
 
@@ -1990,6 +1999,8 @@ Operator grammar:
     <C-w>                Toggle insert/normal mode for query editing
     <leader>fh           Find in nvim help
     <leader>fk           Find keymaps
+    <leader>fi           Find highlight patterns (hipatterns)
+    <leader>fo           Find and edit vim options
     <leader>fr           Find registers
     <leader>fp           Paste from register picker
     <leader>f'           Find marks
@@ -2079,6 +2090,11 @@ git-tracked files.
 
 - `<leader>fr`Browse registers (view contents)
 - `<leader>fp` Paste from register picker (choose register, then paste)
+
+**Inspect editor state**
+
+- `<leader>fi`Browse active highlight patterns from mini.hipatterns
+- `<leader>fo` Browse and edit vim options interactively
 
 **Tips**
 

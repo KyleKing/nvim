@@ -5,15 +5,15 @@
 # Benchmark tasks
 [tasks.bench]
 description = "Run all performance benchmarks"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/startup_spec.lua\"); MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/startup_spec.lua\"); MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
 
 [tasks."bench:startup"]
 description = "Run startup performance benchmarks"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/startup_spec.lua\")" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/startup_spec.lua\")" -c "qall!"'
 
 [tasks."bench:terminal"]
 description = "Run terminal performance benchmarks"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
 
 [tasks.check]
 depends = ["fmt", "test"]
@@ -25,7 +25,7 @@ run = 'nvim --headless -c "helptags doc" -c "qall!"'
 
 [tasks."doc:plugin"]
 description = "Generate plugin documentation from test fixtures"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"tests.docs.generator\").generate_all()" +qall'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"tests.docs.generator\").generate_all()" +qall'
 
 # Documentation tasks
 [tasks."doc:vimdoc"]
@@ -34,16 +34,16 @@ run = "prek run panvimdoc --all-files"
 
 [tasks."fixture:profile"]
 description = "Profile fixture performance"
-run = 'PROFILE_TESTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
+run = 'PROFILE_TESTS=1 NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
 
 # Fixture testing tasks
 [tasks."fixture:test"]
 description = "Run all fixture tests"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
 
 [tasks."fixture:update"]
 description = "Update snapshots (creates new, updates changed, prunes stale)"
-run = 'UPDATE_SNAPSHOTS=1 MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
+run = 'UPDATE_SNAPSHOTS=1 NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
 
 [tasks.fmt]
 description = "Run all pre-commit hooks (stylua, selene, prettier, mdformat, etc.)"
@@ -78,11 +78,11 @@ run = "./scripts/measure_nvim.sh"
 # Test tasks
 [tasks.test]
 description = "Run CI tests (no external tool dependencies, fast ~3-5 seconds)"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_ci_tests()" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_ci_tests()" -c "qall!"'
 
 [tasks."test:all"]
 description = "Run all tests sequentially (fallback, ~20 seconds)"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"'
 
 [tasks."test:coverage"]
 description = "Run tests with coverage tracking (custom modules)"
@@ -104,13 +104,13 @@ if [ -z "${FILE:-}" ]; then
   echo "Usage: mise run test:file FILE=lua/tests/custom/constants_spec.lua"
   exit 1
 fi
-MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua MiniTest.run_file(\"${FILE}\")" -c "qall!"
+NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"${FILE}\")" -c "qall!"
 '''
 
 [tasks."test:parallel"]
 description = "Run all tests with parallel workers (recommended, ~6-8 seconds)"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_tests_parallel()" -c "sleep 10" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_tests_parallel()" -c "sleep 10" -c "qall!"'
 
 [tasks."test:random"]
 description = "Run tests in random order to detect dependencies"
-run = 'MINI_DEPS_LATER_AS_NOW=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_all_tests(false, true, 12345)" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_all_tests(false, true, 12345)" -c "qall!"'

@@ -3,8 +3,8 @@
 local M = {}
 
 -- Timing delays (milliseconds)
--- When MINI_DEPS_LATER_AS_NOW=1, plugins load synchronously so waits can be minimal
-local sync_mode = vim.env.MINI_DEPS_LATER_AS_NOW ~= nil
+-- When NVIM_TEST_SYNC=1, plugins load synchronously so waits can be minimal
+local sync_mode = vim.env.NVIM_TEST_SYNC ~= nil
 M.DELAY = {
     PLUGIN_LOAD = sync_mode and 10 or 1000, -- Time to wait for plugins to load
     KEYMAP_DISPLAY = 500, -- Delay before showing keybinding hints
