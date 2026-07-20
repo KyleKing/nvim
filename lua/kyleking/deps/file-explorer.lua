@@ -145,6 +145,7 @@ later(function()
 
     local function updateMiniWithGit(buf_id, gitStatusMap)
         vim.schedule(function()
+            if not vim.api.nvim_buf_is_valid(buf_id) then return end
             local MiniFiles = require("mini.files")
             local cwd = vim.fs.root(buf_id, ".git")
             if not cwd then return end
