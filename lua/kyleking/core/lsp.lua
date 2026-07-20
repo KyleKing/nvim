@@ -38,40 +38,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
             local trigger = vim.lsp.completion.trigger or function() vim.api.nvim_feedkeys("\24\15", "n", false) end
             vim.keymap.set("i", "<C-Space>", trigger, opts)
 
-            -- Navigate completion menu
-            vim.keymap.set("i", "<C-j>", function()
-                if vim.fn.pumvisible() == 1 then
-                    return "<C-n>"
-                else
-                    return "<C-j>"
-                end
-            end, vim.tbl_extend("force", opts, { expr = true, desc = "Next completion or insert C-j" }))
-
-            vim.keymap.set("i", "<C-k>", function()
-                if vim.fn.pumvisible() == 1 then
-                    return "<C-p>"
-                else
-                    return "<C-k>"
-                end
-            end, vim.tbl_extend("force", opts, { expr = true, desc = "Prev completion or insert C-k" }))
-
-            -- Accept completion with Ctrl-Enter
-            vim.keymap.set("i", "<C-CR>", function()
-                if vim.fn.pumvisible() == 1 then
-                    return "<C-y>"
-                else
-                    return "<C-CR>"
-                end
-            end, vim.tbl_extend("force", opts, { expr = true, desc = "Accept completion or insert C-CR" }))
-
-            -- Abort completion with Enter
-            vim.keymap.set("i", "<CR>", function()
-                if vim.fn.pumvisible() == 1 then
-                    return "<C-e><CR>"
-                else
-                    return "<CR>"
-                end
-            end, vim.tbl_extend("force", opts, { expr = true, desc = "Abort completion or insert newline" }))
+            -- Menu navigation (<C-j>/<C-k>), acceptance (<C-CR>), and abort (<CR>) are
+            -- global Insert-mode multistep maps in deps/keymap.lua (mini.keymap).
 
             -- Toggle between manual and auto-trigger completion
             vim.keymap.set("n", "<leader>ca", function() toggle_completion_mode(ev.buf) end, {
