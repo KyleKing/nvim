@@ -4,6 +4,12 @@
 
 set -e
 
+# Skip re-measuring if the last commit already updated BENCHMARKS.md
+if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -qx 'BENCHMARKS.md'; then
+    echo "BENCHMARKS.md already updated in the last commit, skipping"
+    exit 0
+fi
+
 get_time() {
     grep "NVIM STARTED" <tmp | cut -d ' ' -f 1
 }
