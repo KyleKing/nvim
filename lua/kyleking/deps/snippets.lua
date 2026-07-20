@@ -3,11 +3,10 @@
 -- Provides LSP-integrated snippet support with jump navigation.
 -- Keybindings designed to work alongside completion menu.
 
-local add, later = require("mini.deps").add, require("mini.deps").later
+local later = require("mini.deps").later
 
 later(function()
-    add("echasnovski/mini.snippets")
-
+    -- mini.snippets ships in the mini.nvim bundle; no separate add() needed
     local snippets = require("mini.snippets")
 
     snippets.setup({
