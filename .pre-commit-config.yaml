@@ -37,6 +37,8 @@ repos:
         args: [--fix=auto]
       - id: pretty-format-json
         args: [--autofix, --indent=4]
+        # vim.pack owns this lockfile's format and rewrites it on launch; don't reformat
+        exclude: ^nvim-pack-lock\.json$
       - id: trailing-whitespace
         exclude: doc/kyleking-neovim\.txt
   - repo: https://github.com/JohnnyMorganz/StyLua

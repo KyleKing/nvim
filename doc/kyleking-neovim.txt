@@ -46,6 +46,8 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - See also: jumps, CTRL-O, CTRL-I|kyleking-neovim-see-also:-jumps,-ctrl-o,-ctrl-i|
   - Clue (mini.clue)                        |kyleking-neovim-clue-(mini.clue)|
   - See also: MiniClue                    |kyleking-neovim-see-also:-miniclue|
+  - Command line (mini.cmdline)  |kyleking-neovim-command-line-(mini.cmdline)|
+  - See also: MiniCmdline              |kyleking-neovim-see-also:-minicmdline|
   - Color & UI                                    |kyleking-neovim-color-&-ui|
   - Source: lua/kyleking/deps/colorscheme.lua, lua/kyleking/deps/color.lua, lua/kyleking/deps/bars-and-lines.lua|kyleking-neovim-source:-lua/kyleking/deps/colorscheme.lua,-lua/kyleking/deps/color.lua,-lua/kyleking/deps/bars-and-lines.lua|
   - Comment (mini.comment)            |kyleking-neovim-comment-(mini.comment)|
@@ -64,6 +66,10 @@ Table of Contents                          *kyleking-neovim-table-of-contents*
   - See also: MiniHipatterns        |kyleking-neovim-see-also:-minihipatterns|
   - Reference Highlighting (vim-illuminate)|kyleking-neovim-reference-highlighting-(vim-illuminate)|
   - See also: gd, gr, LSP              |kyleking-neovim-see-also:-gd,-gr,-lsp|
+  - Input prompts (mini.input)    |kyleking-neovim-input-prompts-(mini.input)|
+  - See also: MiniInput                  |kyleking-neovim-see-also:-miniinput|
+  - Smart insert keys (mini.keymap)|kyleking-neovim-smart-insert-keys-(mini.keymap)|
+  - See also: MiniKeymap                |kyleking-neovim-see-also:-minikeymap|
   - LSP Advanced Features              |kyleking-neovim-lsp-advanced-features|
   - See also: lsp, diagnostic, nvim-lint|kyleking-neovim-see-also:-lsp,-diagnostic,-nvim-lint|
   - LSP Completion Keybindings    |kyleking-neovim-lsp-completion-keybindings|
@@ -666,17 +672,20 @@ BOOT SEQUENCE                                  *kyleking-neovim-boot-sequence*
 `init.lua` -> `lua/kyleking/init.lua` which loads two phases:
 
 1. **Core** (`lua/kyleking/core/init.lua`): options -> lsp -> keymaps -> autocmds
-2. **Plugins** (`lua/kyleking/setup-deps.lua`): bootstraps mini.deps, then
-requires each `lua/kyleking/deps/*.lua` file
+2. **Plugins** (`lua/kyleking/setup-deps.lua`): bootstraps the mini.nvim bundle
+via `vim.pack`, then requires each `lua/kyleking/deps/*.lua` file
 
 
 PLUGIN MANAGEMENT                          *kyleking-neovim-plugin-management*
 
-All plugins are managed through mini.deps. Each `deps/*.lua` file groups
-related plugins by functionality.
+All plugins are managed through Neovim’s built-in `vim.pack`, wrapped by a
+thin `lua/kyleking/pack.lua` compatibility layer that exposes `add()`, `now()`,
+and `later()`. Each `deps/*.lua` file groups related plugins by functionality.
+Plugin revisions are tracked in `vim.pack`’s lockfile at
+`nvim-pack-lock.json` (version-control it for reproducible installs).
 
 - `now()` for plugins needed at startup (colorscheme, mini.test)
-- `later()` for everything else (deferred loading)
+- `later()` for everything else (deferred loading, one callback per event loop tick)
 - Plugin keymaps live in their respective `deps/*.lua` file
 
 
@@ -886,9 +895,10 @@ Random order (detect test dependencies):
 PERFORMANCE ~
 
 `MINI_DEPS_LATER_AS_NOW=1` makes plugins load synchronously during tests,
-reducing waits from 1000ms to 10ms. Parallel workers spawn N nvim instances
-(auto-detects CPU cores), each running tests sequentially with state cleanup
-between tests. All workers run concurrently.
+reducing waits from 1000ms to 10ms (the name is retained from the mini.deps
+era; it now drives the `pack.now`/`pack.later` switch). Parallel workers spawn
+N nvim instances (auto-detects CPU cores), each running tests sequentially with
+state cleanup between tests. All workers run concurrently.
 
 Performance comparison:
 
@@ -1167,6 +1177,24 @@ Source: `lua/kyleking/deps/keybinding.lua`
 
 
 SEE ALSO: MINICLUE                        *kyleking-neovim-see-also:-miniclue*
+
+
+COMMAND LINE (MINI.CMDLINE)      *kyleking-neovim-command-line-(mini.cmdline)*
+
+Command-line ergonomics: autocomplete, autocorrect, and autopeek.
+
+**Autocomplete**wildmenu-style suggestions appear as you type a `:` command.
+
+**Autocorrect**non-existing commands and options are corrected automatically.
+
+**Autopeek**shows the target `:range` in a floating window while typing.
+
+Requires Neovim 0.11+ (0.12+ recommended).
+
+Source: `lua/kyleking/deps/cmdline.lua`
+
+
+SEE ALSO: MINICMDLINE                  *kyleking-neovim-see-also:-minicmdline*
 
 
 COLOR & UI                                        *kyleking-neovim-color-&-ui*
@@ -1452,6 +1480,12 @@ Operator grammar:
 Editfiles by typing a new filename (create), deleting a line (delete), or
 editing the name in place (rename). Press `=` to apply.
 
+**LSP-aware operations**
+
+Create,rename, and delete fire LSP `willRename`/`didRename` (and create/delete)
+requests, so language servers update imports and references automatically
+(Neovim 0.11+).
+
 **Git status integration**
 
 Filesshow visual indicators: `+` (added), `✹` (modified), `�� ` (modified
@@ -1581,6 +1615,57 @@ Source: `lua/kyleking/deps/bars-and-lines.lua`
 
 
 SEE ALSO: GD, GR, LSP                  *kyleking-neovim-see-also:-gd,-gr,-lsp*
+
+
+INPUT PROMPTS (MINI.INPUT)        *kyleking-neovim-input-prompts-(mini.input)*
+
+Customizable vim.ui.input() implementation shown as a floating prompt.
+
+Replaces the built-in `vim.ui.input()` used by prompts across Neovim and
+plugins.
+
+mini.ai and mini.surround route their interactive name prompts (function/tag)
+through mini.input automatically.
+
+Source: `lua/kyleking/deps/input.lua`
+
+
+SEE ALSO: MINIINPUT                      *kyleking-neovim-see-also:-miniinput*
+
+
+SMART INSERT KEYS (MINI.KEYMAP)*kyleking-neovim-smart-insert-keys-(mini.keymap)*
+
+Multi-step Insert-mode keys that combine completion-menu control and
+mini.snippets expansion. Each step runs only when its condition holds,
+otherwise the literal key is inserted.
+
+Operator grammar:
+
+>
+    <Tab> / <S-Tab>      Snippet expand and jump
+    <C-j> / <C-k>        Completion menu navigation
+    <C-CR> / <CR>        Accept or abort completion
+<
+
+`<Tab>` Jump to next snippet tabstop, else expand a snippet, else literal Tab.
+
+`<S-Tab>` Jump to previous snippet tabstop, else literal S-Tab.
+
+`<C-j>` / `<C-k>` Select next / previous completion item (when the menu is
+open).
+
+`<C-CR>` Accept the selected completion item.
+
+`<CR>` Abort an open completion menu and insert a newline (acceptance is
+`<C-CR>`).
+
+Buffer-local `<Tab>`/`<CR>` maps (e.g.� markdown/djot list editing) still take
+precedence where set.
+
+Source: `lua/kyleking/deps/keymap.lua`
+
+
+SEE ALSO: MINIKEYMAP                    *kyleking-neovim-see-also:-minikeymap*
 
 
 LSP ADVANCED FEATURES                  *kyleking-neovim-lsp-advanced-features*
@@ -2015,20 +2100,16 @@ Snippet expansion and navigation with LSP integration.
 Operator grammar:
 
 >
-    <Tab>                Expand snippet or jump next
-    <S-Tab>              Jump to previous snippet position
+    mini.snippets API    Expansion and session control
     <C-c>                Stop snippet session
 <
 
-`<Tab>` Expand snippet or jump to next position (insert mode)
+`<Tab>` / `<S-Tab>` Expand and jump snippet tabstops (via mini.keymap, see
+Smart insert keys).
 
-`<S-Tab>` Jump to previous snippet position (insert mode)
-
-`<C-c>` Stop snippet session (insert mode)
+`<C-c>` Stop snippet session (insert mode).
 
 LSP snippets automatically available through nvim 0.11+ completion.
-
-Tab behavior conditional on completion menu state (no conflicts).
 
 Custom snippets can be added to setup configuration.
 

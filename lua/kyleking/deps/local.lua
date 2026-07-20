@@ -1,7 +1,7 @@
 -- PLANNED: test new packages
 
--- local MiniDeps = require("mini.deps")
--- local add, now, _later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+-- local pack = require("kyleking.pack")
+-- local add, now, _later = pack.add, pack.now, pack.later
 
 -- now(function()
 --     add({

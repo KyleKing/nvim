@@ -1,6 +1,6 @@
-local MiniDeps = require("mini.deps")
+local pack = require("kyleking.pack")
 local deps_utils = require("kyleking.deps_utils")
-local add, later = MiniDeps.add, deps_utils.maybe_later
+local add, later = pack.add, deps_utils.maybe_later
 
 later(function()
     -- Adapted from: https://andrewcourter.substack.com/p/which-is-better-flashnvim-or-leapnvim

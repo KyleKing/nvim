@@ -7,16 +7,19 @@ Leader key: `<Space>` -- Local leader: `,`
 `init.lua` -> `lua/kyleking/init.lua` which loads two phases:
 
 1. **Core** (`lua/kyleking/core/init.lua`): options -> lsp -> keymaps -> autocmds
-2. **Plugins** (`lua/kyleking/setup-deps.lua`): bootstraps mini.deps, then
-   requires each `lua/kyleking/deps/*.lua` file
+2. **Plugins** (`lua/kyleking/setup-deps.lua`): bootstraps the mini.nvim bundle
+   via `vim.pack`, then requires each `lua/kyleking/deps/*.lua` file
 
 ## Plugin Management
 
-All plugins are managed through mini.deps. Each `deps/*.lua` file groups
-related plugins by functionality.
+All plugins are managed through Neovim's built-in `vim.pack`, wrapped by a thin
+`lua/kyleking/pack.lua` compatibility layer that exposes `add()`, `now()`, and
+`later()`. Each `deps/*.lua` file groups related plugins by functionality.
+Plugin revisions are tracked in `vim.pack`'s lockfile at
+`nvim-pack-lock.json` (version-control it for reproducible installs).
 
 - `now()` for plugins needed at startup (colorscheme, mini.test)
-- `later()` for everything else (deferred loading)
+- `later()` for everything else (deferred loading, one callback per event loop tick)
 - Plugin keymaps live in their respective `deps/*.lua` file
 
 ## External Tools
@@ -188,7 +191,8 @@ Random order (detect test dependencies):
 ### Performance
 
 `MINI_DEPS_LATER_AS_NOW=1` makes plugins load synchronously during tests,
-reducing waits from 1000ms to 10ms. Parallel workers spawn N nvim instances
+reducing waits from 1000ms to 10ms (the name is retained from the mini.deps era;
+it now drives the `pack.now`/`pack.later` switch). Parallel workers spawn N nvim instances
 (auto-detects CPU cores), each running tests sequentially with state cleanup
 between tests. All workers run concurrently.
 

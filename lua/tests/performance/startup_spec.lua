@@ -84,7 +84,7 @@ end
 
 T["plugin load time"] = MiniTest.new_set()
 
-T["plugin load time"]["mini.deps loads plugins efficiently"] = function()
+T["plugin load time"]["vim.pack loads plugins efficiently"] = function()
     -- This test measures that later() defers plugin loading
     local tmplog = vim.fn.tempname() .. "_plugin.log"
 
@@ -100,15 +100,15 @@ T["plugin load time"]["mini.deps loads plugins efficiently"] = function()
     if vim.fn.filereadable(tmplog) == 1 then
         local content = table.concat(vim.fn.readfile(tmplog), "\n")
 
-        -- Check that plugins are loaded after init
-        local has_mini_deps = content:match("mini%.deps") ~= nil
+        -- Check that the config and plugin bundle are loaded during init
+        local has_pack = content:match("kyleking") ~= nil or content:match("mini%.nvim") ~= nil
         local has_later_plugins = content:match("mini%.pick") ~= nil or content:match("mini%.clue") ~= nil
 
-        if has_mini_deps then print("SUCCESS: mini.deps is loading plugins") end
+        if has_pack then print("SUCCESS: vim.pack bundle is loading during startup") end
 
         if has_later_plugins then print("INFO: later() plugins detected in startup log") end
 
-        MiniTest.expect.equality(has_mini_deps, true, "mini.deps should be present in startup")
+        MiniTest.expect.equality(has_pack, true, "config/plugin bundle should be present in startup")
     end
 
     vim.fn.delete(tmplog)

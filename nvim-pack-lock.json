@@ -1,0 +1,106 @@
+{
+  "plugins": {
+    "SchemaStore.nvim": {
+      "rev": "37dc30ebebd899905f98deccd8c29fcb62531cbf",
+      "src": "https://github.com/b0o/SchemaStore.nvim"
+    },
+    "bufjump.nvim": {
+      "rev": "ae2728a77defbd27e9e5ef64c854fb0813ffba01",
+      "src": "https://github.com/kwkarlwang/bufjump.nvim"
+    },
+    "ccc.nvim": {
+      "rev": "9d1a256e006decc574789dfc7d628ca11644d4c2",
+      "src": "https://github.com/uga-rosa/ccc.nvim"
+    },
+    "codanna.nvim": {
+      "rev": "5abdcfcc4fe9bf39e1b022c4b9fdb0430bd4e012",
+      "src": "https://github.com/KyleKing/codanna.nvim"
+    },
+    "conform.nvim": {
+      "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
+      "src": "https://github.com/stevearc/conform.nvim"
+    },
+    "diffview.nvim": {
+      "rev": "4516612fe98ff56ae0415a259ff6361a89419b0a",
+      "src": "https://github.com/sindrets/diffview.nvim"
+    },
+    "flash.nvim": {
+      "rev": "b6346946d10d07998efee029fb0f7a593806d0cd",
+      "src": "https://github.com/folke/flash.nvim"
+    },
+    "highlight-undo.nvim": {
+      "rev": "ee32e12693d70e66f954d09a504a7371d110fc27",
+      "src": "https://github.com/tzachar/highlight-undo.nvim"
+    },
+    "lazydev.nvim": {
+      "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
+      "src": "https://github.com/folke/lazydev.nvim"
+    },
+    "mini.nvim": {
+      "rev": "a35f08f63b73f0ffac045cd175fb2a22e167c39c",
+      "src": "https://github.com/nvim-mini/mini.nvim"
+    },
+    "multicolumn.nvim": {
+      "rev": "a363bdfd422abf26256f343dac4df183031f8e94",
+      "src": "https://github.com/fmbarina/multicolumn.nvim"
+    },
+    "nap.nvim": {
+      "rev": "98037cff509a12412cf8f32d1b12a9fdcad558ad",
+      "src": "https://github.com/liangxianzhe/nap.nvim"
+    },
+    "nightfox.nvim": {
+      "rev": "4dacd3f0185a2227bdf3b6c0975a8f0bf87cac9a",
+      "src": "https://github.com/EdenEast/nightfox.nvim"
+    },
+    "nvim-lint": {
+      "rev": "a219b2c9e5b4765e5c845aba119dad55806fcaf1",
+      "src": "https://github.com/mfussenegger/nvim-lint"
+    },
+    "nvim-lspconfig": {
+      "rev": "7f87dbb4707f54117e98ab8f15d6a2975b3f13f0",
+      "src": "https://github.com/neovim/nvim-lspconfig"
+    },
+    "nvim-treesitter": {
+      "rev": "cf12346a3414fa1b06af75c79faebe7f76df080a",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter",
+      "version": "'master'"
+    },
+    "nvim-treesitter-textobjects": {
+      "rev": "5ca4aaa6efdcc59be46b95a3e876300cfead05ef",
+      "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects",
+      "version": "'master'"
+    },
+    "patch_it.nvim": {
+      "rev": "bb63c98fc26b50a87048bb94150c2b0b5d46909c",
+      "src": "https://github.com/KyleKing/patch_it.nvim"
+    },
+    "pkl-neovim": {
+      "rev": "7907b89958d06fa5a5dc72eeb26d8289605595c3",
+      "src": "https://github.com/apple/pkl-neovim"
+    },
+    "plantuml-syntax": {
+      "rev": "9d4900aa16674bf5bb8296a72b975317d573b547",
+      "src": "https://github.com/aklt/plantuml-syntax"
+    },
+    "preview.nvim": {
+      "rev": "94a3f893c56556beaa9a9b867f2f3a5bd0315d39",
+      "src": "https://gitlab.com/itaranto/preview.nvim.git"
+    },
+    "url-open": {
+      "rev": "dce2a9bc51e4885ea80ca03da5b4d0f719aaf820",
+      "src": "https://github.com/sontungexpt/url-open"
+    },
+    "vim-dirtytalk": {
+      "rev": "aa57ba902b04341a04ff97214360f56856493583",
+      "src": "https://github.com/psliwka/vim-dirtytalk"
+    },
+    "vim-illuminate": {
+      "rev": "91313e598ca62e110bc71535c49069b66b9883c9",
+      "src": "https://github.com/RRethy/vim-illuminate"
+    },
+    "vim-spellsync": {
+      "rev": "ea9f431483ceb40ede8bd5b126a03eccd49b1bc0",
+      "src": "https://github.com/micarmst/vim-spellsync"
+    }
+  }
+}

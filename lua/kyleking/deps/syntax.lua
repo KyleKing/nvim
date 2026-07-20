@@ -1,10 +1,12 @@
-local MiniDeps = require("mini.deps")
+local pack = require("kyleking.pack")
 local deps_utils = require("kyleking.deps_utils")
-local add, later = MiniDeps.add, deps_utils.maybe_later
+local add, later = pack.add, deps_utils.maybe_later
 
 later(function()
     add({
         source = "nvim-treesitter/nvim-treesitter",
+        -- Pin the classic API branch; `main` is the incompatible rewrite (no nvim-treesitter.configs)
+        checkout = "master",
         hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
     })
     add("apple/pkl-neovim") -- Required for pkl
@@ -28,7 +30,8 @@ later(function()
             )
         end
     end
-    add("nvim-treesitter/nvim-treesitter-textobjects")
+    -- Match nvim-treesitter's classic branch (configured through nvim-treesitter.configs)
+    add({ source = "nvim-treesitter/nvim-treesitter-textobjects", checkout = "master" })
 
     local ensure_installed = {
         "bash",

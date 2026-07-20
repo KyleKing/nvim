@@ -1,5 +1,5 @@
-local MiniDeps = require("mini.deps")
-local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local pack = require("kyleking.pack")
+local _add, _now, later = pack.add, pack.now, pack.later
 
 later(function()
     -- Native [N/M] search count displays in command line; ensure shortmess flag S is not set

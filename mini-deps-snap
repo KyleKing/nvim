@@ -9,7 +9,6 @@ return {
   ["highlight-undo.nvim"] = "ee32e12693d70e66f954d09a504a7371d110fc27",
   ["lazydev.nvim"] = "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
   ["mini.nvim"] = "a35f08f63b73f0ffac045cd175fb2a22e167c39c",
-  ["mini.snippets"] = "050638170639ceb7bef4e804507cbf209e565b2c",
   ["multicolumn.nvim"] = "a363bdfd422abf26256f343dac4df183031f8e94",
   ["nap.nvim"] = "98037cff509a12412cf8f32d1b12a9fdcad558ad",
   ["nightfox.nvim"] = "4dacd3f0185a2227bdf3b6c0975a8f0bf87cac9a",

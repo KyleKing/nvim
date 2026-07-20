@@ -3,7 +3,7 @@
 -- Provides LSP-integrated snippet support with jump navigation.
 -- Keybindings designed to work alongside completion menu.
 
-local later = require("mini.deps").later
+local later = require("kyleking.pack").later
 
 later(function()
     -- mini.snippets ships in the mini.nvim bundle; no separate add() needed

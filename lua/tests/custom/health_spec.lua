@@ -153,20 +153,20 @@ T["_check_core_plugins"]["returns structured results"] = function()
     MiniTest.expect.equality(type(first.loaded), "boolean")
 end
 
-T["_check_core_plugins"]["mini.deps is required and loaded"] = function()
+T["_check_core_plugins"]["vim.pack is required and loaded"] = function()
     local results = health._check_core_plugins()
-    local mini_deps = nil
+    local vim_pack = nil
     for _, r in ipairs(results) do
-        if r.name == "mini.deps" then
-            mini_deps = r
+        if r.name == "vim.pack" then
+            vim_pack = r
             break
         end
     end
 
-    MiniTest.expect.equality(mini_deps ~= nil, true)
-    assert(mini_deps, "mini_deps should not be nil after finding it in results")
-    MiniTest.expect.equality(mini_deps.required, true)
-    MiniTest.expect.equality(mini_deps.loaded, true)
+    MiniTest.expect.equality(vim_pack ~= nil, true)
+    assert(vim_pack, "vim_pack should not be nil after finding it in results")
+    MiniTest.expect.equality(vim_pack.required, true)
+    MiniTest.expect.equality(vim_pack.loaded, true)
 end
 
 T["check"] = MiniTest.new_set()

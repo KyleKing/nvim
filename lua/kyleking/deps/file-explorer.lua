@@ -1,5 +1,5 @@
-local MiniDeps = require("mini.deps")
-local _add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local pack = require("kyleking.pack")
+local _add, _now, later = pack.add, pack.now, pack.later
 
 -- Note: oil.nvim was evaluated (https://github.com/stevearc/oil.nvim) but mini.files was chosen for:
 --  - Column view provides better spatial awareness (parent → current → preview)

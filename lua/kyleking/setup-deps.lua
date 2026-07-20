@@ -1,29 +1,16 @@
--- Clone 'mini.nvim' manually in a way that it gets managed by 'mini.deps'
-local path_package = vim.fn.stdpath("data") .. "/site/"
-local mini_path = path_package .. "pack/deps/start/mini.nvim"
-if not vim.uv.fs_stat(mini_path) then
-    vim.cmd('echo "Installing `mini.nvim`" | redraw')
-    local clone_cmd = {
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/echasnovski/mini.nvim",
-        mini_path,
-    }
-    vim.fn.system(clone_cmd)
-    vim.cmd("packadd mini.nvim | helptags ALL")
-    vim.cmd('echo "Installed `mini.nvim`" | redraw')
-end
+-- Plugin management via Neovim's built-in vim.pack (see lua/kyleking/pack.lua for the
+-- thin add/now/later compatibility layer). Plugin revisions are tracked by vim.pack's
+-- lockfile at stdpath("config")/nvim-pack-lock.json.
 
-require("mini.deps").setup({
-    silent = true, -- Only show ERROR and WARN messages, suppress INFO (snapshots, etc.)
-})
+local pack = require("kyleking.pack")
 
-local MiniDeps = require("mini.deps")
+-- Bootstrap the mini.nvim bundle first: modules (mini.test, mini.statusline, mini.icons)
+-- are needed during startup. vim.pack installs it on first run.
+pack.add("nvim-mini/mini.nvim")
 
 -- For testing: maybe_later uses now() when MINI_DEPS_LATER_AS_NOW=1, otherwise later()
--- This provides explicit control over plugin loading during tests without overriding mini.deps
-local maybe_later = vim.env.MINI_DEPS_LATER_AS_NOW and MiniDeps.now or MiniDeps.later
+-- This provides explicit control over plugin loading during tests.
+local maybe_later = vim.env.MINI_DEPS_LATER_AS_NOW and pack.now or pack.later
 
 -- Export maybe_later via module to avoid global state
 local deps_utils = require("kyleking.deps_utils")
@@ -52,7 +39,7 @@ require("kyleking.deps.terminal-integration")
 require("kyleking.deps.utility")
 require("kyleking.deps.local")
 
-local now, later = MiniDeps.now, MiniDeps.later
+local now = pack.now
 
 -- Test runner (extracted to separate module for maintainability)
 local test_runner = require("kyleking.utils.test_runner")
@@ -115,18 +102,5 @@ now(function()
         -- Test keybindings: Only <leader>tf for re-running failures
         -- For full test runs, use mise: `mise run test`, `mise run test:parallel`, etc.
         vim.keymap.set("n", "<leader>tf", function() test_runner.run_failed_tests() end, { desc = "Run failed tests" })
-    end
-end)
-
--- Save Mini.Deps snapshot when run from config directory (but not for temp sessions)
-later(function()
-    if vim.fn.getcwd() == vim.fn.stdpath("config") then
-        -- Don't save snapshot for temp sessions (would exclude lualine)
-        local utils = require("kyleking.utils")
-        local is_temp_session = utils.detect_temp_session()
-
-        if not is_temp_session then
-            vim.defer_fn(function() vim.cmd("DepsSnapSave") end, 1000) -- 1 second delay
-        end
     end
 end)

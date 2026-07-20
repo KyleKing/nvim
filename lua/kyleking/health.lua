@@ -26,7 +26,7 @@ local system_tools = {
 local lsp_config_files = { "gopls", "lua_ls", "pyright", "terraformls", "ts_ls" }
 
 local core_plugins = {
-    required = { "mini.deps" },
+    required = { "vim.pack" },
     optional = { "conform", "lint", "mini.pick", "mini.files" },
 }
 
@@ -114,7 +114,9 @@ function M._check_core_plugins()
     local results = {}
 
     for _, plugin in ipairs(core_plugins.required) do
-        local loaded = package.loaded[plugin] ~= nil
+        -- vim.pack is the built-in package manager; "loaded" means it manages installed plugins
+        local loaded = plugin == "vim.pack" and (type(vim.pack) == "table" and #vim.pack.get() > 0)
+            or package.loaded[plugin] ~= nil
         table.insert(results, {
             name = plugin,
             required = true,

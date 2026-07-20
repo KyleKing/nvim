@@ -1,6 +1,6 @@
 -- statusline: mini.statusline configuration with profiles, caching, and async updates
-local MiniDeps = require("mini.deps")
-local later = MiniDeps.later
+local pack = require("kyleking.pack")
+local later = pack.later
 
 -- Check for temp session BEFORE scheduling later()
 local utils = require("kyleking.utils")

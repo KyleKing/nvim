@@ -79,9 +79,11 @@ T["test infrastructure"]["helpers.is_plugin_loaded detects loaded plugins"] = fu
     MiniTest.expect.equality(helpers.is_plugin_loaded("nonexistent_plugin_xyz"), false)
 end
 
-T["mini.deps startup"] = MiniTest.new_set()
+T["vim.pack startup"] = MiniTest.new_set()
 
-T["mini.deps startup"]["no errors during two-stage execution"] = function()
+T["vim.pack startup"]["no errors during deferred plugin loading"] = function()
+    -- Spawn a fresh nvim, let all later() callbacks flush, then check for errors that
+    -- only surface after deferred loading completes (nil-rhs keymaps, pack.add failures)
     local result = vim.system({
         "nvim",
         "--headless",
@@ -91,8 +93,8 @@ T["mini.deps startup"]["no errors during two-stage execution"] = function()
         "q",
     }, { text = true }):wait(10000)
     local output = (result.stdout or "") .. (result.stderr or "")
-    local error_start = output:find("%(mini%.deps%) There were errors")
-    MiniTest.expect.equality(error_start, nil, "mini.deps two-stage errors:\n" .. output)
+    local error_start = output:find("E%d+:") or output:find("stack traceback") or output:find("pack %a+ error")
+    MiniTest.expect.equality(error_start, nil, "deferred loading errors:\n" .. output)
 end
 
 T["nvim configuration"] = MiniTest.new_set()
@@ -108,8 +110,9 @@ T["nvim configuration"]["config directory is accessible"] = function()
     MiniTest.expect.equality(vim.fn.isdirectory(config_dir), 1)
 end
 
-T["nvim configuration"]["mini.nvim is installed"] = function()
-    MiniTest.expect.no_error(function() require("mini.deps") end)
+T["nvim configuration"]["vim.pack manages plugins and mini.nvim is installed"] = function()
+    MiniTest.expect.equality(type(vim.pack), "table", "vim.pack should be available (Neovim 0.12+)")
+    MiniTest.expect.equality(#vim.pack.get() > 0, true, "vim.pack should manage installed plugins")
     MiniTest.expect.no_error(function() require("mini.test") end)
 end
 

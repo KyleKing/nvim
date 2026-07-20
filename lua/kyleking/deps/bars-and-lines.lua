@@ -1,5 +1,5 @@
-local MiniDeps = require("mini.deps")
-local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local pack = require("kyleking.pack")
+local add, now, later = pack.add, pack.now, pack.later
 
 -- Load mini.icons early so other plugins can detect and use it
 now(function()
