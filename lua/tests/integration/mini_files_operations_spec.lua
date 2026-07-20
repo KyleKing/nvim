@@ -128,21 +128,19 @@ T["mini.files"]["config validation"] = function()
     MiniTest.expect.equality(type(MiniFiles.synchronize), "function", "synchronize function should be available")
 end
 
+T["mini.files"]["lsp integration is enabled"] = function()
+    local MiniFiles = require("mini.files")
+
+    -- lsp_timeout > 0 keeps rename/create/delete LSP-aware (willRename/didRename); 0 disables it
+    MiniTest.expect.equality(MiniFiles.config.options.lsp_timeout, 1000, "LSP file operations should be enabled")
+end
+
 T["mini.files"]["keybindings are set"] = function()
-    local keymaps = vim.api.nvim_get_keymap("n")
+    -- maparg (via check_keymap) resolves <leader>; nvim_get_keymap returns the space-prefixed lhs instead
+    local exists, keymap = helpers.check_keymap("<leader>e", "n")
 
-    local has_files_keymap = false
-    for _, keymap in ipairs(keymaps) do
-        if keymap.lhs == "<leader>e" or keymap.lhs == "-" then
-            local desc = keymap.desc or ""
-            if desc:match("[Ff]ile") or desc:match("mini%.files") then
-                has_files_keymap = true
-                break
-            end
-        end
-    end
-
-    MiniTest.expect.equality(has_files_keymap, true, "mini.files keybindings should be set")
+    MiniTest.expect.equality(exists, true, "mini.files <leader>e keymap should be set")
+    MiniTest.expect.equality(keymap.desc, "Explorer", "keymap should describe the explorer")
 end
 
 -- For manual running

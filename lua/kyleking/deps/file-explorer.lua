@@ -16,6 +16,10 @@ later(function()
         content = {
             filter = function(entry) return not constants.should_ignore(entry.name) end,
         },
+        options = {
+            -- Fire LSP willRename/didRename (and create/delete) so imports update on file operations
+            lsp_timeout = 1000,
+        },
         windows = {
             -- Whether to show preview of file/directory under cursor
             preview = true,
