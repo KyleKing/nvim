@@ -2,11 +2,8 @@
 
 local M = {}
 
--- Browser auto-refresh interval while watching (ms). No local server, so this
--- polls via <meta refresh>; scroll position is preserved across reloads.
-M.refresh_ms = 1000
-
-local watch = { augroup = nil, timer = nil, path = nil, mtimes = {} }
+-- Single stable output path so on-demand refresh can reload the same browser tab
+local function preview_path() return vim.fn.stdpath("cache") .. "/kyleking-preview.html" end
 
 -- Find available preview tools
 local function find_tool(candidates)
@@ -63,25 +60,9 @@ local function generate_html(filepath, ft)
     return nil, "Preview not supported for filetype: " .. ft
 end
 
--- Wrap a body fragment in a themed HTML document. When refresh_ms is set, inject a
--- meta-refresh poller plus scroll restoration so watched previews reload in place.
-local function wrap_html(body, filetype, refresh_ms)
-    local refresh = ""
-    if refresh_ms and refresh_ms > 0 then
-        refresh = string.format(
-            [[
-    <meta http-equiv="refresh" content="%s">
-    <script>
-        addEventListener("beforeunload", function () { sessionStorage.setItem("y", String(scrollY)); });
-        addEventListener("load", function () {
-            var y = sessionStorage.getItem("y");
-            if (y !== null) scrollTo(0, parseInt(y, 10));
-        });
-    </script>]],
-            refresh_ms / 1000
-        )
-    end
-
+-- Wrap a body fragment in a themed HTML document. The scroll-restore script keeps the
+-- viewport in place across an on-demand reload of the same URL.
+local function wrap_html(body, filetype)
     return table.concat({
         [[<!DOCTYPE html>
 <html>
@@ -89,9 +70,14 @@ local function wrap_html(body, filetype, refresh_ms)
     <meta charset="utf-8">
     <title>Preview - ]],
         filetype,
-        [[</title>]],
-        refresh,
-        [[
+        [[</title>
+    <script>
+        addEventListener("beforeunload", function () { sessionStorage.setItem("y", String(scrollY)); });
+        addEventListener("load", function () {
+            var y = sessionStorage.getItem("y");
+            if (y !== null) scrollTo(0, parseInt(y, 10));
+        });
+    </script>
     <style>
         body {
             max-width: 800px;
@@ -179,157 +165,122 @@ local function open_url(path)
     end
 end
 
--- Local image paths referenced in the buffer, resolved against the source dir.
--- Used to detect when an embedded image changes on disk.
-local function referenced_images(bufnr, dir)
-    local images = {}
-    for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
-        for path in line:gmatch("!%[.-%]%((.-)%)") do
-            images[#images + 1] = path
-        end
-        for path in line:gmatch("src%s*=%s*[\"'](.-)[\"']") do
-            images[#images + 1] = path
-        end
+-- Foreground (non-background) app names, used to reload only browsers already running
+local function running_apps()
+    local out = vim.fn.system({
+        "osascript",
+        "-e",
+        'tell application "System Events" to get name of (processes where background only is false)',
+    })
+    local names = {}
+    for _, name in ipairs(vim.split(out, ",", { trimempty = true })) do
+        names[vim.trim(name)] = true
     end
-
-    local resolved = {}
-    for _, path in ipairs(images) do
-        path = path:gsub("%s.*$", "")
-        if not path:match("^%a[%w+.-]*://") and not path:match("^data:") and path ~= "" then
-            if not path:match("^/") then path = dir .. "/" .. path end
-            resolved[#resolved + 1] = path
-        end
-    end
-    return resolved
+    return names
 end
 
--- Preview current buffer once
-function M.preview()
-    local ft = vim.bo.filetype
-    local filepath = vim.api.nvim_buf_get_name(0)
+-- Firefox exposes no scriptable tab reload, so activate it and send Cmd-R to the
+-- active tab. Steals focus and needs Accessibility permission for System Events.
+local function reload_firefox()
+    vim.fn.system({
+        "osascript",
+        "-e",
+        'tell application "Firefox" to activate',
+        "-e",
+        'tell application "System Events" to keystroke "r" using command down',
+    })
+    if vim.v.shell_error ~= 0 then return 0 end
+    return 1
+end
 
-    if filepath == "" then
-        vim.notify("Buffer has no file path", vim.log.levels.ERROR)
-        return
-    end
+-- Safari is scriptable, so reload the matching tab in place without stealing focus.
+local function reload_safari(needle)
+    local script = string.format(
+        [[
+tell application "Safari"
+    set reloaded to 0
+    repeat with w in windows
+        repeat with t in tabs of w
+            try
+                if (URL of t) contains "%s" then
+                    set URL of t to (URL of t)
+                    set reloaded to reloaded + 1
+                end if
+            end try
+        end repeat
+    end repeat
+    return reloaded
+end tell]],
+        needle
+    )
+    local out = vim.fn.system({ "osascript", "-e", script })
+    return tonumber(vim.trim(out)) or 0
+end
 
-    if vim.bo.modified then vim.cmd("write") end
+-- Reload the open preview tab. macOS only; returns tabs reloaded (0 if none).
+local function reload_browser(needle)
+    if vim.fn.has("mac") ~= 1 then return 0 end
 
+    local running = running_apps()
+    if running["Firefox"] then return reload_firefox() end
+    if running["Safari"] then return reload_safari(needle) end
+    return 0
+end
+
+local function render(filepath, ft)
     local html, err = generate_html(filepath, ft)
     if not html or html == "" then
         vim.notify(err or "Failed to generate HTML", vim.log.levels.ERROR)
-        return
+        return nil
     end
-
-    local path = vim.fn.tempname() .. ".html"
-    if write_atomic(path, wrap_html(html, ft)) then open_url(path) end
+    local path = preview_path()
+    if not write_atomic(path, wrap_html(html, ft)) then return nil end
+    return path
 end
 
--- Stop watching and tear down the timer and autocmds
-function M.watch_stop()
-    if watch.timer then
-        watch.timer:stop()
-        watch.timer:close()
-        watch.timer = nil
-    end
-    if watch.augroup then
-        pcall(vim.api.nvim_del_augroup_by_id, watch.augroup)
-        watch.augroup = nil
-    end
-end
-
--- Preview current buffer and keep it refreshed on save and on image changes
-function M.watch()
+local function current_target()
     local ft = vim.bo.filetype
     local filepath = vim.api.nvim_buf_get_name(0)
-
     if filepath == "" then
         vim.notify("Buffer has no file path", vim.log.levels.ERROR)
-        return
+        return nil
     end
     if ft ~= "markdown" and ft ~= "djot" then
         vim.notify("Preview not supported for filetype: " .. ft, vim.log.levels.ERROR)
-        return
+        return nil
     end
     if vim.bo.modified then vim.cmd("write") end
+    return filepath, ft
+end
 
-    M.watch_stop()
+-- Open a fresh preview of the current buffer in the browser
+function M.preview()
+    local filepath, ft = current_target()
+    if not filepath then return end
+    local path = render(filepath, ft)
+    if path then open_url(path) end
+end
 
-    local bufnr = vim.api.nvim_get_current_buf()
-    local dir = vim.fn.fnamemodify(filepath, ":h")
-    local path = vim.fn.stdpath("cache") .. "/kyleking-preview.html"
-    watch.path = path
-
-    local function regen()
-        local html, err = generate_html(filepath, ft)
-        if not html or html == "" then
-            vim.notify(err or "Failed to generate HTML", vim.log.levels.ERROR)
-            return
-        end
-        write_atomic(path, wrap_html(html, ft, M.refresh_ms))
-    end
-
-    local function snapshot()
-        local mtimes = {}
-        local files = referenced_images(bufnr, dir)
-        files[#files + 1] = filepath
-        for _, file in ipairs(files) do
-            local stat = vim.uv.fs_stat(file)
-            if stat then mtimes[file] = stat.mtime.sec .. "." .. stat.mtime.nsec end
-        end
-        return mtimes
-    end
-
-    regen()
-    open_url(path)
-
-    watch.mtimes = snapshot()
-    watch.augroup = vim.api.nvim_create_augroup("kyleking_preview_watch", { clear = true })
-    vim.api.nvim_create_autocmd("BufWritePost", { group = watch.augroup, buffer = bufnr, callback = regen })
-    vim.api.nvim_create_autocmd("BufUnload", { group = watch.augroup, buffer = bufnr, callback = M.watch_stop })
-
-    watch.timer = vim.uv.new_timer()
-    watch.timer:start(
-        M.refresh_ms,
-        M.refresh_ms,
-        vim.schedule_wrap(function()
-            if not vim.api.nvim_buf_is_valid(bufnr) then
-                M.watch_stop()
-                return
-            end
-            local mtimes = snapshot()
-            local changed = false
-            for file, mtime in pairs(mtimes) do
-                if watch.mtimes[file] ~= mtime then
-                    changed = true
-                    break
-                end
-            end
-            if changed then
-                watch.mtimes = mtimes
-                regen()
-            end
-        end)
-    )
-
-    vim.notify(
-        string.format("Preview watching (refresh %dms). :PreviewWatchStop to end.", M.refresh_ms),
-        vim.log.levels.INFO
-    )
+-- Regenerate and reload the open preview tab; open a new one if none is found
+function M.refresh()
+    local filepath, ft = current_target()
+    if not filepath then return end
+    local path = render(filepath, ft)
+    if not path then return end
+    if reload_browser(vim.fn.fnamemodify(path, ":t")) == 0 then open_url(path) end
 end
 
 -- Setup keymaps and commands
 function M.setup()
     vim.api.nvim_create_user_command("Preview", M.preview, { desc = "Preview markdown/djot in browser" })
-    vim.api.nvim_create_user_command("PreviewWatch", M.watch, { desc = "Preview and auto-refresh on change" })
-    vim.api.nvim_create_user_command("PreviewWatchStop", M.watch_stop, { desc = "Stop preview auto-refresh" })
+    vim.api.nvim_create_user_command("PreviewRefresh", M.refresh, { desc = "Regenerate and reload the preview" })
 
     -- Add keymap for markdown and djot files
     vim.api.nvim_create_autocmd("FileType", {
         pattern = { "markdown", "djot" },
         callback = function()
             vim.keymap.set("n", "<leader>cp", M.preview, { buffer = true, desc = "Preview in browser" })
-            vim.keymap.set("n", "<leader>cP", M.watch, { buffer = true, desc = "Preview (watch)" })
+            vim.keymap.set("n", "<leader>cr", M.refresh, { buffer = true, desc = "Refresh preview" })
         end,
         group = vim.api.nvim_create_augroup("kyleking_preview", { clear = true }),
     })

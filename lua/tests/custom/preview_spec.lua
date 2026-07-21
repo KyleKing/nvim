@@ -34,13 +34,12 @@ T["setup"]["creates Preview command"] = function()
     MiniTest.expect.no_equality(commands["Preview"], nil, ":Preview command should exist")
 end
 
-T["setup"]["creates watch commands"] = function()
+T["setup"]["creates refresh command"] = function()
     local preview = require("kyleking.utils.preview")
     preview.setup()
 
     local commands = vim.api.nvim_get_commands({})
-    MiniTest.expect.no_equality(commands["PreviewWatch"], nil, ":PreviewWatch command should exist")
-    MiniTest.expect.no_equality(commands["PreviewWatchStop"], nil, ":PreviewWatchStop command should exist")
+    MiniTest.expect.no_equality(commands["PreviewRefresh"], nil, ":PreviewRefresh command should exist")
 end
 
 T["setup"]["creates autocmd for markdown"] = function()
@@ -258,21 +257,11 @@ T["integration"]["embeds relative images as data URIs"] = function()
     vim.fn.delete(opened_html)
 end
 
-T["watch"] = MiniTest.new_set({
-    hooks = {
-        post_case = function() require("kyleking.utils.preview").watch_stop() end,
-    },
-})
+T["refresh"] = MiniTest.new_set()
 
-T["watch"]["stop is safe when not watching"] = function()
-    local preview = require("kyleking.utils.preview")
-    local ok = pcall(preview.watch_stop)
-    MiniTest.expect.equality(ok, true, "watch_stop should be a no-op when idle")
-end
-
-T["watch"]["injects auto-refresh and reruns on save"] = function()
+T["refresh"]["preview output has no auto-refresh polling"] = function()
     if vim.fn.executable("pandoc") ~= 1 then
-        MiniTest.skip("pandoc not available for watch test")
+        MiniTest.skip("pandoc not available for refresh test")
         return
     end
 
@@ -293,23 +282,56 @@ T["watch"]["injects auto-refresh and reruns on save"] = function()
         return ""
     end
 
-    local ok = pcall(preview.watch)
-    MiniTest.expect.equality(ok, true, "watch should not error")
-    MiniTest.expect.no_equality(opened_html, nil, "watch should open generated HTML")
+    local ok = pcall(preview.preview)
+    vim.fn.system = original_system
 
-    local first = table.concat(vim.fn.readfile(opened_html), "\n")
-    MiniTest.expect.equality(first:match('http%-equiv="refresh"') ~= nil, true, "watched HTML should auto-refresh")
-    MiniTest.expect.equality(first:match("One") ~= nil, true, "HTML should reflect initial content")
+    MiniTest.expect.equality(ok, true, "preview should not error")
+    MiniTest.expect.no_equality(opened_html, nil, "preview should open generated HTML")
 
-    -- Editing and re-saving regenerates the same output file
+    local html = table.concat(vim.fn.readfile(opened_html), "\n")
+    MiniTest.expect.equality(html:match('http%-equiv="refresh"'), nil, "should not poll with meta refresh")
+    MiniTest.expect.equality(html:match("sessionStorage") ~= nil, true, "should restore scroll on reload")
+
+    vim.fn.delete(temp_file)
+    vim.fn.delete(opened_html)
+end
+
+T["refresh"]["regenerates the stable output on demand"] = function()
+    if vim.fn.executable("pandoc") ~= 1 then
+        MiniTest.skip("pandoc not available for refresh test")
+        return
+    end
+
+    local temp_file = create_temp_file("# One\n", ".md")
+    vim.cmd("edit " .. temp_file)
+    vim.bo.filetype = "markdown"
+
+    local preview = require("kyleking.utils.preview")
+    preview.setup()
+
+    local out_path = vim.fn.stdpath("cache") .. "/kyleking-preview.html"
+
+    local original_system = vim.fn.system
+    vim.fn.system = function(cmd)
+        if type(cmd) == "table" and cmd[1] == "pandoc" then return original_system(cmd) end
+        -- Swallow osascript/open so no real browser is touched
+        return ""
+    end
+
+    pcall(preview.preview)
+    local first = table.concat(vim.fn.readfile(out_path), "\n")
+    MiniTest.expect.equality(first:match("One") ~= nil, true, "preview should write initial content")
+
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { "# Two" })
-    vim.cmd("write")
-    local second = table.concat(vim.fn.readfile(opened_html), "\n")
-    MiniTest.expect.equality(second:match("Two") ~= nil, true, "save should regenerate HTML")
+    local ok = pcall(preview.refresh)
+    MiniTest.expect.equality(ok, true, "refresh should not error")
+
+    local second = table.concat(vim.fn.readfile(out_path), "\n")
+    MiniTest.expect.equality(second:match("Two") ~= nil, true, "refresh should regenerate content")
 
     vim.fn.system = original_system
-    preview.watch_stop()
     vim.fn.delete(temp_file)
+    vim.fn.delete(out_path)
 end
 
 -- Allow running this file directly
