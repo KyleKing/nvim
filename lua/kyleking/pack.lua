@@ -93,4 +93,60 @@ function M.add(spec)
     end
 end
 
+--- List plugins vim.pack knows about (installed on disk / in the lockfile) that were
+--- NOT added via M.add() in the current session, e.g. leftover from a removed add()
+--- call. Only accurate once all `later()` callbacks have run -- if a `later()` add()
+--- hasn't fired yet, its plugin looks orphaned even though it's still wanted. Some
+--- deps files also add() conditionally (e.g. skipped when headless, or behind a
+--- tool-detection check), so treat the result as review candidates, not a delete list.
+function M.list_orphans()
+    local orphans = {}
+    for _, p in ipairs(vim.pack.get()) do
+        if not p.active then orphans[#orphans + 1] = p.spec.name end
+    end
+    table.sort(orphans)
+    return orphans
+end
+
+--- Remove the given plugin names (per M.list_orphans) from disk and the lockfile.
+function M.clean(names)
+    if #names == 0 then
+        vim.notify("pack clean: no orphaned plugins", vim.log.levels.INFO)
+        return
+    end
+    vim.pack.del(names)
+end
+
+-- Report-only by default (:PackClean); requires the bang (:PackClean!) to actually
+-- delete, since orphan detection is a heuristic, not a guarantee -- see M.list_orphans.
+vim.api.nvim_create_user_command("PackClean", function(cmd_opts)
+    if #vim.api.nvim_list_uis() == 0 then
+        vim.notify(
+            "pack clean: skipped, no UI attached (some plugins are only added() when a UI is present)",
+            vim.log.levels.WARN
+        )
+        return
+    end
+    if later_active or #later_queue > 0 then
+        vim.notify("pack clean: still loading deferred plugins, try again in a moment", vim.log.levels.WARN)
+        return
+    end
+
+    local orphans = M.list_orphans()
+    if #orphans == 0 then
+        vim.notify("pack clean: no orphaned plugins", vim.log.levels.INFO)
+        return
+    end
+    if not cmd_opts.bang then
+        vim.notify(
+            "pack clean: not added this session: "
+                .. table.concat(orphans, ", ")
+                .. ". Verify each is truly unused (some deps files add() conditionally), then :PackClean! to delete.",
+            vim.log.levels.WARN
+        )
+        return
+    end
+    M.clean(orphans)
+end, { bang = true, desc = "List (or, with !, delete) plugins installed but not added this session" })
+
 return M
