@@ -61,9 +61,14 @@ Append as `Load average: <value>` so a spiky entry can be explained (or dismisse
 
 No code fix needed for the 10 bisected commits (d59b67d..dafd6da) themselves. Do not revert or investigate the markdown/treesitter fixes (64ee99f, 6a3a2dc) further on performance grounds; they are not implicated.
 
+### 6. Gate the pre-push benchmark hook to config-relevant changes
+
+`measure-startup` in `.pre-commit-config.yaml` ran on every push regardless of whether the change could affect startup time, which is why BENCHMARKS.md accumulated near-duplicate entries for docs/test-only commits. Added a `files:` filter (`^(init\.lua|lua/kyleking/.*\.lua|lsp/.*\.lua)$`) so the hook only fires when config, plugin, or LSP server-config Lua files changed.
+
 ## Order of work
 
-1. Pin `g:python3_host_prog` (#1) -- highest signal-to-effort, fixes the metric that looked worst.
-1. Add median-of-3 sampling (#4) -- makes every future entry self-consistent.
-1. Add load average to the appended entry (#3) -- cheap, explains outliers.
+1. Pin `g:python3_host_prog` (#1) -- highest signal-to-effort, fixes the metric that looked worst. DONE (1c2d5ac)
+1. Add median-of-3 sampling (#4) -- makes every future entry self-consistent. DONE (9d3c2e5)
+1. Add load average to the appended entry (#3) -- cheap, explains outliers. DONE (9d3c2e5)
 1. No action on #2, already shipped in this session.
+1. Gate the pre-push hook to config-relevant paths (#6) -- reduces log noise at the source.

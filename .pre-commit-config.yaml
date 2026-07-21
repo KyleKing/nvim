@@ -124,6 +124,7 @@ repos:
         description: Track nvim startup time across different scenarios
         entry: scripts/measure_nvim.sh
         language: system
+        files: ^(init\.lua|lua/kyleking/.*\.lua|lsp/.*\.lua)$
         pass_filenames: false
         stages: [pre-push]
       - id: helptags
