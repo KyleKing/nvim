@@ -141,7 +141,7 @@ end)
 
 later(function()
     local hipatterns = require("mini.hipatterns")
-    local link_patterns = require("kyleking.utils.link_open").hl_patterns
+    local link_patterns = require("kyleking.utils.link_open").patterns
 
     local word_pattern = function(word) return "%f[%w]()" .. word .. "()%f[%W]" end
     local paren_pattern = function(word) return "%f[%w]()" .. word .. "%(.-%):?()%s" end
