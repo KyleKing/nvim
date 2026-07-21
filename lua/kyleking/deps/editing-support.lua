@@ -11,6 +11,9 @@ end)
 -- PLANNED: Consider mini.cycle when released for bool/semver/custom cycling
 
 later(function()
+    -- Purely visual (flashes undo/redo regions). Skip in UI-less (headless/test) runs where its
+    -- deferred vim.hl.range callbacks fire on already-deleted buffers ("Invalid buffer id: N").
+    if #vim.api.nvim_list_uis() == 0 then return end
     add("tzachar/highlight-undo.nvim")
     require("highlight-undo").setup()
 end)
