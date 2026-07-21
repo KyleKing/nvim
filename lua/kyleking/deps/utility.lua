@@ -79,6 +79,11 @@ later(function()
     end, { desc = "Apply patch (auto-suggest target)" })
 end)
 
+later(function()
+    -- Restore cursor to its last position when reopening a file (skips commit/rebase buffers)
+    require("mini.misc").setup_restore_cursor()
+end)
+
 later(function() add("micarmst/vim-spellsync") end)
 
 later(function()
