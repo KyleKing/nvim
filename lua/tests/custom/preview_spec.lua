@@ -156,6 +156,9 @@ T["integration"]["works with real markdown file"] = function()
 
     local temp_file = create_temp_file("# Test\n\nParagraph", ".md")
     vim.cmd("edit " .. temp_file)
+    -- Force the filetype: this test exercises the convert->open pipeline, not
+    -- filetype autodetection, which is order-sensitive under the full test suite.
+    vim.bo.filetype = "markdown"
 
     local preview = require("kyleking.utils.preview")
     preview.setup()
