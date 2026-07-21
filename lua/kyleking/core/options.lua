@@ -3,6 +3,15 @@
 
 -- PLANNED: See how to use vim.surround: https://youtu.be/pTVLA62CNqg?si=ZgEV2tkIYrGHOUag (<ysiw"> <csaw"> <ysiw)>)
 
+-- Pin python3 host to skip Neovim's PATH/pyenv provider probe on every startup
+-- (was costing ~80ms per open, see BENCHMARKS.md / PLAN_benchmark_reliability.md)
+vim.g.python3_host_prog = vim.fn.exepath("python3")
+
+-- Unused host providers: disable to skip their startup probes entirely
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- Custom filetypes
 vim.filetype.add({
     extension = {
