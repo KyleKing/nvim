@@ -2,8 +2,11 @@ local pack = require("kyleking.pack")
 local deps_utils = require("kyleking.deps_utils")
 local add, later = pack.add, deps_utils.maybe_later
 
--- Setup markdown/djot list editing and preview
-later(function()
+-- Setup markdown/djot list editing and preview now (not later): both just register a
+-- FileType autocmd, and later() defers past the point where nvim fires FileType for a
+-- buffer opened via command-line argument (e.g. `nvim README.md`), so the buffer-local
+-- keymaps would never attach to that first buffer.
+pack.now(function()
     require("kyleking.utils.list_editing").setup()
     require("kyleking.utils.preview").setup()
 end)

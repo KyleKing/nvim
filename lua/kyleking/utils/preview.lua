@@ -60,84 +60,23 @@ local function generate_html(filepath, ft)
     return nil, "Preview not supported for filetype: " .. ft
 end
 
--- Wrap a body fragment in a themed HTML document. The scroll-restore script keeps the
--- viewport in place across an on-demand reload of the same URL.
+-- Themed HTML shell lives in preview_template.html so prettier and HTML checks apply to
+-- it. Read lazily (only when previewing) and cache for the session.
+local template_cache
+local function template_html()
+    if not template_cache then
+        local src = debug.getinfo(1, "S").source:sub(2)
+        local path = vim.fn.fnamemodify(src, ":h") .. "/preview_template.html"
+        template_cache = table.concat(vim.fn.readfile(path), "\n")
+    end
+    return template_cache
+end
+
+-- Fill the template. Function replacements avoid gsub treating `%` in the body as a
+-- capture reference.
 local function wrap_html(body, filetype)
-    return table.concat({
-        [[<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Preview - ]],
-        filetype,
-        [[</title>
-    <script>
-        addEventListener("beforeunload", function () { sessionStorage.setItem("y", String(scrollY)); });
-        addEventListener("load", function () {
-            var y = sessionStorage.getItem("y");
-            if (y !== null) scrollTo(0, parseInt(y, 10));
-        });
-    </script>
-    <style>
-        body {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #1f2328;
-            background: #ffffff;
-        }
-        a { color: #0969da; }
-        img { max-width: 100%; height: auto; }
-        hr { border: 0; border-top: 1px solid #d0d7de; margin: 1.5rem 0; }
-        blockquote {
-            margin: 0 0 1rem 0;
-            padding: 0 1em;
-            color: #656d76;
-            border-left: 0.25em solid #d0d7de;
-        }
-        pre { background: #f6f8fa; padding: 1rem; overflow-x: auto; border-radius: 6px; }
-        code { background: #f6f8fa; padding: 0.2em 0.4em; border-radius: 3px; }
-        pre code { background: none; padding: 0; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #d0d7de; padding: 8px; text-align: left; }
-        th { background-color: #f6f8fa; }
-        .sourceCode a { color: inherit; text-decoration: none; }
-        .kw, .cf, .op { color: #cf222e; }
-        .dt, .bu { color: #953800; }
-        .dv, .bn, .fl, .cn { color: #0550ae; }
-        .st, .ch, .vs, .ss { color: #0a3069; }
-        .co { color: #6e7781; font-style: italic; }
-        .fu { color: #8250df; }
-        .pp, .im { color: #cf222e; }
-        @media (prefers-color-scheme: dark) {
-            body { color: #e6edf3; background: #0d1117; }
-            a { color: #4493f8; }
-            hr { border-top-color: #30363d; }
-            blockquote { color: #8b949e; border-left-color: #30363d; }
-            pre, code { background: #161b22; }
-            pre code { background: none; }
-            th, td { border-color: #30363d; }
-            th { background-color: #161b22; }
-            .kw, .cf, .op { color: #ff7b72; }
-            .dt, .bu { color: #ffa657; }
-            .dv, .bn, .fl, .cn { color: #79c0ff; }
-            .st, .ch, .vs, .ss { color: #a5d6ff; }
-            .co { color: #8b949e; }
-            .fu { color: #d2a8ff; }
-            .pp, .im { color: #ff7b72; }
-        }
-    </style>
-</head>
-<body>
-]],
-        body,
-        [[
-</body>
-</html>
-]],
-    })
+    local html = template_html():gsub("{{TITLE}}", function() return "Preview - " .. filetype end)
+    return (html:gsub("{{BODY}}", function() return body end))
 end
 
 local function write_atomic(path, content)
@@ -253,16 +192,9 @@ local function current_target()
     return filepath, ft
 end
 
--- Open a fresh preview of the current buffer in the browser
+-- Render the current buffer and show it: reload the open preview tab in place, or open a
+-- new one. The reload path is what makes switching files with the same keybind work.
 function M.preview()
-    local filepath, ft = current_target()
-    if not filepath then return end
-    local path = render(filepath, ft)
-    if path then open_url(path) end
-end
-
--- Regenerate and reload the open preview tab; open a new one if none is found
-function M.refresh()
     local filepath, ft = current_target()
     if not filepath then return end
     local path = render(filepath, ft)
@@ -273,14 +205,12 @@ end
 -- Setup keymaps and commands
 function M.setup()
     vim.api.nvim_create_user_command("Preview", M.preview, { desc = "Preview markdown/djot in browser" })
-    vim.api.nvim_create_user_command("PreviewRefresh", M.refresh, { desc = "Regenerate and reload the preview" })
 
     -- Add keymap for markdown and djot files
     vim.api.nvim_create_autocmd("FileType", {
         pattern = { "markdown", "djot" },
         callback = function()
             vim.keymap.set("n", "<leader>cp", M.preview, { buffer = true, desc = "Preview in browser" })
-            vim.keymap.set("n", "<leader>cr", M.refresh, { buffer = true, desc = "Refresh preview" })
         end,
         group = vim.api.nvim_create_augroup("kyleking_preview", { clear = true }),
     })

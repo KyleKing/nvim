@@ -34,14 +34,6 @@ T["setup"]["creates Preview command"] = function()
     MiniTest.expect.no_equality(commands["Preview"], nil, ":Preview command should exist")
 end
 
-T["setup"]["creates refresh command"] = function()
-    local preview = require("kyleking.utils.preview")
-    preview.setup()
-
-    local commands = vim.api.nvim_get_commands({})
-    MiniTest.expect.no_equality(commands["PreviewRefresh"], nil, ":PreviewRefresh command should exist")
-end
-
 T["setup"]["creates autocmd for markdown"] = function()
     local preview = require("kyleking.utils.preview")
     preview.setup()
@@ -296,7 +288,7 @@ T["refresh"]["preview output has no auto-refresh polling"] = function()
     vim.fn.delete(opened_html)
 end
 
-T["refresh"]["regenerates the stable output on demand"] = function()
+T["refresh"]["re-renders the stable output on repeat invocation"] = function()
     if vim.fn.executable("pandoc") ~= 1 then
         MiniTest.skip("pandoc not available for refresh test")
         return
@@ -323,11 +315,11 @@ T["refresh"]["regenerates the stable output on demand"] = function()
     MiniTest.expect.equality(first:match("One") ~= nil, true, "preview should write initial content")
 
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { "# Two" })
-    local ok = pcall(preview.refresh)
-    MiniTest.expect.equality(ok, true, "refresh should not error")
+    local ok = pcall(preview.preview)
+    MiniTest.expect.equality(ok, true, "second preview should not error")
 
     local second = table.concat(vim.fn.readfile(out_path), "\n")
-    MiniTest.expect.equality(second:match("Two") ~= nil, true, "refresh should regenerate content")
+    MiniTest.expect.equality(second:match("Two") ~= nil, true, "repeat preview should regenerate content")
 
     vim.fn.system = original_system
     vim.fn.delete(temp_file)
