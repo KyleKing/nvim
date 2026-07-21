@@ -14,7 +14,22 @@ end
 local function markdown_to_html(filepath)
     -- Try tools in order of preference
     local pandoc = find_tool({ "pandoc" })
-    if pandoc then return vim.fn.system({ pandoc, "-f", "markdown", "-t", "html", filepath }) end
+    if pandoc then
+        -- --embed-resources inlines images as data URIs (no --standalone, so output stays a
+        -- fragment for the wrapper below); --resource-path resolves relative image paths
+        local dir = vim.fn.fnamemodify(filepath, ":h")
+        return vim.fn.system({
+            pandoc,
+            "-f",
+            "markdown",
+            "-t",
+            "html",
+            "--embed-resources",
+            "--resource-path",
+            dir,
+            filepath,
+        })
+    end
 
     -- Python markdown module
     local python = find_tool({ "python3", "python" })

@@ -194,6 +194,61 @@ T["integration"]["works with real markdown file"] = function()
     vim.fn.delete(temp_file)
 end
 
+T["integration"]["embeds relative images as data URIs"] = function()
+    if vim.fn.executable("pandoc") ~= 1 then
+        MiniTest.skip("pandoc not available for image embedding test")
+        return
+    end
+
+    -- 1x1 transparent PNG so pandoc has a real relative resource to inline
+    local png = vim.base64.decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    )
+    local dir = vim.fn.tempname()
+    vim.fn.mkdir(dir, "p")
+    local img = dir .. "/pixel.png"
+    local img_file = io.open(img, "wb")
+    img_file:write(png)
+    img_file:close()
+
+    local md = dir .. "/doc.md"
+    local md_file = io.open(md, "w")
+    md_file:write("# Title\n\n![pixel](pixel.png)\n")
+    md_file:close()
+
+    vim.cmd("edit " .. md)
+    vim.bo.filetype = "markdown"
+
+    local preview = require("kyleking.utils.preview")
+    preview.setup()
+
+    local original_system = vim.fn.system
+    local opened_html = nil
+    vim.fn.system = function(cmd)
+        if type(cmd) == "table" and cmd[1] == "pandoc" then return original_system(cmd) end
+        if type(cmd) == "table" and (cmd[1] == "open" or cmd[1] == "xdg-open" or cmd[1] == "start") then
+            opened_html = cmd[2]
+        end
+        return ""
+    end
+
+    local ok = pcall(preview.preview)
+    vim.fn.system = original_system
+
+    MiniTest.expect.equality(ok, true, "Should not error")
+    MiniTest.expect.no_equality(opened_html, nil, "Should open generated HTML")
+
+    local html = table.concat(vim.fn.readfile(opened_html), "\n")
+    MiniTest.expect.equality(
+        html:match('src="data:image') ~= nil,
+        true,
+        "Relative image should be inlined as a data URI"
+    )
+
+    vim.fn.delete(dir, "rf")
+    vim.fn.delete(opened_html)
+end
+
 -- Allow running this file directly
 if ... == nil then MiniTest.run() end
 
