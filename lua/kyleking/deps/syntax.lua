@@ -125,25 +125,7 @@ later(function()
         textobjects = {
             -- Remapped to avoid conflicts with nap.nvim (]a=tabs, ]f=files, ]b=buffers)
             -- New scheme: ]m=methods, ]z=arguments, ]k=blocks (unchanged)
-            select = {
-                enable = true,
-                lookahead = true, -- Automatically jump forward to textobj, similar to targets.vim
-                keymaps = {
-                    -- You can use the capture groups defined in textobjects.scm
-                    ["ak"] = { query = "@block.outer", desc = "around block" },
-                    ["ik"] = { query = "@block.inner", desc = "inside block" },
-                    ["ac"] = { query = "@class.outer", desc = "around class" },
-                    ["ic"] = { query = "@class.inner", desc = "inside class" },
-                    ["a?"] = { query = "@conditional.outer", desc = "around conditional" },
-                    ["i?"] = { query = "@conditional.inner", desc = "inside conditional" },
-                    ["am"] = { query = "@function.outer", desc = "around method/function" },
-                    ["im"] = { query = "@function.inner", desc = "inside method/function" },
-                    ["ao"] = { query = "@loop.outer", desc = "around loop" },
-                    ["io"] = { query = "@loop.inner", desc = "inside loop" },
-                    ["az"] = { query = "@parameter.outer", desc = "around argument" },
-                    ["iz"] = { query = "@parameter.inner", desc = "inside argument" },
-                },
-            },
+            -- `select` now lives in mini.ai (see editing-support.lua) for dot-repeat + next/last support
             move = {
                 enable = true,
                 set_jumps = true, -- whether to set jumps in the jumplist

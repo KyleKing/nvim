@@ -91,11 +91,25 @@ end)
 later(function()
     -- Enhanced text objects with treesitter support
     -- Adds "around/inside next/last" intelligence: vaN (select around next argument), viL (inside last brackets)
-    -- Works with: f (function), a (argument), b (brackets), q (quotes), t (tags), and more
+    -- Works with: f (function call), a (argument), b (brackets), q (quotes), t (tags), and more
+    --
+    -- Treesitter-backed structural text objects (replaces nvim-treesitter-textobjects `select`).
+    -- These gain dot-repeat and next/last (`n`/`l`) targeting that the classic select module lacked.
+    -- Identifiers preserve the previous scheme: k=block, c=class, ?=conditional, m=method/function,
+    -- o=loop, z=argument. Note: overriding `?` replaces mini.ai's default interactive user-prompt
+    -- text object with conditional, matching the prior `a?`/`i?` binding.
+    local ts = require("mini.ai").gen_spec.treesitter
     require("mini.ai").setup({
         n_lines = 500, -- Search within 500 lines
         search_method = "cover_or_next", -- Prefer covering current cursor, then next occurrence
-        custom_textobjects = nil, -- Use defaults (can customize for project-specific text objects)
+        custom_textobjects = {
+            k = ts({ a = "@block.outer", i = "@block.inner" }),
+            c = ts({ a = "@class.outer", i = "@class.inner" }),
+            ["?"] = ts({ a = "@conditional.outer", i = "@conditional.inner" }),
+            m = ts({ a = "@function.outer", i = "@function.inner" }),
+            o = ts({ a = "@loop.outer", i = "@loop.inner" }),
+            z = ts({ a = "@parameter.outer", i = "@parameter.inner" }),
+        },
     })
 end)
 

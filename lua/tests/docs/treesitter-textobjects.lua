@@ -17,7 +17,7 @@ return {
         "- `]k` / `[k` - Next/previous bloc**k** start",
         "- `]K` / `[K` - Next/previous bloc**k** end",
         "",
-        "**Selection** (visual/operator-pending):",
+        "**Selection** (visual/operator-pending), provided by mini.ai (dot-repeatable, supports next/last):",
         "- `am` / `im` - around/inside method/function",
         "- `az` / `iz` - around/inside argument",
         "- `ak` / `ik` - around/inside block",
@@ -112,16 +112,23 @@ return {
         },
         {
             pattern = "am / im",
-            desc = "Select method/function text object",
+            desc = "Select method/function text object (mini.ai)",
             tests = {
                 {
-                    name = "method text objects configured",
+                    name = "method text object resolves via mini.ai treesitter spec",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
-                            -- Verify treesitter textobjects is loaded
-                            local has_textobjects = pcall(require, "nvim-treesitter.configs")
-                            MiniTest.expect.equality(has_textobjects, true, "Treesitter textobjects should be loaded")
+                            local ai = require("mini.ai")
+                            MiniTest.expect.no_equality(ai.config.custom_textobjects.m, nil, "mini.ai should define m")
+                            vim.cmd("enew")
+                            vim.bo.filetype = "lua"
+                            vim.api.nvim_buf_set_lines(0, 0, -1, false, { "local function foo()", "  return 1", "end" })
+                            vim.treesitter.start(0, "lua")
+                            vim.api.nvim_win_set_cursor(0, { 2, 3 })
+                            local region = ai.find_textobject("i", "m")
+                            MiniTest.expect.no_equality(region, nil, "im should resolve a function-inner region")
+                            vim.cmd("bwipeout!")
                         end,
                     },
                 },
@@ -129,15 +136,15 @@ return {
         },
         {
             pattern = "az / iz",
-            desc = "Select argument text object",
+            desc = "Select argument text object (mini.ai)",
             tests = {
                 {
-                    name = "argument text objects configured",
+                    name = "argument text object defined via mini.ai treesitter spec",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
-                            local has_textobjects = pcall(require, "nvim-treesitter.configs")
-                            MiniTest.expect.equality(has_textobjects, true, "Treesitter textobjects should be loaded")
+                            local ai = require("mini.ai")
+                            MiniTest.expect.no_equality(ai.config.custom_textobjects.z, nil, "mini.ai should define z")
                         end,
                     },
                 },

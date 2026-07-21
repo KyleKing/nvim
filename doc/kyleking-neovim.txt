@@ -2217,8 +2217,8 @@ Operator grammar:
     ]m / [m              Navigate methods/functions
     ]z / [z              Navigate arguments/parameters
     ]k / [k              Navigate blocks
-    am / im              Select method/function text object
-    az / iz              Select argument text object
+    am / im              Select method/function text object (mini.ai)
+    az / iz              Select argument text object (mini.ai)
     >M / <M              Swap functions
 <
 
@@ -2236,7 +2236,8 @@ Keybindings remapped to avoid conflicts with nap.nvim:
 - `]k` / `[k` - Next/previous bloc**k** start
 - `]K` / `[K` - Next/previous bloc**k** end
 
-**Selection** (visual/operator-pending):
+**Selection** (visual/operator-pending), provided by mini.ai (dot-repeatable,
+supports next/last):
 
 - `am` / `im` - around/inside method/function
 - `az` / `iz` - around/inside argument
