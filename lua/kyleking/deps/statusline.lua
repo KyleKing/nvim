@@ -518,7 +518,12 @@ if not is_temp_session then
         -- Filetype-specific profile adjustments (auto-apply on buffer enter)
         vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
             group = vim.api.nvim_create_augroup("kyleking_statusline_filetype", { clear = true }),
-            callback = function() vim.cmd.redrawstatus() end,
+            -- Defer: a synchronous redraw here re-enters the treesitter highlighter mid-parse
+            -- (many markdown code-block injections widen the window), which throws
+            -- "attempt to call method 'range' (a nil value)" from the decoration provider.
+            callback = function()
+                vim.schedule(function() vim.cmd.redrawstatus() end)
+            end,
         })
 
         -- Save profile state on exit
