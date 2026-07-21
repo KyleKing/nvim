@@ -80,22 +80,6 @@ later(function()
         "yaml",
     }
 
-    -- nvim-treesitter's classic branch registers `set-lang-from-info-string!` assuming
-    -- match[id] is a single TSNode, but Neovim 0.12 may pass a TSNode[] (from the highlighter's
-    -- decoration provider). Calling get_node_text on the list throws "attempt to call method
-    -- 'range' (a nil value)" whenever a markdown fenced code block is parsed. Re-register with a
-    -- handler that accepts either shape. See query_predicates.lua upstream.
-    local info_string_aliases = { ex = "elixir", pl = "perl", sh = "bash", ts = "typescript", uxn = "uxntal" }
-    vim.treesitter.query.add_directive("set-lang-from-info-string!", function(match, _, bufnr, pred, metadata)
-        local node = match[pred[2]]
-        if type(node) == "table" then node = node[#node] end
-        if not node then return end
-        local alias = vim.treesitter.get_node_text(node, bufnr):lower()
-        metadata["injection.language"] = vim.filetype.match({ filename = "a." .. alias })
-            or info_string_aliases[alias]
-            or alias
-    end, { force = true, all = false })
-
     -- Install parsers asynchronously (no-op for already-installed parsers)
     require("nvim-treesitter").install(ensure_installed)
 
