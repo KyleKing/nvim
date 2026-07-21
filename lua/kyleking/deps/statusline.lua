@@ -518,9 +518,7 @@ if not is_temp_session then
         -- Filetype-specific profile adjustments (auto-apply on buffer enter)
         vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
             group = vim.api.nvim_create_augroup("kyleking_statusline_filetype", { clear = true }),
-            callback = function()
-                vim.schedule(function() vim.cmd.redrawstatus() end)
-            end,
+            callback = function() vim.cmd.redrawstatus() end,
         })
 
         -- Save profile state on exit

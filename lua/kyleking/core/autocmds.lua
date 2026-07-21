@@ -14,6 +14,21 @@ create_autocmd({ "BufEnter", "FocusGained" }, {
     command = "silent! checktime",
 })
 
+-- Flag oversized buffers so expensive features bail out. nvim-treesitter's classic
+-- `highlight.disable` reads `vim.b.large_buf`, but Neovim's built-in ftplugins (markdown,
+-- etc.) call `vim.treesitter.start()` directly and bypass that guard, so stop treesitter
+-- here too. Runs after runtime ftplugins on the same FileType event.
+create_autocmd("FileType", {
+    group = augroup,
+    callback = function(args)
+        local constants = require("kyleking.utils.constants")
+        if vim.b[args.buf].large_buf == nil then
+            vim.b[args.buf].large_buf = constants.is_large_buffer(args.buf) or nil
+        end
+        if vim.b[args.buf].large_buf then vim.treesitter.stop(args.buf) end
+    end,
+})
+
 -- Terminal buffer options: disable UI elements that don't make sense in terminals
 create_autocmd("TermOpen", {
     group = augroup,

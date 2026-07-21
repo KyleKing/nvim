@@ -17,6 +17,12 @@ M.WINDOW = {
     LARGE = 0.9, -- Large floating window ratio
 }
 
+-- Large buffer thresholds; expensive features (treesitter highlight) bail out above these
+M.LARGE_BUF = {
+    MAX_FILESIZE_BYTES = 1024 * 1024, -- 1 MB
+    MAX_LINES = 5000, -- Line count guard for verbose files (e.g. long transcripts)
+}
+
 -- Character limits for display
 M.CHAR_LIMIT = {
     FILENAME_MIN = 40, -- Minimum space reserved for filename in statusline
@@ -46,6 +52,13 @@ M.IGNORED_PATHS = {
     "htmlcov", -- Python coverage HTML reports
     "node_modules", -- Node.js dependencies
 }
+
+-- True when a buffer is too big for expensive features (treesitter highlight/injections)
+M.is_large_buffer = function(buf)
+    local stats = vim.uv.fs_stat(vim.api.nvim_buf_get_name(buf))
+    if stats and stats.size > M.LARGE_BUF.MAX_FILESIZE_BYTES then return true end
+    return vim.api.nvim_buf_line_count(buf) > M.LARGE_BUF.MAX_LINES
+end
 
 -- Helper function to check if a path should be ignored
 M.should_ignore = function(name)
