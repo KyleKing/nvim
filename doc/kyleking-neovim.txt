@@ -983,6 +983,15 @@ Treesitter motions (`]m`, `[m`, etc. via nap.nvim and textobjects) for moving
 between structural units, and as operator targets: `d]m` deletes to the next
 method start.
 
+Replacing incremental selection: the classic treesitter `incremental_selection`
+(`<C-space>` to grow the selection node-by-node) was dropped with the move to
+nvim-treesitter `main`. For its two uses, reach for flash treesitter (`<A-S>`)
+to label and pick any syntax node, or mini.ai structural objects (`vam` a
+function, `vac` a class, `va?` a conditional, `vao` a loop, `vak` a block)
+which are `.`-repeatable and take next/last via `n`/`l` (for example `vanm`
+selects the next function). Together these cover node selection without a
+dedicated grow/shrink mode, and free `<C-space>`/`<C-s>`/`<M-,>`.
+
 
 BACKGROUND: TWO MOTION MODELS  *kyleking-neovim-background:-two-motion-models*
 

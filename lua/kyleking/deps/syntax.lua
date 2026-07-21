@@ -5,8 +5,8 @@ local add, later = pack.add, deps_utils.maybe_later
 later(function()
     add({
         source = "nvim-treesitter/nvim-treesitter",
-        -- Pin the classic API branch; `main` is the incompatible rewrite (no nvim-treesitter.configs)
-        checkout = "master",
+        -- `main` is the current rewrite (Neovim 0.12+): parsers via install(), highlight via vim.treesitter.start
+        checkout = "main",
         hooks = { post_checkout = function() vim.cmd("TSUpdate") end },
     })
     add("apple/pkl-neovim") -- Required for pkl
@@ -30,8 +30,8 @@ later(function()
             )
         end
     end
-    -- Match nvim-treesitter's classic branch (configured through nvim-treesitter.configs)
-    add({ source = "nvim-treesitter/nvim-treesitter-textobjects", checkout = "master" })
+    -- Move/swap modules for the `main` branch (queries + navigation; keymaps set below)
+    add({ source = "nvim-treesitter/nvim-treesitter-textobjects", checkout = "main" })
 
     local ensure_installed = {
         "bash",
@@ -56,7 +56,6 @@ later(function()
         "jsdoc",
         "json",
         "json5",
-        "jsonc",
         "lua",
         "luap", -- lua_patterns
         "markdown",
@@ -97,72 +96,67 @@ later(function()
             or alias
     end, { force = true, all = false })
 
-    require("nvim-treesitter.configs").setup({
-        ensure_installed = ensure_installed,
+    -- Install parsers asynchronously (no-op for already-installed parsers)
+    require("nvim-treesitter").install(ensure_installed)
 
-        -- Don't automatically install missing parsers when entering buffer
-        auto_install = false,
-        -- Install languages synchronously (only applied to `ensure_installed`)
-        sync_install = false,
+    -- main has no `configs` module: enable highlight + indent per buffer via FileType.
+    -- `later()` defers this past the initial file open, so also attach to buffers
+    -- already loaded at this point (the autocmd only covers subsequently-opened ones).
+    local function ts_attach(buf)
+        if vim.b[buf].large_buf then return end
+        if not pcall(vim.treesitter.start, buf) then return end
+        vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+    end
 
-        highlight = {
-            enable = true,
-            -- vim.b.large_buf is set per-buffer in core/autocmds.lua on FileType
-            disable = function(_, bufnr) return vim.b[bufnr].large_buf end,
-        },
-        -- Note: <c-space> shared with LSP completion (insert mode only, no conflict)
-        -- <c-s> now available (removed from save operations for this use)
-        incremental_selection = {
-            enable = true,
-            keymaps = {
-                init_selection = "<c-space>",
-                node_incremental = "<c-space>",
-                scope_incremental = "<c-s>",
-                node_decremental = "<M-,>",
-            },
-        },
-        indent = { enable = true },
-        textobjects = {
-            -- Remapped to avoid conflicts with nap.nvim (]a=tabs, ]f=files, ]b=buffers)
-            -- New scheme: ]m=methods, ]z=arguments, ]k=blocks (unchanged)
-            -- `select` now lives in mini.ai (see editing-support.lua) for dot-repeat + next/last support
-            move = {
-                enable = true,
-                set_jumps = true, -- whether to set jumps in the jumplist
-                goto_next_start = {
-                    ["]k"] = { query = "@block.outer", desc = "Next block start" },
-                    ["]m"] = { query = "@function.outer", desc = "Next method/function start" },
-                    ["]z"] = { query = "@parameter.inner", desc = "Next argument start" },
-                },
-                goto_next_end = {
-                    ["]K"] = { query = "@block.outer", desc = "Next block end" },
-                    ["]M"] = { query = "@function.outer", desc = "Next method/function end" },
-                    ["]Z"] = { query = "@parameter.inner", desc = "Next argument end" },
-                },
-                goto_previous_start = {
-                    ["[k"] = { query = "@block.outer", desc = "Previous block start" },
-                    ["[m"] = { query = "@function.outer", desc = "Previous method/function start" },
-                    ["[z"] = { query = "@parameter.inner", desc = "Previous argument start" },
-                },
-                goto_previous_end = {
-                    ["[K"] = { query = "@block.outer", desc = "Previous block end" },
-                    ["[M"] = { query = "@function.outer", desc = "Previous method/function end" },
-                    ["[Z"] = { query = "@parameter.inner", desc = "Previous argument end" },
-                },
-            },
-            swap = {
-                enable = true,
-                swap_next = {
-                    [">K"] = { query = "@block.outer", desc = "Swap next block" },
-                    [">M"] = { query = "@function.outer", desc = "Swap next method/function" },
-                    [">Z"] = { query = "@parameter.inner", desc = "Swap next argument" },
-                },
-                swap_previous = {
-                    ["<K"] = { query = "@block.outer", desc = "Swap previous block" },
-                    ["<M"] = { query = "@function.outer", desc = "Swap previous method/function" },
-                    ["<Z"] = { query = "@parameter.inner", desc = "Swap previous argument" },
-                },
-            },
-        },
+    local ts_group = vim.api.nvim_create_augroup("kyleking_treesitter", { clear = true })
+    vim.api.nvim_create_autocmd("FileType", {
+        group = ts_group,
+        callback = function(args) ts_attach(args.buf) end,
     })
+    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+        if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].filetype ~= "" then ts_attach(buf) end
+    end
+
+    -- Structural selection replaces the classic incremental_selection (removed on main).
+    -- Use mini.ai's treesitter objects (editing-support.lua) with `v`: e.g. `vim`/`vam`
+    -- selects a function, `vac`/`va?`/`vao` a class/conditional/loop; repeat with `.` and
+    -- target next/last with `n`/`l` (e.g. `vanm`). The <c-space>/<c-s>/<M-,> binds are freed.
+
+    -- Move + swap live in nvim-treesitter-textobjects `main` (explicit keymaps).
+    -- Remapped to avoid conflicts with nap.nvim (]a=tabs, ]f=files, ]b=buffers):
+    -- ]m=methods, ]z=arguments, ]k=blocks.
+    require("nvim-treesitter-textobjects").setup({ move = { set_jumps = true } })
+    local move = require("nvim-treesitter-textobjects.move")
+    local swap = require("nvim-treesitter-textobjects.swap")
+    local K = vim.keymap.set
+
+    local moves = {
+        { "]k", move.goto_next_start, "@block.outer", "Next block start" },
+        { "]m", move.goto_next_start, "@function.outer", "Next method/function start" },
+        { "]z", move.goto_next_start, "@parameter.inner", "Next argument start" },
+        { "]K", move.goto_next_end, "@block.outer", "Next block end" },
+        { "]M", move.goto_next_end, "@function.outer", "Next method/function end" },
+        { "]Z", move.goto_next_end, "@parameter.inner", "Next argument end" },
+        { "[k", move.goto_previous_start, "@block.outer", "Previous block start" },
+        { "[m", move.goto_previous_start, "@function.outer", "Previous method/function start" },
+        { "[z", move.goto_previous_start, "@parameter.inner", "Previous argument start" },
+        { "[K", move.goto_previous_end, "@block.outer", "Previous block end" },
+        { "[M", move.goto_previous_end, "@function.outer", "Previous method/function end" },
+        { "[Z", move.goto_previous_end, "@parameter.inner", "Previous argument end" },
+    }
+    for _, m in ipairs(moves) do
+        K({ "n", "x", "o" }, m[1], function() m[2](m[3], "textobjects") end, { desc = m[4] })
+    end
+
+    local swaps = {
+        { ">K", swap.swap_next, "@block.outer", "Swap next block" },
+        { ">M", swap.swap_next, "@function.outer", "Swap next method/function" },
+        { ">Z", swap.swap_next, "@parameter.inner", "Swap next argument" },
+        { "<K", swap.swap_previous, "@block.outer", "Swap previous block" },
+        { "<M", swap.swap_previous, "@function.outer", "Swap previous method/function" },
+        { "<Z", swap.swap_previous, "@parameter.inner", "Swap previous argument" },
+    }
+    for _, s in ipairs(swaps) do
+        K("n", s[1], function() s[2](s[3]) end, { desc = s[4] })
+    end
 end)
