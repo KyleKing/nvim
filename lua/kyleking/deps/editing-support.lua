@@ -141,6 +141,7 @@ end)
 
 later(function()
     local hipatterns = require("mini.hipatterns")
+    local link_patterns = require("kyleking.utils.link_open").hl_patterns
 
     local word_pattern = function(word) return "%f[%w]()" .. word .. "()%f[%W]" end
     local paren_pattern = function(word) return "%f[%w]()" .. word .. "%(.-%):?()%s" end
@@ -159,6 +160,9 @@ later(function()
             warning = { pattern = { word_pattern("WARNING"), paren_pattern("WARNING") }, group = "MiniHipatternsFixme" },
             perf = { pattern = { word_pattern("PERF"), paren_pattern("PERF") }, group = "MiniHipatternsHack" },
             test = { pattern = { word_pattern("TEST"), paren_pattern("TEST") }, group = "MiniHipatternsTodo" },
+            url = { pattern = link_patterns.url, group = "Underlined" },
+            md_link = { pattern = link_patterns.md_link, group = "Underlined" },
+            plugin_ref = { pattern = link_patterns.plugin, group = "Underlined" },
         },
     })
 
