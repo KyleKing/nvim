@@ -107,6 +107,7 @@ later(function()
 
         highlight = {
             enable = true,
+            -- vim.b.large_buf is set per-buffer in core/autocmds.lua on FileType
             disable = function(_, bufnr) return vim.b[bufnr].large_buf end,
         },
         -- Note: <c-space> shared with LSP completion (insert mode only, no conflict)

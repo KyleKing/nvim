@@ -23,6 +23,7 @@ create_autocmd("FileType", {
     callback = function(args)
         local constants = require("kyleking.utils.constants")
         if vim.b[args.buf].large_buf == nil then
+            -- Persist only `true`; leave nil (not false) so a not-yet-large buffer is re-checked
             vim.b[args.buf].large_buf = constants.is_large_buffer(args.buf) or nil
         end
         if vim.b[args.buf].large_buf then vim.treesitter.stop(args.buf) end

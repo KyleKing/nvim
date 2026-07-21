@@ -70,6 +70,9 @@ T["injection rendering"]["parses many code blocks without errors"] = function()
     local lines = markdown_blocks(300)
     vim.fn.writefile(lines, tmpfile)
 
+    -- The spawned nvim inherits NVIM_TEST_SYNC from the test runner, so nvim-treesitter (and
+    -- its set-lang-from-info-string! injection directive) loads synchronously before the parse
+    -- below. That is what exercises the code path the syntax.lua directive fix guards against.
     local start = vim.loop.now()
     local result = vim.system({
         "nvim",
