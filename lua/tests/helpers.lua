@@ -8,7 +8,16 @@ local constants = require("kyleking.utils.constants")
 -- buffer long before that, and the timer then clears a namespace on a dead buffer. The
 -- highlight is a UI nicety that no assertion reads, so tests drop the delay to 0 and
 -- M.drain_deferred lets the callback run while the buffer is still valid.
-if package.loaded["mini.surround"] then require("mini.surround").config.highlight_duration = 0 end
+--- Called at module load, before any test can schedule a highlight, and again from
+--- drain_deferred. The second call is the backstop: if mini.surround was not set up
+--- yet when this file loaded (a task without NVIM_TEST_SYNC, where plugins load
+--- deferred), the load-time call is a no-op and only the teardown call catches it.
+local function silence_surround_highlight()
+    local surround = package.loaded["mini.surround"]
+    if surround ~= nil and surround.config ~= nil then surround.config.highlight_duration = 0 end
+end
+
+silence_surround_highlight()
 
 -- Wait for LSP client to attach to buffer
 -- @param bufnr number: Buffer number to wait for
@@ -68,6 +77,7 @@ end
 -- The marker below is queued behind whatever is already pending, so waiting on it drains the
 -- queue with no fixed sleep. Measured at about 0.015ms per call.
 function M.drain_deferred()
+    silence_surround_highlight()
     local drained = false
     vim.defer_fn(function() drained = true end, 0)
     vim.wait(100, function() return drained end, 1)
