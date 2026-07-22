@@ -40,7 +40,9 @@ The wrapper records `{lhs, desc, mode, buffer-local?}` at set-time, and for **ca
 
 ### 2. Commands — one `CmdlineLeave` autocmd
 
-On `CmdlineLeave` with `cmdtype == ":"`, read `vim.fn.getcmdline()` and log the first token. Captures built-in (`:w`), user (`:RunAllTests`, `:PackClean`), and plugin commands with zero per-command wiring. No wrapping of `nvim_create_user_command` needed unless we later want to flag user commands defined but never called (that falls out of the never-used reconciliation in hook 4 instead).
+On `CmdlineLeave` with `cmdtype == ":"`, read `vim.fn.getcmdline()` and log the first token. Captures built-in (`:w`), user (`:RunAllTests`, `:PackClean`), and plugin commands with zero per-command wiring. No wrapping of `nvim_create_user_command` needed unless we later want to flag user commands defined but never called (that falls out of the cold-view reconciliation instead).
+
+Verified behavior worth knowing when reading the report: `CmdlineLeave` fires only for a **typed** cmdline. Commands run through `vim.cmd()`, `-c`, or a keymap that calls `vim.cmd("PackClean")` never reach it. That is the behavior we want, since the question is what I reach for by hand, and a command invoked from a keymap is already counted as that keymap. It does mean command counts read as "typed by me", not "executed", so a command reachable both ways will look quieter than it is. Range prefixes resolve to the command (`%s/a/b` counts as `s`), bare line jumps (`:42`) are skipped, and a cmdline aborted with `<Esc>` records nothing.
 
 ### 3. Motions — throttled `vim.on_key` with sequence assembly
 
@@ -179,6 +181,6 @@ require("kyleking.utils.usage").install({
 
 ## Phases
 
-1. writer + map wrapper + command hook + minimal `:FeatureUsage` top-used view. Land this, run it for a couple weeks, confirm the data is worth it.
+1. writer + map wrapper + command hook + minimal `:FeatureUsage` top-used view. Land this, run it for a couple weeks, confirm the data is worth it. **DONE** — `lua/kyleking/utils/usage/`, 17 cases in `lua/tests/custom/usage_spec.lua`. Tracking stays off without a UI, so headless runs, tests, and the startup benchmark write nothing; `NVIM_USAGE_DIR` forces it on for verifying the real boot path. Measured startup cost is ~0.5ms, inside the run-to-run noise band.
 1. the cold view (reconciliation + last-used) and the pick source.
 1. motion sampler behind `track.motions`: assembler, pattern matcher, `patterns.json`, and the `:FeatureUsage noise` triage view. Build the matcher and its tests before the sampler, since everything downstream depends on the escaping being right.
