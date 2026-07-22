@@ -181,118 +181,10 @@ end
 --- Run only the failed cases from the last run
 function M.run_failed_tests() return M.run_all_tests(true, false) end
 
--- Parallel worker pool implementation
-local WorkerPool = {}
-WorkerPool.__index = WorkerPool
-
--- Create a new worker pool
--- @param num_workers number Number of workers to create
--- @return table Worker pool instance
-function WorkerPool.new(num_workers)
-    local self = setmetatable({}, WorkerPool)
-    self.num_workers = num_workers or 4
-    self.workers = {}
-    self.socket_dir = vim.fn.tempname() .. "-test-sockets"
-    vim.fn.mkdir(self.socket_dir, "p")
-    return self
-end
-
--- Start all workers
-function WorkerPool:start()
-    for i = 1, self.num_workers do
-        local socket = string.format("%s/worker-%d.sock", self.socket_dir, i)
-        local cmd = {
-            "nvim",
-            "--headless",
-            "--listen",
-            socket,
-        }
-
-        if vim.env.NVIM_TEST_SYNC then cmd = { "env", "NVIM_TEST_SYNC=1", unpack(cmd) } end
-
-        local job = vim.system(cmd, { detach = true })
-        self.workers[i] = {
-            id = i,
-            socket = socket,
-            job = job,
-            busy = false,
-        }
-
-        -- Wait for socket to be ready
-        local max_wait = 2000
-        local start = vim.uv.now()
-        while vim.uv.now() - start < max_wait do
-            if vim.uv.fs_stat(socket) then break end
-            vim.wait(10)
-        end
-    end
-end
-
--- Execute Lua code in a worker via RPC
--- @param worker_id number Worker ID
--- @param lua_code string Lua code to execute
--- @return table Result {success: boolean, output: string, error: string}
-function WorkerPool:execute_in_worker(worker_id, lua_code)
-    local worker = self.workers[worker_id]
-    if not worker then return { success = false, error = "Invalid worker ID" } end
-
-    -- Create temporary file with Lua code
-    local tmpfile = vim.fn.tempname() .. ".lua"
-    local wrapped = string.format(
-        [[
-local ok, result = pcall(function()
-    %s
-end)
-if not ok then
-    print("ERROR: " .. tostring(result))
-end
-]],
-        lua_code
-    )
-
-    local f = io.open(tmpfile, "w")
-    if f then
-        f:write(wrapped)
-        f:close()
-    end
-
-    -- Execute via nvim --server
-    local cmd = {
-        "nvim",
-        "--server",
-        worker.socket,
-        "--remote-send",
-        string.format("<Cmd>luafile %s<CR>", tmpfile),
-    }
-
-    local result = vim.system(cmd, { text = true }):wait(10000)
-    vim.fn.delete(tmpfile)
-
-    return {
-        success = result.code == 0,
-        output = result.stdout or "",
-        error = result.stderr or "",
-    }
-end
-
--- Run cleanup in worker
-function WorkerPool:cleanup_worker(worker_id)
-    local cleanup_code = [[
-        local helpers = require("tests.helpers")
-        helpers.full_cleanup()
-    ]]
-    return self:execute_in_worker(worker_id, cleanup_code)
-end
-
--- Stop all workers
-function WorkerPool:shutdown()
-    for _, worker in ipairs(self.workers) do
-        vim.system({ "nvim", "--server", worker.socket, "--remote-send", "<Cmd>qall!<CR>" }):wait(1000)
-    end
-    vim.fn.delete(self.socket_dir, "rf")
-end
-
--- Run tests in parallel with worker pool
+-- Run every spec across background nvim processes, one chunk of files each.
+-- Each worker is a plain `nvim --headless -c luafile`: it gets its whole chunk written
+-- out as a script up front and reports through its log file. There is no channel back,
+-- which is why the tally below is scraped rather than returned.
 -- @param shuffle boolean Whether to shuffle test order
 -- @param seed number|nil Random seed for shuffling
 -- @return table Test results
@@ -318,12 +210,13 @@ function M.run_tests_parallel(shuffle, seed)
         end
     end
 
-    -- Detect CPU cores
-    local num_workers = tonumber(vim.fn.system("sysctl -n hw.ncpu"):match("%d+")) or 4
+    -- available_parallelism reads the cgroup CPU quota where there is one, so a CI
+    -- container reports what it may actually use rather than what the host has.
+    local num_workers = math.max(1, vim.uv.available_parallelism())
     print(string.format("Starting %d workers for %d test files...", num_workers, #test_files))
 
-    local pool = WorkerPool.new(num_workers)
-    pool:start()
+    local work_dir = vim.fn.tempname() .. "-test-workers"
+    vim.fn.mkdir(work_dir, "p")
 
     -- Split test files into chunks for workers
     local chunks = {}
@@ -365,7 +258,7 @@ function M.run_tests_parallel(shuffle, seed)
 
     for worker_id, file_chunk in ipairs(chunks) do
         -- Create script for this worker
-        local script_path = string.format("%s/worker-%d-script.lua", pool.socket_dir, worker_id)
+        local script_path = string.format("%s/worker-%d-script.lua", work_dir, worker_id)
         local script_content = {}
 
         table.insert(script_content, "local MiniTest = require('mini.test')")
@@ -412,7 +305,7 @@ function M.run_tests_parallel(shuffle, seed)
         end
 
         -- Start worker process
-        local log_path = string.format("%s/worker-%d.log", pool.socket_dir, worker_id)
+        local log_path = string.format("%s/worker-%d.log", work_dir, worker_id)
         local cmd = {
             "nvim",
             "--headless",
@@ -488,7 +381,7 @@ function M.run_tests_parallel(shuffle, seed)
     vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
     vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
 
-    pool:shutdown()
+    vim.fn.delete(work_dir, "rf")
     return results
 end
 
