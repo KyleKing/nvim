@@ -206,9 +206,11 @@ T["terminal performance"]["illuminate disabled in terminal buffers"] = function(
         return
     end
 
+    -- 'buftype' cannot be set to "terminal" by hand, so open a real terminal
     local bufnr = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_set_current_buf(bufnr)
-    vim.bo[bufnr].buftype = "terminal"
+    vim.fn.termopen({ vim.o.shell })
+    bufnr = vim.api.nvim_get_current_buf()
 
     -- Trigger illuminate events
     vim.cmd("doautocmd CursorMoved")

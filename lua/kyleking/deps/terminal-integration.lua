@@ -120,8 +120,22 @@ local function toggle_tui_float(opts)
     )
     term.winid = winid
 
+    -- jobwait with a zero timeout returns -1 while the job is still running, so anything
+    -- else means this buffer's terminal is gone and the window needs a new one. Reading
+    -- the check the other way round restarted the job on every toggle, which errors
+    -- because termopen refuses a buffer that already hosted a terminal.
     local chan_id = vim.b[term.bufnr].terminal_job_id
-    if not chan_id or vim.fn.jobwait({ chan_id }, 0)[1] == -1 then
+    local job_running = chan_id ~= nil and vim.fn.jobwait({ chan_id }, 0)[1] == -1
+
+    if not job_running then
+        if chan_id then
+            local bufnr = vim.api.nvim_create_buf(false, true)
+            vim.bo[bufnr].bufhidden = "hide"
+            vim.bo[bufnr].buflisted = false
+            term.bufnr = bufnr
+            vim.api.nvim_win_set_buf(winid, bufnr)
+        end
+
         vim.fn.termopen({ vim.o.shell, "-c", opts.cmd }, {
             on_exit = function()
                 vim.schedule(function()

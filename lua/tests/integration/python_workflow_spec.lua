@@ -23,7 +23,9 @@ T["python workflow"]["python formatter is configured"] = function()
     helpers.wait_for_plugins()
 
     local conform = require("conform")
-    local formatters = conform.formatters_by_ft.python or {}
+    -- Python picks its formatters from the project, so the entry is a callable
+    local entry = conform.formatters_by_ft.python or {}
+    local formatters = vim.is_callable(entry) and entry(vim.api.nvim_get_current_buf()) or entry
 
     MiniTest.expect.equality(#formatters > 0, true, "Python should have formatters configured")
 
@@ -60,8 +62,8 @@ end
 T["python workflow"]["python parser is available"] = function()
     helpers.wait_for_plugins()
 
-    local parsers = require("nvim-treesitter.parsers")
-    local has_parser = parsers.has_parser("python")
+    -- nvim-treesitter's main branch dropped parsers.has_parser; ask the core API instead
+    local has_parser = pcall(vim.treesitter.language.add, "python")
 
     MiniTest.expect.equality(has_parser, true, "Python parser should be installed")
 end

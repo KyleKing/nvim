@@ -64,25 +64,14 @@ T["keybinding conflicts"]["treesitter and nap coexist"] = function()
     local content = { "function test()", "  return 1", "end" }
     local bufnr = helpers.create_test_buffer(content, "lua")
 
-    -- Wait for treesitter to attach and set up keymaps
-    vim.wait(1000, function()
-        local buf_keymaps = vim.api.nvim_buf_get_keymap(bufnr, "n")
-        for _, map in ipairs(buf_keymaps) do
-            if map.lhs == "]m" then return true end
-        end
-        return false
-    end)
-
-    -- Get buffer-local keymaps (treesitter) and global keymaps (nap)
-    local buf_keymaps = vim.api.nvim_buf_get_keymap(bufnr, "n")
+    -- deps/syntax.lua registers the textobject moves globally, alongside nap's
     local global_keymaps = vim.api.nvim_get_keymap("n")
 
     local has_treesitter_m = false
     local has_treesitter_z = false
     local has_treesitter_k = false
 
-    -- Check treesitter keymaps (buffer-local)
-    for _, map in ipairs(buf_keymaps) do
+    for _, map in ipairs(global_keymaps) do
         if map.lhs == "]m" then has_treesitter_m = true end
         if map.lhs == "]z" then has_treesitter_z = true end
         if map.lhs == "]k" then has_treesitter_k = true end

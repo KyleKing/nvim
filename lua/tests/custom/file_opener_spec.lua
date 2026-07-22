@@ -232,7 +232,9 @@ T["open_from_terminal"]["opens relative path from terminal cwd"] = function()
     vim.fn.writefile({ "test content" }, temp_file)
 
     vim.cmd("tabnew")
-    local term_bufnr = vim.fn.termopen({ vim.o.shell })
+    -- termopen returns a channel id, so the buffer variable has to come from the buffer
+    vim.fn.termopen({ vim.o.shell })
+    local term_bufnr = vim.api.nvim_get_current_buf()
     vim.wait(500)
 
     vim.b[term_bufnr].terminal_job_cwd = temp_dir

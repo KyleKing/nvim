@@ -136,19 +136,18 @@ T["query matching"]["respects smartcase"] = function()
     local stritems = { "MiniPick", "minipick", "MINIPICK" }
     local inds = { 1, 2, 3 }
 
-    local saved_ic = vim.o.ignorecase
-    local saved_sc = vim.o.smartcase
-    vim.o.ignorecase = true
-    vim.o.smartcase = true
+    -- mini.pick lowercases both stritems and query before calling `match` when the query
+    -- has "ignore case" properties, so smartcase lives in the picker and default_match
+    -- itself always compares verbatim
+    MiniTest.expect.equality(vim.o.ignorecase, true, "'ignorecase' drives case insensitive picking")
+    MiniTest.expect.equality(vim.o.smartcase, true, "'smartcase' makes a mixed-case query exact")
 
-    local result_lower = MiniPick.default_match(stritems, inds, { "m", "i", "n", "i" }, { sync = true })
+    local folded = { "minipick", "minipick", "minipick" }
+    local result_lower = MiniPick.default_match(folded, inds, { "m", "i", "n", "i" }, { sync = true })
     local result_upper = MiniPick.default_match(stritems, inds, { "M", "i", "n", "i" }, { sync = true })
 
-    vim.o.ignorecase = saved_ic
-    vim.o.smartcase = saved_sc
-
-    MiniTest.expect.equality(#result_lower, 3, "Lowercase query with smartcase should match all cases")
-    MiniTest.expect.equality(#result_upper < 3, true, "Mixed-case query with smartcase should be case-sensitive")
+    MiniTest.expect.equality(#result_lower, 3, "Lowercased items should all match a lowercase query")
+    MiniTest.expect.equality(#result_upper, 1, "Mixed-case query should match only the exact casing")
 end
 
 -- -- Keymap descriptions -- --
@@ -157,7 +156,7 @@ T["keymap descriptions"] = MiniTest.new_set()
 
 T["keymap descriptions"]["all picker keymaps have descriptive desc fields"] = function()
     local expected = {
-        { "<leader><CR>", "n", "Resume" },
+        { "<leader><leader>", "n", "Resume" },
         { "<leader>;", "n", "buffer" },
         { "<leader>bb", "n", "buffer" },
         { "<leader>bL", "n", "lines" },
@@ -173,7 +172,7 @@ T["keymap descriptions"]["all picker keymaps have descriptive desc fields"] = fu
         { "<leader>fB", "n", "picker" },
         { "<leader>fe", "n", "xplore" },
         { "<leader>fH", "n", "history" },
-        { "<leader>fl", "n", "list" },
+        { "<leader>fl", "n", "quickfix" },
         { "<leader>f'", "n", "mark" },
         { "<leader>f*", "v", "visual" },
     }

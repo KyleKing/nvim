@@ -62,14 +62,15 @@ T["keymap compatibility"]["mode arrays in vim.keymap.set don't break mini.clue"]
     MiniTest.expect.equality(ok_n, true, "Should query normal mode keymaps without error")
     MiniTest.expect.equality(ok_x, true, "Should query visual mode keymaps without error")
 
-    -- Find our test keymap
+    -- nvim_get_keymap reports the resolved leader, not the "<leader>" placeholder
+    local resolved_key = (vim.g.mapleader or "\\") .. "xtest"
     local found_n = false
     local found_x = false
     for _, k in ipairs(keymaps_n) do
-        if k.lhs == test_key then found_n = true end
+        if k.lhs == resolved_key then found_n = true end
     end
     for _, k in ipairs(keymaps_x) do
-        if k.lhs == test_key then found_x = true end
+        if k.lhs == resolved_key then found_x = true end
     end
 
     MiniTest.expect.equality(found_n, true, "Keymap should exist in normal mode")

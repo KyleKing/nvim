@@ -154,21 +154,28 @@ end
 T["tui float terminals"]["reuses buffer"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
-    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_reuse" })
+    -- A command that exits right away takes the buffer down with it (the on_exit handler
+    -- drops the entry), and termopen cannot reattach to a buffer that already ran a job,
+    -- so hold the job open for the length of the test
+    local cmd = "sleep 30"
+
+    module.toggle_tui_float({ cmd = cmd, term_id = "test_reuse" })
     vim.wait(200)
 
     local first_bufnr = module.tui_terminals["test_reuse"].bufnr
 
-    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_reuse" })
+    module.toggle_tui_float({ cmd = cmd, term_id = "test_reuse" })
     vim.wait(100)
 
-    module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_reuse" })
+    module.toggle_tui_float({ cmd = cmd, term_id = "test_reuse" })
     vim.wait(200)
 
     MiniTest.expect.equality(module.tui_terminals["test_reuse"].bufnr, first_bufnr, "Should reuse same buffer")
 
     local term = module.tui_terminals["test_reuse"]
     if term.winid and vim.api.nvim_win_is_valid(term.winid) then vim.api.nvim_win_close(term.winid, true) end
+    -- Deleting the buffer kills the sleep
+    pcall(vim.api.nvim_buf_delete, term.bufnr, { force = true })
 end
 
 if ... == nil then MiniTest.run() end

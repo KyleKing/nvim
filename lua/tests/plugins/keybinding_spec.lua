@@ -85,30 +85,39 @@ T["clue configuration"]["window has rounded border"] = function()
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
 
-    MiniTest.expect.equality(config.window.config.border, "rounded", "Window should have rounded border")
+    -- Height depends on 'lines', so the config is a callable rather than a table
+    MiniTest.expect.equality(vim.is_callable(config.window.config), true, "Window config should be callable")
+    MiniTest.expect.equality(config.window.config().border, "rounded", "Window should have rounded border")
 end
 
-T["clue configuration"]["uses mode arrays for common triggers"] = function()
+T["clue configuration"]["registers one string mode per trigger"] = function()
     helpers.wait_for_plugins()
 
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
 
-    -- Check that common triggers use mode arrays instead of separate entries
-    local trigger_counts = {}
+    -- mini.clue passes `mode` to nvim_get_keymap, which rejects a table, so each
+    -- trigger needs its own entry per mode rather than one entry with a mode array
+    local seen = {}
     for _, trigger in ipairs(config.triggers) do
-        local key = trigger.keys
-        trigger_counts[key] = (trigger_counts[key] or 0) + 1
+        MiniTest.expect.equality(
+            type(trigger.mode),
+            "string",
+            string.format("Trigger '%s' should use a string mode", tostring(trigger.keys))
+        )
+        local id = trigger.mode .. trigger.keys
+        MiniTest.expect.equality(
+            seen[id],
+            nil,
+            string.format("Duplicate trigger '%s' in mode '%s'", trigger.keys, trigger.mode)
+        )
+        seen[id] = true
     end
 
-    -- Common triggers should appear only once (using mode arrays)
-    local common_triggers = { "<Leader>", "g", "'", "`", '"', "z" }
-    for _, key in ipairs(common_triggers) do
-        MiniTest.expect.equality(
-            trigger_counts[key],
-            1,
-            string.format("Trigger '%s' should use mode array (found %d entries)", key, trigger_counts[key] or 0)
-        )
+    -- Triggers shared by normal and visual mode need both entries to fire in both
+    for _, key in ipairs({ "<Leader>", "g", "'", "`", '"', "z" }) do
+        MiniTest.expect.equality(seen["n" .. key], true, string.format("Trigger '%s' missing in normal mode", key))
+        MiniTest.expect.equality(seen["x" .. key], true, string.format("Trigger '%s' missing in visual mode", key))
     end
 end
 
@@ -137,7 +146,8 @@ T["group descriptions"]["leader groups are defined"] = function()
         ["<Leader>l"] = "+LSP",
         ["<Leader>m"] = "+Move",
         ["<Leader>p"] = "+Plugins",
-        ["<Leader>r"] = "+Register",
+        ["<Leader>n"] = "+Navigate",
+        ["<Leader>s"] = "+Symbols",
         ["<Leader>t"] = "+Terminal/Test",
         ["<Leader>u"] = "+UI",
         ["<Leader>w"] = "+Window",
@@ -269,17 +279,24 @@ T["clue completeness"]["all leader group prefixes have descriptions"] = function
     helpers.wait_for_plugins()
 
     local leader = vim.g.mapleader or "\\"
-    local keymaps = vim.api.nvim_get_keymap("n")
-    local leader_prefixes = {}
+    local suffixes, mapped = {}, {}
 
-    for _, keymap in ipairs(keymaps) do
+    for _, keymap in ipairs(vim.api.nvim_get_keymap("n")) do
         local lhs = keymap.lhs
-        if lhs:sub(1, #leader) == leader then
+        if lhs:sub(1, #leader) == leader and #lhs > #leader then
             local suffix = lhs:sub(#leader + 1)
-            for len = 1, math.min(2, #suffix) do
-                local prefix = "<Leader>" .. suffix:sub(1, len)
-                leader_prefixes[prefix] = true
-            end
+            table.insert(suffixes, suffix)
+            mapped[suffix] = true
+        end
+    end
+
+    -- A prefix needs a group description only when it leads to longer keymaps and is
+    -- not a keymap itself: <Leader>f opens a group, <Leader>ff runs a command
+    local leader_prefixes = {}
+    for _, suffix in ipairs(suffixes) do
+        for len = 1, #suffix - 1 do
+            local prefix = suffix:sub(1, len)
+            if not mapped[prefix] then leader_prefixes["<Leader>" .. prefix] = true end
         end
     end
 
@@ -311,9 +328,13 @@ T["clue completeness"]["no orphan clue groups"] = function()
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
 
+    -- LSP attach registers these per buffer, so nvim_get_keymap cannot see them in a
+    -- headless run with no attached client
+    local buffer_local_groups = { ["<Leader>c"] = true, ["<Leader>k"] = true }
+
     local groups = {}
     for _, clue in ipairs(config.clues) do
-        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then
+        if type(clue) == "table" and clue.desc and clue.desc:match("^%+") and not buffer_local_groups[clue.keys] then
             table.insert(groups, { keys = clue.keys, mode = clue.mode or "n" })
         end
     end
