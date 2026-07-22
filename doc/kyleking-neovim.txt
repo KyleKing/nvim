@@ -1564,6 +1564,7 @@ Operator grammar:
 >
     <leader>ft           Find TODO patterns
     auto-highlight       Automatic keyword highlighting
+    link highlighting    URL, markdown-link, and plugin-ref highlighting
 <
 
 Keywords: FIXME, TODO, NOTE, PLANNED, WARNING, HACK, PERF, TEST, FYI.
@@ -1571,6 +1572,10 @@ Keywords: FIXME, TODO, NOTE, PLANNED, WARNING, HACK, PERF, TEST, FYI.
 Custom PLANNED keyword uses `#FCD7AD` background.
 
 `<leader>ft` opens picker to find all highlighted patterns in buffer.
+
+Links: URLs (`@markup.link.url`), markdown link text (`@markup.link.label`),
+and `author/repo.nvim` plugin refs (`@markup.link`) are also highlighted –
+see link_open.
 
 Source: `lua/kyleking/deps/editing-support.lua`
 
@@ -2279,7 +2284,7 @@ Operator grammar:
 
 >
     <leader>pa           Patch operations
-    gx                   Open URL/file under cursor
+    <leader>uu           Open link under cursor
 <
 
 **patch_it.nvim** – Apply LLM-generated patches with fuzzy matching:
@@ -2314,9 +2319,11 @@ Lua API:
 
 See also: <https://github.com/KyleKing/patch_it.nvim>
 
-**gx.nvim** – `gx` opens URL or file path under cursor
-
-**url-open** – `<leader>uu` opens URL under cursor
+**link_open** – `<leader>uu` opens the link found on the current line:
+markdown links, plain URLs, `author/repo.nvim` plugin refs (resolved to
+GitHub), and package names in
+`package.json`/`requirements.txt`/`pyproject.toml`/`Brewfile` (resolved to
+npm/PyPI/Homebrew). `gx` is deliberately left unbound.
 
 **vim-dirtytalk** – extends spell dictionary with programming terms.
 `<leader>pzs` sorts the spell dictionary file
