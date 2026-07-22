@@ -1,7 +1,7 @@
 {
   "plugins": {
     "SchemaStore.nvim": {
-      "rev": "37dc30ebebd899905f98deccd8c29fcb62531cbf",
+      "rev": "77fb1b0aa0c7528680bed48687f3dd2c2a6ed111",
       "src": "https://github.com/b0o/SchemaStore.nvim"
     },
     "bufjump.nvim": {
@@ -14,7 +14,7 @@
     },
     "codanna.nvim": {
       "rev": "30cffbe65760670bc1804f8ac6a4c61d17fcb7e4",
-      "src": "file:///Users/kyleking/Developer/kyleking/codanna.nvim"
+      "src": "https://github.com/KyleKing/codanna.nvim"
     },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",
@@ -57,7 +57,7 @@
       "src": "https://github.com/mfussenegger/nvim-lint"
     },
     "nvim-lspconfig": {
-      "rev": "7f87dbb4707f54117e98ab8f15d6a2975b3f13f0",
+      "rev": "b89138d9af0a96e6048e202a15765fc6b6416bd4",
       "src": "https://github.com/neovim/nvim-lspconfig"
     },
     "nvim-treesitter": {
