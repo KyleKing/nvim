@@ -7,6 +7,11 @@ after:
   -- TODO: fix this
   -- NOTE: important
 cursor_after: [1, 0]
+highlights:
+  - group: MiniHipatternsTodo
+    range: [[1, 3], [1, 7]]
+  - group: MiniHipatternsNote
+    range: [[2, 3], [2, 7]]
 # ---
 # name: auto-highlight > FIXME highlighted
 before:
@@ -15,6 +20,9 @@ cursor: [1, 0]
 after:
   -- FIXME: broken
 cursor_after: [1, 0]
+highlights:
+  - group: MiniHipatternsFixme
+    range: [[1, 3], [1, 8]]
 # ---
 # name: auto-highlight > PLANNED highlighted
 before:
@@ -23,3 +31,41 @@ cursor: [1, 0]
 after:
   -- PLANNED: feature
 cursor_after: [1, 0]
+highlights:
+  - group: MiniHipatternsPlanned
+    range: [[1, 3], [1, 10]]
+# ---
+# name: link highlighting > markdown link text highlighted
+before:
+  [Neovim docs](https://neovim.io/doc)
+cursor: [1, 0]
+after:
+  [Neovim docs](https://neovim.io/doc)
+cursor_after: [1, 0]
+highlights:
+  - group: @markup.link.label
+    range: [[1, 1], [1, 12]]
+  - group: @markup.link.url
+    range: [[1, 14], [1, 36]]
+# ---
+# name: link highlighting > plain URL highlighted
+before:
+  See https://example.com for details
+cursor: [1, 0]
+after:
+  See https://example.com for details
+cursor_after: [1, 0]
+highlights:
+  - group: @markup.link.url
+    range: [[1, 4], [1, 23]]
+# ---
+# name: link highlighting > plugin ref highlighted
+before:
+  Uses echasnovski/mini.nvim under the hood
+cursor: [1, 0]
+after:
+  Uses echasnovski/mini.nvim under the hood
+cursor_after: [1, 0]
+highlights:
+  - group: @markup.link
+    range: [[1, 5], [1, 26]]

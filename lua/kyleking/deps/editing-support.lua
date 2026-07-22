@@ -146,6 +146,11 @@ later(function()
     local word_pattern = function(word) return "%f[%w]()" .. word .. "()%f[%W]" end
     local paren_pattern = function(word) return "%f[%w]()" .. word .. "%(.-%):?()%s" end
 
+    -- Highlight only the "[text]" span of a markdown link (not the "(url)" part,
+    -- which the `url` highlighter below already covers) so the two look distinct
+    -- instead of stacking the same group over the whole "[text](url)".
+    local md_link_text_pattern = "%[().-()%]%b()"
+
     hipatterns.setup({
         highlighters = {
             fixme = { pattern = { word_pattern("FIXME"), paren_pattern("FIXME") }, group = "MiniHipatternsFixme" },
@@ -160,9 +165,12 @@ later(function()
             warning = { pattern = { word_pattern("WARNING"), paren_pattern("WARNING") }, group = "MiniHipatternsFixme" },
             perf = { pattern = { word_pattern("PERF"), paren_pattern("PERF") }, group = "MiniHipatternsHack" },
             test = { pattern = { word_pattern("TEST"), paren_pattern("TEST") }, group = "MiniHipatternsTodo" },
-            url = { pattern = link_patterns.url, group = "Underlined" },
-            md_link = { pattern = link_patterns.md_link, group = "Underlined" },
-            plugin_ref = { pattern = link_patterns.plugin, group = "Underlined" },
+            -- Link to the built-in treesitter markup groups so link colors stay
+            -- theme-aware instead of hardcoding hex (three distinct looks: url is
+            -- italic+underlined, md_link text is Special-linked, plugin_ref is bold).
+            url = { pattern = link_patterns.url, group = "@markup.link.url" },
+            md_link = { pattern = md_link_text_pattern, group = "@markup.link.label" },
+            plugin_ref = { pattern = link_patterns.plugin, group = "@markup.link" },
         },
     })
 

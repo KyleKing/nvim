@@ -27,7 +27,7 @@ return {
         "",
         "See also: <https://github.com/KyleKing/patch_it.nvim>",
         "",
-        "**link_open** -- `gx` / `<leader>uu` open the link found on the current line: markdown links, plain URLs, `author/repo.nvim` plugin refs (resolved to GitHub), and package names in `package.json`/`requirements.txt`/`pyproject.toml`/`Brewfile` (resolved to npm/PyPI/Homebrew).",
+        "**link_open** -- `<leader>uu` opens the link found on the current line: markdown links, plain URLs, `author/repo.nvim` plugin refs (resolved to GitHub), and package names in `package.json`/`requirements.txt`/`pyproject.toml`/`Brewfile` (resolved to npm/PyPI/Homebrew). `gx` is deliberately left unbound.",
         "",
         "**vim-dirtytalk** -- extends spell dictionary with programming terms. `<leader>pzs` sorts the spell dictionary file",
         "",
@@ -52,17 +52,17 @@ return {
             },
         },
         {
-            pattern = "gx",
-            desc = "Open URL/file under cursor",
+            pattern = "<leader>uu",
+            desc = "Open link under cursor",
             tests = {
                 {
-                    name = "gx functionality",
+                    name = "<leader>uu functionality",
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap = helpers.check_keymap("gx", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have gx keymap in normal mode")
+                            local has_keymap = helpers.check_keymap("<leader>uu", "n")
+                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>uu keymap in normal mode")
                         end,
                     },
                 },

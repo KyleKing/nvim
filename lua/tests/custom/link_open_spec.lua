@@ -139,10 +139,20 @@ T["open"]["resolves a PyPI package from pyproject.toml, dropping the version spe
     MiniTest.expect.equality(opened, "https://pypi.org/project/pydantic")
 end
 
+T["open"]["does not treat a Poetry-style pyproject.toml metadata line as a package"] = function()
+    -- Poetry's `key = "value"` lines (version, description, ...) are quoted too, but the
+    -- quote isn't the first non-whitespace char, unlike a bare list entry.
+    local opened = open_in_named_file("pyproject.toml", { "[tool.poetry]", 'version = "0.1.0"' }, 2)
+    MiniTest.expect.equality(opened, nil)
+end
+
 T["open"]["resolves a Homebrew formula from a Brewfile"] = function()
     local opened = open_in_named_file("Brewfile", { 'brew "ripgrep"' }, 1)
     MiniTest.expect.equality(opened, "https://formulae.brew.sh/formula/ripgrep")
 end
+
+-- Highlighting itself is covered by the "link highlighting" snapshot cases in
+-- lua/tests/docs/hipatterns.snap (real highlight extmarks, not just resolver output).
 
 if ... == nil then MiniTest.run() end
 

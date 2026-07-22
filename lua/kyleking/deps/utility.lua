@@ -87,7 +87,8 @@ end)
 later(function() add("micarmst/vim-spellsync") end)
 
 later(function()
+    -- gx deliberately left unbound (reserved for a future different use); this feature
+    -- is <leader>uu only.
     local K = vim.keymap.set
-    K("n", "gx", function() require("kyleking.utils.link_open").open() end, { desc = "Open link" })
     K("n", "<leader>uu", function() require("kyleking.utils.link_open").open() end, { desc = "Open link" })
 end)

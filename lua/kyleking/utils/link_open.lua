@@ -13,10 +13,30 @@ M.patterns = {
     plugin = "[%w][%-_%w]+/[%-_.%w]*nvim[%-_.%w]*",
 }
 
+-- The url pattern's character class allows `(` `)` (so URLs like Wikipedia's
+-- "...Lua_(programming_language)" survive), which means a bare URL wrapped in prose
+-- parens -- "(see https://example.com)" -- or ended by sentence punctuation --
+-- "https://example.com." -- greedily swallows the trailing char too. Trim it back off.
+local function trim_trailing_punctuation(url)
+    local open_count, close_count = 0, 0
+    for c in url:gmatch("[()]") do
+        if c == "(" then
+            open_count = open_count + 1
+        else
+            close_count = close_count + 1
+        end
+    end
+    while close_count > open_count and url:sub(-1) == ")" do
+        url = url:sub(1, -2)
+        close_count = close_count - 1
+    end
+    return (url:gsub("[.,;:!?]+$", ""))
+end
+
 -- Ordered list: most specific first
 local resolvers = {
     { pat = M.patterns.md_link, resolve = function(m) return m:match("%((.*)%)$") end },
-    { pat = M.patterns.url, resolve = function(m) return m end },
+    { pat = M.patterns.url, resolve = trim_trailing_punctuation },
     { pat = M.patterns.plugin, resolve = function(m) return "https://github.com/" .. m end },
 }
 
@@ -26,7 +46,14 @@ local resolvers = {
 local ft_resolvers = {
     ["package%.json"] = { pat = '"([%w@][%w@./_-]*)"', base = "https://npmjs.com/package/" },
     ["requirements.*%.txt"] = { pat = "(%w[%w._-]*)", base = "https://pypi.org/project/" },
-    ["pyproject%.toml"] = { pat = '"(%w[%w._-]*)', base = "https://pypi.org/project/" },
+    -- Anchored so the quote must open the line: matches PEP 621/uv/hatch-style bare
+    -- list entries ('  "pydantic>=2.0",') but not Poetry's `key = "value"` metadata
+    -- lines (version, description, ...), which would otherwise misresolve. Poetry's
+    -- `key = "value"` *dependency* lines (e.g. `requests = "^2.31.0"`) are the same
+    -- shape as that metadata, so a line-based regex can't tell them apart -- doing so
+    -- safely would need the toml treesitter parser (already installed) to find the
+    -- enclosing table and check its name ends in "dependencies".
+    ["pyproject%.toml"] = { pat = '^%s*"(%w[%w._-]*)', base = "https://pypi.org/project/" },
     ["Brewfile"] = { pat = 'brew "(%w[%w._-]*)"', base = "https://formulae.brew.sh/formula/" },
 }
 
@@ -35,6 +62,11 @@ local function ft_resolver()
     for pat, r in pairs(ft_resolvers) do
         if fname:match(pat) then return r end
     end
+end
+
+local function open_url(url)
+    local ok, err = vim.ui.open(url)
+    if not ok then vim.notify("Failed to open " .. url .. ": " .. tostring(err), vim.log.levels.ERROR) end
 end
 
 --- Resolve and open the link found on the current line (filetype-specific resolvers
@@ -47,7 +79,7 @@ function M.open()
     if ftr then
         local m = line:match(ftr.pat)
         if m then
-            vim.ui.open(ftr.base .. m)
+            open_url(ftr.base .. m)
             return
         end
     end
@@ -55,7 +87,7 @@ function M.open()
     for _, r in ipairs(resolvers) do
         local m = line:match(r.pat)
         if m then
-            vim.ui.open(r.resolve(m))
+            open_url(r.resolve(m))
             return
         end
     end
