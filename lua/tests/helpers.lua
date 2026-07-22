@@ -19,6 +19,12 @@ function M.wait_for_lsp_attach(bufnr, timeout_ms)
     return false
 end
 
+-- Return to a clean normal mode, dropping any pending count
+-- v:count survives the command that set it, and plugin functions called straight from
+-- Lua still read v:count1: MiniMove.move_line("down") after a fixture that left
+-- v:count at 1000 moves the line 1000 rows. Tests then fail based on run order.
+function M.reset_pending_state() vim.cmd("normal! " .. vim.api.nvim_replace_termcodes("<Esc>", true, false, true)) end
+
 -- Clear 'winfixbuf' from every window
 -- mini.files, mini.pick and friends pin their windows to a buffer. A test that leaves
 -- one of those windows current makes every later buffer switch fail with E1513, so

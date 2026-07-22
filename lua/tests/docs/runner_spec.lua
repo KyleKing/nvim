@@ -4,8 +4,15 @@ local runner = require("tests.docs.runner")
 local T = MiniTest.new_set({
     hooks = {
         -- A fixture that leaves a pinned window current (mini.files, mini.pick) breaks
-        -- buffer switching for every fixture after it
-        pre_case = function() require("tests.helpers").clear_winfixbuf() end,
+        -- buffer switching for every fixture after it, and unconsumed keys replay
+        -- inside whichever fixture runs next
+        pre_case = function()
+            local helpers = require("tests.helpers")
+            -- An explorer left open swallows keys meant for the next fixture
+            pcall(function() require("mini.files").close() end)
+            helpers.clear_winfixbuf()
+            helpers.reset_pending_state()
+        end,
         post_once = function()
             runner.print_profiling_summary()
             runner.clear_snapshot_cache()

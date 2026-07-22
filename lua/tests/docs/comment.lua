@@ -105,6 +105,12 @@ return {
                     keys = "gcip",
                     before = { "line1", "line2", "" },
                     cursor = { 1, 0 },
+                    setup = {
+                        fn = function()
+                            vim.bo.commentstring = "-- %s"
+                            vim.bo.filetype = "lua"
+                        end,
+                    },
                     expect = {
                         fn = function(ctx)
                             local lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 2, false)
@@ -125,6 +131,12 @@ return {
                     keys = "Vjgc",
                     before = { "line1", "line2", "line3" },
                     cursor = { 1, 0 },
+                    setup = {
+                        fn = function()
+                            vim.bo.commentstring = "-- %s"
+                            vim.bo.filetype = "lua"
+                        end,
+                    },
                     expect = {
                         fn = function(ctx)
                             local lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 2, false)

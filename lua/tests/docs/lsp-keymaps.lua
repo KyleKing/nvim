@@ -90,9 +90,8 @@ return {
 
                             -- Verify LSP completion trigger exists
                             MiniTest.expect.equality(type(vim.lsp.completion), "table")
-                            -- vim.lsp.completion.trigger exists in 0.12+, falls back to feedkeys in 0.11
-                            local has_trigger = vim.lsp.completion.trigger ~= nil
-                                or vim.fn.exists("*vim.lsp.completion.enable") == 1
+                            -- 0.11 exposed trigger(); 0.12 replaced it with get()
+                            local has_trigger = vim.lsp.completion.get ~= nil or vim.lsp.completion.trigger ~= nil
                             MiniTest.expect.equality(has_trigger, true, "Should have completion trigger mechanism")
                         end,
                     },

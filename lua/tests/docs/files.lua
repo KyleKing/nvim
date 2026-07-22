@@ -77,21 +77,27 @@ return {
                             local MiniFiles = require("mini.files")
                             local MiniTest = require("mini.test")
 
-                            -- Open explorer to trigger bookmark setup
-                            MiniFiles.open()
-                            vim.wait(20)
+                            -- mini.files has no bookmark getter, so record what the
+                            -- config's MiniFilesExplorerOpen handler registers
+                            local set_bookmark = MiniFiles.set_bookmark
+                            local registered = {}
+                            MiniFiles.set_bookmark = function(key, path, opts)
+                                registered[key] = true
+                                return set_bookmark(key, path, opts)
+                            end
 
-                            -- Trigger MiniFilesExplorerOpen event to set up bookmarks
-                            vim.api.nvim_exec_autocmds("User", { pattern = "MiniFilesExplorerOpen" })
-                            vim.wait(20)
+                            local ok, err = pcall(function()
+                                MiniFiles.open()
+                                vim.api.nvim_exec_autocmds("User", { pattern = "MiniFilesExplorerOpen" })
+                            end)
 
-                            -- Verify core bookmarks exist
-                            local bookmarks = MiniFiles.get_bookmark_data()
-                            MiniTest.expect.no_equality(bookmarks.h, nil, "Home bookmark should exist")
-                            MiniTest.expect.no_equality(bookmarks.c, nil, "Config bookmark should exist")
-                            MiniTest.expect.no_equality(bookmarks.w, nil, "Working directory bookmark should exist")
+                            MiniFiles.set_bookmark = set_bookmark
+                            pcall(MiniFiles.close)
 
-                            MiniFiles.close()
+                            MiniTest.expect.equality(ok, true, "Explorer open should not error: " .. tostring(err))
+                            MiniTest.expect.equality(registered.h, true, "Home bookmark should be set")
+                            MiniTest.expect.equality(registered.c, true, "Config bookmark should be set")
+                            MiniTest.expect.equality(registered.w, true, "Working directory bookmark should be set")
                         end,
                     },
                 },

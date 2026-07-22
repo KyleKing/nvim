@@ -26,17 +26,12 @@ return {
                 },
                 {
                     name = "sort semicolon-separated",
-                    keys = "V",
+                    -- Charwise motion, not V: a linewise selection sorts whole lines,
+                    -- so a single line comes back unchanged
+                    keys = "gs$",
                     before = { "c; a; b" },
                     cursor = { 1, 0 },
-                    expect = {
-                        fn = function(ctx)
-                            vim.cmd("normal gs")
-                            local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
-                            local MiniTest = require("mini.test")
-                            MiniTest.expect.equality(line, "a; b; c", "Semicolon-separated values should be sorted")
-                        end,
-                    },
+                    expect = { lines = { "a; b; c" } },
                 },
                 {
                     name = "sort lines in paragraph",
@@ -72,10 +67,12 @@ return {
             tests = {
                 {
                     name = "multiply word 3 times",
+                    -- [count]gm adds [count] copies alongside the original, so the
+                    -- word appears four times, not three
                     keys = "3gmiw",
                     before = { "word" },
                     cursor = { 1, 0 },
-                    expect = { lines = { "wordwordword" } },
+                    expect = { lines = { "wordwordwordword" } },
                 },
             },
         },
