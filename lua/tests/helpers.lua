@@ -257,9 +257,11 @@ function M.full_cleanup()
     end
 
     -- Clear test-related autocmds (preserve user config autocmds)
-    local test_groups = vim.api.nvim_get_autocmds({ group = "test_*" })
-    for _, autocmd in ipairs(test_groups) do
-        pcall(vim.api.nvim_del_autocmd, autocmd.id)
+    -- nvim_get_autocmds takes an exact group name, and errors on a glob, so match by hand
+    for _, autocmd in ipairs(vim.api.nvim_get_autocmds({})) do
+        if autocmd.group_name and autocmd.group_name:match("^test_") then
+            pcall(vim.api.nvim_del_autocmd, autocmd.id)
+        end
     end
 
     -- Clear test keymaps (keymaps starting with <leader>test or containing "test")

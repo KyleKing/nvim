@@ -1,197 +1,180 @@
 -- Test runner for mini.test
--- Provides functions to run all tests or only failed tests with results displayed in a floating window
+-- Collects spec files, executes them in one batch, and reports a per-file tally.
+--
+-- Two mini.test details drive the shape of this file:
+-- - `MiniTest.execute` runs cases through `vim.schedule` and returns nothing, so a tally
+--   has to be read off the case list after the queue drains, not off a return value
+-- - the headless stdout reporter quits Neovim when it finishes, so running one file per
+--   `MiniTest.run_file` call ends the process at the first file and silently drops the rest
 
 local M = {}
 
+local TEST_DIR = vim.fn.stdpath("config") .. "/lua/tests"
+local EXECUTE_TIMEOUT_MS = 600000
+
 -- Store the last test run results for re-running failed tests
 local last_test_run = {
-    results = {},
-    failed_tests = {}, -- Format: { {file = "file_path", case_name = "case_name"}, ... }
+    failed_tests = {}, -- Format: { {file = "file_path", id = "full case id"}, ... }
     has_failures = false,
 }
 
--- Run all mini.test test files
--- @param only_failed boolean Whether to run only failed tests from last run
--- @param shuffle boolean Whether to shuffle test order
--- @param seed number|nil Random seed for shuffling
--- @return table Test results
-function M.run_all_tests(only_failed, shuffle, seed)
+local function is_headless() return #vim.api.nvim_list_uis() == 0 end
+
+local function emit(line) print(line) end
+
+-- Full description of a case; its first element is the file it was collected from
+local function case_id(case) return table.concat(case.desc, " | ") end
+
+local function case_failed(case) return type(case.exec) ~= "table" or #case.exec.fails > 0 end
+
+--- Collect cases from the given files without touching the global collect config.
+--- Every spec ends with `if ... == nil then MiniTest.run() end` and mini.test collects by
+--- `dofile`, where `...` is nil, so a globally installed `find_files` would make each
+--- collected file start a run that collects it again. Passing `find_files` per call keeps
+--- that nested run on mini.test's default glob, which matches nothing here and terminates.
+local function collect_cases(files, filter_cases)
     local MiniTest = require("mini.test")
-    local test_dir = vim.fn.stdpath("config") .. "/lua/tests"
-    local test_results = {}
-    local total_passed = 0
-    local total_failed = 0
-    local total_tests = 0
-    local new_failed_tests = {}
+    return MiniTest.collect({
+        find_files = function() return files end,
+        filter_cases = filter_cases,
+    })
+end
 
-    -- Create a floating window for the test output
-    local buf = vim.api.nvim_create_buf(false, true)
-    local ui = require("kyleking.utils.ui")
-    vim.api.nvim_open_win(
-        buf,
-        true,
-        ui.create_centered_window({
-            relative = "editor",
-            style = "minimal",
-        })
-    )
+--- Execute cases and block until the scheduled queue drains.
+---@return boolean finished False if execution timed out
+local function execute_cases(cases)
+    local MiniTest = require("mini.test")
+    -- quit_on_finish would end the process before the summary below is printed
+    local reporter = is_headless() and MiniTest.gen_reporter.stdout({ quit_on_finish = false }) or nil
 
-    -- Function to append lines to the buffer
-    local function append_line(line)
-        local lines = vim.split(line, "\n", { plain = true })
-        vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+    MiniTest.execute(cases, { reporter = reporter })
+    return vim.wait(EXECUTE_TIMEOUT_MS, function() return not MiniTest.is_executing() end, 10)
+end
+
+--- Print one summary line per collected file plus a totals block.
+---@return table summary {total, passed, failed, failed_tests}
+local function report(files, cases)
+    local per_file = {}
+    for _, file in ipairs(files) do
+        per_file[file] = { passed = 0, failed = 0 }
     end
+
+    local failed_tests = {}
+    local total, passed, failed = 0, 0, 0
+    for _, case in ipairs(cases) do
+        local file = case.desc[1]
+        local tally = per_file[file] or { passed = 0, failed = 0 }
+        per_file[file] = tally
+        total = total + 1
+        if case_failed(case) then
+            failed = failed + 1
+            tally.failed = tally.failed + 1
+            table.insert(failed_tests, { file = file, id = case_id(case) })
+        else
+            passed = passed + 1
+            tally.passed = tally.passed + 1
+        end
+    end
+
+    emit("")
+    emit("==== Per-file results ====")
+    for _, file in ipairs(files) do
+        local tally = per_file[file]
+        local relative = file:match("lua/tests/(.+)$") or file
+        emit(string.format("%s: %d passed, %d failed", relative, tally.passed, tally.failed))
+    end
+
+    emit("")
+    emit("==== Test Summary ====")
+    emit("Files: " .. #files)
+    emit("Total tests: " .. total)
+    emit("Passed: " .. passed)
+    emit("Failed: " .. failed)
+
+    return { total = total, passed = passed, failed = failed, failed_tests = failed_tests }
+end
+
+--- Run the given spec files as a single batch.
+--- Quits with a non-zero code on failure when headless so a task runner sees the failure.
+---@param files string[] Spec file paths
+---@param filter_cases function|nil `MiniTest.collect` case filter
+---@return table summary
+local function run_files(files, filter_cases)
+    if #files == 0 then
+        emit("No test files found")
+        return { total = 0, passed = 0, failed = 0, failed_tests = {} }
+    end
+
+    local cases = collect_cases(files, filter_cases)
+    local finished = execute_cases(cases)
+    local summary = report(files, cases)
+
+    if not finished then
+        emit(string.format("TIMEOUT: execution did not finish within %d ms", EXECUTE_TIMEOUT_MS))
+        summary.failed = summary.failed + 1
+    end
+
+    last_test_run.failed_tests = summary.failed_tests
+    last_test_run.has_failures = #summary.failed_tests > 0
+
+    if summary.failed > 0 then
+        emit("")
+        emit("Use :RunFailedTests or <leader>tf to re-run only failed tests")
+        if is_headless() then vim.cmd("silent! 1cquit") end
+    end
+
+    return summary
+end
+
+--- Run an explicit list of spec files (used by the coverage script)
+---@param files string[] Spec file paths
+function M.run_files(files) return run_files(files) end
+
+--- Run all mini.test spec files
+---@param only_failed boolean Whether to run only failed cases from the last run
+---@param shuffle boolean Whether to shuffle file order
+---@param seed number|nil Random seed for shuffling
+---@return table summary
+function M.run_all_tests(only_failed, shuffle, seed)
+    local files, filter_cases = {}, nil
 
     if only_failed then
         if not last_test_run.has_failures then
-            append_line("No failed tests from previous run.")
-            append_line("Press 'q' or <Esc> to close this window.")
-            vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
-            vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
-            return
+            emit("No failed tests from previous run.")
+            return { total = 0, passed = 0, failed = 0, failed_tests = {} }
         end
-        append_line("Re-running failed tests from last run...")
+
+        local seen, wanted = {}, {}
+        for _, failed_test in ipairs(last_test_run.failed_tests) do
+            wanted[failed_test.id] = true
+            if not seen[failed_test.file] then
+                seen[failed_test.file] = true
+                table.insert(files, failed_test.file)
+            end
+        end
+        -- `MiniTest.run` ignores a top-level `filter` key; the filter belongs to `collect`
+        filter_cases = function(case) return wanted[case_id(case)] == true end
+        emit("Re-running failed tests from last run...")
     else
-        append_line("Running all Mini.Tests...")
+        files = vim.fn.globpath(TEST_DIR, "**/*_spec.lua", false, true)
+        emit("Running all Mini.Tests...")
     end
 
     if shuffle then
         seed = seed or os.time()
-        append_line(string.format("Random order (seed: %d)", seed))
-    end
-    append_line("")
-
-    -- Find all test files or use only failed test files
-    local test_files = {}
-    if only_failed then
-        -- Get unique files from failed tests
-        local unique_files = {}
-        for _, failed_test in ipairs(last_test_run.failed_tests) do
-            unique_files[failed_test.file] = true
-        end
-        for file, _ in pairs(unique_files) do
-            table.insert(test_files, file)
-        end
-    else
-        test_files = vim.fn.globpath(test_dir, "**/*_spec.lua", false, true)
-    end
-
-    -- Shuffle if requested
-    if shuffle then
+        emit(string.format("Random order (seed: %d)", seed))
         math.randomseed(seed)
-        -- Fisher-Yates shuffle
-        for i = #test_files, 2, -1 do
+        for i = #files, 2, -1 do
             local j = math.random(i)
-            test_files[i], test_files[j] = test_files[j], test_files[i]
+            files[i], files[j] = files[j], files[i]
         end
     end
 
-    if #test_files == 0 then
-        append_line("No test files found" .. (only_failed and " in last failed run." or " in " .. test_dir))
-        append_line("Press 'q' or <Esc> to close this window.")
-        vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
-        vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
-        return
-    end
-
-    for _, test_file in ipairs(test_files) do
-        local file_name = vim.fn.fnamemodify(test_file, ":t")
-        append_line("==== Running tests from " .. file_name .. " ====")
-
-        -- Clear package cache for the test module
-        -- Get relative path from test_dir and convert to module name
-        local relative_path = test_file:sub(#test_dir + 2) -- +2 to skip the trailing "/"
-        local module_name = "tests." .. vim.fn.fnamemodify(relative_path, ":r"):gsub("/", ".")
-        package.loaded[module_name] = nil
-
-        -- Load the test module
-        local ok, test_module = pcall(require, module_name)
-        if not ok then
-            append_line("Error loading test module: " .. tostring(test_module))
-            test_results[file_name] = { status = "error", error = tostring(test_module) }
-            break
-        end
-
-        -- Run tests - either all tests in the file or only failed tests
-        local test_result
-        if only_failed then
-            -- Get list of failed cases from this file
-            local failed_cases = {}
-            for _, failed_test in ipairs(last_test_run.failed_tests) do
-                if failed_test.file == test_file then failed_cases[failed_test.case_name] = true end
-            end
-
-            -- Run only failed test cases
-            test_result = MiniTest.run_file(test_file, {
-                verbose = true,
-                filter = function(_, _, case_name) return failed_cases[case_name] == true end,
-            })
-        else
-            test_result = MiniTest.run_file(test_file, { verbose = true })
-        end
-
-        test_results[file_name] = test_result
-
-        -- Process results for this file
-        local file_passed = 0
-        local file_failed = 0
-
-        -- Safely iterate through the test results
-        if type(test_result) == "table" then
-            for case_name, case_result in pairs(test_result) do
-                -- Ensure we're only processing valid test case results
-                if type(case_result) == "table" and case_result.status then
-                    total_tests = total_tests + 1
-                    if case_result.status == "pass" then
-                        file_passed = file_passed + 1
-                        total_passed = total_passed + 1
-                    else
-                        file_failed = file_failed + 1
-                        total_failed = total_failed + 1
-                        -- Record failed test for next run
-                        table.insert(new_failed_tests, {
-                            file = test_file,
-                            case_name = case_name,
-                        })
-                        -- Display details of failed tests
-                        append_line("  FAILED: " .. case_name)
-                        if case_result.error then append_line("    Error: " .. case_result.error) end
-                    end
-                end
-            end
-        else
-            append_line("  WARNING: No valid test results returned for " .. file_name)
-        end
-
-        append_line("  Results: " .. file_passed .. " passed, " .. file_failed .. " failed")
-        append_line("")
-    end
-
-    -- Print summary
-    append_line("==== Test Summary ====")
-    append_line("Total tests: " .. total_tests)
-    append_line("Passed: " .. total_passed)
-    append_line("Failed: " .. total_failed)
-
-    if total_failed > 0 then
-        append_line("")
-        append_line("Use :RunFailedTests or <leader>tf to re-run only failed tests")
-    end
-
-    -- Add keymaps to close the window
-    vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })
-    vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", "<Cmd>close<CR>", { noremap = true, silent = true })
-
-    -- Update last test run status for future failed test runs
-    last_test_run.results = test_results
-    last_test_run.failed_tests = new_failed_tests
-    last_test_run.has_failures = total_failed > 0
-
-    return test_results
+    return run_files(files, filter_cases)
 end
 
--- Run only the failed tests from the last run
-function M.run_failed_tests() return M.run_all_tests(true) end
+--- Run only the failed cases from the last run
+function M.run_failed_tests() return M.run_all_tests(true, false) end
 
 -- Parallel worker pool implementation
 local WorkerPool = {}
@@ -362,7 +345,9 @@ function M.run_tests_parallel(shuffle, seed)
 
     local function append_line(line)
         local lines = vim.split(line, "\n", { plain = true })
-        vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+        if vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_buf_set_lines(buf, -1, -1, false, lines) end
+        -- A headless run has no window to read the buffer in
+        if #vim.api.nvim_list_uis() == 0 then print(line) end
     end
 
     append_line(string.format("Running %d tests across %d workers...", #test_files, num_workers))
@@ -385,20 +370,26 @@ function M.run_tests_parallel(shuffle, seed)
         for _, test_file in ipairs(file_chunk) do
             local file_name = vim.fn.fnamemodify(test_file, ":t")
             table.insert(script_content, string.format("print('=== Running %s ===')", file_name))
+            -- The stdout reporter quits Neovim once a file finishes, which would drop
+            -- every later file in this worker's chunk
             table.insert(
                 script_content,
-                string.format("local result = MiniTest.run_file('%s', {verbose = false})", test_file)
+                string.format(
+                    "MiniTest.run_file('%s', {execute = {reporter = MiniTest.gen_reporter.stdout({quit_on_finish = false})}})",
+                    test_file
+                )
             )
             table.insert(
                 script_content,
                 [[
+                -- run_file returns nothing and executes asynchronously, so read the
+                -- outcome off the case list once the queue drains
+                vim.wait(300000, function() return not MiniTest.is_executing() end, 10)
                 local passed = 0
                 local failed = 0
-                for k, v in pairs(result) do
-                    if type(v) == 'table' and v.status then
-                        if v.status == 'pass' then passed = passed + 1
-                        else failed = failed + 1 end
-                    end
+                for _, case in ipairs(MiniTest.current.all_cases or {}) do
+                    local fails = type(case.exec) == 'table' and case.exec.fails or {}
+                    if #fails == 0 then passed = passed + 1 else failed = failed + 1 end
                 end
                 print(string.format('Results: %d passed, %d failed', passed, failed))
             ]]
@@ -428,38 +419,31 @@ function M.run_tests_parallel(shuffle, seed)
 
         -- Redirect output to log file
         local log_file = io.open(log_path, "w")
-        worker_processes[worker_id] = {
-            job = vim.system(cmd, {
-                text = true,
-                stdout = function(_, data)
-                    if log_file and data then log_file:write(data) end
-                end,
-                stderr = function(_, data)
-                    if log_file and data then log_file:write(data) end
-                end,
-            }),
+        local proc = {
             log_path = log_path,
             log_file = log_file,
             chunk = file_chunk,
         }
+        -- Completion has to come from on_exit: job:wait(0) does not poll, it kills the
+        -- process the moment the timeout expires, so every worker died before running
+        proc.job = vim.system(cmd, {
+            text = true,
+            stdout = function(_, data)
+                if log_file and data then log_file:write(data) end
+            end,
+            stderr = function(_, data)
+                if log_file and data then log_file:write(data) end
+            end,
+        }, function() proc.exited = true end)
+        worker_processes[worker_id] = proc
     end
 
     -- Wait for all workers to complete
     append_line("Workers running...")
-    local all_complete = false
-    while not all_complete do
-        all_complete = true
-        for worker_id, proc in ipairs(worker_processes) do
-            local result = proc.job:wait(0) -- Non-blocking check
-            if not result then
-                all_complete = false
-            elseif not proc.completed then
-                proc.completed = true
-                proc.log_file:close()
-                append_line(string.format("[Worker %d] Completed", worker_id))
-            end
-        end
-        if not all_complete then vim.wait(25) end
+    for worker_id, proc in ipairs(worker_processes) do
+        vim.wait(600000, function() return proc.exited end, 25)
+        proc.log_file:close()
+        append_line(string.format("[Worker %d] Completed", worker_id))
     end
 
     -- Parse results from log files
@@ -488,8 +472,6 @@ end
 --- Run fast tests (excludes subprocess-heavy and slow integration tests)
 --- Designed for rapid development feedback (~10-15 seconds)
 function M.run_fast_tests()
-    local MiniTest = require("mini.test")
-
     -- Fast test files: no subprocess spawning, minimal external dependencies
     local fast_test_patterns = {
         -- Core tests (excluding subprocess smoke test)
@@ -524,20 +506,12 @@ function M.run_fast_tests()
     end
 
     print("Running fast tests (" .. #test_files .. " files)...")
-    for i, test_file in ipairs(test_files) do
-        local relative = test_file:match("lua/tests/(.+)$") or test_file
-        print(string.format("[%d/%d] %s", i, #test_files, relative))
-        MiniTest.run_file(test_file, { verbose = false })
-    end
-
-    print("\nFast tests completed!")
+    return run_files(test_files)
 end
 
 --- Run CI-safe tests (tests that don't require external tools)
 --- These tests only require Neovim and plugins installed via vim.pack
 function M.run_ci_tests()
-    local MiniTest = require("mini.test")
-
     -- CI-safe test files: no external tool dependencies (stylua, ruff, selene, etc.)
     local ci_safe_patterns = {
         -- Core tests
@@ -580,15 +554,8 @@ function M.run_ci_tests()
         end
     end
 
-    -- Run tests sequentially
     print("Running CI-safe tests (" .. #test_files .. " files)...")
-    for i, test_file in ipairs(test_files) do
-        local relative = test_file:match("lua/tests/(.+)$") or test_file
-        print(string.format("[%d/%d] %s", i, #test_files, relative))
-        MiniTest.run_file(test_file, { verbose = false })
-    end
-
-    print("\nCI tests completed!")
+    return run_files(test_files)
 end
 
 return M
