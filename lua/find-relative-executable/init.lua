@@ -242,20 +242,6 @@ function M.get_vcs_root(buf_path)
     end)
 end
 
--- Create LSP root_dir function for given ecosystems
----@param ecosystems_list string[] List of ecosystem names in priority order
----@return function root_dir_fn Function for LSP root_dir configuration
-function M.lsp_root_for(ecosystems_list)
-    return function(fname)
-        for _, eco in ipairs(ecosystems_list) do
-            local root = M.get_project_root(fname, eco)
-            if root then return root end
-        end
-        -- Fallback to VCS root (jj > git)
-        return vim.fs.root(fname, { ".jj", ".git" })
-    end
-end
-
 -- Tool configuration file markers (indicates project uses this tool)
 local config_markers = {
     -- JavaScript/TypeScript

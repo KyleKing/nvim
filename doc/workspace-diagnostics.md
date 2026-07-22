@@ -91,7 +91,9 @@ require("conform").setup({
     formatters = { ruff_format = { command = fre.command_for("ruff") } },
 })
 require("lint").linters.ruff.cmd = fre.cmd_for("ruff")
-vim.lsp.config("pyright", { root_dir = fre.lsp_root_for({ "python" }) })
+vim.lsp.config("pyright", {
+    root_dir = function(bufnr, on_dir) on_dir(fre.get_project_root(vim.api.nvim_buf_get_name(bufnr), "python")) end,
+})
 ```
 
 ## Adding New Tools

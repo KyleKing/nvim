@@ -287,7 +287,7 @@ end, 100)
 LSP configuration is split across three locations:
 
 1. **Core setup** (`lua/kyleking/core/lsp.lua`): Completion, snippet, keymap setup
-1. **Server configs** (`lsp/<server>.lua`): One file per server returning a `{filetypes, root_markers, settings}` table, auto-loaded by the native LSP system. Adding a server means adding a file; nothing registers it elsewhere. See `lsp/README.md` for the field reference and the workspace-aware `root_markers` pattern
+1. **Server configs** (`lsp/<server>.lua`): One file per server returning a `{filetypes, root_markers, settings}` table, auto-loaded by the native LSP system. Adding a server means adding a file; nothing registers it elsewhere. See `lsp/README.md` for the field reference and the workspace-aware `root_dir` pattern, including why a plain `root_markers` list is the better default
 1. **Plugin integration** (`lua/kyleking/deps/lsp.lua`): Linters (nvim-lint), formatting (conform.nvim), signature help, and servers whose config depends on a plugin (jsonls/yamlls with SchemaStore)
 
 ### Tool resolution and workspace detection

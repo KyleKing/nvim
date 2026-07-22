@@ -56,17 +56,6 @@ T["find-relative-executable"]["get_current_project_root works"] = function()
     MiniTest.expect.equality(type(result) == "string" or result == nil, true)
 end
 
-T["find-relative-executable"]["lsp_root_for returns function"] = function()
-    local root_fn = fre.lsp_root_for({ "python", "node" })
-    MiniTest.expect.equality(type(root_fn), "function")
-end
-
-T["find-relative-executable"]["lsp_root_for function returns string or nil"] = function()
-    local root_fn = fre.lsp_root_for({ "python" })
-    local result = root_fn(vim.fn.getcwd())
-    MiniTest.expect.equality(type(result) == "string" or result == nil, true)
-end
-
 T["find-relative-executable"]["get_current_project_root caches results"] = function()
     -- Create a test buffer with known path
     local test_file = vim.fn.tempname() .. ".lua"
