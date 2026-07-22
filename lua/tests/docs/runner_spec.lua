@@ -3,6 +3,9 @@ local runner = require("tests.docs.runner")
 
 local T = MiniTest.new_set({
     hooks = {
+        -- A fixture that leaves a pinned window current (mini.files, mini.pick) breaks
+        -- buffer switching for every fixture after it
+        pre_case = function() require("tests.helpers").clear_winfixbuf() end,
         post_once = function()
             runner.print_profiling_summary()
             runner.clear_snapshot_cache()

@@ -118,11 +118,11 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Verify window management keymaps exist
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wz"), true, "zoom window")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wm"), true, "maximize window")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w="), true, "equalize windows")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w|"), true, "maximize width")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w_"), true, "maximize height")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>wz", "n"), true, "zoom window")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>wm", "n"), true, "maximize window")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>w=", "n"), true, "equalize windows")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>w|", "n"), true, "maximize width")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>w_", "n"), true, "maximize height")
                         end,
                     },
                 },

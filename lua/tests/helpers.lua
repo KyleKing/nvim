@@ -19,6 +19,16 @@ function M.wait_for_lsp_attach(bufnr, timeout_ms)
     return false
 end
 
+-- Clear 'winfixbuf' from every window
+-- mini.files, mini.pick and friends pin their windows to a buffer. A test that leaves
+-- one of those windows current makes every later buffer switch fail with E1513, so
+-- tests blame whichever case runs next instead of the one that leaked the window.
+function M.clear_winfixbuf()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+        if vim.api.nvim_win_is_valid(win) and vim.wo[win].winfixbuf then vim.wo[win].winfixbuf = false end
+    end
+end
+
 -- Create a test buffer with given lines
 -- @param lines table: List of lines to set in buffer
 -- @param filetype string: Optional filetype to set
@@ -28,14 +38,9 @@ function M.create_test_buffer(lines, filetype)
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 
     if filetype then
-        -- Try to set buffer as current, but fallback to direct option set if winfixbuf prevents it
-        local ok = pcall(vim.api.nvim_set_current_buf, bufnr)
-        if ok then
-            vim.bo[bufnr].filetype = filetype
-        else
-            -- Fallback: set filetype directly without switching buffers
-            vim.api.nvim_buf_set_option(bufnr, "filetype", filetype)
-        end
+        M.clear_winfixbuf()
+        vim.api.nvim_set_current_buf(bufnr)
+        vim.bo[bufnr].filetype = filetype
     end
 
     return bufnr
@@ -45,6 +50,26 @@ end
 -- @param bufnr number: Buffer number to delete
 function M.delete_buffer(bufnr)
     if vim.api.nvim_buf_is_valid(bufnr) then vim.api.nvim_buf_delete(bufnr, { force = true }) end
+end
+
+-- Inspect a mini.pick picker while it is open, then close it
+-- MiniPick.start() does not return until the picker closes, and it waits on
+-- getcharstr(), which never returns under `nvim --headless`. Queue the stop key
+-- before starting so the picker closes on its own, and read its state from the
+-- MiniPickStop autocmd, which fires while the picker is still active.
+-- @param start_opts table: Options passed to MiniPick.start
+-- @param fn function: Called with the picker open; its return value is returned
+-- @return any: Whatever fn returned
+function M.with_active_picker(start_opts, fn)
+    local result
+    vim.api.nvim_create_autocmd("User", {
+        pattern = "MiniPickStop",
+        once = true,
+        callback = function() result = fn() end,
+    })
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "t", false)
+    require("mini.pick").start(start_opts)
+    return result
 end
 
 -- Check if a keymap exists and matches expected description
@@ -214,6 +239,7 @@ function M.full_cleanup()
     end
 
     -- Reset to single window
+    M.clear_winfixbuf()
     vim.cmd("only")
 
     -- Clear all diagnostics

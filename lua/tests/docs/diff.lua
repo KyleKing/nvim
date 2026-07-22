@@ -42,10 +42,10 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Verify hunk operation keymaps exist
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>gha"), true, "apply hunk")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ghr"), true, "reset hunk")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "]h"), true, "next hunk")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "[h"), true, "prev hunk")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>gha", "n"), true, "apply hunk")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>ghr", "n"), true, "reset hunk")
+                            MiniTest.expect.equality(helpers.check_keymap("]h", "n"), true, "next hunk")
+                            MiniTest.expect.equality(helpers.check_keymap("[h", "n"), true, "prev hunk")
                         end,
                     },
                 },
@@ -63,11 +63,11 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Verify VCS command keymaps exist
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>gs"), true, "status")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>gl"), true, "log")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>gb"), true, "blame")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>gd"), true, "diff")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>gc"), true, "commit")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>gs", "n"), true, "status")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>gl", "n"), true, "log")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>gb", "n"), true, "blame")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>gd", "n"), true, "diff")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>gc", "n"), true, "commit")
                         end,
                     },
                 },

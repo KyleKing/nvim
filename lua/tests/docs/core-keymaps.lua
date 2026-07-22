@@ -174,42 +174,42 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Background
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ub"), true, "dark background")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uB"), true, "light background")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>ub", "n"), true, "dark background")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>uB", "n"), true, "light background")
                             -- Toggles
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>uc"),
+                                helpers.check_keymap("<leader>uc", "n"),
                                 true,
                                 "conceallevel toggle"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>ud"),
+                                helpers.check_keymap("<leader>ud", "n"),
                                 true,
                                 "diagnostics toggle"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>ui"),
+                                helpers.check_keymap("<leader>ui", "n"),
                                 true,
                                 "indent scope toggle"
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>ul"), true, "list chars toggle")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>ul", "n"), true, "list chars toggle")
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>un"),
+                                helpers.check_keymap("<leader>un", "n"),
                                 true,
                                 "line numbers toggle"
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>up"), true, "paste mode toggle")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>up", "n"), true, "paste mode toggle")
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>uN"),
+                                helpers.check_keymap("<leader>uN", "n"),
                                 true,
                                 "relative numbers toggle"
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>us"), true, "spellcheck toggle")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>us", "n"), true, "spellcheck toggle")
                             -- Note: <leader>ut is for trailspace toggle (checked in editing-support.lua)
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uT"), true, "treesitter toggle")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>uw"), true, "wrap toggle")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>uT", "n"), true, "treesitter toggle")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>uw", "n"), true, "wrap toggle")
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>uy"),
+                                helpers.check_keymap("<leader>uy", "n"),
                                 true,
                                 "syntax highlight toggle"
                             )
@@ -231,15 +231,15 @@ return {
 
                             -- Check window management keybindings
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>wf"),
+                                helpers.check_keymap("<leader>wf", "n"),
                                 true,
                                 "toggle window focus"
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wz"), true, "zoom window")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>wm"), true, "maximize window")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w="), true, "equalize windows")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w|"), true, "maximize width")
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<leader>w_"), true, "maximize height")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>wz", "n"), true, "zoom window")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>wm", "n"), true, "maximize window")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>w=", "n"), true, "equalize windows")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>w|", "n"), true, "maximize width")
+                            MiniTest.expect.equality(helpers.check_keymap("<leader>w_", "n"), true, "maximize height")
                         end,
                     },
                 },
@@ -257,7 +257,7 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<Esc>"),
+                                helpers.check_keymap("<Esc>", "n"),
                                 true,
                                 "Esc keymap should exist"
                             )
@@ -278,12 +278,12 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("t", "<C-\\><C-n>"),
+                                helpers.check_keymap("<C-\\><C-n>", "t"),
                                 true,
                                 "terminal mode escape with C-\\C-n"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("t", "<Esc><Esc>"),
+                                helpers.check_keymap("<Esc><Esc>", "t"),
                                 true,
                                 "terminal mode escape with double Esc"
                             )
@@ -303,7 +303,7 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
 
-                            MiniTest.expect.equality(helpers.check_keymap("n", "<C-q>"), true, "force quit keymap")
+                            MiniTest.expect.equality(helpers.check_keymap("<C-q>", "n"), true, "force quit keymap")
                         end,
                     },
                 },
@@ -321,12 +321,12 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>bw"),
+                                helpers.check_keymap("<leader>bw", "n"),
                                 true,
                                 "wipeout buffer keymap"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>bW"),
+                                helpers.check_keymap("<leader>bW", "n"),
                                 true,
                                 "wipeout all buffers keymap"
                             )
@@ -347,17 +347,17 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>y"),
+                                helpers.check_keymap("<leader>y", "n"),
                                 true,
                                 "Should have <leader>y keymap"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("x", "<leader>y"),
+                                helpers.check_keymap("<leader>y", "x"),
                                 true,
                                 "Should have <leader>y in visual mode"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>Y"),
+                                helpers.check_keymap("<leader>Y", "n"),
                                 true,
                                 "Should have <leader>Y keymap"
                             )
@@ -372,17 +372,17 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>p"),
+                                helpers.check_keymap("<leader>p", "n"),
                                 true,
                                 "Should have <leader>p keymap"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("x", "<leader>p"),
+                                helpers.check_keymap("<leader>p", "x"),
                                 true,
                                 "Should have <leader>p in visual mode"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>P"),
+                                helpers.check_keymap("<leader>P", "n"),
                                 true,
                                 "Should have <leader>P keymap"
                             )
@@ -397,12 +397,12 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("n", "<leader>d"),
+                                helpers.check_keymap("<leader>d", "n"),
                                 true,
                                 "Should have <leader>d keymap"
                             )
                             MiniTest.expect.equality(
-                                helpers.check_keymap("x", "<leader>d"),
+                                helpers.check_keymap("<leader>d", "x"),
                                 true,
                                 "Should have <leader>d in visual mode"
                             )
@@ -417,7 +417,7 @@ return {
                             local helpers = require("tests.helpers")
 
                             MiniTest.expect.equality(
-                                helpers.check_keymap("i", "<C-v>"),
+                                helpers.check_keymap("<C-v>", "i"),
                                 true,
                                 "Should have <C-v> in insert mode"
                             )

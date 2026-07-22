@@ -98,9 +98,11 @@ return {
                         fn = function(_ctx)
                             local MiniPick = require("mini.pick")
                             local MiniTest = require("mini.test")
-                            MiniPick.start({ source = { name = "Buffers", items = { "a", "b", "c" } } })
-                            local is_active = MiniPick.is_picker_active()
-                            MiniPick.stop()
+                            local helpers = require("tests.helpers")
+                            local is_active = helpers.with_active_picker(
+                                { source = { name = "Buffers", items = { "a", "b", "c" } } },
+                                function() return MiniPick.is_picker_active() end
+                            )
                             MiniTest.expect.equality(is_active, true, "Picker should be active")
                         end,
                     },
@@ -117,13 +119,17 @@ return {
                         fn = function(_ctx)
                             local MiniPick = require("mini.pick")
                             local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
                             -- Start and stop a picker to create history
-                            MiniPick.start({ source = { name = "Test", items = { "x", "y" } } })
-                            MiniPick.stop()
+                            helpers.with_active_picker(
+                                { source = { name = "Test", items = { "x", "y" } } },
+                                function() end
+                            )
                             -- Resume should work
-                            MiniPick.start({ source = { name = "Resume" } })
-                            local is_active = MiniPick.is_picker_active()
-                            MiniPick.stop()
+                            local is_active = helpers.with_active_picker(
+                                { source = { name = "Resume" } },
+                                function() return MiniPick.is_picker_active() end
+                            )
                             MiniTest.expect.equality(is_active, true, "Resume should start picker")
                         end,
                     },
@@ -140,16 +146,15 @@ return {
                         fn = function(_ctx)
                             local MiniPick = require("mini.pick")
                             local MiniTest = require("mini.test")
-                            MiniPick.start({ source = { name = "Nav", items = { "a", "b", "c" } } })
-                            local was_active = MiniPick.is_picker_active()
-                            -- Simulate navigation
-                            vim.api.nvim_feedkeys(
-                                vim.api.nvim_replace_termcodes("<C-j>", true, false, true),
-                                "x",
-                                false
+                            local helpers = require("tests.helpers")
+                            local was_active = helpers.with_active_picker(
+                                { source = { name = "Nav", items = { "a", "b", "c" } } },
+                                function()
+                                    local active = MiniPick.is_picker_active()
+                                    MiniPick.set_picker_query({ "b" })
+                                    return active
+                                end
                             )
-                            vim.wait(20)
-                            MiniPick.stop()
                             MiniTest.expect.equality(was_active, true, "Picker should be active for navigation")
                         end,
                     },
@@ -166,21 +171,17 @@ return {
                         fn = function(_ctx)
                             local MiniPick = require("mini.pick")
                             local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
 
-                            -- Start picker with some items
-                            MiniPick.start({ source = { name = "Test", items = { "apple", "banana", "cherry" } } })
+                            local initial_query = helpers.with_active_picker(
+                                { source = { name = "Test", items = { "apple", "banana", "cherry" } } },
+                                function()
+                                    MiniPick.set_picker_query({ "t", "e", "s", "t" })
+                                    return table.concat(MiniPick.get_picker_query())
+                                end
+                            )
 
-                            -- Set initial query
-                            MiniPick.set_picker_query("test")
-
-                            -- Get the query before toggling
-                            local initial_query = MiniPick.get_picker_query()
-
-                            -- Verify initial query is set
                             MiniTest.expect.equality(initial_query, "test", "Initial query should be 'test'")
-
-                            -- Cleanup
-                            MiniPick.stop()
                         end,
                     },
                 },
@@ -213,14 +214,16 @@ return {
                         fn = function(_ctx)
                             local MiniPick = require("mini.pick")
                             local MiniTest = require("mini.test")
+                            local helpers = require("tests.helpers")
 
-                            MiniPick.start({ source = { name = "Test", items = { "a", "b", "c" } } })
-
-                            -- Set query programmatically (simulates editing)
-                            MiniPick.set_picker_query("new query")
-                            local query = MiniPick.get_picker_query()
-
-                            MiniPick.stop()
+                            local query = helpers.with_active_picker(
+                                { source = { name = "Test", items = { "a", "b", "c" } } },
+                                function()
+                                    -- Set query programmatically (simulates editing)
+                                    MiniPick.set_picker_query(vim.split("new query", ""))
+                                    return table.concat(MiniPick.get_picker_query())
+                                end
+                            )
 
                             MiniTest.expect.equality(query, "new query", "Query should be updated")
                         end,
@@ -323,8 +326,8 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
-                            local has_keymap_n = helpers.check_keymap("n", "<leader>fp")
-                            local has_keymap_x = helpers.check_keymap("x", "<leader>fp")
+                            local has_keymap_n = helpers.check_keymap("<leader>fp", "n")
+                            local has_keymap_x = helpers.check_keymap("<leader>fp", "x")
                             MiniTest.expect.equality(has_keymap_n, true, "Should have <leader>fp in normal mode")
                             MiniTest.expect.equality(has_keymap_x, true, "Should have <leader>fp in visual mode")
                         end,
