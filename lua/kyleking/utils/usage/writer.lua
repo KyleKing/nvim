@@ -9,11 +9,13 @@ local M = {}
 
 local MAX_BUFFERED = 200
 
---- Create a writer appending JSONL to `dir/<host>.jsonl`.
+--- Create a writer appending JSONL to the path `path_for(event)` returns.
+--- Batches are grouped by target path, so a flush spanning a month boundary lands each
+--- event in the file for its own month.
 --- Returns nil when the directory cannot be created, which the caller should treat as
 --- "tracking is off on this machine" rather than an error.
 --- Do not reuse the returned table after calling close().
----@param cfg table {dir, host, flush_interval_ms}
+---@param cfg table {dir, path_for, flush_interval_ms}
 ---@return table|nil
 function M.new(cfg)
     if vim.fn.isdirectory(cfg.dir) == 0 then
@@ -21,23 +23,30 @@ function M.new(cfg)
         if not ok or vim.fn.isdirectory(cfg.dir) == 0 then return nil end
     end
 
-    local path = cfg.dir .. "/" .. cfg.host .. ".jsonl"
     local buffered = {}
 
     local function flush()
         if #buffered == 0 then return end
-        local fh = io.open(path, "a")
-        -- Drop the batch rather than growing it without bound when the sync folder
-        -- goes away mid-session (unmounted volume, revoked permissions).
-        if fh == nil then
-            buffered = {}
-            return
-        end
+
+        local by_path = {}
         for _, event in ipairs(buffered) do
-            fh:write(vim.json.encode(event), "\n")
+            local path = cfg.path_for(event)
+            by_path[path] = by_path[path] or {}
+            table.insert(by_path[path], event)
         end
-        fh:close()
+        -- Clear first: a batch that cannot be written is dropped rather than retried
+        -- forever, so an unmounted sync volume cannot grow the buffer without bound.
         buffered = {}
+
+        for path, events in pairs(by_path) do
+            local fh = io.open(path, "a")
+            if fh ~= nil then
+                for _, event in ipairs(events) do
+                    fh:write(vim.json.encode(event), "\n")
+                end
+                fh:close()
+            end
+        end
     end
 
     local function add(event)
@@ -60,7 +69,7 @@ function M.new(cfg)
         flush()
     end
 
-    return { add = add, flush = flush, close = close, path = path }
+    return { add = add, flush = flush, close = close }
 end
 
 return M

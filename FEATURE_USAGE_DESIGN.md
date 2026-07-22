@@ -42,6 +42,8 @@ The wrapper records `{lhs, desc, mode, buffer-local?}` at set-time, and for **ca
 
 On `CmdlineLeave` with `cmdtype == ":"`, read `vim.fn.getcmdline()` and log the first token. Captures built-in (`:w`), user (`:RunAllTests`, `:PackClean`), and plugin commands with zero per-command wiring. No wrapping of `nvim_create_user_command` needed unless we later want to flag user commands defined but never called (that falls out of the cold-view reconciliation instead).
 
+Abbreviations are expanded through `vim.fn.fullcommand()`, so `:w`, `:wr`, and `:write` count as one row instead of three; unknown names (a typo, a plugin command not yet loaded) fall back to what was typed. Real data made the case: an early mystery row `previ` was `:previous`.
+
 Verified behavior worth knowing when reading the report: `CmdlineLeave` fires only for a **typed** cmdline. Commands run through `vim.cmd()`, `-c`, or a keymap that calls `vim.cmd("PackClean")` never reach it. That is the behavior we want, since the question is what I reach for by hand, and a command invoked from a keymap is already counted as that keymap. It does mean command counts read as "typed by me", not "executed", so a command reachable both ways will look quieter than it is. Range prefixes resolve to the command (`%s/a/b` counts as `s`), bare line jumps (`:42`) are skipped, and a cmdline aborted with `<Esc>` records nothing.
 
 ### 3. Motions — throttled `vim.on_key` with sequence assembly
@@ -90,6 +92,10 @@ Precedence is denylist first (an explicit drop always wins), then groups, then t
 
 **Seeing what was dropped.** Denying at capture time keeps event volume sane, but it also means denied data is invisible forever, so an over-greedy pattern can quietly eat a real signal. Compromise: keep **aggregate counters only** for denied patterns (`pattern -> count`, no per-event lines), flushed with the normal batch. Enough to notice `c*w` swallowed 4000 events and walk it back; cheap enough to cost a few bytes a day.
 
+**Applying a changed denylist to history.** Adding a pattern should clean up the events it would have blocked. `:FeatureUsageCompact` rewrites raw files and summary rows against the current denylist, and `meta-<host>.json` records what was last applied so drift is detectable (`denylist_drifted()`).
+
+The asymmetry to keep in mind: **retroactive filtering can only remove, never restore.** An event denied at capture time was never written, so dropping a pattern from the denylist cannot bring that history back. This is why the rewrite is an explicit command rather than something that runs automatically at startup: it deletes data.
+
 ### Coverage summary
 
 | Layer                      | Hook                  | Fires on   | Gap                     |
@@ -112,7 +118,19 @@ Fields: `ts` (epoch s), `kind` (`map`/`cmd`/`motion`), `key`, `desc` (maps only)
 
 ## Storage and sync
 
-- Path: `opts.dir` (default `~/Sync/.nvim/usage/`), file `<host>.jsonl` where host comes from `vim.uv.os_gethostname()`. Per-device override of the directory via config, so a machine without `~/Sync` points elsewhere or disables writing.
+Layout under `opts.dir` (default `~/Sync/.nvim/usage/`):
+
+```
+<host>-YYYY-MM.jsonl         raw events, one file per month
+summary-<host>-YYYY-MM.json  compacted counts for an expired month
+patterns.json                denylist and groups
+meta-<host>.json             denylist last applied to this host's data
+```
+
+- **Monthly files, never suffix rotation.** A finished month is immutable, so Syncthing transfers it once and never revisits it. Suffix rotation (`.1`, `.2`) is the opposite: renames make it re-transfer everything and can manufacture conflicts. The report globs `*.jsonl`, so rotation needed no report change and pre-rotation files keep working.
+- **Compaction.** Months past `retention_months` (default 1) roll into a summary of `{kind, key, desc, count, last}` and the raw file is deleted. Measured 130 B/event, so an uncompacted year runs 35-70 MB per host; summaries are a few KB per month. History stays unbounded, disk does not.
+- **`host` is not stored per event.** The filename carries it. Repeating it cost about a quarter of every line.
+- Per-device override of the directory via config, so a machine without `~/Sync` points elsewhere or disables writing.
 - **Never fsync per event.** Buffer events in a Lua table, flush batched via `vim.uv` async append on a timer (e.g. every 30 s) and unconditionally on `VimLeavePre`. A crash loses at most the last window, which is fine.
 - Append-only + per-host means Syncthing merges are trivial (two hosts never write the same file). The report reads every `*.jsonl` in the dir and unions them.
 

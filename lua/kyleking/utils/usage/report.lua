@@ -1,36 +1,43 @@
--- Aggregate the per-host JSONL logs into usage counts.
+-- Aggregate the per-host logs into usage counts, merging raw events with the compacted
+-- summaries of expired months.
+
+local patterns = require("kyleking.utils.usage.patterns")
+local store = require("kyleking.utils.usage.store")
 
 local M = {}
 
 local DEFAULT_LIMIT = 40
 
---- Sum events across every host file in `dir`, ranked by count then key.
---- Malformed lines are skipped so a partially written batch cannot break the report.
+--- Sum every host file and summary in `dir`, ranked by count then key.
+--- Denied keys are dropped and grouped keys collapse under their pattern, so editing
+--- patterns.json changes the report without touching stored data.
 ---@param dir string
----@return table[] rows {kind, key, desc, count, last}
+---@return table[] rows {kind, key, count, last, desc}
 function M.aggregate(dir)
-    local rows = {}
+    local active = patterns.load(dir)
+    local row_lists = {}
 
-    for _, path in ipairs(vim.fn.glob(dir .. "/*.jsonl", false, true)) do
-        if vim.fn.filereadable(path) == 1 then
-            for line in io.lines(path) do
-                local ok, event = pcall(vim.json.decode, line)
-                if ok and type(event) == "table" and type(event.key) == "string" then
-                    local id = (event.kind or "?") .. "\0" .. event.key
-                    local row = rows[id]
-                    if row == nil then
-                        row = { kind = event.kind or "?", key = event.key, count = 0, last = 0 }
-                        rows[id] = row
-                    end
-                    row.count = row.count + 1
-                    row.last = math.max(row.last, tonumber(event.ts) or 0)
-                    row.desc = row.desc or event.desc
-                end
-            end
-        end
+    for _, path in ipairs(store.raw_files(dir)) do
+        local rows = store.summarize(store.read_events(path))
+        row_lists[#row_lists + 1] = rows
     end
 
-    local ranked = vim.tbl_values(rows)
+    for _, path in ipairs(store.summary_files(dir)) do
+        local summary = store.read_json(path)
+        if summary ~= nil and type(summary.rows) == "table" then row_lists[#row_lists + 1] = summary.rows end
+    end
+
+    local labeled = {}
+    for _, rows in ipairs(row_lists) do
+        local kept = {}
+        for _, row in ipairs(rows) do
+            local label = patterns.label(active, row.key)
+            if label ~= nil then kept[#kept + 1] = vim.tbl_extend("force", row, { key = label }) end
+        end
+        labeled[#labeled + 1] = kept
+    end
+
+    local ranked = store.merge_rows(labeled)
     table.sort(ranked, function(a, b)
         if a.count ~= b.count then return a.count > b.count end
         return a.key < b.key

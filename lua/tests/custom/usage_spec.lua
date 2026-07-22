@@ -1,8 +1,10 @@
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
+local patterns = require("kyleking.utils.usage.patterns")
+local report = require("kyleking.utils.usage.report")
+local store = require("kyleking.utils.usage.store")
 local usage = require("kyleking.utils.usage")
 local writer = require("kyleking.utils.usage.writer")
-local report = require("kyleking.utils.usage.report")
 
 local tmp_dirs = {}
 
@@ -40,54 +42,83 @@ local T = MiniTest.new_set({
 
 T["writer"] = MiniTest.new_set()
 
+local function fixed_writer(dir)
+    local path = dir .. "/h.jsonl"
+    return writer.new({ dir = dir, flush_interval_ms = 0, path_for = function() return path end }), path
+end
+
 T["writer"]["writes one JSON object per line"] = function()
-    local w = writer.new({ dir = make_dir(), host = "h", flush_interval_ms = 0 })
+    local w, path = fixed_writer(make_dir())
     w.add({ kind = "map", key = "a" })
     w.add({ kind = "cmd", key = "w" })
     w.flush()
 
-    local events = read_events(w.path)
+    local events = read_events(path)
     MiniTest.expect.equality(#events, 2)
     MiniTest.expect.equality(events[1].key, "a")
     MiniTest.expect.equality(events[2].kind, "cmd")
 end
 
 T["writer"]["buffers until flushed"] = function()
-    local w = writer.new({ dir = make_dir(), host = "h", flush_interval_ms = 0 })
+    local w, path = fixed_writer(make_dir())
     w.add({ kind = "map", key = "a" })
-    MiniTest.expect.equality(#read_events(w.path), 0, "should not touch disk before flush")
+    MiniTest.expect.equality(#read_events(path), 0, "should not touch disk before flush")
     w.flush()
-    MiniTest.expect.equality(#read_events(w.path), 1)
+    MiniTest.expect.equality(#read_events(path), 1)
 end
 
 T["writer"]["flushing nothing is a no-op"] = function()
-    local w = writer.new({ dir = make_dir(), host = "h", flush_interval_ms = 0 })
+    local w, path = fixed_writer(make_dir())
     w.flush()
     w.flush()
-    MiniTest.expect.equality(#read_events(w.path), 0)
+    MiniTest.expect.equality(#read_events(path), 0)
 end
 
 T["writer"]["appends across flushes"] = function()
-    local w = writer.new({ dir = make_dir(), host = "h", flush_interval_ms = 0 })
+    local w, path = fixed_writer(make_dir())
     w.add({ kind = "map", key = "a" })
     w.flush()
     w.add({ kind = "map", key = "b" })
     w.flush()
-    MiniTest.expect.equality(#read_events(w.path), 2, "second flush must not truncate the first")
+    MiniTest.expect.equality(#read_events(path), 2, "second flush must not truncate the first")
+end
+
+T["writer"]["splits one batch across month files"] = function()
+    local dir = make_dir()
+    local w = writer.new({
+        dir = dir,
+        flush_interval_ms = 0,
+        path_for = function(event) return ("%s/h-%s.jsonl"):format(dir, store.month_of(event.ts)) end,
+    })
+    w.add({ kind = "map", key = "a", ts = os.time({ year = 2026, month = 6, day = 30, hour = 23 }) })
+    w.add({ kind = "map", key = "b", ts = os.time({ year = 2026, month = 7, day = 1, hour = 1 }) })
+    w.flush()
+
+    MiniTest.expect.equality(#read_events(dir .. "/h-2026-06.jsonl"), 1, "June event lands in the June file")
+    MiniTest.expect.equality(#read_events(dir .. "/h-2026-07.jsonl"), 1, "July event lands in the July file")
 end
 
 T["command_name"] = MiniTest.new_set()
 
 T["command_name"]["reads plain and user commands"] = function()
-    MiniTest.expect.equality(usage.command_name("w"), "w")
+    MiniTest.expect.equality(usage.command_name("write"), "write")
     MiniTest.expect.equality(usage.command_name("PackClean"), "PackClean")
-    MiniTest.expect.equality(usage.command_name("  RunAllTests"), "RunAllTests")
+end
+
+T["command_name"]["collapses abbreviations onto one name"] = function()
+    MiniTest.expect.equality(usage.command_name("w"), "write")
+    MiniTest.expect.equality(usage.command_name("wr"), "write", ":w and :wr must not be separate rows")
+    MiniTest.expect.equality(usage.command_name("noh"), "nohlsearch")
+end
+
+T["command_name"]["keeps an unknown name as typed"] = function()
+    MiniTest.expect.equality(usage.command_name("NotARealCommandXyz"), "NotARealCommandXyz")
 end
 
 T["command_name"]["skips range prefixes"] = function()
-    MiniTest.expect.equality(usage.command_name("%s/foo/bar"), "s")
+    MiniTest.expect.equality(usage.command_name("%s/foo/bar"), "substitute")
     MiniTest.expect.equality(usage.command_name("'<,'>sort"), "sort")
-    MiniTest.expect.equality(usage.command_name("1,5d"), "d")
+    MiniTest.expect.equality(usage.command_name("1,5d"), "delete")
 end
 
 T["command_name"]["ignores a bare line jump"] = function()
@@ -120,7 +151,8 @@ local function invoke(lhs)
 end
 
 local function map_events(dir)
-    return vim.tbl_filter(function(event) return event.kind == "map" end, read_events(dir .. "/testhost.jsonl"))
+    local path = store.raw_path(dir, "testhost", store.month_of(os.time()))
+    return vim.tbl_filter(function(event) return event.kind == "map" end, read_events(path))
 end
 
 T["maps"]["records an invocation with its desc"] = function()
@@ -235,6 +267,203 @@ T["report"]["handles an empty directory"] = function()
     local rows = report.aggregate(make_dir())
     MiniTest.expect.equality(#rows, 0)
     MiniTest.expect.equality(report.render(rows), { "No usage recorded yet." })
+end
+
+T["patterns"] = MiniTest.new_set()
+
+T["patterns"]["expands * across a family"] = function()
+    MiniTest.expect.equality(patterns.matches("c*w", "ciw"), true)
+    MiniTest.expect.equality(patterns.matches("c*w", "caw"), true)
+    MiniTest.expect.equality(patterns.matches("c*w", "ciwx"), false, "must stay anchored at both ends")
+    MiniTest.expect.equality(patterns.matches("c*w", "diw"), false)
+end
+
+T["patterns"]["treats magic characters literally"] = function()
+    MiniTest.expect.equality(patterns.matches("di(", "di("), true)
+    MiniTest.expect.equality(patterns.matches("di(", "diX"), false, "( must not act as a Lua capture")
+    MiniTest.expect.equality(patterns.matches("$", "$"), true)
+    MiniTest.expect.equality(patterns.matches("$", "x"), false, "$ must not act as an anchor")
+    MiniTest.expect.equality(patterns.matches("%", "%"), true)
+    MiniTest.expect.equality(patterns.matches(".", "x"), false, ". must not match any character")
+end
+
+T["patterns"]["is case-sensitive"] = function()
+    MiniTest.expect.equality(patterns.matches("c*w", "ciW"), false, "ciW is a different motion from ciw")
+    MiniTest.expect.equality(patterns.matches("c*W", "ciW"), true)
+end
+
+T["patterns"]["denies before grouping"] = function()
+    local active = { denylist = { "ciw" }, groups = { "c*w" } }
+    MiniTest.expect.equality(patterns.label(active, "ciw"), nil, "an explicit deny wins over a group")
+    MiniTest.expect.equality(patterns.label(active, "caw"), "c*w", "other family members still collapse")
+    MiniTest.expect.equality(patterns.label(active, "dd"), "dd", "unmatched keys keep their own name")
+end
+
+T["patterns"]["falls back when the file is malformed"] = function()
+    local dir = make_dir()
+    vim.fn.mkdir(dir, "p")
+    local fh = assert(io.open(dir .. "/patterns.json", "w"))
+    fh:write("{ not json")
+    fh:close()
+
+    local active = patterns.load(dir)
+    MiniTest.expect.equality(active.denylist, {}, "a bad hand edit must not lose events")
+end
+
+T["store"] = MiniTest.new_set()
+
+T["store"]["parses hostnames containing hyphens"] = function()
+    local host, month = store.parse_raw_name("Kyles-MacBook-Pro.local-2026-07.jsonl")
+    MiniTest.expect.equality(host, "Kyles-MacBook-Pro.local")
+    MiniTest.expect.equality(month, "2026-07")
+end
+
+T["store"]["treats a pre-rotation file as legacy"] = function()
+    local host, month = store.parse_raw_name("Kyles-MacBook-Pro.local.jsonl")
+    MiniTest.expect.equality(host, "Kyles-MacBook-Pro.local")
+    MiniTest.expect.equality(month, nil)
+end
+
+local function write_raw(dir, name, events)
+    vim.fn.mkdir(dir, "p")
+    local fh = assert(io.open(dir .. "/" .. name, "w"))
+    for _, event in ipairs(events) do
+        fh:write(vim.json.encode(event), "\n")
+    end
+    fh:close()
+end
+
+local JUNE = os.time({ year = 2026, month = 6, day = 15, hour = 12 })
+local JULY = os.time({ year = 2026, month = 7, day = 15, hour = 12 })
+
+T["store"]["compacts an expired month and keeps the current one"] = function()
+    local dir = make_dir()
+    write_raw(dir, "h-2026-06.jsonl", {
+        { kind = "map", key = "a", ts = JUNE },
+        { kind = "map", key = "a", ts = JUNE },
+    })
+    write_raw(dir, "h-2026-07.jsonl", { { kind = "map", key = "b", ts = JULY } })
+
+    local compacted = store.compact(dir, { retention_months = 1, now = JULY })
+
+    MiniTest.expect.equality(compacted, { "2026-06" })
+    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h-2026-06.jsonl"), 0, "raw month is removed")
+    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h-2026-07.jsonl"), 1, "current month is kept raw")
+
+    local summary = store.read_json(dir .. "/summary-h-2026-06.json")
+    MiniTest.expect.equality(#summary.rows, 1)
+    MiniTest.expect.equality(summary.rows[1].count, 2, "counts survive compaction")
+end
+
+T["store"]["compaction preserves totals in the report"] = function()
+    local dir = make_dir()
+    write_raw(dir, "h-2026-06.jsonl", {
+        { kind = "map", key = "a", ts = JUNE },
+        { kind = "map", key = "a", ts = JUNE },
+    })
+    write_raw(dir, "h-2026-07.jsonl", { { kind = "map", key = "a", ts = JULY } })
+
+    local before = report.aggregate(dir)
+    store.compact(dir, { retention_months = 1, now = JULY })
+    local after = report.aggregate(dir)
+
+    MiniTest.expect.equality(before[1].count, 3)
+    MiniTest.expect.equality(after[1].count, 3, "compaction must not change what the report shows")
+    MiniTest.expect.equality(after[1].last, JULY)
+end
+
+T["store"]["dates a legacy file by its newest event"] = function()
+    local dir = make_dir()
+    write_raw(dir, "h.jsonl", { { kind = "map", key = "a", ts = JUNE } })
+
+    store.compact(dir, { retention_months = 1, now = JULY })
+
+    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h.jsonl"), 0, "pre-rotation file is compacted too")
+    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/summary-h-2026-06.json"), 1)
+end
+
+T["retro denylist"] = MiniTest.new_set()
+
+T["retro denylist"]["removes matching events and summary rows"] = function()
+    local dir = make_dir()
+    write_raw(dir, "h-2026-07.jsonl", {
+        { kind = "motion", key = "ciw", ts = JULY },
+        { kind = "motion", key = "j", ts = JULY },
+        { kind = "motion", key = "j", ts = JULY },
+    })
+    vim.fn.mkdir(dir, "p")
+    local fh = assert(io.open(dir .. "/summary-h-2026-06.json", "w"))
+    fh:write(vim.json.encode({
+        host = "h",
+        month = "2026-06",
+        rows = {
+            { kind = "motion", key = "j", count = 500, last = JUNE },
+            { kind = "motion", key = "ciw", count = 9, last = JUNE },
+        },
+    }))
+    fh:close()
+
+    local removed = store.apply_denylist(dir, { "j" })
+
+    MiniTest.expect.equality(removed.events_removed, 2)
+    MiniTest.expect.equality(removed.rows_removed, 1)
+
+    local rows = report.aggregate(dir)
+    MiniTest.expect.equality(#rows, 1, "denied key is gone from both raw and summarized history")
+    MiniTest.expect.equality(rows[1].key, "ciw")
+end
+
+T["retro denylist"]["leaves data alone when the denylist is empty"] = function()
+    local dir = make_dir()
+    write_raw(dir, "h-2026-07.jsonl", { { kind = "map", key = "a", ts = JULY } })
+
+    local removed = store.apply_denylist(dir, {})
+
+    MiniTest.expect.equality(removed.events_removed, 0)
+    MiniTest.expect.equality(#read_events(dir .. "/h-2026-07.jsonl"), 1)
+end
+
+T["retro denylist"]["detects a changed denylist"] = function()
+    local dir = make_dir()
+    install(dir)
+    patterns.save(dir, { denylist = { "j" }, groups = {} })
+
+    MiniTest.expect.equality(usage.denylist_drifted(), false, "nothing applied yet, so nothing to drift from")
+    store.write_applied_denylist(dir, "testhost", { "j" })
+    MiniTest.expect.equality(usage.denylist_drifted(), false)
+
+    patterns.save(dir, { denylist = { "j", "k" }, groups = {} })
+    MiniTest.expect.equality(usage.denylist_drifted(), true, "a new pattern needs a retro pass")
+end
+
+T["capture"] = MiniTest.new_set()
+
+T["capture"]["skips a denied key at capture time"] = function()
+    local dir = make_dir()
+    vim.fn.mkdir(dir, "p")
+    patterns.save(dir, { denylist = { "<leader>zd" }, groups = {} })
+    install(dir)
+
+    vim.keymap.set("n", "<leader>zd", function() end, { desc = "Denied" })
+    invoke("<leader>zd")
+    usage.flush()
+
+    MiniTest.expect.equality(#map_events(dir), 0, "denied keys never reach disk")
+    vim.keymap.del("n", "<leader>zd")
+end
+
+T["capture"]["omits the host from each event"] = function()
+    local dir = make_dir()
+    install(dir)
+
+    vim.keymap.set("n", "<leader>zh", function() end)
+    invoke("<leader>zh")
+    usage.flush()
+
+    local events = map_events(dir)
+    MiniTest.expect.equality(#events, 1)
+    MiniTest.expect.equality(events[1].host, nil, "the filename already carries the host")
+    vim.keymap.del("n", "<leader>zh")
 end
 
 if MiniTest.current.all_cases == nil then MiniTest.run() end
