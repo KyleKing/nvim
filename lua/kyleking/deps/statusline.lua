@@ -178,19 +178,30 @@ if not is_temp_session then
                         try_update_cache()
                     end)
 
-                    -- Get PR info (takes precedence)
-                    vim.system({ "gh", "pr", "view", "--json", "number,title" }, { cwd = vcs.root }, function(pr_result)
-                        if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
-                            local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
-                            if ok and pr_data.number then
-                                local title = pr_data.title:sub(1, 25)
-                                if #pr_data.title > 25 then title = title .. "…" end
-                                result_data.pr = string.format("#%d: %s", pr_data.number, title)
+                    -- Get PR info (takes precedence). vim.system raises on a missing
+                    -- executable rather than returning a non-zero code, and gh is the one
+                    -- command here that is routinely absent, so check before spawning.
+                    -- The branch name below is the fallback when there is no PR to show.
+                    if vim.fn.executable("gh") == 1 then
+                        vim.system(
+                            { "gh", "pr", "view", "--json", "number,title" },
+                            { cwd = vcs.root },
+                            function(pr_result)
+                                if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
+                                    local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
+                                    if ok and pr_data.number then
+                                        local title = pr_data.title:sub(1, 25)
+                                        if #pr_data.title > 25 then title = title .. "…" end
+                                        result_data.pr = string.format("#%d: %s", pr_data.number, title)
+                                    end
+                                end
+                                completed.pr = true
+                                try_update_cache()
                             end
-                        end
+                        )
+                    else
                         completed.pr = true
-                        try_update_cache()
-                    end)
+                    end
 
                     -- Get file status counts (LazyGit-style: +added ~modified -deleted)
                     vim.system({ "git", "status", "--porcelain" }, { cwd = vcs.root }, function(status_result)
