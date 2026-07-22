@@ -200,5 +200,14 @@ require("kyleking.utils.usage").install({
 ## Phases
 
 1. writer + map wrapper + command hook + minimal `:FeatureUsage` top-used view. Land this, run it for a couple weeks, confirm the data is worth it. **DONE** — `lua/kyleking/utils/usage/`, 17 cases in `lua/tests/custom/usage_spec.lua`. Tracking stays off without a UI, so headless runs, tests, and the startup benchmark write nothing; `NVIM_USAGE_DIR` forces it on for verifying the real boot path. Measured startup cost is ~0.5ms, inside the run-to-run noise band.
-1. the cold view (reconciliation + last-used) and the pick source.
-1. motion sampler behind `track.motions`: assembler, pattern matcher, `patterns.json`, and the `:FeatureUsage noise` triage view. Build the matcher and its tests before the sampler, since everything downstream depends on the escaping being right.
+1. the cold view (reconciliation + last-used) and the pick source. **DONE** — `cold.lua`, `:FeatureUsageCold`, 15 cases. Guarded by `pack.is_loading()`: reconciliation reads the live keymap set, and opening it mid-startup measured 147 registered against 356 once deferred loading settled, which would report maps that exist as never used.
+1. motion sampler behind `track.motions` (on by default). **DONE** — `motion.lua`, 17 cases. A pure assembler (`new_assembler`) holds the heuristic and `attach()` holds every editor hook, which is what makes it testable without real keystrokes.
+
+Two things the build settled that the design above got wrong:
+
+- **Feed `typed`, not `key`.** `vim.on_key` reports a resolved mapping once with `typed` set, then replays the constituent keys with `typed` empty. Feeding `key` produced `"cw"` for `ciw`. Feeding `typed` keeps a mapped text object whole and skips the replay the keymap hook already counts.
+- **`ModeChanged` cannot be the mode source**, only an early-flush optimization. It is suppressed under `eventignore`/`noautocmd` and never arrives at all under the test runner, and a cached mode degrades every compound motion into single keys. The handler calls `nvim_get_mode()` per key instead, at ~0.1 µs.
+
+Verified end to end by driving a real nvim in a pty, since neither `feedkeys` (always `typed=""`) nor `nvim_input` (no `on_key` events headlessly) can exercise this path: `ciw`, `dd`, `viwd`, `cw`, `yy`/`p`, `fb`/`di(`, `d10j`, `gUiw` all assemble correctly. `3ciw` splits into `3` and `ciw`, as documented.
+
+Still open: the `:FeatureUsage noise` triage view, which would let a keypress append a pattern to `patterns.json`. Editing that file by hand works today.

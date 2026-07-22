@@ -16,6 +16,7 @@ local state = {
     writer = nil,
     cfg = nil,
     original_set = nil,
+    motion = nil,
     patterns = { denylist = {}, groups = {} },
 }
 
@@ -28,7 +29,7 @@ local function build_cfg(opts)
         host = nil,
         flush_interval_ms = 30000,
         retention_months = 1,
-        track = { maps = true, commands = true },
+        track = { maps = true, commands = true, motions = true },
         redact_cwd = true,
     }, opts or {})
 
@@ -127,10 +128,34 @@ function M.install(opts)
     state.writer, state.cfg, state.installed = w, cfg, true
 
     -- Seed patterns.json on first run so the denylist is discoverable and hand-editable.
-    -- <Space> is mini.clue's leader-prefix query map, which fires on every leader press
-    -- and otherwise dominates the report.
+    -- <Space> is mini.clue's leader-prefix query map, which fires on every leader press.
+    -- The rest are single-key navigation and the cmdline/search openers, all confirmed by
+    -- driving real keys: plain motion keys log one row each and swamp everything else,
+    -- and ":" would double-count commands the cmdline hook already records.
+    -- Deliberately NOT denied: "g*" and "z*", which would eat gUiw and friends.
     if vim.fn.filereadable(cfg.dir .. "/patterns.json") == 0 then
-        patterns.save(cfg.dir, { denylist = { "<Space>" }, groups = {} })
+        patterns.save(cfg.dir, {
+            denylist = {
+                "<Space>",
+                "<Esc>",
+                ":",
+                "/",
+                "?",
+                "h",
+                "j",
+                "k",
+                "l",
+                "w",
+                "b",
+                "e",
+                "0",
+                "$",
+                "^",
+                "gj",
+                "gk",
+            },
+            groups = { "c*w", "c*W", "d*w", "d*W", "y*w", "f*", "t*" },
+        })
     end
     state.patterns = patterns.load(cfg.dir)
 
@@ -149,6 +174,18 @@ function M.install(opts)
                 if vim.fn.getcmdtype() ~= ":" then return end
                 local name = M.command_name(vim.fn.getcmdline())
                 if name ~= nil then record("cmd", name) end
+            end,
+        })
+    end
+
+    -- Groups collapse a family onto one row ("ciw"/"caw" -> "c*w"); label() returns nil
+    -- for a denied sequence. Motions are the noisy kind, so this is where the denylist
+    -- earns its keep.
+    if cfg.track.motions then
+        state.motion = require("kyleking.utils.usage.motion").attach({
+            on_sequence = function(seq)
+                local label = patterns.label(state.patterns, seq)
+                if label ~= nil then record("motion", label) end
             end,
         })
     end
@@ -222,6 +259,7 @@ end
 function M.uninstall()
     if not state.installed then return end
     if state.original_set ~= nil then vim.keymap.set = state.original_set end
+    if state.motion ~= nil then state.motion.stop() end
     if state.writer ~= nil then state.writer.close() end
     pcall(vim.api.nvim_del_augroup_by_name, "kyleking_usage")
     pcall(vim.api.nvim_del_user_command, "FeatureUsage")
@@ -232,6 +270,7 @@ function M.uninstall()
         writer = nil,
         cfg = nil,
         original_set = nil,
+        motion = nil,
         patterns = { denylist = {}, groups = {} },
     }
 end
