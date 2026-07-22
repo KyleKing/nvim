@@ -5,9 +5,42 @@ local pack = require("kyleking.pack")
 local deps_utils = require("kyleking.deps_utils")
 local add, later = pack.add, deps_utils.maybe_later
 
+-- file:// sources are fragile: if the source repo doesn't exist yet when nvim first
+-- runs add(), or if a clone/checkout gets interrupted, vim.pack can end up with the
+-- plugin "installed" in the lockfile but an empty or partial working tree. require()
+-- then fails deep inside the plugin with a generic "module not found", which gives no
+-- hint that the local checkout (not the plugin itself) is the problem. Checking for the
+-- entry module before add() catches both cases with an actionable message instead.
+local function add_local(repo, module_name, opts)
+    local path = "/Users/kyleking/Developer/kyleking/" .. repo
+    if vim.fn.filereadable(path .. "/lua/" .. module_name .. "/init.lua") ~= 1 then
+        vim.notify(
+            ("local plugin %s: no lua/%s/init.lua under %s (missing source repo or a broken vim.pack checkout -- "):format(
+                repo,
+                module_name,
+                path
+            )
+                .. "delete the installed copy under site/pack/*/opt/"
+                .. repo
+                .. " and reopen nvim to reinstall)",
+            vim.log.levels.WARN
+        )
+        return false
+    end
+    add({ source = "file://" .. path })
+    local ok, err = pcall(require(module_name).setup, opts)
+    if not ok then
+        vim.notify(
+            ("local plugin %s: setup() failed after install -- %s"):format(repo, tostring(err)),
+            vim.log.levels.ERROR
+        )
+        return false
+    end
+    return true
+end
+
 later(function()
-    add({ source = "file:///Users/kyleking/Developer/kyleking/codanna.nvim" })
-    require("codanna").setup({ preferred_picker = "mini" })
+    if not add_local("codanna.nvim", "codanna", { preferred_picker = "mini" }) then return end
 
     local K = vim.keymap.set
     K("n", "<leader>sC", "<cmd>CodannaCalls<cr>", { desc = "Codanna outgoing calls" })
@@ -19,8 +52,7 @@ later(function()
 end)
 
 later(function()
-    add({ source = "file:///Users/kyleking/Developer/kyleking/spaghetti-comb.nvim" })
-    require("spaghetti-comb").setup({})
+    if not add_local("spaghetti-comb.nvim", "spaghetti-comb", {}) then return end
 
     local K = vim.keymap.set
     K("n", "<leader>nb", "<cmd>SpaghettiCombBack<cr>", { desc = "Navigate back in trail" })
