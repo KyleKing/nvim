@@ -150,6 +150,19 @@ later(function()
     -- instead of stacking the same group over the whole "[text](url)".
     local md_link_text_pattern = "%[().-()%]%b()"
 
+    -- `link_patterns.url`'s character class allows `(` `)` (so URLs like Wikipedia's
+    -- "...Lua_(programming_language)" survive open-url); link_open.lua compensates by
+    -- trimming an unbalanced trailing ")" after matching. Highlighting can't run that
+    -- same post-match trim, so mirror it with two alternatives instead: one that only
+    -- consumes a balanced "(...)" suffix, and one with no parens in the class at all,
+    -- so a URL wrapped in prose parens -- "(see https://example.com)" -- doesn't pull
+    -- the closing ")" into the highlight.
+    local url_body = "[%w_.~:/?#%[%]@!$&'*+,;=%%-]+"
+    local url_patterns = {
+        "()https?://" .. url_body .. "%b()()",
+        "()https?://" .. url_body .. "()",
+    }
+
     hipatterns.setup({
         highlighters = {
             fixme = { pattern = { word_pattern("FIXME"), paren_pattern("FIXME") }, group = "MiniHipatternsFixme" },
@@ -167,7 +180,7 @@ later(function()
             -- Link to the built-in treesitter markup groups so link colors stay
             -- theme-aware instead of hardcoding hex (three distinct looks: url is
             -- italic+underlined, md_link text is Special-linked, plugin_ref is bold).
-            url = { pattern = link_patterns.url, group = "@markup.link.url" },
+            url = { pattern = url_patterns, group = "@markup.link.url" },
             md_link = { pattern = md_link_text_pattern, group = "@markup.link.label" },
             plugin_ref = { pattern = link_patterns.plugin, group = "@markup.link" },
         },

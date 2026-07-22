@@ -46,7 +46,7 @@ highlights:
   - group: @markup.link.label
     range: [[1, 1], [1, 12]]
   - group: @markup.link.url
-    range: [[1, 14], [1, 36]]
+    range: [[1, 14], [1, 35]]
 # ---
 # name: link highlighting > plain URL highlighted
 before:
