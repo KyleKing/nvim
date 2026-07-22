@@ -1,5 +1,6 @@
 -- Tests for preview utility
 local MiniTest = require("mini.test")
+local helpers = require("tests.helpers")
 
 local T = MiniTest.new_set({
     hooks = {
@@ -7,9 +8,9 @@ local T = MiniTest.new_set({
             vim.cmd("enew")
             vim.bo.filetype = "markdown"
         end,
-        post_case = function()
-            if vim.api.nvim_buf_is_valid(0) then vim.api.nvim_buf_delete(0, { force = true }) end
-        end,
+        -- Cases here set a filetype, which queues an LSP autostart, so they delete through
+        -- the helper: it drains that callback while the buffer is still valid
+        post_case = function() helpers.delete_buffer(vim.api.nvim_get_current_buf()) end,
     },
 })
 

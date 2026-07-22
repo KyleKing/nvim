@@ -128,7 +128,9 @@ return {
                             vim.api.nvim_win_set_cursor(0, { 2, 3 })
                             local region = ai.find_textobject("i", "m")
                             MiniTest.expect.no_equality(region, nil, "im should resolve a function-inner region")
-                            vim.cmd("bwipeout!")
+                            -- Delete through the helper: setting filetype above queued an LSP
+                            -- autostart, which the helper drains while the buffer is still valid
+                            require("tests.helpers").delete_buffer(vim.api.nvim_get_current_buf())
                         end,
                     },
                 },

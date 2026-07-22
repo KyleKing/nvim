@@ -2,6 +2,14 @@
 local M = {}
 local constants = require("kyleking.utils.constants")
 
+-- Shorten mini.surround's unhighlight timer for test runs
+-- After a surround operation mini.surround highlights the region and hands the cleanup to
+-- vim.defer_fn(_, highlight_duration), 500ms by default. A test finishes and deletes its
+-- buffer long before that, and the timer then clears a namespace on a dead buffer. The
+-- highlight is a UI nicety that no assertion reads, so tests drop the delay to 0 and
+-- M.drain_deferred lets the callback run while the buffer is still valid.
+if package.loaded["mini.surround"] then require("mini.surround").config.highlight_duration = 0 end
+
 -- Wait for LSP client to attach to buffer
 -- @param bufnr number: Buffer number to wait for
 -- @param timeout_ms number: Timeout in milliseconds (default: 5000)
@@ -52,9 +60,24 @@ function M.create_test_buffer(lines, filetype)
     return bufnr
 end
 
+-- Run the event loop until work already queued with vim.schedule or vim.defer_fn(_, 0) has run
+-- Those callbacks capture a buffer id and use it later. Deleting the buffer first leaves them
+-- holding a dead handle, and they raise "Invalid buffer id" from outside any test case, so
+-- nothing fails but the run prints tracebacks to stderr. Two reach us: mini.surround's
+-- region_unhighlight, and vim.lsp's start_config, which an autostart schedules on FileType.
+-- The marker below is queued behind whatever is already pending, so waiting on it drains the
+-- queue with no fixed sleep. Measured at about 0.015ms per call.
+function M.drain_deferred()
+    local drained = false
+    vim.defer_fn(function() drained = true end, 0)
+    vim.wait(100, function() return drained end, 1)
+end
+
 -- Delete a buffer forcefully
 -- @param bufnr number: Buffer number to delete
 function M.delete_buffer(bufnr)
+    if not vim.api.nvim_buf_is_valid(bufnr) then return end
+    M.drain_deferred()
     if vim.api.nvim_buf_is_valid(bufnr) then vim.api.nvim_buf_delete(bufnr, { force = true }) end
 end
 
@@ -232,6 +255,9 @@ end
 -- Comprehensive cleanup for sequential test execution
 -- Resets state between tests to prevent interference
 function M.full_cleanup()
+    -- Let queued callbacks run before the buffers they reference disappear
+    M.drain_deferred()
+
     -- Delete all user-created buffers (keep scratch buffers from mini.test)
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         if vim.api.nvim_buf_is_valid(buf) then
