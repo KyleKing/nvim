@@ -45,12 +45,23 @@ later(function()
     -- Buffers accessible via mini.pick (<leader>fb) or :ls
     vim.opt.showtabline = 1 -- Show tabline only when multiple tabs exist
 
-    -- Apply nightfly-inspired theme colors for native tabline
-    local colors = require("kyleking.theme").get_colors()
+    -- Apply nightfly-inspired theme colors for native tabline.
+    -- colorscheme.lua loads after this file and `:colorscheme` clears every highlight,
+    -- so setting these only once loses them (the bold on the active tab in particular).
+    local function set_tabline_hl()
+        local colors = require("kyleking.theme").get_colors()
 
-    vim.api.nvim_set_hl(0, "TabLine", { fg = colors.fg3, bg = colors.bg0 })
-    vim.api.nvim_set_hl(0, "TabLineSel", { fg = colors.fg1, bg = colors.bg2, bold = true })
-    vim.api.nvim_set_hl(0, "TabLineFill", { bg = colors.bg0 })
+        vim.api.nvim_set_hl(0, "TabLine", { fg = colors.fg3, bg = colors.bg0 })
+        vim.api.nvim_set_hl(0, "TabLineSel", { fg = colors.fg1, bg = colors.bg2, bold = true })
+        vim.api.nvim_set_hl(0, "TabLineFill", { bg = colors.bg0 })
+    end
+
+    vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("kyleking_tabline", { clear = true }),
+        callback = set_tabline_hl,
+        desc = "Keep tabline highlights after a colorscheme change",
+    })
+    set_tabline_hl()
 end)
 
 later(function()

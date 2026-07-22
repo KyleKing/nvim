@@ -106,8 +106,24 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local fre = require("find-relative-executable")
-                            MiniTest.expect.equality(type(fre.ecosystems.eslint), "string")
-                            MiniTest.expect.equality(type(fre.ecosystems.oxlint), "string")
+
+                            -- The tool-to-ecosystem table is private, so prove the node mapping
+                            -- through resolve(): a package.json project resolves to node_modules/.bin
+                            local root = vim.fn.tempname()
+                            local bin_dir = root .. "/node_modules/.bin"
+                            vim.fn.mkdir(bin_dir, "p")
+                            for _, tool in ipairs({ "eslint", "oxlint" }) do
+                                vim.fn.writefile({ "#!/bin/sh" }, bin_dir .. "/" .. tool)
+                            end
+                            vim.fn.writefile({ "{}" }, root .. "/package.json")
+
+                            local buf_path = root .. "/src/index.ts"
+                            fre.clear_cache()
+                            MiniTest.expect.equality(fre.resolve("eslint", buf_path), bin_dir .. "/eslint")
+                            MiniTest.expect.equality(fre.resolve("oxlint", buf_path), bin_dir .. "/oxlint")
+
+                            fre.clear_cache()
+                            vim.fn.delete(root, "rf")
                         end,
                     },
                 },

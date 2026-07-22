@@ -159,17 +159,16 @@ return {
                     expect = {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
-                            local keymaps = vim.api.nvim_get_keymap("n")
-                            local has_swap_next = false
-                            local has_swap_prev = false
+                            local helpers = require("tests.helpers")
 
-                            for _, map in ipairs(keymaps) do
-                                if map.lhs == ">M" then has_swap_next = true end
-                                if map.lhs == "<M" then has_swap_prev = true end
-                            end
-
-                            MiniTest.expect.equality(has_swap_next, true, "Should have >M keybinding")
-                            MiniTest.expect.equality(has_swap_prev, true, "Should have <M keybinding")
+                            -- nvim_get_keymap reports a leading "<" as "<lt>", so scanning
+                            -- it for a literal "<M" never matches. maparg resolves both.
+                            MiniTest.expect.equality(helpers.check_keymap(">M", "n"), true, "Should have >M keybinding")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<lt>M", "n"),
+                                true,
+                                "Should have <M keybinding"
+                            )
                         end,
                     },
                 },

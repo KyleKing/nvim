@@ -92,7 +92,7 @@ end)
 
 later(function()
     -- Enhanced text objects with treesitter support
-    -- Adds "around/inside next/last" intelligence: vaN (select around next argument), viL (inside last brackets)
+    -- Adds "around/inside next/last" intelligence: vana (around next argument), vilb (inside last brackets)
     -- Works with: f (function call), a (argument), b (brackets), q (quotes), t (tags), and more
     --
     -- Treesitter-backed structural text objects (replaces nvim-treesitter-textobjects `select`).
