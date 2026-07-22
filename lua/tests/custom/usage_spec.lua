@@ -466,6 +466,66 @@ T["capture"]["omits the host from each event"] = function()
     vim.keymap.del("n", "<leader>zh")
 end
 
+T["map echo"] = MiniTest.new_set()
+
+-- Typing "dd" fires the dd keymap and also assembles as the motion "dd". Both describe
+-- one keypress, so the motion is dropped and the map event (which carries the desc)
+-- stands. record_motion is the same entry point install() hands to the sampler.
+T["map echo"]["drops a motion that repeats the keymap just fired"] = function()
+    local dir = make_dir()
+    install(dir)
+
+    vim.keymap.set("n", "<leader>zm", function() end, { desc = "Echoed" })
+    invoke("<leader>zm")
+    -- The sampler sees the keys the map consumed; " zm" is <leader>zm expanded.
+    usage.record_motion(" zm")
+    usage.flush()
+
+    local events = read_events(store.raw_path(dir, "testhost", store.month_of(os.time())))
+    local kinds = vim.tbl_map(function(e) return e.kind end, events)
+    MiniTest.expect.equality(kinds, { "map" }, "the motion echo must not be counted a second time")
+
+    vim.keymap.del("n", "<leader>zm")
+end
+
+T["map echo"]["keeps a motion that no keymap fired"] = function()
+    local dir = make_dir()
+    install(dir)
+
+    usage.record_motion("ciw")
+    usage.flush()
+
+    local events = read_events(store.raw_path(dir, "testhost", store.month_of(os.time())))
+    MiniTest.expect.equality(#events, 1)
+    MiniTest.expect.equality(events[1].kind, "motion")
+    MiniTest.expect.equality(events[1].key, "c*w", "grouped onto its family")
+end
+
+T["noise suggestions"] = MiniTest.new_set()
+
+T["noise suggestions"]["ranks noisy ungrouped motions"] = function()
+    local rows = {
+        { kind = "motion", key = "x", count = 90, last = 1 },
+        { kind = "motion", key = "c*w", count = 80, last = 1 },
+        { kind = "map", key = "<leader>ff", count = 70, last = 1 },
+        { kind = "motion", key = "p", count = 5, last = 1 },
+    }
+    local noisy = report.noise(rows, { min_count = 20 })
+
+    MiniTest.expect.equality(#noisy, 1, "only ungrouped motions past the threshold qualify")
+    MiniTest.expect.equality(noisy[1].key, "x")
+end
+
+T["noise suggestions"]["never writes patterns.json"] = function()
+    local dir = make_dir()
+    vim.fn.mkdir(dir, "p")
+    patterns.save(dir, { denylist = { "j" }, groups = {} })
+
+    report.noise({ { kind = "motion", key = "x", count = 99, last = 1 } })
+
+    MiniTest.expect.equality(patterns.load(dir).denylist, { "j" }, "suggestions are read-only")
+end
+
 if MiniTest.current.all_cases == nil then MiniTest.run() end
 
 return T

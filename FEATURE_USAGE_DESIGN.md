@@ -88,7 +88,9 @@ Precedence is denylist first (an explicit drop always wins), then groups, then t
 
 **Where the list lives.** Not hardcoded in Lua, or updating it means editing config and reloading. Two layers: built-in defaults ship in the module, and a mutable `patterns.json` sits in the sync dir alongside the event logs. The data file wins on conflict, syncs across machines for free, and can be hand-edited or appended to by the report.
 
-**The triage loop** (the "update it over time from noisy data" ask): a `:FeatureUsage noise` view lists the highest-count sequences that are neither denied nor grouped, ranked by count. One keypress on a row appends it to `denylist` or `groups` in `patterns.json`. That turns denylist maintenance into a periodic 30-second pass over real data instead of guesswork up front.
+**The triage loop** (the "update it over time from noisy data" ask): `:FeatureUsage` ends with a short list of the highest-count motion sequences that are neither denied nor grouped. These are **suggestions only**. The report never writes `patterns.json`; I edit it by hand.
+
+That split is deliberate and simpler than the alternative. A read-only report needs no confirmation prompt, no undo, and no write path that could corrupt the pattern file, and it keeps the one destructive step (which is what a denylist addition is, since it drops events from then on) an explicit human action. Grouped keys are excluded from the suggestions, since a pattern like `c*w` already collapses its family and is signal rather than noise.
 
 **Seeing what was dropped.** Denying at capture time keeps event volume sane, but it also means denied data is invisible forever, so an over-greedy pattern can quietly eat a real signal. Compromise: keep **aggregate counters only** for denied patterns (`pattern -> count`, no per-event lines), flushed with the normal batch. Enough to notice `c*w` swallowed 4000 events and walk it back; cheap enough to cost a few bytes a day.
 
@@ -168,8 +170,8 @@ require("kyleking.utils.usage").install({
     motion = {
         max_seq_len = 6,
         -- Seed values only. patterns.json in `dir` overrides these and is what
-        -- the :FeatureUsage noise view appends to, so the live lists drift from
-        -- this default over time by design.
+        -- I hand-edit over time, prompted by the report's suggestions, so the live
+        -- lists drift from this default by design.
         denylist = { "h", "j", "k", "l", "w", "b", "e", "0", "$", "^", "gj", "gk" },
         -- Word and WORD need separate entries; matching is case-sensitive.
         groups = { "c*w", "c*W", "d*w", "d*W", "y*w", "c*(", "c*\"", "f*", "t*" },
@@ -180,8 +182,8 @@ require("kyleking.utils.usage").install({
 
 ## Risks and open questions
 
-- **Motion attribution accuracy** (hook 3). Ship it behind `track.motions` so it can be cut without touching maps/commands. The denylist-vs-allowlist question is settled (denylist, see mechanism 4); what remains unproven is whether the seed denylist is close enough that the noise view is usable on day one, or whether the first week's log is mostly junk. Acceptable either way, since triage is the designed workflow.
-- **Over-greedy patterns.** A careless `c*` eats most of the interesting data. The denied-pattern aggregate counters exist to make that visible; still worth a confirmation prompt before the noise view writes a pattern shorter than two characters.
+- **Motion attribution accuracy** (hook 3). Ship it behind `track.motions` so it can be cut without touching maps/commands. The denylist-vs-allowlist question is settled (denylist, see mechanism 4); what remains unproven is whether the seed denylist is close enough on day one, or whether the first week's log is mostly junk. Acceptable either way, since hand-editing prompted by the report's suggestions is the designed workflow.
+- **Over-greedy patterns.** A careless `c*` eats most of the interesting data. Since only I write `patterns.json`, there is no automated write to guard; the risk is a careless hand edit, and `:FeatureUsageCompact` reports how many events a pass removed.
 - **Startup cost.** Patching one function + two autocmds is negligible, but the per-callback wrapper adds a closure and a table write on every map invocation. Measure with `bench:startup` and a hot-loop test before trusting it.
 - **String-rhs invocation gap.** Accept for v1. Revisit only if a specific string-rhs map turns out to be a decision I can't make without its count.
 - **Privacy in the sync folder.** `cwd` is stored as basename only. No file contents, no full paths, no typed text beyond the motion key name. Confirm that's enough before syncing.
@@ -193,7 +195,8 @@ require("kyleking.utils.usage").install({
 - **command hook**: `CmdlineLeave` logs the first token for user and built-in commands; aborted cmdline (`<Esc>`) logs nothing (integration spec).
 - **motion assembler**: `ciw` assembles to one event; a denylisted single key logs nothing; a sequence over `max_seq_len` is dropped (custom spec).
 - **pattern matcher**: `c*w` matches `ciw`/`caw`/`ciW` and not `ciwx`; magic-char sequences (`di(`, `f;`, `$`, `^`, `%`) match literally rather than as Lua patterns; denylist beats groups on a sequence matching both; a denied pattern increments its aggregate counter without writing an event (custom spec — this is the escaping-order bug most likely to ship silently).
-- **patterns.json**: a missing or malformed file falls back to the seed defaults without erroring; an append from the noise view round-trips (custom spec).
+- **patterns.json**: a missing or malformed file falls back to the seed defaults without erroring (custom spec).
+- **noise suggestions**: only ungrouped motions past the count threshold are suggested, and generating suggestions never writes patterns.json (custom spec).
 - **report**: cold view lists a registered-but-unlogged map and ranks a tried-then-dropped map by last-used date; top-used ranks by count; aggregation unions two host files (custom spec with fixture JSONL).
 - **smoke**: the subprocess smoke test already catches boot breakage from the line-1 wiring.
 
@@ -210,4 +213,6 @@ Two things the build settled that the design above got wrong:
 
 Verified end to end by driving a real nvim in a pty, since neither `feedkeys` (always `typed=""`) nor `nvim_input` (no `on_key` events headlessly) can exercise this path: `ciw`, `dd`, `viwd`, `cw`, `yy`/`p`, `fb`/`di(`, `d10j`, `gUiw` all assemble correctly. `3ciw` splits into `3` and `ciw`, as documented.
 
-Still open: the `:FeatureUsage noise` triage view, which would let a keypress append a pattern to `patterns.json`. Editing that file by hand works today.
+**Double counting is suppressed at capture time.** Typing `dd` fires the `dd` keymap and also assembles as the motion `dd`; both describe one keypress. The map hook stamps the normalized lhs and a monotonic timestamp, and a motion that matches within 1.2s is dropped. The map event wins because it carries the `desc`. Verified by typing through a pty: `dd` records one row, while `ciw` still records both `map i` (mini.ai's text object) and `motion c*w`, which are different granularity rather than duplicates.
+
+All three phases have shipped; the noise triage is suggestions-only per the above. Nothing here is outstanding.

@@ -45,6 +45,29 @@ function M.aggregate(dir)
     return ranked
 end
 
+--- Sequences noisy enough to be worth denying, highest count first.
+--- Suggestions only: the report never edits patterns.json. Hand-editing it is the whole
+--- workflow, which keeps this a pure read and leaves the destructive step deliberate.
+--- Only motions qualify, since maps and commands are things I configured on purpose.
+---@param rows table[] output of M.aggregate
+---@param opts table|nil {min_count, limit}
+---@return table[] rows worth denying
+function M.noise(rows, opts)
+    opts = opts or {}
+    local min_count = opts.min_count or 20
+    local limit = opts.limit or 10
+
+    local candidates = {}
+    for _, row in ipairs(rows) do
+        -- A grouped key already collapses a family, so it is signal, not noise.
+        if row.kind == "motion" and row.count >= min_count and row.key:find("*", 1, true) == nil then
+            candidates[#candidates + 1] = row
+            if #candidates >= limit then break end
+        end
+    end
+    return candidates
+end
+
 ---@param rows table[]
 ---@param limit number|nil
 ---@return string[]
@@ -57,6 +80,15 @@ function M.render(rows, limit)
         local row = rows[i]
         local last = row.last > 0 and os.date("%Y-%m-%d", row.last) or "?"
         lines[#lines + 1] = ("%6d  %-7s %-24s %-12s %s"):format(row.count, row.kind, row.key, last, row.desc or "")
+    end
+
+    local noisy = M.noise(rows)
+    if #noisy > 0 then
+        lines[#lines + 1] = ""
+        lines[#lines + 1] = "Noisy motions worth denying (add to patterns.json by hand):"
+        for _, row in ipairs(noisy) do
+            lines[#lines + 1] = ("  %6d  %s"):format(row.count, row.key)
+        end
     end
     return lines
 end

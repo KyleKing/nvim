@@ -27,11 +27,7 @@ local MODES = { "n", "x", "o", "i", "v", "s", "t", "c" }
 --- Canonical byte form of a key, shared by both sides of the reconciliation.
 ---@param key string
 ---@return string
-function M.normalize(key)
-    local ok, replaced = pcall(vim.api.nvim_replace_termcodes, key, true, true, true)
-    if ok and replaced ~= nil then return replaced end
-    return key
-end
+M.normalize = patterns.normalize
 
 -- Plugin-internal mappings are not things I type, so they can never be "cold". <Plug>
 -- and <SNR> entries exist only as targets for other maps.

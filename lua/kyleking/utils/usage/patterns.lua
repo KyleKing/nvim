@@ -8,6 +8,17 @@ local M = {}
 
 local compiled = {}
 
+--- Canonical byte form of a key, so the several places that compare keys agree.
+--- nvim_get_keymap returns the leader already expanded (" ff") while the log stores the
+--- lhs as written ("<leader>ff"); both land on the same bytes here.
+---@param key string
+---@return string
+function M.normalize(key)
+    local ok, replaced = pcall(vim.api.nvim_replace_termcodes, key, true, true, true)
+    if ok and replaced ~= nil then return replaced end
+    return key
+end
+
 --- Convert a glob to an anchored Lua pattern.
 --- Escapes every magic character (including `*`) first, then un-escapes `%*` into
 --- `.*`. Doing it in that order avoids escaping the `.` that expanding `*` introduces.

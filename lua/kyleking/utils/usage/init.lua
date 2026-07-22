@@ -17,6 +17,7 @@ local state = {
     cfg = nil,
     original_set = nil,
     motion = nil,
+    last_map = nil,
     patterns = { denylist = {}, groups = {} },
 }
 
@@ -91,13 +92,39 @@ local function record(kind, key, desc)
     })
 end
 
+-- How long after a keymap fires its identical motion sequence is treated as the same
+-- action. Covers the assembler's idle flush (400ms) with room to spare, while staying
+-- short enough that a genuinely repeated motion still counts.
+local MAP_ECHO_MS = 1200
+
 -- Records before calling so a keymap whose callback errors still counts as used.
 -- Returns rhs's values untouched, which `expr = true` maps depend on.
 local function wrap_rhs(lhs, rhs, desc)
     return function(...)
         record("map", lhs, desc)
+        -- Remembered so the motion sampler can drop the echo of this same keypress.
+        state.last_map = { key = patterns.normalize(lhs), at = vim.uv.now() }
         return rhs(...)
     end
+end
+
+--- True when this sequence is just the keymap that already recorded itself.
+--- Typing "dd" fires the dd keymap and also assembles as the motion "dd"; both describe
+--- one keypress. The map event wins because it carries the desc.
+local function echoes_last_map(seq)
+    local last = state.last_map
+    if last == nil then return false end
+    if vim.uv.now() - last.at > MAP_ECHO_MS then return false end
+    return patterns.normalize(seq) == last.key
+end
+
+--- Record an assembled motion, dropping the echo of a keymap and collapsing a family
+--- onto its group. Public so the wiring can be exercised without synthesising keystrokes.
+---@param seq string
+function M.record_motion(seq)
+    if echoes_last_map(seq) then return end
+    local label = patterns.label(state.patterns, seq)
+    if label ~= nil then record("motion", label) end
 end
 
 local function patched_set(mode, lhs, rhs, opts)
@@ -182,12 +209,7 @@ function M.install(opts)
     -- for a denied sequence. Motions are the noisy kind, so this is where the denylist
     -- earns its keep.
     if cfg.track.motions then
-        state.motion = require("kyleking.utils.usage.motion").attach({
-            on_sequence = function(seq)
-                local label = patterns.label(state.patterns, seq)
-                if label ~= nil then record("motion", label) end
-            end,
-        })
+        state.motion = require("kyleking.utils.usage.motion").attach({ on_sequence = M.record_motion })
     end
 
     vim.api.nvim_create_autocmd("VimLeavePre", { group = group, callback = function() M.flush() end })
@@ -271,6 +293,7 @@ function M.uninstall()
         cfg = nil,
         original_set = nil,
         motion = nil,
+        last_map = nil,
         patterns = { denylist = {}, groups = {} },
     }
 end
