@@ -273,7 +273,7 @@ tests = {
 - Global toggles: test enabling/disabling doesn't leak state
 - Persistent toggles: verify state survives reloads
 
-**Async operations** - Use `vim.wait()` for eventual consistency:
+**Async operations** - Always give `vim.wait()` a condition, never a bare duration:
 
 ```lua
 -- Pattern: Plugin highlights/LSP attach/async initialization
@@ -281,6 +281,14 @@ vim.wait(2000, function()
     return condition_met()
 end, 100)
 ```
+
+`vim.wait(500)` with no predicate sleeps the full 500ms every time, so it costs the same whether the work takes 1ms or never finishes. With a predicate the call returns the moment the condition holds, and the number becomes a ceiling instead of a price. `file_opener_spec.lua` carried ten bare waits and spent five seconds of a thirty-five second suite on them, all for state that was already settled.
+
+Write the predicate against the thing the case is about to assert (`tabpagenr("$") > initial`, `nvim_win_get_cursor(0)[1] == 2`, a flag a mocked `vim.notify` sets), then assert it normally afterwards. The wait failing to converge and the assertion failing then report the same fact, and the case fails on the assertion's message rather than on a timeout.
+
+Keep the wait even when the operation turns out to be synchronous, as `wait_for_terminal` in `file_opener_spec.lua` does. It costs one poll, it says which state the case depends on, and it degrades to a slow test rather than a failing one if that operation later becomes async.
+
+Waiting for the event loop to drain rather than for a condition is a different job: use `helpers.drain_deferred()`, which queues a marker behind whatever is already pending and waits for that. `helpers.delete_buffer` calls it, which is why deleting a buffer through the helper avoids the `Invalid buffer id` tracebacks a queued callback would otherwise print.
 
 ### LSP configuration (nvim 0.11+)
 

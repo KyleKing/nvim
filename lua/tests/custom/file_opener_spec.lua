@@ -11,6 +11,14 @@ local T = MiniTest.new_set({
 
 local file_opener = require("kyleking.utils.file_opener")
 
+-- termopen sets buftype and the job variables before it returns, so this costs one poll.
+-- It stays as a wait rather than a bare assertion so a future async termopen would be a
+-- slow test rather than a failing one.
+local function wait_for_terminal(bufnr)
+    bufnr = bufnr or 0
+    vim.wait(500, function() return vim.bo[bufnr].buftype == "terminal" end, 1)
+end
+
 T["parse_file_location"] = MiniTest.new_set()
 
 T["parse_file_location"]["parses simple file path"] = function()
@@ -211,13 +219,13 @@ T["open_from_terminal"]["opens absolute path from terminal"] = function()
 
     vim.cmd("tabnew")
     local _ = vim.fn.termopen({ vim.o.shell })
-    vim.wait(500)
+    wait_for_terminal()
 
     local initial_tab_count = vim.fn.tabpagenr("$")
 
     file_opener.open_from_terminal(temp_file)
 
-    vim.wait(500)
+    vim.wait(500, function() return vim.fn.tabpagenr("$") > initial_tab_count end)
 
     MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count + 1, "Should open new tab")
     MiniTest.expect.equality(vim.fn.expand("%:p"), temp_file, "Should open correct file")
@@ -235,7 +243,7 @@ T["open_from_terminal"]["opens relative path from terminal cwd"] = function()
     -- termopen returns a channel id, so the buffer variable has to come from the buffer
     vim.fn.termopen({ vim.o.shell })
     local term_bufnr = vim.api.nvim_get_current_buf()
-    vim.wait(500)
+    wait_for_terminal(term_bufnr)
 
     vim.b[term_bufnr].terminal_job_cwd = temp_dir
 
@@ -243,7 +251,7 @@ T["open_from_terminal"]["opens relative path from terminal cwd"] = function()
 
     file_opener.open_from_terminal("test.lua")
 
-    vim.wait(500)
+    vim.wait(500, function() return vim.fn.tabpagenr("$") > initial_tab_count end)
 
     MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count + 1, "Should open new tab")
     MiniTest.expect.equality(vim.fn.expand("%:p"), temp_file, "Should open correct file")
@@ -257,11 +265,11 @@ T["open_from_terminal"]["opens path with line number"] = function()
 
     vim.cmd("tabnew")
     local _ = vim.fn.termopen({ vim.o.shell })
-    vim.wait(500)
+    wait_for_terminal()
 
     file_opener.open_from_terminal(temp_file .. ":2")
 
-    vim.wait(500)
+    vim.wait(500, function() return vim.api.nvim_win_get_cursor(0)[1] == 2 end)
 
     local cursor = vim.api.nvim_win_get_cursor(0)
     MiniTest.expect.equality(cursor[1], 2, "Should jump to line 2")
@@ -275,11 +283,11 @@ T["open_from_terminal"]["opens path with line and column"] = function()
 
     vim.cmd("tabnew")
     local _ = vim.fn.termopen({ vim.o.shell })
-    vim.wait(500)
+    wait_for_terminal()
 
     file_opener.open_from_terminal(temp_file .. ":2:8")
 
-    vim.wait(500)
+    vim.wait(500, function() return vim.api.nvim_win_get_cursor(0)[1] == 2 end)
 
     local cursor = vim.api.nvim_win_get_cursor(0)
     MiniTest.expect.equality(cursor[1], 2, "Should jump to line 2")
@@ -291,7 +299,7 @@ end
 T["open_from_terminal"]["shows warning for non-existent file"] = function()
     vim.cmd("tabnew")
     local _ = vim.fn.termopen({ vim.o.shell })
-    vim.wait(500)
+    wait_for_terminal()
 
     local initial_tab_count = vim.fn.tabpagenr("$")
 
@@ -304,9 +312,8 @@ T["open_from_terminal"]["shows warning for non-existent file"] = function()
 
     file_opener.open_from_terminal("/tmp/nonexistent_file_12345.lua")
 
+    vim.wait(500, function() return notified end)
     vim.notify = original_notify
-
-    vim.wait(500)
 
     MiniTest.expect.equality(notified, true, "Should notify about non-existent file")
     MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count, "Should not open new tab")
