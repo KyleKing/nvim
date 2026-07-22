@@ -449,9 +449,17 @@ function M.run_tests_parallel(shuffle, seed)
     -- Parse results from log files
     append_line("")
     append_line("=== Results ===")
+    local started, reported, passed, failed = 0, 0, 0, 0
     for worker_id, proc in ipairs(worker_processes) do
         local log = vim.fn.readfile(proc.log_path)
         for _, line in ipairs(log) do
+            if line:match("^=== Running") then started = started + 1 end
+            local file_passed, file_failed = line:match("^Results: (%d+) passed, (%d+) failed")
+            if file_passed then
+                reported = reported + 1
+                passed = passed + tonumber(file_passed)
+                failed = failed + tonumber(file_failed)
+            end
             if line:match("^=== Running") or line:match("^Results:") then
                 append_line(string.format("[W%d] %s", worker_id, line))
             end
@@ -459,7 +467,17 @@ function M.run_tests_parallel(shuffle, seed)
     end
 
     append_line("")
-    append_line("All tests completed!")
+    append_line("==== Test Summary ====")
+    append_line(string.format("Files: %d of %d reported", reported, #test_files))
+    append_line("Passed: " .. passed)
+    append_line("Failed: " .. failed)
+
+    -- A file that started without reporting means its worker died mid-chunk
+    local incomplete = started - reported
+    if incomplete > 0 then append_line(string.format("Files that started but never reported: %d", incomplete)) end
+
+    if is_headless() and (failed > 0 or incomplete > 0 or reported < #test_files) then vim.cmd("silent! 1cquit") end
+
     append_line("Press 'q' or <Esc> to close")
 
     vim.api.nvim_buf_set_keymap(buf, "n", "q", "<Cmd>close<CR>", { noremap = true, silent = true })

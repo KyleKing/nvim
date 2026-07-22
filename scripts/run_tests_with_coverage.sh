@@ -33,7 +33,7 @@ elif [ "$TARGET" = "custom" ]; then
     # Run only custom module tests
     NVIM_TEST_SYNC=1 nvim --headless \
         -c "lua package.loaded.luacov = require('luacov'); luacov.init()" \
-        -c "lua local files = vim.fn.glob('lua/tests/custom/*_spec.lua', false, true); for _, f in ipairs(files) do MiniTest.run_file(f, {verbose=false}) end" \
+        -c "lua require('kyleking.utils.test_runner').run_files(vim.fn.glob('lua/tests/custom/*_spec.lua', false, true))" \
         +qall || true
 else
     # Run specific test file
