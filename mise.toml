@@ -77,7 +77,7 @@ run = "./scripts/measure_nvim.sh"
 
 # Test tasks
 [tasks.test]
-description = "Run CI tests (no external tool dependencies, ~50 seconds)"
+description = "Run CI tests (every spec except those marked @ci-skip, ~55 seconds)"
 run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_ci_tests()" -c "qall!"'
 
 [tasks."test:all"]

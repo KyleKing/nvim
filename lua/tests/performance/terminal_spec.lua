@@ -1,3 +1,4 @@
+-- @ci-skip: wall-clock terminal benchmarks that need bash brace expansion in /bin/sh
 local MiniTest = require("mini.test")
 
 local T = MiniTest.new_set({

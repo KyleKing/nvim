@@ -46,7 +46,7 @@ Some hooks are staged `pre-push` rather than `pre-commit`, so committing does no
 
 ### Running tests
 
-`mise run test` is the default: CI-safe cases only, no external tool dependencies, a few seconds. The `test:*` namespace adds fuller runs (everything sequential, everything in parallel workers, randomized order to catch inter-test dependencies) and coverage variants that need luacov (`luarocks install luacov`). A single file goes through `FILE=<path> mise run test:file`.
+`mise run test` is the default: every spec found by glob under `lua/tests/`, minus the few that opt out. A new spec joins that run the moment the file exists, with nothing to register. A spec opts out by putting `-- @ci-skip: <reason>` in its first ten lines, which `run_ci_tests` in `lua/kyleking/utils/test_runner.lua` reads without loading the file. Earn the directive only by needing a host tool or a language server CI lacks, or by asserting wall-clock behavior that does not hold off this machine. A spec that merely calls an optional tool should detect its absence and `MiniTest.skip` instead, the way `lua/tests/plugins/formatting_spec.lua` does for stylua. The `test:*` namespace adds fuller runs (everything sequential, everything in parallel workers, randomized order to catch inter-test dependencies) and coverage variants that need luacov (`luarocks install luacov`). A single file goes through `FILE=<path> mise run test:file`.
 
 ```bash
 mise run test
@@ -193,7 +193,7 @@ Each mini module is configured in the `deps/*.lua` file for its functional area,
 
 Tests use mini.test (not plenary or busted). Test files live in `lua/tests/` and follow `*_spec.lua` naming. `mini-deps-snap/` at the repo root is mini.test's baseline directory, configured in `setup-deps.lua`, and despite the name has nothing to do with mini.deps.
 
-Subdirectories of `lua/tests/` sort by what a test needs, not by which file it covers: `core/` for whole-config startup checks, `custom/` for the config's own Lua modules, `integration/` for workflows crossing several plugins or an LSP, `performance/` for timing assertions, `plugins/` and `ui/` for single-plugin and single-component behavior. Put a new test in the directory matching its dependencies, since that is what decides whether it can run in the CI-safe set.
+Subdirectories of `lua/tests/` sort by what a test needs, not by which file it covers: `core/` for whole-config startup checks, `custom/` for the config's own Lua modules, `integration/` for workflows crossing several plugins or an LSP, `performance/` for timing assertions, `plugins/` and `ui/` for single-plugin and single-component behavior. Put a new test in the directory matching its dependencies.
 
 `lua/tests/docs/` is the exception to the naming rule: fixtures there are plain modules driven by `runner_spec.lua`, not standalone specs. `lua/tests/helpers.lua` holds the shared utilities (`nvim_interaction_test`, `check_keymap`, `create_test_buffer`, and others); read it before writing a helper of your own.
 
@@ -310,7 +310,7 @@ Read the module for the current API; it exposes root detection, an LSP `root_dir
 
 Config-owned Lua lives in `lua/kyleking/utils/`, one module per concern (diagnostic suppression, filesystem and git-worktree helpers, list editing, preview, link opening, sorting, and so on), with larger ones as directories. Each file opens with a comment stating its job, so grep or skim the directory rather than trusting a list here.
 
-These modules carry the bulk of the config's real logic, so they are also where test coverage matters most; their specs live in `lua/tests/custom/`. Keep a utility free of plugin dependencies where you can, since that is what lets its tests run in the CI-safe set.
+These modules carry the bulk of the config's real logic, so they are also where test coverage matters most; their specs live in `lua/tests/custom/`. Keep a utility free of plugin dependencies where you can, so its tests stay cheap and stay in the default run.
 
 ## Style
 

@@ -41,8 +41,8 @@ jobs:
 
       - name: Run CI tests
         run: |
-          # Run only tests that don't require external tools (stylua, ruff, etc.)
-          # This matches the local :RunTestCI command
+          # Every spec except those whose header carries a `@ci-skip:` directive.
+          # This matches the local :RunTestCI command and `mise run test`.
           NVIM_TEST_SYNC=1 nvim --headless \
             -c "lua require('kyleking.utils.test_runner').run_ci_tests()" \
             -c "qall!"

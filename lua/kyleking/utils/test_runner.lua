@@ -12,6 +12,11 @@ local M = {}
 local TEST_DIR = vim.fn.stdpath("config") .. "/lua/tests"
 local EXECUTE_TIMEOUT_MS = 600000
 
+-- A spec opts out of the default run by putting `-- @ci-skip: <reason>` in its header.
+-- Only two things earn the directive: the spec needs a host tool or a language server CI
+-- does not have, or it asserts wall-clock behavior that is unreliable off this machine.
+local CI_SKIP_HEADER_LINES = 10
+
 -- Store the last test run results for re-running failed tests
 local last_test_run = {
     failed_tests = {}, -- Format: { {file = "file_path", id = "full case id"}, ... }
@@ -527,52 +532,43 @@ function M.run_fast_tests()
     return run_files(test_files)
 end
 
---- Run CI-safe tests (tests that don't require external tools)
---- These tests only require Neovim and plugins installed via vim.pack
+--- Read a spec's `@ci-skip` reason from its header, or nil when it has none.
+--- Reading the header keeps discovery cheap: mini.test only loads a spec at collect time,
+--- so the runner cannot ask the module for a marker before deciding whether to collect it.
+local function ci_skip_reason(file)
+    local handle = io.open(file, "r")
+    if handle == nil then return nil end
+
+    local reason = nil
+    for _ = 1, CI_SKIP_HEADER_LINES do
+        local line = handle:read("l")
+        if line == nil then break end
+        reason = line:match("^%s*%-%-%s*@ci%-skip:%s*(.+)$")
+        if reason ~= nil then break end
+    end
+
+    handle:close()
+    return reason
+end
+
+--- Run every spec except the ones whose header opts out with `-- @ci-skip: <reason>`.
+--- Discovery is a glob, so a new spec joins this run without being registered anywhere.
 function M.run_ci_tests()
-    -- CI-safe test files: no external tool dependencies (stylua, ruff, selene, etc.)
-    local ci_safe_patterns = {
-        -- Core tests
-        "lua/tests/core/smoke_spec.lua",
-        "lua/tests/core/keymap_collision_spec.lua",
-
-        -- All custom utility tests
-        "lua/tests/custom/*_spec.lua",
-
-        -- Doc fixture tests
-        "lua/tests/docs/runner_spec.lua",
-
-        -- Plugin tests that only check config/keymaps
-        "lua/tests/plugins/keybinding_spec.lua",
-        "lua/tests/plugins/mini_ai_spec.lua",
-
-        -- UI tests
-        "lua/tests/ui/temp_statusline_spec.lua",
-        "lua/tests/ui/picker_config_spec.lua",
-
-        -- Integration tests that don't need external tools
-        "lua/tests/integration/clue_keymap_integration_spec.lua",
-        "lua/tests/integration/mini_files_operations_spec.lua",
-        "lua/tests/integration/git_hunks_spec.lua", -- git usually available in CI
-
-        -- Performance tests
-        "lua/tests/performance/startup_spec.lua",
-    }
-
-    -- Expand glob patterns and collect test files
-    local test_files = {}
-    for _, pattern in ipairs(ci_safe_patterns) do
-        if pattern:match("%*") then
-            -- Glob pattern
-            local expanded = vim.fn.glob(pattern, false, true)
-            vim.list_extend(test_files, expanded)
+    local test_files, skipped = {}, {}
+    for _, file in ipairs(vim.fn.globpath(TEST_DIR, "**/*_spec.lua", false, true)) do
+        local reason = ci_skip_reason(file)
+        if reason == nil then
+            table.insert(test_files, file)
         else
-            -- Direct file path
-            if vim.fn.filereadable(pattern) == 1 then table.insert(test_files, pattern) end
+            table.insert(skipped, { file = file:match("lua/tests/(.+)$") or file, reason = reason })
         end
     end
 
     print("Running CI-safe tests (" .. #test_files .. " files)...")
+    for _, entry in ipairs(skipped) do
+        print(string.format("Skipping %s: %s", entry.file, entry.reason))
+    end
+
     return run_files(test_files)
 end
 

@@ -1,5 +1,6 @@
 -- Detailed LSP functionality tests
 -- Batched tests to minimize subprocess overhead
+-- @ci-skip: needs a running lua-language-server; the child nvim hangs and times out without one
 local MiniTest = require("mini.test")
 local helpers = require("tests.helpers")
 
