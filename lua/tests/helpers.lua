@@ -24,16 +24,7 @@ silence_surround_highlight()
 -- @param timeout_ms number: Timeout in milliseconds (default: 5000)
 -- @return boolean: true if LSP attached, false if timeout
 function M.wait_for_lsp_attach(bufnr, timeout_ms)
-    timeout_ms = timeout_ms or 5000
-    local start_time = vim.uv.now()
-
-    while vim.uv.now() - start_time < timeout_ms do
-        local clients = vim.lsp.get_clients({ bufnr = bufnr })
-        if #clients > 0 then return true end
-        vim.wait(100)
-    end
-
-    return false
+    return vim.wait(timeout_ms or 5000, function() return #vim.lsp.get_clients({ bufnr = bufnr }) > 0 end, 10)
 end
 
 -- Return to a clean normal mode, dropping any pending count
@@ -128,20 +119,9 @@ end
 -- Wait for a condition to be true
 -- @param fn function: Function to check (should return boolean)
 -- @param timeout_ms number: Timeout in milliseconds (default: 2000)
--- @param interval_ms number: Check interval in milliseconds (default: 100)
+-- @param interval_ms number: Check interval in milliseconds (default: 10)
 -- @return boolean: true if condition met, false if timeout
-function M.wait_for_condition(fn, timeout_ms, interval_ms)
-    timeout_ms = timeout_ms or 2000
-    interval_ms = interval_ms or 100
-    local start_time = vim.uv.now()
-
-    while vim.uv.now() - start_time < timeout_ms do
-        if fn() then return true end
-        vim.wait(interval_ms)
-    end
-
-    return false
-end
+function M.wait_for_condition(fn, timeout_ms, interval_ms) return vim.wait(timeout_ms or 2000, fn, interval_ms or 10) end
 
 -- Wait for autocmd to be registered
 -- @param event string: Event name
@@ -328,8 +308,8 @@ function M.full_cleanup()
     -- Force garbage collection to clean up resources
     collectgarbage("collect")
 
-    -- Brief wait for cleanup to settle
-    vim.wait(10)
+    -- Let anything the cleanup scheduled run before the next case starts
+    M.drain_deferred()
 end
 
 --- Run Lua code in a subprocess nvim with full user config loaded.

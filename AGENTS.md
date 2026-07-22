@@ -290,6 +290,8 @@ Keep the wait even when the operation turns out to be synchronous, as `wait_for_
 
 Waiting for the event loop to drain rather than for a condition is a different job: use `helpers.drain_deferred()`, which queues a marker behind whatever is already pending and waits for that. `helpers.delete_buffer` calls it, which is why deleting a buffer through the helper avoids the `Invalid buffer id` tracebacks a queued callback would otherwise print.
 
+The same applies inside the Lua payloads handed to `helpers.nvim_interaction_test`: they run in a child nvim, so a bare wait there costs the parent the same wall clock. The child loads the full user config, so `require("tests.helpers")` works there too and `drain_deferred` is the right tool after `nvim_feedkeys(_, "x", _)`, which runs the keys before it returns.
+
 ### LSP configuration (nvim 0.11+)
 
 LSP configuration is split across three locations:
