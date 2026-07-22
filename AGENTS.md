@@ -166,7 +166,7 @@ end
 
 ### Startup validation
 
-The subprocess-based smoke test in `lua/tests/core/smoke_spec.lua` spawns a fresh nvim and checks stderr for `mini.deps` two-stage execution errors. This catches nil-rhs keymap errors and other issues that only surface after all `later()` callbacks complete -- issues that in-process MiniTest cases cannot observe due to `vim.schedule` nesting.
+The subprocess-based smoke test in `lua/tests/core/smoke_spec.lua` spawns a fresh nvim and checks stderr for `pack` (vim.pack) errors surfacing after deferred plugin loading. This catches nil-rhs keymap errors and other issues that only appear once all `later()` callbacks complete -- issues that in-process MiniTest cases cannot observe due to `vim.schedule` nesting.
 
 ## Architecture
 
@@ -175,15 +175,15 @@ The subprocess-based smoke test in `lua/tests/core/smoke_spec.lua` spawns a fres
 `init.lua` -> `lua/kyleking/init.lua` which loads two phases:
 
 1. **Core** (`lua/kyleking/core/init.lua`): options -> lsp -> keymaps -> autocmds
-1. **Plugins** (`lua/kyleking/setup-deps.lua`): bootstraps mini.deps, then requires each `lua/kyleking/deps/*.lua` file
+1. **Plugins** (`lua/kyleking/setup-deps.lua`): requires each `lua/kyleking/deps/*.lua` file, which call into `lua/kyleking/pack.lua`
 
-### Plugin management (mini.deps)
+### Plugin management (vim.pack)
 
-All plugins are managed through mini.deps, not lazy.nvim. Each `deps/*.lua` file groups related plugins by functionality (not one-file-per-plugin).
+All plugins are managed through Neovim's built-in `vim.pack` (0.12+), not lazy.nvim or mini.deps (mini.deps is frozen upstream in favor of vim.pack -- see https://echasnovski.com/blog/2026-03-13-a-guide-to-vim-pack). `lua/kyleking/pack.lua` is a thin compatibility layer exposing the small slice of the old mini.deps API (`add()`/`now()`/`later()`) this config's `deps/*.lua` files are written against; it queues `later()` callbacks one per event-loop tick so the UI stays responsive. Each `deps/*.lua` file groups related plugins by functionality (not one-file-per-plugin).
 
 ```lua
-local MiniDeps = require("mini.deps")
-local add, _now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
+local pack = require("kyleking.pack")
+local add, later = pack.add, deps_utils.maybe_later
 
 later(function()
     add("author/plugin")
@@ -197,6 +197,9 @@ end)
 - Set `NVIM_TEST_SYNC=1` to make `later()` behave like `now()` (useful for testing)
 - Plugin keymaps belong in their respective `deps/*.lua` file, not in `core/keymaps.lua`
 - Wrap plugin function calls in keymaps with anonymous functions to prevent nil-rhs errors when the plugin hasn't loaded yet
+- Plugin state (installed revision, source) lives in `nvim-pack-lock.json`, tracked in git -- treat it like any other lockfile: never hand-edit it, let `vim.pack` write it
+- To check for and review plugin updates: `:lua vim.pack.update()` fetches and opens a confirm buffer per plugin (grouped "# Same"/"# Update", with revision and changelog); edit out lines you don't want updated, then `:write` to apply. Call it directly rather than wrapping it in a command -- that's vim.pack's own recommended usage, not a gap this config needs to fill
+- `:PackClean` (in `pack.lua`) reports plugins installed/lockfile-tracked but not `add()`-ed this session -- leftovers from a removed `add()` call. Report-only by default; `:PackClean!` deletes. Some plugins are added conditionally (e.g. skipped when headless), so treat its output as candidates to verify, not a delete list
 
 ### mini.nvim ecosystem
 

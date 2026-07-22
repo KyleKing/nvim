@@ -4,6 +4,12 @@
 -- Deferred loading (later) mirrors mini.deps: queued callbacks run one per event
 -- loop tick after startup so the UI stays responsive. Plugin install/update/version
 -- state is tracked by vim.pack's own lockfile (nvim-pack-lock.json).
+--
+-- To check for and review plugin updates, call `vim.pack.update()` directly (no
+-- wrapper here by design -- see :h vim.pack.update): it fetches, then opens a
+-- confirm buffer grouping plugins under "# Same"/"# Update" with per-plugin revision
+-- and changelog; edit out lines you don't want and `:write` to apply. `:PackClean`
+-- below covers the one thing that API doesn't: finding plugins nothing add()s anymore.
 
 local M = {}
 

@@ -534,7 +534,7 @@ function M.run_fast_tests()
 end
 
 --- Run CI-safe tests (tests that don't require external tools)
---- These tests only require Neovim and plugins installed via mini.deps
+--- These tests only require Neovim and plugins installed via vim.pack
 function M.run_ci_tests()
     local MiniTest = require("mini.test")
 
