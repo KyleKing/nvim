@@ -22,7 +22,7 @@ None tracks semantic maps + commands + curated motions with a "never used" repor
 
 ## Locked decisions (from review)
 
-- **Scope**: maps + commands + configurable motion sampling. The sampler keeps compound sequences I care about (`ciw`, `f{char}`, operator+textobject) and drops a configurable denylist of pure-navigation single keys (`h j k l w b e 0 $` and similar).
+- **Scope**: maps + commands + configurable motion sampling. The sampler keeps compound sequences I care about (`ciw`, `f{char}`, operator+textobject) and drops a **denylist** of pure-navigation single keys (`h j k l w b e 0 $` and similar). Denylist over allowlist, with `*` glob patterns and a triage view for updating it from real data (mechanism 4).
 - **Storage**: JSONL, one file per host, under a configurable Syncthing path. Default `~/Sync/.nvim/usage/<host>.jsonl`. Per-host files so Syncthing never hits an append conflict; the report globs every host file at analysis time.
 - **Delivery**: this doc first, then a phased build with tests.
 
@@ -52,6 +52,41 @@ This is the hard hook and the one with real imprecision. `vim.on_key(fn, ns)` gi
 - Cap sequence length (e.g. 6 keys) so a stuck buffer can't log garbage.
 
 Known limitation to accept up front: counts under a `count` prefix (`3ciw`), register prefixes (`"ayy`), and remapped operators can misattribute. The sampler is a **directional signal** ("I lean on text objects", "I never use `t`"), not an exact ledger. If it proves too noisy, hook 3 is the one to disable via config while 1 and 2 keep working.
+
+### 4. Denylist patterns, and keeping them current
+
+Decision: **denylist**, not allowlist. An allowlist only teaches me about motions I already thought to name, which defeats the point of discovery.
+
+**Glob syntax.** Patterns support `*`, matching any run of keys: `c*w` covers `ciw`, `caw`, `c2w`.
+
+Escaping is the part that will silently break, because vim keys are full of Lua-pattern magic characters (`di(`, `f;`, `$`, `^`, `%`). Prototyped and verified against 17 cases; this order works:
+
+```lua
+local function compile(glob)
+    local escaped = glob:gsub("[%^%$%(%)%%%.%[%]%*%+%-%?]", "%%%1")
+    return "^" .. escaped:gsub("%%%*", ".*") .. "$"
+end
+```
+
+Escape everything including `*`, then un-escape `%*` into `.*`. Doing it in that order sidesteps the trap of expanding `*` first and then escaping the `.` you just introduced.
+
+Two behaviors the prototype surfaced, both worth knowing before writing seed patterns:
+
+- **Matching is case-sensitive**, which is correct for vim (`ciw` and `ciW` are different motions), but it means `c*w` does *not* cover the WORD family. Word and WORD variants each need their own pattern.
+- **`*` spans arbitrary keys**, so `g*w` matches `gUiw`. Short globs are far broader than they look. This is the concrete form of the over-greedy risk below.
+
+**One matcher, two lists.** Note the tension in `c*w`: it's the family I use most, so denying it throws away the signal I most want. So the same pattern engine feeds two lists:
+
+- `denylist` — matched sequences are dropped, never logged
+- `groups` — matched sequences are logged under the pattern as their label, collapsing a family into one row (`c*w: 412` instead of `ciw`/`caw`/`ciW` as three separate rows)
+
+Precedence is denylist first (an explicit drop always wins), then groups, then the raw sequence. So `c*w` belongs in `groups`; `h`, `j`, `k`, `l` belong in `denylist`.
+
+**Where the list lives.** Not hardcoded in Lua, or updating it means editing config and reloading. Two layers: built-in defaults ship in the module, and a mutable `patterns.json` sits in the sync dir alongside the event logs. The data file wins on conflict, syncs across machines for free, and can be hand-edited or appended to by the report.
+
+**The triage loop** (the "update it over time from noisy data" ask): a `:FeatureUsage noise` view lists the highest-count sequences that are neither denied nor grouped, ranked by count. One keypress on a row appends it to `denylist` or `groups` in `patterns.json`. That turns denylist maintenance into a periodic 30-second pass over real data instead of guesswork up front.
+
+**Seeing what was dropped.** Denying at capture time keeps event volume sane, but it also means denied data is invisible forever, so an over-greedy pattern can quietly eat a real signal. Compromise: keep **aggregate counters only** for denied patterns (`pattern -> count`, no per-event lines), flushed with the normal batch. Enough to notice `c*w` swallowed 4000 events and walk it back; cheap enough to cost a few bytes a day.
 
 ### Coverage summary
 
@@ -94,7 +129,8 @@ Reconciliation runs **lazily** when the report opens, not at startup, because `p
 lua/kyleking/utils/usage/
   init.lua       -- install(): patch vim.keymap.set, register autocmds/on_key, config
   writer.lua     -- buffered JSONL append (vim.uv async, timer + VimLeavePre flush)
-  motion.lua     -- on_key sequence assembler + denylist
+  patterns.lua   -- glob -> Lua pattern compiler, denylist/groups matching, patterns.json
+  motion.lua     -- on_key sequence assembler, feeds sequences through patterns.lua
   report.lua     -- aggregate host files, three views, :FeatureUsage + pick source
 ```
 
@@ -111,7 +147,12 @@ require("kyleking.utils.usage").install({
     track = { maps = true, commands = true, motions = true },
     motion = {
         max_seq_len = 6,
+        -- Seed values only. patterns.json in `dir` overrides these and is what
+        -- the :FeatureUsage noise view appends to, so the live lists drift from
+        -- this default over time by design.
         denylist = { "h", "j", "k", "l", "w", "b", "e", "0", "$", "^", "gj", "gk" },
+        -- Word and WORD need separate entries; matching is case-sensitive.
+        groups = { "c*w", "c*W", "d*w", "d*W", "y*w", "c*(", "c*\"", "f*", "t*" },
     },
     redact_cwd = true,                -- store project basename, not full path
 })
@@ -119,7 +160,8 @@ require("kyleking.utils.usage").install({
 
 ## Risks and open questions
 
-- **Motion attribution accuracy** (hook 3). Ship it behind `track.motions` so it can be cut without touching maps/commands. Open question: is the denylist the right filter, or do I want an *allowlist* of sequences I explicitly care about (`ciw`, `di(`, `ca"`)? An allowlist is far more precise and far less noisy, at the cost of only learning about motions I already thought to list. Leaning allowlist for the compound-motion view; still deciding.
+- **Motion attribution accuracy** (hook 3). Ship it behind `track.motions` so it can be cut without touching maps/commands. The denylist-vs-allowlist question is settled (denylist, see mechanism 4); what remains unproven is whether the seed denylist is close enough that the noise view is usable on day one, or whether the first week's log is mostly junk. Acceptable either way, since triage is the designed workflow.
+- **Over-greedy patterns.** A careless `c*` eats most of the interesting data. The denied-pattern aggregate counters exist to make that visible; still worth a confirmation prompt before the noise view writes a pattern shorter than two characters.
 - **Startup cost.** Patching one function + two autocmds is negligible, but the per-callback wrapper adds a closure and a table write on every map invocation. Measure with `bench:startup` and a hot-loop test before trusting it.
 - **String-rhs invocation gap.** Accept for v1. Revisit only if a specific string-rhs map turns out to be a decision I can't make without its count.
 - **Privacy in the sync folder.** `cwd` is stored as basename only. No file contents, no full paths, no typed text beyond the motion key name. Confirm that's enough before syncing.
@@ -130,6 +172,8 @@ require("kyleking.utils.usage").install({
 - **map wrapper**: setting a callback map still calls the original; a logged event carries the right `lhs`/`desc`/`mode`; string-rhs maps set without error and are not double-invoked (custom spec).
 - **command hook**: `CmdlineLeave` logs the first token for user and built-in commands; aborted cmdline (`<Esc>`) logs nothing (integration spec).
 - **motion assembler**: `ciw` assembles to one event; a denylisted single key logs nothing; a sequence over `max_seq_len` is dropped (custom spec).
+- **pattern matcher**: `c*w` matches `ciw`/`caw`/`ciW` and not `ciwx`; magic-char sequences (`di(`, `f;`, `$`, `^`, `%`) match literally rather than as Lua patterns; denylist beats groups on a sequence matching both; a denied pattern increments its aggregate counter without writing an event (custom spec — this is the escaping-order bug most likely to ship silently).
+- **patterns.json**: a missing or malformed file falls back to the seed defaults without erroring; an append from the noise view round-trips (custom spec).
 - **report**: cold view lists a registered-but-unlogged map and ranks a tried-then-dropped map by last-used date; top-used ranks by count; aggregation unions two host files (custom spec with fixture JSONL).
 - **smoke**: the subprocess smoke test already catches boot breakage from the line-1 wiring.
 
@@ -137,4 +181,4 @@ require("kyleking.utils.usage").install({
 
 1. writer + map wrapper + command hook + minimal `:FeatureUsage` top-used view. Land this, run it for a couple weeks, confirm the data is worth it.
 1. the cold view (reconciliation + last-used) and the pick source.
-1. motion sampler (denylist or allowlist per the open question), behind `track.motions`.
+1. motion sampler behind `track.motions`: assembler, pattern matcher, `patterns.json`, and the `:FeatureUsage noise` triage view. Build the matcher and its tests before the sampler, since everything downstream depends on the escaping being right.
