@@ -13,8 +13,8 @@
       "src": "https://github.com/uga-rosa/ccc.nvim"
     },
     "codanna.nvim": {
-      "rev": "5abdcfcc4fe9bf39e1b022c4b9fdb0430bd4e012",
-      "src": "https://github.com/KyleKing/codanna.nvim"
+      "rev": "30cffbe65760670bc1804f8ac6a4c61d17fcb7e4",
+      "src": "file:///Users/kyleking/Developer/kyleking/codanna.nvim"
     },
     "conform.nvim": {
       "rev": "619363c30309d29ffa631e67c8183f2a72caa373",

@@ -6,6 +6,19 @@ local deps_utils = require("kyleking.deps_utils")
 local add, later = pack.add, deps_utils.maybe_later
 
 later(function()
+    add({ source = "file:///Users/kyleking/Developer/kyleking/codanna.nvim" })
+    require("codanna").setup({ preferred_picker = "mini" })
+
+    local K = vim.keymap.set
+    K("n", "<leader>sC", "<cmd>CodannaCalls<cr>", { desc = "Codanna outgoing calls" })
+    K("n", "<leader>sc", "<cmd>CodannaCallers<cr>", { desc = "Codanna callers" })
+    K("n", "<leader>sd", "<cmd>CodannaDocuments<cr>", { desc = "Codanna documents" })
+    K("n", "<leader>si", "<cmd>CodannaImpact<cr>", { desc = "Codanna impact analysis" })
+    K("n", "<leader>ss", "<cmd>CodannaSearch<cr>", { desc = "Codanna semantic search" })
+    K("n", "<leader>sy", "<cmd>CodannaSymbols<cr>", { desc = "Codanna symbols" })
+end)
+
+later(function()
     add({ source = "file:///Users/kyleking/Developer/kyleking/spaghetti-comb.nvim" })
     require("spaghetti-comb").setup({})
 
