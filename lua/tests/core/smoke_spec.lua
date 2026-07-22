@@ -151,12 +151,15 @@ T["plugin interactions"]["mini.files open and close without errors"] = function(
 end
 
 T["plugin interactions"]["mini.pick can be invoked without errors"] = function()
+    -- `pick.builtin.files` blocks in mini.pick's own key loop until the picker stops, so
+    -- the stop has to be queued before it opens. Calling it afterwards never runs: the
+    -- child nvim sat in the picker until the harness killed it, and the check below then
+    -- passed on the empty stderr of a killed process without exercising anything.
     local result = helpers.nvim_interaction_test([[
         local ok, pick = pcall(require, "mini.pick")
         if ok and pick then
+            vim.defer_fn(function() pcall(pick.stop) end, 200)
             pcall(pick.builtin.files, { tool = "git" })
-            vim.wait(200, function() return false end)
-            pcall(pick.stop)
         end
     ]])
     assert_no_stderr_errors(result, "mini.pick interaction")
