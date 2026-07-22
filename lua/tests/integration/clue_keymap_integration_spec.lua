@@ -91,8 +91,11 @@ T["common keypress scenarios"]["pressing 'g' doesn't error"] = function()
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {"line 1", "line 2", "line 3"})
 
         -- Simulate pressing 'g' (which triggers mini.clue)
+        -- feedkeys with "x" runs the key before it returns, so only clue's scheduled
+        -- work is left to drain. Its window opens on a 500ms timer that neither this
+        -- test nor its earlier fixed 100ms wait ever reached.
         vim.api.nvim_feedkeys("g", "x", false)
-        vim.wait(100)
+        require("tests.helpers").drain_deferred()
 
         -- If mini.clue errored, it would show in stderr
         print("SUCCESS: g keypress handled")
@@ -118,11 +121,11 @@ T["common keypress scenarios"]["pressing 'gg' navigation works"] = function()
 
         -- Move to bottom
         vim.api.nvim_feedkeys("G", "x", false)
-        vim.wait(100)
+        vim.wait(100, function() return vim.api.nvim_win_get_cursor(0)[1] == 50 end)
 
         -- Press 'gg' to go to top
         vim.api.nvim_feedkeys("gg", "x", false)
-        vim.wait(100)
+        vim.wait(100, function() return vim.api.nvim_win_get_cursor(0)[1] == 1 end)
 
         local cursor = vim.api.nvim_win_get_cursor(0)
         if cursor[1] == 1 then
@@ -145,19 +148,16 @@ end
 T["common keypress scenarios"]["leader key triggers clue window"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        -- Press leader and wait for clue window
-        vim.api.nvim_feedkeys(" ", "x", false)
-        vim.wait(600) -- Wait longer than clue delay (500ms)
-
-        -- Check if a float window exists (clue window)
-        local found_float = false
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local config = vim.api.nvim_win_get_config(win)
-            if config.relative ~= "" then
-                found_float = true
-                break
+        local function any_float()
+            for _, win in ipairs(vim.api.nvim_list_wins()) do
+                if vim.api.nvim_win_get_config(win).relative ~= "" then return true end
             end
+            return false
         end
+
+        -- Press leader and wait for the clue window, which opens on a 500ms timer
+        vim.api.nvim_feedkeys(" ", "x", false)
+        local found_float = vim.wait(600, function() return any_float() end)
 
         if found_float then
             print("SUCCESS: Leader key triggered clue window")
@@ -177,13 +177,15 @@ T["common keypress scenarios"]["bracket navigation triggers clue"] = function()
         vim.cmd("enew")
         vim.api.nvim_buf_set_lines(0, 0, -1, false, {"line 1", "line 2"})
 
+        local drain = require("tests.helpers").drain_deferred
+
         -- Press '[' which should trigger mini.clue
         vim.api.nvim_feedkeys("[", "x", false)
-        vim.wait(100)
+        drain()
 
         -- Press ']' which should also trigger mini.clue
         vim.api.nvim_feedkeys("]", "x", false)
-        vim.wait(100)
+        drain()
 
         print("SUCCESS: Bracket keys handled")
     ]],
@@ -208,25 +210,27 @@ T["workflow scenarios"]["typical editing workflow"] = function()
             "}",
         })
 
+        local drain = require("tests.helpers").drain_deferred
+
         -- Navigation: gg to go to top
         vim.api.nvim_feedkeys("gg", "x", false)
-        vim.wait(50)
+        vim.wait(50, function() return vim.api.nvim_win_get_cursor(0)[1] == 1 end)
 
         -- Navigation: G to go to bottom
         vim.api.nvim_feedkeys("G", "x", false)
-        vim.wait(50)
+        vim.wait(50, function() return vim.api.nvim_win_get_cursor(0)[1] == 3 end)
 
         -- Try 'g' prefix (should show clue)
         vim.api.nvim_feedkeys("g", "x", false)
-        vim.wait(100)
+        drain()
         vim.api.nvim_feedkeys("\27", "x", false) -- ESC to cancel
-        vim.wait(50)
+        drain()
 
         -- Try 'z' prefix (should show clue)
         vim.api.nvim_feedkeys("z", "x", false)
-        vim.wait(100)
+        drain()
         vim.api.nvim_feedkeys("\27", "x", false) -- ESC to cancel
-        vim.wait(50)
+        drain()
 
         print("SUCCESS: Editing workflow completed")
     ]],
@@ -245,17 +249,19 @@ T["workflow scenarios"]["file navigation workflow"] = function()
             vim.api.nvim_buf_set_lines(0, 0, -1, false, {"Buffer " .. i})
         end
 
+        local drain = require("tests.helpers").drain_deferred
+
         -- Try window navigation (should trigger <C-w> clue)
         vim.api.nvim_feedkeys("\23", "x", false) -- <C-w>
-        vim.wait(100)
+        drain()
         vim.api.nvim_feedkeys("\27", "x", false) -- ESC
-        vim.wait(50)
+        drain()
 
         -- Try marks (should trigger marks clue)
         vim.api.nvim_feedkeys("'", "x", false)
-        vim.wait(100)
+        drain()
         vim.api.nvim_feedkeys("\27", "x", false) -- ESC
-        vim.wait(50)
+        drain()
 
         print("SUCCESS: File navigation workflow completed")
     ]],

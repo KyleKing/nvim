@@ -54,7 +54,7 @@ T["shell terminal tab"]["creates new tab"] = function()
     local initial_tab_count = #vim.api.nvim_list_tabpages()
 
     module.toggle_shell_tab()
-    vim.wait(200)
+    vim.wait(200, function() return #vim.api.nvim_list_tabpages() > initial_tab_count end)
 
     local new_tab_count = #vim.api.nvim_list_tabpages()
     MiniTest.expect.equality(new_tab_count, initial_tab_count + 1, "Should create a new tab")
@@ -68,12 +68,12 @@ T["shell terminal tab"]["toggle from terminal returns to previous tab"] = functi
     local original_tab = vim.api.nvim_get_current_tabpage()
 
     module.toggle_shell_tab()
-    vim.wait(200)
+    vim.wait(200, function() return vim.api.nvim_get_current_tabpage() ~= original_tab end)
 
     MiniTest.expect.equality(vim.api.nvim_get_current_tabpage() ~= original_tab, true, "Should be on terminal tab")
 
     module.toggle_shell_tab()
-    vim.wait(100)
+    vim.wait(100, function() return vim.api.nvim_get_current_tabpage() == original_tab end)
 
     MiniTest.expect.equality(vim.api.nvim_get_current_tabpage(), original_tab, "Should return to original tab")
 end
@@ -82,16 +82,16 @@ T["shell terminal tab"]["toggle from other tab switches to terminal"] = function
     local module = require("kyleking.deps.terminal-integration")
 
     module.toggle_shell_tab()
-    vim.wait(200)
+    vim.wait(200, function() return module.shell_term.tabnr ~= nil end)
 
     module.toggle_shell_tab()
-    vim.wait(100)
+    vim.wait(100, function() return vim.api.nvim_get_current_tabpage() ~= module.shell_term.tabnr end)
 
     local current_tab = vim.api.nvim_get_current_tabpage()
     MiniTest.expect.equality(current_tab ~= module.shell_term.tabnr, true, "Should not be on terminal tab")
 
     module.toggle_shell_tab()
-    vim.wait(100)
+    vim.wait(100, function() return vim.api.nvim_get_current_tabpage() == module.shell_term.tabnr end)
 
     MiniTest.expect.equality(
         vim.api.nvim_get_current_tabpage(),
@@ -104,15 +104,15 @@ T["shell terminal tab"]["reuses buffer"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
     module.toggle_shell_tab()
-    vim.wait(200)
+    vim.wait(200, function() return module.shell_term.bufnr ~= nil end)
 
     local first_bufnr = module.shell_term.bufnr
 
     module.toggle_shell_tab()
-    vim.wait(100)
+    vim.wait(100, function() return vim.api.nvim_get_current_tabpage() ~= module.shell_term.tabnr end)
 
     module.toggle_shell_tab()
-    vim.wait(100)
+    vim.wait(100, function() return vim.api.nvim_get_current_tabpage() == module.shell_term.tabnr end)
 
     MiniTest.expect.equality(module.shell_term.bufnr, first_bufnr, "Should reuse same buffer")
 end
@@ -125,7 +125,7 @@ T["tui float terminals"]["float creates window"] = function()
     local initial_win_count = #vim.api.nvim_list_wins()
 
     module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_float" })
-    vim.wait(200)
+    vim.wait(200, function() return #vim.api.nvim_list_wins() > initial_win_count end)
 
     local new_win_count = #vim.api.nvim_list_wins()
     MiniTest.expect.equality(new_win_count > initial_win_count, true, "Float should create new window")
@@ -139,14 +139,14 @@ T["tui float terminals"]["toggle hides float"] = function()
     local module = require("kyleking.deps.terminal-integration")
 
     module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_hide" })
-    vim.wait(200)
+    vim.wait(200, function() return module.tui_terminals["test_hide"] ~= nil end)
 
     local term = module.tui_terminals["test_hide"]
     local winid_before = term.winid
     MiniTest.expect.equality(vim.api.nvim_win_is_valid(winid_before), true, "Window should be valid")
 
     module.toggle_tui_float({ cmd = vim.o.shell, term_id = "test_hide" })
-    vim.wait(100)
+    vim.wait(100, function() return not vim.api.nvim_win_is_valid(winid_before) end)
 
     MiniTest.expect.equality(vim.api.nvim_win_is_valid(winid_before), false, "Window should be closed after toggle")
 end
@@ -160,15 +160,18 @@ T["tui float terminals"]["reuses buffer"] = function()
     local cmd = "sleep 30"
 
     module.toggle_tui_float({ cmd = cmd, term_id = "test_reuse" })
-    vim.wait(200)
+    vim.wait(200, function() return module.tui_terminals["test_reuse"] ~= nil end)
 
     local first_bufnr = module.tui_terminals["test_reuse"].bufnr
 
     module.toggle_tui_float({ cmd = cmd, term_id = "test_reuse" })
-    vim.wait(100)
+    vim.wait(100, function() return module.tui_terminals["test_reuse"].winid == nil end)
 
     module.toggle_tui_float({ cmd = cmd, term_id = "test_reuse" })
-    vim.wait(200)
+    vim.wait(200, function()
+        local winid = module.tui_terminals["test_reuse"].winid
+        return winid ~= nil and vim.api.nvim_win_is_valid(winid)
+    end)
 
     MiniTest.expect.equality(module.tui_terminals["test_reuse"].bufnr, first_bufnr, "Should reuse same buffer")
 

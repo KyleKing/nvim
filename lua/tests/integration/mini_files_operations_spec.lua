@@ -18,7 +18,7 @@ T["mini.files"]["can open file browser"] = function()
     vim.fn.mkdir(tmpdir, "p")
 
     MiniFiles.open(tmpdir)
-    vim.wait(200)
+    vim.wait(200, function() return vim.bo.filetype == "minifiles" end)
 
     -- Check that mini.files window is open
     local buffers = vim.api.nvim_list_bufs()
@@ -47,7 +47,7 @@ T["mini.files"]["can create file"] = function()
 
     -- Open mini.files and create a file
     MiniFiles.open(tmpdir)
-    vim.wait(200)
+    vim.wait(200, function() return vim.bo.filetype == "minifiles" end)
 
     -- Get current buffer and add a new line (simulating file creation)
     local new_file = tmpdir .. "/test_file.txt"
@@ -55,7 +55,7 @@ T["mini.files"]["can create file"] = function()
 
     -- Synchronize
     MiniFiles.synchronize()
-    vim.wait(200)
+    vim.wait(200, function() return vim.fn.filereadable(new_file) == 1 end)
 
     MiniFiles.close()
 
@@ -79,12 +79,12 @@ T["mini.files"]["can delete file"] = function()
 
     -- Open mini.files
     MiniFiles.open(tmpdir)
-    vim.wait(200)
+    vim.wait(200, function() return vim.bo.filetype == "minifiles" end)
 
     -- Delete the file
     vim.fn.delete(test_file)
     MiniFiles.synchronize()
-    vim.wait(200)
+    vim.wait(200, function() return vim.fn.filereadable(test_file) == 0 end)
 
     MiniFiles.close()
 
@@ -106,7 +106,7 @@ T["mini.files"]["can navigate directories"] = function()
 
     -- Open mini.files at root
     MiniFiles.open(tmpdir)
-    vim.wait(200)
+    vim.wait(200, function() return MiniFiles.get_fs_entry() ~= nil end)
 
     -- Check that we can navigate (basic config validation)
     local current_dir = MiniFiles.get_fs_entry()

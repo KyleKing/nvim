@@ -77,7 +77,8 @@ T["temp session statusline"]["mode highlight groups are defined"] = function()
 
     -- Open in new buffer to trigger autocmd
     vim.cmd("edit " .. tmpfile)
-    vim.wait(100) -- Wait for autocmd to execute
+    -- BufEnter fires while :edit runs, so the highlights are already defined here
+    vim.wait(100, function() return next(vim.api.nvim_get_hl(0, { name = "TempModeNormal" })) ~= nil end)
 
     local utils = require("kyleking.utils")
     local is_temp = utils.detect_temp_session()
@@ -120,7 +121,7 @@ T["temp session statusline"]["session badge highlight groups are defined"] = fun
     vim.fn.writefile({ "test" }, tmpfile)
 
     vim.cmd("edit " .. tmpfile)
-    vim.wait(100)
+    vim.wait(100, function() return next(vim.api.nvim_get_hl(0, { name = "TempSessionClaude" })) ~= nil end)
 
     local utils = require("kyleking.utils")
     local is_temp = utils.detect_temp_session()
@@ -150,7 +151,7 @@ T["temp session statusline"]["statusline is set in temp session"] = function()
     vim.fn.writefile({ "test" }, tmpfile)
 
     vim.cmd("edit " .. tmpfile)
-    vim.wait(100)
+    vim.wait(100, function() return vim.o.statusline:match("TempMode") ~= nil end)
 
     local utils = require("kyleking.utils")
     local is_temp = utils.detect_temp_session()
@@ -192,7 +193,7 @@ T["temp session statusline"]["git commit file triggers temp session"] = function
     vim.fn.writefile({ "test commit" }, tmpfile)
 
     vim.cmd("edit " .. tmpfile)
-    vim.wait(100)
+    vim.wait(100, function() return vim.o.statusline:match("TempMode") ~= nil end)
 
     local utils = require("kyleking.utils")
     local is_temp, session_type = utils.detect_temp_session()
@@ -220,7 +221,7 @@ T["temp session statusline"]["easy quit keymap is set in temp session"] = functi
     vim.fn.writefile({ "test" }, tmpfile)
 
     vim.cmd("edit " .. tmpfile)
-    vim.wait(100)
+    vim.wait(100, function() return vim.fn.maparg("<leader>q", "n", false, true).buffer == 1 end)
 
     local utils = require("kyleking.utils")
     local is_temp = utils.detect_temp_session()

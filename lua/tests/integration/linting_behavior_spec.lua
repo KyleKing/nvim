@@ -19,7 +19,9 @@ T["linting integration"]["detects lint issues"] = function()
 
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(500)
+        -- nvim-lint is set up in a deferred callback, so wait for the module rather than
+        -- for a fixed slice of it
+        vim.wait(500, function() return package.loaded["lint"] ~= nil end)
 
         local errors = {}
         local successes = {}
@@ -44,7 +46,7 @@ T["linting integration"]["detects lint issues"] = function()
         f:close()
 
         vim.cmd("edit " .. tmpfile1)
-        vim.wait(200)
+        vim.wait(200, function() return vim.bo.filetype == "lua" end)
         require("lint").try_lint({ "selene" })
 
         local found = vim.wait(2000, function()

@@ -48,7 +48,7 @@ return {
                             local MiniFiles = require("mini.files")
                             local MiniTest = require("mini.test")
                             MiniFiles.open()
-                            vim.wait(20)
+                            vim.wait(20, function() return vim.bo.filetype == "minifiles" end)
                             local is_open = vim.bo.filetype == "minifiles"
                             MiniFiles.close()
                             MiniTest.expect.equality(is_open, true, "Explorer should open")
@@ -62,9 +62,9 @@ return {
                             local MiniFiles = require("mini.files")
                             local MiniTest = require("mini.test")
                             MiniFiles.open()
-                            vim.wait(20)
+                            vim.wait(20, function() return vim.bo.filetype == "minifiles" end)
                             MiniFiles.close()
-                            vim.wait(20)
+                            vim.wait(20, function() return vim.bo.filetype ~= "minifiles" end)
                             local is_closed = vim.bo.filetype ~= "minifiles"
                             MiniTest.expect.equality(is_closed, true, "Explorer should close")
                         end,
