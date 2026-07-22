@@ -71,4 +71,6 @@ No code fix needed for the 10 bisected commits (d59b67d..dafd6da) themselves. Do
 1. Add median-of-3 sampling (#4) -- makes every future entry self-consistent. DONE (9d3c2e5)
 1. Add load average to the appended entry (#3) -- cheap, explains outliers. DONE (9d3c2e5)
 1. No action on #2, already shipped in this session.
-1. Gate the pre-push hook to config-relevant paths (#6) -- reduces log noise at the source.
+1. Gate the pre-push hook to config-relevant paths (#6) -- reduces log noise at the source. DONE (ae811d2)
+
+All items are shipped. #5 needed no code by design. Verified against the tree: `g:python3_host_prog` at `lua/kyleking/core/options.lua:8`, median-of-3 plus machine and load-average fields in `scripts/measure_nvim.sh`, and the `files:` filter at `.pre-commit-config.yaml:127`.
