@@ -207,12 +207,12 @@ T["integration"]["embeds relative images as data URIs"] = function()
     local dir = vim.fn.tempname()
     vim.fn.mkdir(dir, "p")
     local img = dir .. "/pixel.png"
-    local img_file = io.open(img, "wb")
+    local img_file = assert(io.open(img, "wb"))
     img_file:write(png)
     img_file:close()
 
     local md = dir .. "/doc.md"
-    local md_file = io.open(md, "w")
+    local md_file = assert(io.open(md, "w"))
     md_file:write("# Title\n\n![pixel](pixel.png)\n")
     md_file:close()
 

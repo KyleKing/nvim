@@ -44,7 +44,7 @@ T["writer"] = MiniTest.new_set()
 
 local function fixed_writer(dir)
     local path = dir .. "/h.jsonl"
-    return writer.new({ dir = dir, flush_interval_ms = 0, path_for = function() return path end }), path
+    return assert(writer.new({ dir = dir, flush_interval_ms = 0, path_for = function() return path end })), path
 end
 
 T["writer"]["writes one JSON object per line"] = function()
@@ -85,11 +85,11 @@ end
 
 T["writer"]["splits one batch across month files"] = function()
     local dir = make_dir()
-    local w = writer.new({
+    local w = assert(writer.new({
         dir = dir,
         flush_interval_ms = 0,
         path_for = function(event) return ("%s/h-%s.jsonl"):format(dir, store.month_of(event.ts)) end,
-    })
+    }))
     w.add({ kind = "map", key = "a", ts = os.time({ year = 2026, month = 6, day = 30, hour = 23 }) })
     w.add({ kind = "map", key = "b", ts = os.time({ year = 2026, month = 7, day = 1, hour = 1 }) })
     w.flush()
@@ -350,7 +350,7 @@ T["store"]["compacts an expired month and keeps the current one"] = function()
     MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h-2026-06.jsonl"), 0, "raw month is removed")
     MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h-2026-07.jsonl"), 1, "current month is kept raw")
 
-    local summary = store.read_json(dir .. "/summary-h-2026-06.json")
+    local summary = assert(store.read_json(dir .. "/summary-h-2026-06.json"))
     MiniTest.expect.equality(#summary.rows, 1)
     MiniTest.expect.equality(summary.rows[1].count, 2, "counts survive compaction")
 end

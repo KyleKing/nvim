@@ -54,7 +54,7 @@ end
 ---@return table {feed, flush, pending}
 function M.new_assembler(opts)
     opts = opts or {}
-    local on_sequence = opts.on_sequence or function() end
+    local on_sequence = opts.on_sequence or function(_) end
     local max_seq_len = opts.max_seq_len or DEFAULT_MAX_SEQ_LEN
     local is_rest = opts.is_rest or default_is_rest
 
@@ -116,7 +116,7 @@ end
 function M.attach(opts)
     opts = opts or {}
     local idle_ms = opts.idle_ms or DEFAULT_IDLE_MS
-    local emit = opts.on_sequence or function() end
+    local emit = opts.on_sequence or function(_) end
 
     local assembler = M.new_assembler({
         max_seq_len = opts.max_seq_len,

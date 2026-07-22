@@ -132,6 +132,19 @@ end
 
 `.github/workflows/test.yml` runs the CI-safe suite against both stable and nightly Neovim, then runs pre-commit with a `SKIP` list for hooks that need binaries or an nvim the runner does not have. Adding a hook that depends on a system tool means adding it to that `SKIP` list, or CI fails on a machine that cannot install it.
 
+### Lua diagnostics (lua-language-server)
+
+The `lua-diagnostics` hook (`scripts/check-lua-lsp.sh`) is staged `pre-push` and is in CI's `SKIP` list, so it never runs automatically until push time -- `mise run check` before pushing is the only routine check. Run `lua-language-server --check=$(pwd) --check_format=pretty --checklevel=Warning` directly for a faster loop while fixing a batch of warnings.
+
+Two false-positive patterns account for most of what shows up:
+
+- Reassigning a global table field (`vim.keymap.set = ...`, `vim.notify = ...`) with a value whose declared type includes `nil` pollutes lua-language-server's inferred type for that field across the *entire workspace*, since it merges type info for a field from every assignment site. One nilable reassignment can turn every unrelated call site (e.g. every `local K = vim.keymap.set` alias in `deps/*.lua`) into a spurious `need-check-nil` warning. Narrow through a local variable first: `local original_set = state.original_set; if original_set ~= nil then vim.keymap.set = original_set end`.
+- `os.date(fmt, ...)` is typed generically as `string|osdate` regardless of what the literal `fmt` argument implies, so code that branches on `"*t"` vs. a format string needs an explicit cast (`--[[@as osdate]]` or `--[[@as string]]`) rather than triggering a real fix.
+
+Unwrap a genuinely nilable return (`io.open`, `writer.new`, `store.read_json`, a lookup helper) with `assert(...)` rather than leaving it unchecked -- it satisfies the type checker and fails fast, matching the existing `assert(io.open(...))` convention throughout `lua/kyleking/utils/usage/` and `lua/tests/custom/`.
+
+A test that monkey-patches and restores a global (`vim.notify = function(...) ... end` / `vim.ui.open = ...`) trips `duplicate-set-field` once the same field is assigned a function literal at more than one call site in the workspace. This is inherent to the mock-then-restore pattern, not a bug; suppress it at the assignment with `---@diagnostic disable-next-line: duplicate-set-field` rather than restructuring the mock.
+
 ### Startup validation
 
 The subprocess-based smoke test in `lua/tests/core/smoke_spec.lua` spawns a fresh nvim and checks stderr for `pack` (vim.pack) errors surfacing after deferred plugin loading. This catches nil-rhs keymap errors and other issues that only appear once all `later()` callbacks complete -- issues that in-process MiniTest cases cannot observe due to `vim.schedule` nesting.

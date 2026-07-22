@@ -295,6 +295,7 @@ T["open_from_terminal"]["shows warning for non-existent file"] = function()
 
     local notified = false
     local original_notify = vim.notify
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.notify = function(msg, level)
         if level == vim.log.levels.WARN and msg:find("File not found") then notified = true end
     end

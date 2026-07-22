@@ -13,7 +13,10 @@ local patterns = require("kyleking.utils.usage.patterns")
 
 local M = {}
 
-function M.month_of(ts) return os.date("%Y-%m", ts) end
+---@return string
+function M.month_of(ts)
+    return os.date("%Y-%m", ts) --[[@as string]]
+end
 
 function M.raw_path(dir, host, month) return ("%s/%s-%s.jsonl"):format(dir, host, month) end
 
@@ -89,7 +92,7 @@ M.read_json = read_json
 
 --- Month string `n` months before `ts`.
 function M.month_before(ts, n)
-    local date = os.date("*t", ts)
+    local date = os.date("*t", ts) --[[@as osdate]]
     date.month = date.month - n
     date.day = 1
     return os.date("%Y-%m", os.time(date))

@@ -25,8 +25,6 @@ local DEFAULT_LIMIT = 40
 local MODES = { "n", "x", "o", "i", "v", "s", "t", "c" }
 
 --- Canonical byte form of a key, shared by both sides of the reconciliation.
----@param key string
----@return string
 M.normalize = patterns.normalize
 
 -- Plugin-internal mappings are not things I type, so they can never be "cold". <Plug>

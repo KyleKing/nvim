@@ -18,6 +18,7 @@ local function set_line_and_open(line, ft)
 
     local opened = nil
     local original_open = vim.ui.open
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.ui.open = function(target)
         opened = target
         return true
@@ -42,6 +43,7 @@ local function open_in_named_file(fname, lines, lnum)
 
     local opened = nil
     local original_open = vim.ui.open
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.ui.open = function(target)
         opened = target
         return true
@@ -84,6 +86,7 @@ end
 T["open"]["does not treat a generic word/word fragment as a plugin ref"] = function()
     local notified = false
     local original_notify = vim.notify
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.notify = function(msg, level)
         if level == vim.log.levels.WARN and msg:find("No link found") then notified = true end
     end
@@ -97,6 +100,7 @@ end
 T["open"]["notifies when no link is found"] = function()
     local notified = false
     local original_notify = vim.notify
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.notify = function(msg, level)
         if level == vim.log.levels.WARN and msg:find("No link found") then notified = true end
     end

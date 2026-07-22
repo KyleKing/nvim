@@ -42,10 +42,12 @@ local function pick(pool) return pool[math.random(1, #pool)] end
 local function open_current_buffer()
     local opened, warned = nil, nil
     local original_open, original_notify = vim.ui.open, vim.notify
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.ui.open = function(target)
         opened = target
         return true
     end
+    ---@diagnostic disable-next-line: duplicate-set-field
     vim.notify = function(msg, level)
         if level == vim.log.levels.WARN then warned = msg end
     end

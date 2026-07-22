@@ -70,8 +70,7 @@ T["registered"] = MiniTest.new_set()
 T["registered"]["lists a map with its desc"] = function()
     map("<leader>zcr", "Cold registered")
 
-    local row = find(cold.registered(), "<leader>zcr")
-    MiniTest.expect.equality(row ~= nil, true, "a freshly set map must show up in the live snapshot")
+    local row = assert(find(cold.registered(), "<leader>zcr"), "a freshly set map must show up in the live snapshot")
     MiniTest.expect.equality(row.desc, "Cold registered")
     MiniTest.expect.equality(row.kind, "map")
 end
@@ -79,7 +78,7 @@ end
 T["registered"]["hands back the leader already expanded"] = function()
     map("<leader>zcx", "Expanded lhs")
 
-    local row = find(cold.registered(), "<leader>zcx")
+    local row = assert(find(cold.registered(), "<leader>zcx"))
     MiniTest.expect.equality(
         row.key,
         vim.g.mapleader .. "zcx",
@@ -115,7 +114,7 @@ T["cold"]["reports an unlogged map as never used"] = function()
     local dir = make_dir()
     map("<leader>zcn", "Never used")
 
-    local row = find(cold.cold(dir), "<leader>zcn")
+    local row = assert(find(cold.cold(dir), "<leader>zcn"))
     MiniTest.expect.equality(row.count, 0)
     MiniTest.expect.equality(row.last, 0, "count 0 and last 0 read as never triggered")
 end
@@ -125,7 +124,7 @@ T["cold"]["matches a logged <leader> map against its expanded lhs"] = function()
     map("<leader>zcu", "Used once")
     write_log(dir, "mbp", { { kind = "map", key = "<leader>zcu", desc = "Used once", ts = JULY } })
 
-    local row = find(cold.cold(dir), "<leader>zcu")
+    local row = assert(find(cold.cold(dir), "<leader>zcu"))
     MiniTest.expect.equality(row.count, 1, "the log stores <leader>zcu while the keymap reads ' zcu'")
     MiniTest.expect.equality(row.last, JULY)
 end
@@ -193,7 +192,7 @@ T["cold"]["lists a registered user command"] = function()
     for _, row in ipairs(rows) do
         if row.kind == "cmd" and row.key == "UsageColdTestCmd" then hit = row end
     end
-    MiniTest.expect.equality(hit ~= nil, true, "user commands reconcile the same way maps do")
+    hit = assert(hit, "user commands reconcile the same way maps do")
     MiniTest.expect.equality(hit.count, 0)
 
     pcall(vim.api.nvim_del_user_command, "UsageColdTestCmd")
@@ -218,7 +217,7 @@ T["render"]["separates never-used from tried-then-dropped"] = function()
     MiniTest.expect.equality(lines[1]:find("1 of 2 registered never used", 1, true) ~= nil, true)
     MiniTest.expect.equality(lines[3]:find("never", 1, true) ~= nil, true, "count 0 has no meaningful date")
     MiniTest.expect.equality(
-        lines[4]:find(os.date("%Y-%m-%d", JUNE), 1, true) ~= nil,
+        lines[4]:find(os.date("%Y-%m-%d", JUNE) --[[@as string]], 1, true) ~= nil,
         true,
         "a dropped map is dated so it reads differently from one never discovered"
     )

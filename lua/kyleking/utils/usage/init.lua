@@ -280,7 +280,8 @@ end
 --- Stop tracking and restore the original vim.keymap.set. Mainly for tests.
 function M.uninstall()
     if not state.installed then return end
-    if state.original_set ~= nil then vim.keymap.set = state.original_set end
+    local original_set = state.original_set
+    if original_set ~= nil then vim.keymap.set = original_set end
     if state.motion ~= nil then state.motion.stop() end
     if state.writer ~= nil then state.writer.close() end
     pcall(vim.api.nvim_del_augroup_by_name, "kyleking_usage")
