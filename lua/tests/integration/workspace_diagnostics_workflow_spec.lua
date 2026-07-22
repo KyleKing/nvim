@@ -14,7 +14,8 @@ T["Workspace diagnostics workflow"] = MiniTest.new_set()
 T["Workspace diagnostics workflow"]["can populate quickfix from LSP diagnostics"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        -- The subprocess helper already waits for startup; this only confirms it
+        vim.wait(200, function() return vim.v.vim_did_enter == 1 end)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -35,7 +36,7 @@ T["Workspace diagnostics workflow"]["can populate quickfix from LSP diagnostics"
             return
         end
 
-        vim.wait(500)
+        vim.wait(500, function() return #vim.diagnostic.get(0) > 0 end)
 
         -- Populate quickfix from diagnostics
         vim.diagnostic.setqflist({ severity = nil })
@@ -56,7 +57,7 @@ T["Quickfix filtering"] = MiniTest.new_set()
 T["Quickfix filtering"]["severity filter workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 
@@ -115,7 +116,7 @@ end
 T["Quickfix filtering"]["pattern filter workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 
@@ -155,7 +156,7 @@ T["Quickfix grouping"] = MiniTest.new_set()
 T["Quickfix grouping"]["group by file"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 
@@ -200,7 +201,7 @@ end
 T["Quickfix grouping"]["group by type"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 
@@ -239,7 +240,7 @@ T["Session management"] = MiniTest.new_set()
 T["Session management"]["save and load workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 
@@ -294,7 +295,7 @@ T["Batch operations"] = MiniTest.new_set()
 T["Batch operations"]["open all files workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 
@@ -342,7 +343,7 @@ end
 T["Batch operations"]["stats display workflow"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        vim.wait(200, function() return pcall(require, "kyleking.utils.workspace_diagnostics") end)
 
         local wd = require("kyleking.utils.workspace_diagnostics")
 

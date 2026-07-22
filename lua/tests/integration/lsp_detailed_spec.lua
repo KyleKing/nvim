@@ -15,7 +15,8 @@ T["LSP navigation"] = MiniTest.new_set()
 T["LSP navigation"]["navigation features work"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        -- The subprocess helper already waits for startup; this only confirms it
+        vim.wait(200, function() return vim.v.vim_did_enter == 1 end)
 
         local successes = {}
         local warnings = {}
@@ -52,7 +53,7 @@ T["LSP navigation"]["navigation features work"] = function()
         -- Test 1: Go-to-definition
         vim.api.nvim_win_set_cursor(0, {9, 0}) -- Line with my_function() call
         vim.lsp.buf.definition()
-        vim.wait(200)
+        vim.wait(200, function() return vim.api.nvim_win_get_cursor(0)[1] == 1 end)
 
         local cursor = vim.api.nvim_win_get_cursor(0)
         if cursor[1] == 1 then
@@ -64,7 +65,7 @@ T["LSP navigation"]["navigation features work"] = function()
         -- Test 2: Find references
         vim.api.nvim_win_set_cursor(0, {5, 6}) -- Position on my_var definition
         vim.lsp.buf.references()
-        vim.wait(1000)
+        vim.wait(1000, function() return #vim.fn.getqflist() >= 2 end)
 
         local qf = vim.fn.getqflist()
         if #qf >= 2 then
@@ -73,19 +74,17 @@ T["LSP navigation"]["navigation features work"] = function()
             table.insert(warnings, "references: expected >=2, got " .. #qf)
         end
 
+        local function hover_window_open()
+            for _, win in ipairs(vim.api.nvim_list_wins()) do
+                if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "markdown" then return true end
+            end
+            return false
+        end
+
         -- Test 3: Hover
         vim.api.nvim_win_set_cursor(0, {10, 4}) -- Position on vim.fn
         vim.lsp.buf.hover()
-        vim.wait(500)
-
-        local hover_found = false
-        for _, win in ipairs(vim.api.nvim_list_wins()) do
-            local buf = vim.api.nvim_win_get_buf(win)
-            if vim.bo[buf].filetype == "markdown" then
-                hover_found = true
-                break
-            end
-        end
+        local hover_found = vim.wait(500, function() return hover_window_open() end)
 
         if hover_found then
             table.insert(successes, "hover (window opened)")
@@ -112,7 +111,8 @@ T["LSP code actions"] = MiniTest.new_set()
 T["LSP code actions"]["code actions and rename available"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        -- The subprocess helper already waits for startup; this only confirms it
+        vim.wait(200, function() return vim.v.vim_did_enter == 1 end)
 
         local successes = {}
 
@@ -142,7 +142,7 @@ T["LSP code actions"]["code actions and rename available"] = function()
             filter = function(a) return a ~= nil end,
             apply = false,
         })
-        vim.wait(200)
+        vim.wait(200, function() return vim.fn.mode() ~= "n" end)
         table.insert(successes, "code_action")
 
         -- Test 2: Rename exists
@@ -165,7 +165,8 @@ T["LSP diagnostics"] = MiniTest.new_set()
 T["LSP diagnostics"]["diagnostics are displayed for errors"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        -- The subprocess helper already waits for startup; this only confirms it
+        vim.wait(200, function() return vim.v.vim_did_enter == 1 end)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -186,7 +187,7 @@ T["LSP diagnostics"]["diagnostics are displayed for errors"] = function()
             return
         end
 
-        vim.wait(200)
+        vim.wait(200, function() return #vim.diagnostic.get(0) > 0 end)
 
         local diagnostics = vim.diagnostic.get(0)
         if #diagnostics > 0 then
@@ -208,7 +209,8 @@ T["LSP completion integration"] = MiniTest.new_set()
 T["LSP completion integration"]["completion triggered in Lua file"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        -- The subprocess helper already waits for startup; this only confirms it
+        vim.wait(200, function() return vim.v.vim_did_enter == 1 end)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -233,11 +235,11 @@ T["LSP completion integration"]["completion triggered in Lua file"] = function()
 
         -- Enter insert mode and trigger completion
         vim.cmd("startinsert")
-        vim.wait(100)
+        vim.wait(100, function() return vim.fn.mode() == "i" end)
 
         -- Trigger completion with Ctrl-Space
         vim.api.nvim_feedkeys("\14\32", "x", false) -- Ctrl-N then Space
-        vim.wait(200)
+        vim.wait(200, function() return vim.fn.pumvisible() == 1 end)
 
         print("SUCCESS: Completion triggered")
 
@@ -252,7 +254,7 @@ end
 T["LSP formatting"] = MiniTest.new_set()
 
 T["LSP formatting"]["format on save is configured"] = function()
-    vim.wait(1000)
+    vim.wait(1000, function() return package.loaded["conform"] ~= nil end)
 
     local conform = require("conform")
     MiniTest.expect.equality(type(conform.format), "function", "Format function should exist")
@@ -261,7 +263,8 @@ end
 T["LSP formatting"]["can format Lua buffer"] = function()
     local result = helpers.nvim_interaction_test(
         [[
-        vim.wait(200)
+        -- The subprocess helper already waits for startup; this only confirms it
+        vim.wait(200, function() return vim.v.vim_did_enter == 1 end)
 
         local tmpfile = vim.fn.tempname() .. ".lua"
         vim.cmd("edit " .. tmpfile)
@@ -273,11 +276,11 @@ T["LSP formatting"]["can format Lua buffer"] = function()
         })
         vim.bo.filetype = "lua"
 
-        vim.wait(300)
+        vim.wait(300, function() return #require("conform").list_formatters(0) > 0 end)
 
         -- Format buffer
         require("conform").format({ bufnr = 0, timeout_ms = 5000 })
-        vim.wait(200)
+        vim.wait(200, function() return vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] ~= "local x=1" end)
 
         local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
         print("Formatted lines: " .. vim.inspect(lines))

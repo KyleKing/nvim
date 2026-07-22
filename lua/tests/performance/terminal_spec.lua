@@ -214,8 +214,10 @@ T["terminal performance"]["illuminate disabled in terminal buffers"] = function(
     bufnr = vim.api.nvim_get_current_buf()
 
     -- Trigger illuminate events
+    -- The assertion reads illuminate's config rather than its highlights, so this waits on
+    -- the buftype the config keys off and is outside every timed section of this file
     vim.cmd("doautocmd CursorMoved")
-    vim.wait(300) -- Wait for illuminate delay
+    vim.wait(300, function() return vim.bo[bufnr].buftype == "terminal" end)
 
     -- Check that illuminate is disabled for this buffer
     -- We verify by checking if should_enable returns false
