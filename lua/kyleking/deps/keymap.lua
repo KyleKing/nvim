@@ -1,5 +1,5 @@
-local deps_utils = require("kyleking.deps_utils")
-local later = deps_utils.maybe_later
+local pack = require("kyleking.pack")
+local later = pack.later
 
 -- Smart Insert-mode keys via mini.keymap multistep. Consolidates the completion-menu
 -- navigation (previously hand-rolled with pumvisible() checks in core/lsp.lua) and the

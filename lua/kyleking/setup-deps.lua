@@ -8,14 +8,6 @@ local pack = require("kyleking.pack")
 -- are needed during startup. vim.pack installs it on first run.
 pack.add("nvim-mini/mini.nvim")
 
--- For testing: maybe_later uses now() when NVIM_TEST_SYNC=1, otherwise later()
--- This provides explicit control over plugin loading during tests.
-local maybe_later = vim.env.NVIM_TEST_SYNC and pack.now or pack.later
-
--- Export maybe_later via module to avoid global state
-local deps_utils = require("kyleking.deps_utils")
-deps_utils.maybe_later = maybe_later
-
 require("kyleking.deps.bars-and-lines")
 require("kyleking.deps.buffer")
 require("kyleking.deps.cmdline")

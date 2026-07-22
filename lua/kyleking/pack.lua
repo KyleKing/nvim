@@ -25,6 +25,11 @@ end
 --- Run a function immediately (fail-safe).
 function M.now(f) safe_call("now", f) end
 
+-- Tests assert against the registered keymap and command set, which is only complete
+-- once the deferred queue drains. NVIM_TEST_SYNC collapses later() into now() so a
+-- headless run does not race the queue.
+local run_sync = vim.env.NVIM_TEST_SYNC ~= nil
+
 local later_queue = {}
 local later_active = false
 
@@ -40,6 +45,7 @@ end
 
 --- Queue a function to run after startup, one per event loop tick.
 function M.later(f)
+    if run_sync then return M.now(f) end
     later_queue[#later_queue + 1] = f
     if not later_active then
         later_active = true

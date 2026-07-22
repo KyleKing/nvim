@@ -2,8 +2,7 @@
 -- vim.pack tracks them in the lockfile like any other plugin. Local edits only
 -- take effect after committing in the source repo and running vim.pack.update().
 local pack = require("kyleking.pack")
-local deps_utils = require("kyleking.deps_utils")
-local add, later = pack.add, deps_utils.maybe_later
+local add, later = pack.add, pack.later
 
 -- file:// sources are fragile: if the source repo doesn't exist yet when nvim first
 -- runs add(), or if a clone/checkout gets interrupted, vim.pack can end up with the

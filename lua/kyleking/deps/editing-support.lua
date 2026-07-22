@@ -1,6 +1,5 @@
 local pack = require("kyleking.pack")
-local deps_utils = require("kyleking.deps_utils")
-local add, later = pack.add, deps_utils.maybe_later
+local add, later = pack.add, pack.later
 
 -- Setup markdown/djot list editing and preview now (not later): both just register a
 -- FileType autocmd, and later() defers past the point where nvim fires FileType for a

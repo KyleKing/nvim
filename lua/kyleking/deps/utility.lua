@@ -1,6 +1,5 @@
 local pack = require("kyleking.pack")
-local deps_utils = require("kyleking.deps_utils")
-local add, later = pack.add, deps_utils.maybe_later
+local add, later = pack.add, pack.later
 
 -- Extend vim spelling dictionary with dynamically generated one
 ---@class LazyPluginSpec
