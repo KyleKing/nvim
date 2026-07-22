@@ -79,8 +79,33 @@ end
 T["handle_return"]["stops list on empty item"] = function()
     set_line_and_cursor("- ")
     local result = simulate_return()
-    -- Empty list items should delete marker and end at cursor position
-    MiniTest.expect.no_equality(result:match("<End>"), nil, "Should end cursor positioning")
+    -- Buffer mutation is deferred (vim.schedule) to avoid E565, so the expr
+    -- result itself is just an empty string; the marker deletion is async.
+    MiniTest.expect.equality(result, "", "Should return empty string, deferring the edit")
+
+    vim.wait(200, function() return vim.api.nvim_get_current_line() == "" end)
+    MiniTest.expect.equality(vim.api.nvim_get_current_line(), "", "Should delete the list marker")
+end
+
+T["handle_return"]["does not raise E565 when stopping list via real keypress"] = function()
+    local list_editing = require("kyleking.utils.list_editing")
+    list_editing.setup()
+    vim.bo.filetype = "markdown"
+    vim.cmd("doautocmd FileType markdown")
+
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { "" })
+    vim.api.nvim_win_set_cursor(0, { 1, 0 })
+
+    -- Regression test for E565: calling handle_return() directly never hits the
+    -- textlock that guards expr-mappings, so only a real keypress through the
+    -- registered <CR> mapping reproduces the bug this guards against.
+    local ok, err = pcall(function()
+        vim.cmd("startinsert")
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("- <CR>", true, false, true), "x", false)
+    end)
+    vim.cmd("stopinsert")
+
+    MiniTest.expect.equality(ok, true, "Should not raise an error: " .. tostring(err))
 end
 
 T["handle_return"]["preserves indentation"] = function()
@@ -97,6 +122,7 @@ T["handle_tab"]["indents list item"] = function()
     set_line_and_cursor("- item", 0)
 
     list_editing.handle_tab()
+    vim.wait(200, function() return vim.api.nvim_get_current_line():match("^  %-") ~= nil end)
 
     local line = vim.api.nvim_get_current_line()
     MiniTest.expect.no_equality(line:match("^  %-"), nil, "Should be indented by 2 spaces")
@@ -120,6 +146,7 @@ T["handle_tab"]["inserts blank line for djot"] = function()
     vim.api.nvim_win_set_cursor(0, { 2, 0 })
 
     list_editing.handle_tab()
+    vim.wait(200, function() return #vim.api.nvim_buf_get_lines(0, 0, -1, false) == 3 end)
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
     MiniTest.expect.equality(#lines, 3, "Should insert blank line")
@@ -133,6 +160,7 @@ T["handle_shift_tab"]["dedents list item"] = function()
     set_line_and_cursor("    - item", 0)
 
     list_editing.handle_shift_tab()
+    vim.wait(200, function() return vim.api.nvim_get_current_line():match("^  %-") ~= nil end)
 
     local line = vim.api.nvim_get_current_line()
     MiniTest.expect.no_equality(line:match("^  %-"), nil, "Should be dedented by 2 spaces")
@@ -143,6 +171,7 @@ T["handle_shift_tab"]["stops at zero indent"] = function()
     set_line_and_cursor("- item", 0)
 
     list_editing.handle_shift_tab()
+    vim.wait(200, function() return vim.api.nvim_get_current_line():match("^%-") ~= nil end)
 
     local line = vim.api.nvim_get_current_line()
     MiniTest.expect.no_equality(line:match("^%-"), nil, "Should remain at zero indent")
