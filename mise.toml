@@ -82,7 +82,7 @@ run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_ru
 
 [tasks."test:all"]
 description = "Run all tests sequentially (fallback, ~20 seconds)"
-run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run()" -c "qall!"'
+run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_all_tests(false, false)" -c "qall!"'
 
 [tasks."test:coverage"]
 description = "Run tests with coverage tracking (custom modules)"

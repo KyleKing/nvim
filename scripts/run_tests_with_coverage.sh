@@ -27,7 +27,7 @@ cd "$CONFIG_DIR"
 if [ "$TARGET" = "all" ]; then
     NVIM_TEST_SYNC=1 nvim --headless \
         -c "lua package.loaded.luacov = require('luacov'); luacov.init()" \
-        -c "lua MiniTest.run()" \
+        -c "lua require('kyleking.utils.test_runner').run_all_tests(false, false)" \
         +qall || true
 elif [ "$TARGET" = "custom" ]; then
     # Run only custom module tests
