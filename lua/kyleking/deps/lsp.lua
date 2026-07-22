@@ -125,12 +125,6 @@ later(function()
     -- Set USE_PYRIGHT=1 to prefer pyright over ty
     local python_lsp = vim.env.USE_PYRIGHT == "1" and "pyright" or "ty"
 
-    -- Jinja templates (*.jinja, *.html.jinja) for the typed-jinja language server
-    vim.filetype.add({
-        extension = { jinja = "jinja" },
-        pattern = { [".*%.html%.jinja"] = "jinja" },
-    })
-
     vim.lsp.enable({
         "bashls",
         "cssls",
@@ -144,7 +138,6 @@ later(function()
         "terraformls",
         "tombi",
         "ts_ls",
-        "typed_jinja",
         "yamlls",
     })
 
