@@ -47,6 +47,10 @@ function M.later(f)
     end
 end
 
+--- True while deferred `later()` callbacks are still draining. Anything that reads the
+--- registered keymap or command set is incomplete until this goes false.
+function M.is_loading() return later_active or #later_queue > 0 end
+
 local function to_url(source)
     if source:match("^%w[%w+.-]*://") then return source end
     return "https://github.com/" .. source

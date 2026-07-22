@@ -161,6 +161,18 @@ function M.install(opts)
         { desc = "Show keymap and command usage counts" }
     )
 
+    -- Reconciliation reads the live keymap and command set, which is only complete once
+    -- deferred loading drains. Opening it early reports maps that do exist as never
+    -- used (measured 147 registered mid-startup against 356 once settled), which is the
+    -- one way this view could talk me into deleting something I use.
+    vim.api.nvim_create_user_command("FeatureUsageCold", function()
+        if require("kyleking.pack").is_loading() then
+            vim.notify("feature usage: still loading deferred plugins, try again in a moment", vim.log.levels.WARN)
+            return
+        end
+        require("kyleking.utils.usage.cold").show(cfg.dir)
+    end, { desc = "Show registered keymaps and commands that are never or barely used" })
+
     vim.api.nvim_create_user_command(
         "FeatureUsageCompact",
         function() vim.notify(M.compact(), vim.log.levels.INFO) end,
@@ -213,6 +225,7 @@ function M.uninstall()
     if state.writer ~= nil then state.writer.close() end
     pcall(vim.api.nvim_del_augroup_by_name, "kyleking_usage")
     pcall(vim.api.nvim_del_user_command, "FeatureUsage")
+    pcall(vim.api.nvim_del_user_command, "FeatureUsageCold")
     pcall(vim.api.nvim_del_user_command, "FeatureUsageCompact")
     state = {
         installed = false,
