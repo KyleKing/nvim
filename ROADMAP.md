@@ -34,3 +34,7 @@ Design essays live in `ideas-testdoc/` (documentation-driven testing, composable
 ## Phase 4: Module rename
 
 Rename `lua/find-relative-executable/` to `project-tools` (noted in AGENTS.md). Touchpoints: requires in `deps/lsp.lua`, conform/nvim-lint integration, `doc/workspace-diagnostics.md`, and tests.
+
+## Phase 5: Markdown WYSIWYG and editable preview
+
+Read-heavy AI markdown reads faster rendered. Full proposal with options and tradeoffs in `ideas-markdown-wysiwyg/proposal.md`. Near-term step: add render-markdown.nvim in `deps/syntax.lua` with a `lua/tests/docs/` fixture, keeping the one-way browser preview (`lua/kyleking/utils/preview.lua`) read-only. The editable-round-trip and app-based options stay parked in the proposal until the in-buffer renderer proves insufficient.
