@@ -39,12 +39,19 @@ local function resolve_ssh_git(m)
     return "https://" .. host .. "/" .. path:gsub("%.git$", "")
 end
 
--- Ordered list: most specific first
+-- Ordered list: most specific first. `guard` is a literal substring required
+-- for the pattern to ever match (both patterns below require it verbatim), so
+-- checking it first with a plain `find` lets a non-matching line skip the
+-- pattern instead of paying for it. Without this, `ssh_git` and `plugin` both
+-- open with a bare/near-bare character class rather than an anchor, so an
+-- unanchored search over a long line with no "/" retries the same
+-- backtrack-to-failure at every position -- O(n^2) on adversarial input (e.g.
+-- a huge minified line) instead of O(n).
 local resolvers = {
     { pat = M.patterns.md_link, resolve = function(m) return m:match("%((.*)%)$") end },
     { pat = M.patterns.url, resolve = trim_trailing_punctuation },
-    { pat = M.patterns.ssh_git, resolve = resolve_ssh_git },
-    { pat = M.patterns.plugin, resolve = function(m) return "https://github.com/" .. m end },
+    { pat = M.patterns.ssh_git, resolve = resolve_ssh_git, guard = "git@" },
+    { pat = M.patterns.plugin, resolve = function(m) return "https://github.com/" .. m end, guard = "nvim" },
 }
 
 -- Filetype-aware resolvers checked first when the current file matches. Package name
@@ -92,10 +99,12 @@ function M.open()
     end
 
     for _, r in ipairs(resolvers) do
-        local m = line:match(r.pat)
-        if m then
-            open_url(r.resolve(m))
-            return
+        if not r.guard or line:find(r.guard, 1, true) then
+            local m = line:match(r.pat)
+            if m then
+                open_url(r.resolve(m))
+                return
+            end
         end
     end
 
