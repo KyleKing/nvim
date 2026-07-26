@@ -73,6 +73,11 @@ T["open"]["keeps parens inside a markdown link's URL"] = function()
     MiniTest.expect.equality(opened, "https://example.com/a(b)c")
 end
 
+T["open"]["resolves an SSH git remote to its GitHub URL"] = function()
+    local opened = set_line_and_open("    url: git@github.com:KyleKing/simple-crypt.git")
+    MiniTest.expect.equality(opened, "https://github.com/KyleKing/simple-crypt")
+end
+
 T["open"]["resolves a plugin ref to its GitHub URL"] = function()
     local opened = set_line_and_open('add("echasnovski/mini.nvim")')
     MiniTest.expect.equality(opened, "https://github.com/echasnovski/mini.nvim")

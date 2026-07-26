@@ -11,6 +11,7 @@ M.patterns = {
     -- highlight-undo.nvim) -- restricting to "nvim" avoids false positives on generic
     -- word/word fragments (paths, division-like expressions, etc.)
     plugin = "[%w][%-_%w]+/[%-_.%w]*nvim[%-_.%w]*",
+    ssh_git = "git@[%w.-]+:[%w_.-]+/[%w_.-]+",
 }
 
 -- The url pattern's character class allows `(` `)` (so URLs like Wikipedia's
@@ -33,10 +34,16 @@ local function trim_trailing_punctuation(url)
     return (url:gsub("[.,;:!?]+$", ""))
 end
 
+local function resolve_ssh_git(m)
+    local host, path = m:match("^git@([%w.-]+):(.+)$")
+    return "https://" .. host .. "/" .. path:gsub("%.git$", "")
+end
+
 -- Ordered list: most specific first
 local resolvers = {
     { pat = M.patterns.md_link, resolve = function(m) return m:match("%((.*)%)$") end },
     { pat = M.patterns.url, resolve = trim_trailing_punctuation },
+    { pat = M.patterns.ssh_git, resolve = resolve_ssh_git },
     { pat = M.patterns.plugin, resolve = function(m) return "https://github.com/" .. m end },
 }
 
