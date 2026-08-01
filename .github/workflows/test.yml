@@ -47,6 +47,21 @@ jobs:
             -c "lua require('kyleking.utils.test_runner').run_ci_tests()" \
             -c "qall!"
 
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install mise
+        uses: jdx/mise-action@v2
+
+      # Plugins are not installed in CI, so cross-plugin requires resolve to
+      # warnings; the gate is errors only.
+      - name: Run emmylua_check
+        run: mise run typecheck
+
   lint:
     name: Lint
     runs-on: ubuntu-latest

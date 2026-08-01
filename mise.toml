@@ -16,8 +16,8 @@ description = "Run terminal performance benchmarks"
 run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/performance/terminal_spec.lua\")" -c "qall!"'
 
 [tasks.check]
-depends = ["fmt", "test"]
-description = "Run all checks (format + test)"
+depends = ["fmt", "test", "typecheck"]
+description = "Run all checks (format + test + typecheck)"
 
 [tasks."doc:helptags"]
 description = "Generate helptags"
@@ -114,3 +114,15 @@ run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_ru
 [tasks."test:random"]
 description = "Run tests in random order to detect dependencies"
 run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"kyleking.utils.test_runner\").run_all_tests(false, true, 12345)" -c "qall!"'
+
+# Type checking tasks
+[tasks.typecheck]
+description = "Type check with emmylua_check (errors only; warnings are advisory)"
+run = "emmylua_check --severity error ."
+
+[tasks."typecheck:all"]
+description = "Show every emmylua_check diagnostic, including the warning backlog"
+run = "emmylua_check ."
+
+[tools]
+"ubi:EmmyLuaLs/emmylua-analyzer-rust[exe=emmylua_check]" = "0.24.0"
