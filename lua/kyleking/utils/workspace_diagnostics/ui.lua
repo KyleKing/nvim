@@ -75,6 +75,7 @@ end
 ---@param filepath string|nil Path to save (defaults to .qf_session in cwd)
 function M.qf.save_session(filepath)
     filepath = filepath or vim.fn.getcwd() .. "/.qf_session"
+    ---@cast filepath string
 
     local qf = vim.fn.getqflist()
     if #qf == 0 then
@@ -92,6 +93,7 @@ function M.qf.save_session(filepath)
         vim.notify("Failed to encode quickfix list", vim.log.levels.ERROR)
         return
     end
+    ---@cast encoded string
 
     local file = io.open(filepath, "w")
     if not file then
@@ -109,6 +111,7 @@ end
 ---@param filepath string|nil Path to load (defaults to .qf_session in cwd)
 function M.qf.load_session(filepath)
     filepath = filepath or vim.fn.getcwd() .. "/.qf_session"
+    ---@cast filepath string
 
     local file = io.open(filepath, "r")
     if not file then
@@ -124,6 +127,7 @@ function M.qf.load_session(filepath)
         vim.notify("Failed to decode quickfix session", vim.log.levels.ERROR)
         return
     end
+    ---@cast data {items: table[], title: string?}
 
     vim.fn.setqflist({}, "r", { items = data.items, title = data.title or "Loaded session" })
     vim.cmd("copen")
