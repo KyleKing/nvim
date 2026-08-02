@@ -55,6 +55,7 @@ later(function()
 
         local available = {}
         for _, linter_name in ipairs(configured) do
+            ---@type (lint.Linter|fun():lint.Linter)?
             local linter = lint.linters[linter_name]
 
             if type(linter) == "function" then
@@ -179,12 +180,14 @@ end)
 
 later(function()
     add("folke/lazydev.nvim")
-    require("lazydev").setup({
+    ---@type any
+    local lazydev_opts = {
         integrations = {
             cmp = false,
             coq = false,
         },
-    })
+    }
+    require("lazydev").setup(lazydev_opts)
 end)
 
 later(function()
