@@ -77,11 +77,12 @@ function M.get_truncated_filename()
         local min_width = constants.CHAR_LIMIT.FILENAME_MIN
 
         -- Use available space or fall back to minimum
+        ---@type number
         local max_width = math.max(min_width, available)
 
         if #full_path > max_width then
             local truncation_len = constants.CHAR_LIMIT.TRUNCATION_INDICATOR
-            return ".../" .. string.sub(full_path, -(max_width - truncation_len))
+            return ".../" .. string.sub(full_path, -math.floor(max_width - truncation_len))
         end
         return full_path
     else
@@ -174,7 +175,9 @@ function M.toggle_window_focus()
         local min_width = 20
 
         -- Calculate active window size
+        ---@type number
         local active_height = math.floor(total_lines * active_ratio)
+        ---@type number
         local active_width = math.floor(total_cols * active_ratio)
 
         -- Ensure minimum sizes for other windows

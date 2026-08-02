@@ -18,8 +18,9 @@ local EXECUTE_TIMEOUT_MS = 600000
 local CI_SKIP_HEADER_LINES = 10
 
 -- Store the last test run results for re-running failed tests
+---@type {failed_tests: {file: string, id: string}[], has_failures: boolean}
 local last_test_run = {
-    failed_tests = {}, -- Format: { {file = "file_path", id = "full case id"}, ... }
+    failed_tests = {},
     has_failures = false,
 }
 
@@ -59,6 +60,7 @@ end
 --- Print one summary line per collected file plus a totals block.
 ---@return table summary {total, passed, failed, failed_tests}
 local function report(files, cases)
+    ---@type table<string, {passed: integer, failed: integer}>
     local per_file = {}
     for _, file in ipairs(files) do
         per_file[file] = { passed = 0, failed = 0 }
@@ -168,7 +170,8 @@ function M.run_all_tests(only_failed, shuffle, seed)
     if shuffle then
         seed = seed or os.time()
         emit(string.format("Random order (seed: %d)", seed))
-        math.randomseed(seed)
+        ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
+        math.randomseed(seed --[[@as integer]])
         for i = #files, 2, -1 do
             local j = math.random(i)
             files[i], files[j] = files[j], files[i]
@@ -200,7 +203,8 @@ function M.run_tests_parallel(shuffle, seed)
     -- Shuffle if requested
     if shuffle then
         seed = seed or os.time()
-        math.randomseed(seed)
+        ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
+        math.randomseed(seed --[[@as integer]])
         print(string.format("Running tests in random order (seed: %d)", seed))
 
         -- Fisher-Yates shuffle
@@ -347,6 +351,7 @@ function M.run_tests_parallel(shuffle, seed)
     -- Parse results from log files
     append_line("")
     append_line("=== Results ===")
+    ---@type integer, integer, number, number
     local started, reported, passed, failed = 0, 0, 0, 0
     for worker_id, proc in ipairs(worker_processes) do
         local log = vim.fn.readfile(proc.log_path)
@@ -355,8 +360,8 @@ function M.run_tests_parallel(shuffle, seed)
             local file_passed, file_failed = line:match("^Results: (%d+) passed, (%d+) failed")
             if file_passed then
                 reported = reported + 1
-                passed = passed + tonumber(file_passed)
-                failed = failed + tonumber(file_failed)
+                passed = passed + (tonumber(file_passed) or 0)
+                failed = failed + (tonumber(file_failed) or 0)
             end
             if line:match("^=== Running") or line:match("^Results:") then
                 append_line(string.format("[W%d] %s", worker_id, line))
