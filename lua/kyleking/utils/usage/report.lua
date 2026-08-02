@@ -77,7 +77,7 @@ function M.render(rows, limit)
 
     local lines = { ("Feature usage: top %d of %d"):format(math.min(limit, #rows), #rows), "" }
     for i = 1, math.min(limit, #rows) do
-        local row = rows[i]
+        local row = assert(rows[i], "i within bounds of rows")
         local last = row.last > 0 and os.date("%Y-%m-%d", row.last) or "?"
         lines[#lines + 1] = ("%6d  %-7s %-24s %-12s %s"):format(row.count, row.kind, row.key, last, row.desc or "")
     end
