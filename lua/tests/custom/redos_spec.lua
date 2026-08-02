@@ -6,6 +6,11 @@ local T = MiniTest.new_set({
             vim.cmd("tabonly")
             vim.cmd("%bwipeout!")
         end,
+        -- The last case's adversarial buffer would otherwise survive into whichever spec
+        -- file runs next (pre_case only wipes at the start of this file's own next case),
+        -- and a later mini.hipatterns re-enable on that buffer replays the same
+        -- worst-case-shaped highlighter match against it, hanging that unrelated test.
+        post_case = function() vim.cmd("%bwipeout!") end,
     },
 })
 
