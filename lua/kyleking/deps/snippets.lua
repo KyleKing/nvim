@@ -36,7 +36,11 @@ later(function()
     -- Ctrl-C: Stop snippet session
     -- Falls through to default Ctrl-C (exit insert mode) after stopping
     vim.keymap.set("i", "<C-c>", function()
-        if snippets.session.get() then snippets.session.stop() end
+        if
+            snippets.session.get() --[[@as table?]]
+        then
+            snippets.session.stop()
+        end
         return "<C-c>"
     end, { expr = true, desc = "Stop snippet session" })
 end)
