@@ -58,7 +58,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, list_editing = pcall(require, "kyleking.utils.list_editing")
-                            MiniTest.expect.equality(ok, true, "list_editing should be available")
+                            MiniTest.expect.equality(ok, true, { fail_reason = "list_editing should be available" })
                             if ok then
                                 MiniTest.expect.equality(type(list_editing.handle_return), "function")
                                 MiniTest.expect.equality(type(list_editing.handle_tab), "function")
@@ -79,7 +79,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, preview = pcall(require, "kyleking.utils.preview")
-                            MiniTest.expect.equality(ok, true, "preview should be available")
+                            MiniTest.expect.equality(ok, true, { fail_reason = "preview should be available" })
                             if ok then
                                 MiniTest.expect.equality(type(preview.preview), "function")
                                 MiniTest.expect.equality(type(preview.setup), "function")

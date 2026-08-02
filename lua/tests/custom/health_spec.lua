@@ -37,7 +37,7 @@ T["_check_lsp_servers"]["returns structured results"] = function()
     MiniTest.expect.equality(type(results), "table")
     MiniTest.expect.equality(#results > 0, true)
 
-    local first = results[1]
+    local first = assert(results[1], "expected at least one result")
     MiniTest.expect.equality(type(first.name), "string")
     MiniTest.expect.equality(type(first.binary), "string")
     MiniTest.expect.equality(type(first.found), "boolean")
@@ -46,7 +46,9 @@ end
 T["_check_lsp_servers"]["results are sorted by name"] = function()
     local results = health._check_lsp_servers()
     for i = 2, #results do
-        MiniTest.expect.equality(results[i - 1].name < results[i].name, true)
+        local prev = assert(results[i - 1], "index within bounds")
+        local cur = results[i]
+        MiniTest.expect.equality(prev.name < cur.name, true)
     end
 end
 
@@ -58,7 +60,7 @@ T["_check_lsp_servers"]["includes all configured servers"] = function()
     end
 
     for server, _ in pairs(health._config.lsp_binaries) do
-        MiniTest.expect.equality(names[server], true, "missing server: " .. server)
+        MiniTest.expect.equality(names[server], true, { fail_reason = "missing server: " .. server })
     end
 end
 
@@ -69,7 +71,7 @@ T["_check_lsp_configs"]["returns structured results"] = function()
     MiniTest.expect.equality(type(results), "table")
     MiniTest.expect.equality(#results > 0, true)
 
-    local first = results[1]
+    local first = assert(results[1], "expected at least one result")
     MiniTest.expect.equality(type(first.name), "string")
     MiniTest.expect.equality(type(first.path), "string")
     MiniTest.expect.equality(type(first.exists), "boolean")
@@ -77,6 +79,7 @@ end
 
 T["_check_lsp_configs"]["existing configs report correctly"] = function()
     local results = health._check_lsp_configs()
+    ---@type {name: string, path: string, exists: boolean}?
     local lua_ls_result = nil
     for _, r in ipairs(results) do
         if r.name == "lua_ls" then
@@ -97,7 +100,7 @@ T["_check_fre_tools"]["returns structured results"] = function()
     MiniTest.expect.equality(type(results), "table")
     MiniTest.expect.equality(#results > 0, true)
 
-    local first = results[1]
+    local first = assert(results[1], "expected at least one result")
     MiniTest.expect.equality(type(first.name), "string")
     MiniTest.expect.equality(type(first.ecosystem), "string")
     MiniTest.expect.equality(type(first.found), "boolean")
@@ -107,7 +110,9 @@ end
 T["_check_fre_tools"]["results are sorted by name"] = function()
     local results = health._check_fre_tools()
     for i = 2, #results do
-        MiniTest.expect.equality(results[i - 1].name < results[i].name, true)
+        local prev = assert(results[i - 1], "index within bounds")
+        local cur = results[i]
+        MiniTest.expect.equality(prev.name < cur.name, true)
     end
 end
 
@@ -118,7 +123,7 @@ T["_check_system_tools"]["returns structured results"] = function()
     MiniTest.expect.equality(type(results), "table")
     MiniTest.expect.equality(#results > 0, true)
 
-    local first = results[1]
+    local first = assert(results[1], "expected at least one result")
     MiniTest.expect.equality(type(first.name), "string")
     MiniTest.expect.equality(type(first.category), "string")
     MiniTest.expect.equality(type(first.found), "boolean")
@@ -127,7 +132,9 @@ end
 T["_check_system_tools"]["results are sorted by name"] = function()
     local results = health._check_system_tools()
     for i = 2, #results do
-        MiniTest.expect.equality(results[i - 1].name < results[i].name, true)
+        local prev = assert(results[i - 1], "index within bounds")
+        local cur = results[i]
+        MiniTest.expect.equality(prev.name < cur.name, true)
     end
 end
 
@@ -135,7 +142,7 @@ T["_check_system_tools"]["deduplicates tools"] = function()
     local results = health._check_system_tools()
     local seen = {}
     for _, r in ipairs(results) do
-        MiniTest.expect.equality(seen[r.name], nil, "duplicate tool: " .. r.name)
+        MiniTest.expect.equality(seen[r.name], nil, { fail_reason = "duplicate tool: " .. r.name })
         seen[r.name] = true
     end
 end
@@ -147,7 +154,7 @@ T["_check_core_plugins"]["returns structured results"] = function()
     MiniTest.expect.equality(type(results), "table")
     MiniTest.expect.equality(#results > 0, true)
 
-    local first = results[1]
+    local first = assert(results[1], "expected at least one result")
     MiniTest.expect.equality(type(first.name), "string")
     MiniTest.expect.equality(type(first.required), "boolean")
     MiniTest.expect.equality(type(first.loaded), "boolean")
@@ -155,6 +162,7 @@ end
 
 T["_check_core_plugins"]["vim.pack is required and loaded"] = function()
     local results = health._check_core_plugins()
+    ---@type {name: string, required: boolean, loaded: boolean}?
     local vim_pack = nil
     for _, r in ipairs(results) do
         if r.name == "vim.pack" then
@@ -173,7 +181,7 @@ T["check"] = MiniTest.new_set()
 
 T["check"]["runs without error"] = function()
     local ok, err = pcall(health.check)
-    MiniTest.expect.equality(ok, true, "health.check() failed: " .. tostring(err))
+    MiniTest.expect.equality(ok, true, { fail_reason = "health.check() failed: " .. tostring(err) })
 end
 
 if MiniTest.current.all_cases == nil then MiniTest.run() end

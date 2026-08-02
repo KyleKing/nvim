@@ -51,7 +51,7 @@ return {
                             vim.wait(20, function() return vim.bo.filetype == "minifiles" end)
                             local is_open = vim.bo.filetype == "minifiles"
                             MiniFiles.close()
-                            MiniTest.expect.equality(is_open, true, "Explorer should open")
+                            MiniTest.expect.equality(is_open, true, { fail_reason = "Explorer should open" })
                         end,
                     },
                 },
@@ -66,7 +66,7 @@ return {
                             MiniFiles.close()
                             vim.wait(20, function() return vim.bo.filetype ~= "minifiles" end)
                             local is_closed = vim.bo.filetype ~= "minifiles"
-                            MiniTest.expect.equality(is_closed, true, "Explorer should close")
+                            MiniTest.expect.equality(is_closed, true, { fail_reason = "Explorer should close" })
                         end,
                     },
                 },
@@ -94,10 +94,26 @@ return {
                             MiniFiles.set_bookmark = set_bookmark
                             pcall(MiniFiles.close)
 
-                            MiniTest.expect.equality(ok, true, "Explorer open should not error: " .. tostring(err))
-                            MiniTest.expect.equality(registered.h, true, "Home bookmark should be set")
-                            MiniTest.expect.equality(registered.c, true, "Config bookmark should be set")
-                            MiniTest.expect.equality(registered.w, true, "Working directory bookmark should be set")
+                            MiniTest.expect.equality(
+                                ok,
+                                true,
+                                { fail_reason = "Explorer open should not error: " .. tostring(err) }
+                            )
+                            MiniTest.expect.equality(
+                                registered.h,
+                                true,
+                                { fail_reason = "Home bookmark should be set" }
+                            )
+                            MiniTest.expect.equality(
+                                registered.c,
+                                true,
+                                { fail_reason = "Config bookmark should be set" }
+                            )
+                            MiniTest.expect.equality(
+                                registered.w,
+                                true,
+                                { fail_reason = "Working directory bookmark should be set" }
+                            )
                         end,
                     },
                 },
@@ -118,7 +134,11 @@ return {
                                 group = "ec-mini-files",
                                 pattern = "MiniFilesBufferCreate",
                             })
-                            MiniTest.expect.no_equality(#autocmds, 0, "Should have autocmd for hidden toggle")
+                            MiniTest.expect.no_equality(
+                                #autocmds,
+                                0,
+                                { fail_reason = "Should have autocmd for hidden toggle" }
+                            )
                         end,
                     },
                 },

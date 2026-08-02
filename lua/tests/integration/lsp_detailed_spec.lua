@@ -257,7 +257,7 @@ T["LSP formatting"]["format on save is configured"] = function()
     vim.wait(1000, function() return package.loaded["conform"] ~= nil end)
 
     local conform = require("conform")
-    MiniTest.expect.equality(type(conform.format), "function", "Format function should exist")
+    MiniTest.expect.equality(type(conform.format), "function", { fail_reason = "Format function should exist" })
 end
 
 T["LSP formatting"]["can format Lua buffer"] = function()

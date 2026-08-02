@@ -14,8 +14,8 @@ T["python workflow"] = MiniTest.new_set()
 
 T["python workflow"]["can create python buffer"] = function()
     local bufnr = helpers.create_test_buffer({ "def hello():", "    pass" }, "python")
-    MiniTest.expect.equality(vim.api.nvim_buf_is_valid(bufnr), true, "Python buffer should be valid")
-    MiniTest.expect.equality(vim.bo[bufnr].filetype, "python", "Filetype should be python")
+    MiniTest.expect.equality(vim.api.nvim_buf_is_valid(bufnr), true, { fail_reason = "Python buffer should be valid" })
+    MiniTest.expect.equality(vim.bo[bufnr].filetype, "python", { fail_reason = "Filetype should be python" })
     helpers.delete_buffer(bufnr)
 end
 
@@ -25,9 +25,10 @@ T["python workflow"]["python formatter is configured"] = function()
     local conform = require("conform")
     -- Python picks its formatters from the project, so the entry is a callable
     local entry = conform.formatters_by_ft.python or {}
-    local formatters = vim.is_callable(entry) and entry(vim.api.nvim_get_current_buf()) or entry
+    local formatters = vim.is_callable(entry) and (entry --[[@as function]])(vim.api.nvim_get_current_buf()) or entry
+    ---@cast formatters string[]
 
-    MiniTest.expect.equality(#formatters > 0, true, "Python should have formatters configured")
+    MiniTest.expect.equality(#formatters > 0, true, { fail_reason = "Python should have formatters configured" })
 
     local has_ruff = false
     for _, formatter in ipairs(formatters) do
@@ -37,7 +38,7 @@ T["python workflow"]["python formatter is configured"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_ruff, true, "Python should use ruff formatter")
+    MiniTest.expect.equality(has_ruff, true, { fail_reason = "Python should use ruff formatter" })
 end
 
 T["python workflow"]["python linter is configured"] = function()
@@ -46,7 +47,7 @@ T["python workflow"]["python linter is configured"] = function()
     local lint = require("lint")
     local linters = lint.linters_by_ft.python or {}
 
-    MiniTest.expect.equality(#linters > 0, true, "Python should have linters configured")
+    MiniTest.expect.equality(#linters > 0, true, { fail_reason = "Python should have linters configured" })
 
     local has_ruff = false
     for _, linter in ipairs(linters) do
@@ -56,7 +57,7 @@ T["python workflow"]["python linter is configured"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_ruff, true, "Python should use ruff linter")
+    MiniTest.expect.equality(has_ruff, true, { fail_reason = "Python should use ruff linter" })
 end
 
 T["python workflow"]["python parser is available"] = function()
@@ -65,15 +66,15 @@ T["python workflow"]["python parser is available"] = function()
     -- nvim-treesitter's main branch dropped parsers.has_parser; ask the core API instead
     local has_parser = pcall(vim.treesitter.language.add, "python")
 
-    MiniTest.expect.equality(has_parser, true, "Python parser should be installed")
+    MiniTest.expect.equality(has_parser, true, { fail_reason = "Python parser should be installed" })
 end
 
 T["python workflow"]["can detect python path"] = function()
     local fs_utils = require("kyleking.utils.fs_utils")
     local python_path = fs_utils.get_python_path()
 
-    MiniTest.expect.equality(type(python_path), "string", "Should return python path")
-    MiniTest.expect.equality(#python_path > 0, true, "Python path should not be empty")
+    MiniTest.expect.equality(type(python_path), "string", { fail_reason = "Should return python path" })
+    MiniTest.expect.equality(#python_path > 0, true, { fail_reason = "Python path should not be empty" })
 end
 
 -- For manual running

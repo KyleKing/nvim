@@ -90,8 +90,8 @@ return {
                             local exists_next, _ = helpers.check_keymap("]b", "n")
                             local exists_prev, _ = helpers.check_keymap("[b", "n")
 
-                            MiniTest.expect.equality(exists_next, true, "]b keymap missing")
-                            MiniTest.expect.equality(exists_prev, true, "[b keymap missing")
+                            MiniTest.expect.equality(exists_next, true, { fail_reason = "]b keymap missing" })
+                            MiniTest.expect.equality(exists_prev, true, { fail_reason = "[b keymap missing" })
                         end,
                     },
                 },
@@ -115,8 +115,8 @@ return {
                             local exists_next, _ = helpers.check_keymap("]a", "n")
                             local exists_prev, _ = helpers.check_keymap("[a", "n")
 
-                            MiniTest.expect.equality(exists_next, true, "]a keymap missing")
-                            MiniTest.expect.equality(exists_prev, true, "[a keymap missing")
+                            MiniTest.expect.equality(exists_next, true, { fail_reason = "]a keymap missing" })
+                            MiniTest.expect.equality(exists_prev, true, { fail_reason = "[a keymap missing" })
                         end,
                     },
                 },

@@ -23,7 +23,7 @@ T["startup time"]["startup completes under threshold"] = function()
         "qall!",
     }, { text = true }):wait(5000)
 
-    MiniTest.expect.equality(result.code, 0, "Startup should complete successfully")
+    MiniTest.expect.equality(result.code, 0, { fail_reason = "Startup should complete successfully" })
 
     -- Read and parse startup log
     if vim.fn.filereadable(tmplog) == 1 then
@@ -48,7 +48,7 @@ T["startup time"]["startup completes under threshold"] = function()
             MiniTest.expect.equality(
                 total_time < 300.0,
                 true,
-                string.format("Startup time %.1fms should be under 300ms", total_time)
+                { fail_reason = string.format("Startup time %.1fms should be under 300ms", total_time) }
             )
         else
             print("WARNING: Could not parse startup time from log")
@@ -68,7 +68,7 @@ T["startup time"]["no errors during startup"] = function()
         "qall!",
     }, { text = true }):wait(5000)
 
-    MiniTest.expect.equality(result.code, 0, "Startup should complete without errors")
+    MiniTest.expect.equality(result.code, 0, { fail_reason = "Startup should complete without errors" })
 
     -- Check for common error patterns
     local stderr = result.stderr or ""
@@ -79,7 +79,7 @@ T["startup time"]["no errors during startup"] = function()
         print(stderr)
     end
 
-    MiniTest.expect.equality(has_error, false, "Should have no errors in stderr: " .. stderr)
+    MiniTest.expect.equality(has_error, false, { fail_reason = "Should have no errors in stderr: " .. stderr })
 end
 
 T["plugin load time"] = MiniTest.new_set()
@@ -108,7 +108,7 @@ T["plugin load time"]["vim.pack loads plugins efficiently"] = function()
 
         if has_later_plugins then print("INFO: later() plugins detected in startup log") end
 
-        MiniTest.expect.equality(has_pack, true, "config/plugin bundle should be present in startup")
+        MiniTest.expect.equality(has_pack, true, { fail_reason = "config/plugin bundle should be present in startup" })
     end
 
     vim.fn.delete(tmplog)
@@ -144,8 +144,8 @@ T["large file handling"]["can open moderately large file"] = function()
 
     print(string.format("Opened 1000-line file in %.0fms", elapsed))
 
-    MiniTest.expect.equality(result.code, 0, "Should open large file: " .. (result.stderr or ""))
-    MiniTest.expect.equality(elapsed < 5000, true, "Should open large file in under 5s")
+    MiniTest.expect.equality(result.code, 0, { fail_reason = "Should open large file: " .. (result.stderr or "") })
+    MiniTest.expect.equality(elapsed < 5000, true, { fail_reason = "Should open large file in under 5s" })
 
     vim.fn.delete(tmpfile)
 end
@@ -179,7 +179,11 @@ T["large file handling"]["treesitter handles large file"] = function()
         "qall!",
     }, { text = true }):wait(5000)
 
-    MiniTest.expect.equality(result.code, 0, "Should handle treesitter on large file: " .. (result.stderr or ""))
+    MiniTest.expect.equality(
+        result.code,
+        0,
+        { fail_reason = "Should handle treesitter on large file: " .. (result.stderr or "") }
+    )
 
     vim.fn.delete(tmpfile)
 end
@@ -199,7 +203,7 @@ T["memory usage"]["startup memory is reasonable"] = function()
 
     if result.stdout then print("Memory info captured (requires external profiling for detailed analysis)") end
 
-    MiniTest.expect.equality(result.code, 0, "Should capture memory info")
+    MiniTest.expect.equality(result.code, 0, { fail_reason = "Should capture memory info" })
 end
 
 -- For manual running

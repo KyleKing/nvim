@@ -31,7 +31,11 @@ return {
                         fn = function(ctx)
                             local line = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 1, false)[1]
                             local MiniTest = require("mini.test")
-                            MiniTest.expect.equality(line:match("^%s*%-%-") ~= nil, true, "Line should be commented")
+                            MiniTest.expect.equality(
+                                line:match("^%s*%-%-") ~= nil,
+                                true,
+                                { fail_reason = "Line should be commented" }
+                            )
                         end,
                     },
                 },
@@ -66,7 +70,7 @@ return {
                             MiniTest.expect.equality(
                                 line:match("^%s*#") ~= nil,
                                 true,
-                                "Line should be commented with #"
+                                { fail_reason = "Line should be commented with #" }
                             )
                         end,
                     },
@@ -89,7 +93,7 @@ return {
                             MiniTest.expect.equality(
                                 line:match("^%s*//") ~= nil,
                                 true,
-                                "Line should be commented with //"
+                                { fail_reason = "Line should be commented with //" }
                             )
                         end,
                     },
@@ -115,8 +119,16 @@ return {
                         fn = function(ctx)
                             local lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 2, false)
                             local MiniTest = require("mini.test")
-                            MiniTest.expect.equality(lines[1]:match("^%s*%-%-") ~= nil, true, "First line commented")
-                            MiniTest.expect.equality(lines[2]:match("^%s*%-%-") ~= nil, true, "Second line commented")
+                            MiniTest.expect.equality(
+                                lines[1]:match("^%s*%-%-") ~= nil,
+                                true,
+                                { fail_reason = "First line commented" }
+                            )
+                            MiniTest.expect.equality(
+                                lines[2]:match("^%s*%-%-") ~= nil,
+                                true,
+                                { fail_reason = "Second line commented" }
+                            )
                         end,
                     },
                 },
@@ -141,8 +153,16 @@ return {
                         fn = function(ctx)
                             local lines = vim.api.nvim_buf_get_lines(ctx.bufnr, 0, 2, false)
                             local MiniTest = require("mini.test")
-                            MiniTest.expect.equality(lines[1]:match("^%s*%-%-") ~= nil, true, "First line commented")
-                            MiniTest.expect.equality(lines[2]:match("^%s*%-%-") ~= nil, true, "Second line commented")
+                            MiniTest.expect.equality(
+                                lines[1]:match("^%s*%-%-") ~= nil,
+                                true,
+                                { fail_reason = "First line commented" }
+                            )
+                            MiniTest.expect.equality(
+                                lines[2]:match("^%s*%-%-") ~= nil,
+                                true,
+                                { fail_reason = "Second line commented" }
+                            )
                         end,
                     },
                 },

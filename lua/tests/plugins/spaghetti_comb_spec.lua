@@ -21,13 +21,21 @@ T["spaghetti-comb"]["records jumps and navigates back"] = function()
         position = { line = 3, column = 1 },
     }
 
-    MiniTest.expect.equality(mgr.record_jump(nil, first, "manual"), true, "First jump should record")
-    MiniTest.expect.equality(mgr.record_jump(first, second, "manual"), true, "Second jump should record")
-    MiniTest.expect.equality(#mgr.get_all_entries(), 2, "Trail should hold both jumps")
+    MiniTest.expect.equality(mgr.record_jump(nil, first, "manual"), true, { fail_reason = "First jump should record" })
+    MiniTest.expect.equality(
+        mgr.record_jump(first, second, "manual"),
+        true,
+        { fail_reason = "Second jump should record" }
+    )
+    MiniTest.expect.equality(#mgr.get_all_entries(), 2, { fail_reason = "Trail should hold both jumps" })
 
     local ok, entry = mgr.go_back(1)
-    MiniTest.expect.equality(ok, true, "go_back should succeed")
-    MiniTest.expect.equality(vim.fn.fnamemodify(entry.file_path, ":t"), "pack.lua", "go_back should land on first jump")
+    MiniTest.expect.equality(ok, true, { fail_reason = "go_back should succeed" })
+    MiniTest.expect.equality(
+        vim.fn.fnamemodify(entry.file_path, ":t"),
+        "pack.lua",
+        { fail_reason = "go_back should land on first jump" }
+    )
 end
 
 T["spaghetti-comb"]["bookmark toggle adds then removes"] = function()
@@ -38,12 +46,12 @@ T["spaghetti-comb"]["bookmark toggle adds then removes"] = function()
     }
 
     local ok, action = bookmarks.toggle_bookmark(location)
-    MiniTest.expect.equality(ok, true, "First toggle should succeed")
-    MiniTest.expect.equality(action, "added", "First toggle should add")
+    MiniTest.expect.equality(ok, true, { fail_reason = "First toggle should succeed" })
+    MiniTest.expect.equality(action, "added", { fail_reason = "First toggle should add" })
 
     ok, action = bookmarks.toggle_bookmark(location)
-    MiniTest.expect.equality(ok, true, "Second toggle should succeed")
-    MiniTest.expect.equality(action, "removed", "Second toggle should remove")
+    MiniTest.expect.equality(ok, true, { fail_reason = "Second toggle should succeed" })
+    MiniTest.expect.equality(action, "removed", { fail_reason = "Second toggle should remove" })
 end
 
 T["spaghetti-comb"]["tree toggle opens and closes floats"] = function()
@@ -64,9 +72,9 @@ T["spaghetti-comb"]["tree toggle opens and closes floats"] = function()
 
     local baseline = count_floats()
     vim.cmd("SpaghettiCombTree")
-    MiniTest.expect.equality(count_floats() > baseline, true, "Tree should open floating windows")
+    MiniTest.expect.equality(count_floats() > baseline, true, { fail_reason = "Tree should open floating windows" })
     vim.cmd("SpaghettiCombTree")
-    MiniTest.expect.equality(count_floats(), baseline, "Second toggle should close them")
+    MiniTest.expect.equality(count_floats(), baseline, { fail_reason = "Second toggle should close them" })
 end
 
 if ... == nil then MiniTest.run() end

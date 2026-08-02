@@ -30,6 +30,7 @@ local core_plugins = {
     optional = { "conform", "lint", "mini.pick", "mini.files" },
 }
 
+---@return {name: string, binary: string, found: boolean, path: string?}[]
 function M._check_lsp_servers()
     local results = {}
     for server, binary in pairs(lsp_binaries) do
@@ -46,6 +47,7 @@ function M._check_lsp_servers()
     return results
 end
 
+---@return {name: string, path: string, exists: boolean}[]
 function M._check_lsp_configs()
     local results = {}
     local config_dir = vim.fn.stdpath("config") .. "/lsp"
@@ -61,6 +63,7 @@ function M._check_lsp_configs()
     return results
 end
 
+---@return {name: string, ecosystem: string, found: boolean, path: string?, is_local: boolean}[]
 function M._check_fre_tools()
     local results = {}
     local fre = require("find-relative-executable")
@@ -86,6 +89,7 @@ function M._check_fre_tools()
     return results
 end
 
+---@return {name: string, category: string, found: boolean, path: string?}[]
 function M._check_system_tools()
     local results = {}
     local seen = {}
@@ -110,6 +114,7 @@ function M._check_system_tools()
     return results
 end
 
+---@return {name: string, required: boolean, loaded: boolean}[]
 function M._check_core_plugins()
     local results = {}
 

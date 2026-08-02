@@ -62,7 +62,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>uu", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>uu keymap in normal mode")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>uu keymap in normal mode" }
+                            )
                         end,
                     },
                 },

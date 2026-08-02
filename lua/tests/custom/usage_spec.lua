@@ -62,7 +62,7 @@ end
 T["writer"]["buffers until flushed"] = function()
     local w, path = fixed_writer(make_dir())
     w.add({ kind = "map", key = "a" })
-    MiniTest.expect.equality(#read_events(path), 0, "should not touch disk before flush")
+    MiniTest.expect.equality(#read_events(path), 0, { fail_reason = "should not touch disk before flush" })
     w.flush()
     MiniTest.expect.equality(#read_events(path), 1)
 end
@@ -80,7 +80,7 @@ T["writer"]["appends across flushes"] = function()
     w.flush()
     w.add({ kind = "map", key = "b" })
     w.flush()
-    MiniTest.expect.equality(#read_events(path), 2, "second flush must not truncate the first")
+    MiniTest.expect.equality(#read_events(path), 2, { fail_reason = "second flush must not truncate the first" })
 end
 
 T["writer"]["splits one batch across month files"] = function()
@@ -94,8 +94,16 @@ T["writer"]["splits one batch across month files"] = function()
     w.add({ kind = "map", key = "b", ts = os.time({ year = 2026, month = 7, day = 1, hour = 1 }) })
     w.flush()
 
-    MiniTest.expect.equality(#read_events(dir .. "/h-2026-06.jsonl"), 1, "June event lands in the June file")
-    MiniTest.expect.equality(#read_events(dir .. "/h-2026-07.jsonl"), 1, "July event lands in the July file")
+    MiniTest.expect.equality(
+        #read_events(dir .. "/h-2026-06.jsonl"),
+        1,
+        { fail_reason = "June event lands in the June file" }
+    )
+    MiniTest.expect.equality(
+        #read_events(dir .. "/h-2026-07.jsonl"),
+        1,
+        { fail_reason = "July event lands in the July file" }
+    )
 end
 
 T["command_name"] = MiniTest.new_set()
@@ -107,7 +115,11 @@ end
 
 T["command_name"]["collapses abbreviations onto one name"] = function()
     MiniTest.expect.equality(usage.command_name("w"), "write")
-    MiniTest.expect.equality(usage.command_name("wr"), "write", ":w and :wr must not be separate rows")
+    MiniTest.expect.equality(
+        usage.command_name("wr"),
+        "write",
+        { fail_reason = ":w and :wr must not be separate rows" }
+    )
     MiniTest.expect.equality(usage.command_name("noh"), "nohlsearch")
 end
 
@@ -130,7 +142,7 @@ T["install"] = MiniTest.new_set()
 
 T["install"]["stays off without an explicit dir when root is missing"] = function()
     local installed = usage.install({ root = "/nonexistent-sync-root", enabled = true })
-    MiniTest.expect.equality(installed, false, "an unsynced machine should not be tracked")
+    MiniTest.expect.equality(installed, false, { fail_reason = "an unsynced machine should not be tracked" })
 end
 
 T["install"]["is off by default in headless"] = function()
@@ -164,7 +176,7 @@ T["maps"]["records an invocation with its desc"] = function()
     invoke("<leader>zz")
     usage.flush()
 
-    MiniTest.expect.equality(called, 1, "original callback must still run")
+    MiniTest.expect.equality(called, 1, { fail_reason = "original callback must still run" })
     local events = map_events(dir)
     MiniTest.expect.equality(#events, 1)
     MiniTest.expect.equality(events[1].key, "<leader>zz")
@@ -177,7 +189,11 @@ T["maps"]["preserves the return value of an expr map"] = function()
     install(make_dir())
 
     vim.keymap.set("n", "<leader>ze", function() return "ihello" end, { expr = true })
-    MiniTest.expect.equality(invoke("<leader>ze"), "ihello", "expr maps depend on the rhs return value")
+    MiniTest.expect.equality(
+        invoke("<leader>ze"),
+        "ihello",
+        { fail_reason = "expr maps depend on the rhs return value" }
+    )
 
     vim.keymap.del("n", "<leader>ze")
 end
@@ -190,9 +206,9 @@ T["maps"]["records even when the callback errors"] = function()
     local ok = pcall(invoke, "<leader>zx")
     usage.flush()
 
-    MiniTest.expect.equality(ok, false, "the error must still propagate")
+    MiniTest.expect.equality(ok, false, { fail_reason = "the error must still propagate" })
     local events = map_events(dir)
-    MiniTest.expect.equality(#events, 1, "a failing map still counts as used")
+    MiniTest.expect.equality(#events, 1, { fail_reason = "a failing map still counts as used" })
     MiniTest.expect.equality(events[1].key, "<leader>zx")
 
     vim.keymap.del("n", "<leader>zx")
@@ -203,8 +219,8 @@ T["maps"]["leaves a string rhs untouched"] = function()
 
     vim.keymap.set("n", "<leader>zs", "ihi<Esc>")
     local _, keymap = helpers.check_keymap("<leader>zs", "n")
-    MiniTest.expect.equality(keymap.callback, nil, "a string rhs has no callback to wrap")
-    MiniTest.expect.equality(keymap.rhs, "ihi<Esc>", "the string rhs must pass through unchanged")
+    MiniTest.expect.equality(keymap.callback, nil, { fail_reason = "a string rhs has no callback to wrap" })
+    MiniTest.expect.equality(keymap.rhs, "ihi<Esc>", { fail_reason = "the string rhs must pass through unchanged" })
 
     vim.keymap.del("n", "<leader>zs")
 end
@@ -212,7 +228,7 @@ end
 T["maps"]["restores the original setter on uninstall"] = function()
     local before = vim.keymap.set
     install(make_dir())
-    MiniTest.expect.equality(vim.keymap.set ~= before, true, "should be patched while installed")
+    MiniTest.expect.equality(vim.keymap.set ~= before, true, { fail_reason = "should be patched while installed" })
     usage.uninstall()
     MiniTest.expect.equality(vim.keymap.set, before)
 end
@@ -243,9 +259,13 @@ T["report"]["unions hosts and ranks by count"] = function()
     local rows = report.aggregate(dir)
     MiniTest.expect.equality(#rows, 2)
     MiniTest.expect.equality(rows[1].key, "<leader>ff")
-    MiniTest.expect.equality(rows[1].count, 3, "counts must sum across host files")
-    MiniTest.expect.equality(rows[1].desc, "Find files", "desc carries over from the event that had one")
-    MiniTest.expect.equality(rows[1].last, 300, "last-used is the newest across hosts")
+    MiniTest.expect.equality(rows[1].count, 3, { fail_reason = "counts must sum across host files" })
+    MiniTest.expect.equality(
+        rows[1].desc,
+        "Find files",
+        { fail_reason = "desc carries over from the event that had one" }
+    )
+    MiniTest.expect.equality(rows[1].last, 300, { fail_reason = "last-used is the newest across hosts" })
     MiniTest.expect.equality(rows[2].count, 2)
 end
 
@@ -260,7 +280,7 @@ T["report"]["skips malformed lines"] = function()
 
     local rows = report.aggregate(dir)
     MiniTest.expect.equality(#rows, 1)
-    MiniTest.expect.equality(rows[1].count, 2, "a torn line must not lose the valid ones")
+    MiniTest.expect.equality(rows[1].count, 2, { fail_reason = "a torn line must not lose the valid ones" })
 end
 
 T["report"]["handles an empty directory"] = function()
@@ -274,29 +294,41 @@ T["patterns"] = MiniTest.new_set()
 T["patterns"]["expands * across a family"] = function()
     MiniTest.expect.equality(patterns.matches("c*w", "ciw"), true)
     MiniTest.expect.equality(patterns.matches("c*w", "caw"), true)
-    MiniTest.expect.equality(patterns.matches("c*w", "ciwx"), false, "must stay anchored at both ends")
+    MiniTest.expect.equality(
+        patterns.matches("c*w", "ciwx"),
+        false,
+        { fail_reason = "must stay anchored at both ends" }
+    )
     MiniTest.expect.equality(patterns.matches("c*w", "diw"), false)
 end
 
 T["patterns"]["treats magic characters literally"] = function()
     MiniTest.expect.equality(patterns.matches("di(", "di("), true)
-    MiniTest.expect.equality(patterns.matches("di(", "diX"), false, "( must not act as a Lua capture")
+    MiniTest.expect.equality(patterns.matches("di(", "diX"), false, { fail_reason = "( must not act as a Lua capture" })
     MiniTest.expect.equality(patterns.matches("$", "$"), true)
-    MiniTest.expect.equality(patterns.matches("$", "x"), false, "$ must not act as an anchor")
+    MiniTest.expect.equality(patterns.matches("$", "x"), false, { fail_reason = "$ must not act as an anchor" })
     MiniTest.expect.equality(patterns.matches("%", "%"), true)
-    MiniTest.expect.equality(patterns.matches(".", "x"), false, ". must not match any character")
+    MiniTest.expect.equality(patterns.matches(".", "x"), false, { fail_reason = ". must not match any character" })
 end
 
 T["patterns"]["is case-sensitive"] = function()
-    MiniTest.expect.equality(patterns.matches("c*w", "ciW"), false, "ciW is a different motion from ciw")
+    MiniTest.expect.equality(
+        patterns.matches("c*w", "ciW"),
+        false,
+        { fail_reason = "ciW is a different motion from ciw" }
+    )
     MiniTest.expect.equality(patterns.matches("c*W", "ciW"), true)
 end
 
 T["patterns"]["denies before grouping"] = function()
     local active = { denylist = { "ciw" }, groups = { "c*w" } }
-    MiniTest.expect.equality(patterns.label(active, "ciw"), nil, "an explicit deny wins over a group")
-    MiniTest.expect.equality(patterns.label(active, "caw"), "c*w", "other family members still collapse")
-    MiniTest.expect.equality(patterns.label(active, "dd"), "dd", "unmatched keys keep their own name")
+    MiniTest.expect.equality(patterns.label(active, "ciw"), nil, { fail_reason = "an explicit deny wins over a group" })
+    MiniTest.expect.equality(
+        patterns.label(active, "caw"),
+        "c*w",
+        { fail_reason = "other family members still collapse" }
+    )
+    MiniTest.expect.equality(patterns.label(active, "dd"), "dd", { fail_reason = "unmatched keys keep their own name" })
 end
 
 T["patterns"]["falls back when the file is malformed"] = function()
@@ -307,7 +339,7 @@ T["patterns"]["falls back when the file is malformed"] = function()
     fh:close()
 
     local active = patterns.load(dir)
-    MiniTest.expect.equality(active.denylist, {}, "a bad hand edit must not lose events")
+    MiniTest.expect.equality(active.denylist, {}, { fail_reason = "a bad hand edit must not lose events" })
 end
 
 T["store"] = MiniTest.new_set()
@@ -347,12 +379,20 @@ T["store"]["compacts an expired month and keeps the current one"] = function()
     local compacted = store.compact(dir, { retention_months = 1, now = JULY })
 
     MiniTest.expect.equality(compacted, { "2026-06" })
-    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h-2026-06.jsonl"), 0, "raw month is removed")
-    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h-2026-07.jsonl"), 1, "current month is kept raw")
+    MiniTest.expect.equality(
+        vim.fn.filereadable(dir .. "/h-2026-06.jsonl"),
+        0,
+        { fail_reason = "raw month is removed" }
+    )
+    MiniTest.expect.equality(
+        vim.fn.filereadable(dir .. "/h-2026-07.jsonl"),
+        1,
+        { fail_reason = "current month is kept raw" }
+    )
 
     local summary = assert(store.read_json(dir .. "/summary-h-2026-06.json"))
     MiniTest.expect.equality(#summary.rows, 1)
-    MiniTest.expect.equality(summary.rows[1].count, 2, "counts survive compaction")
+    MiniTest.expect.equality(summary.rows[1].count, 2, { fail_reason = "counts survive compaction" })
 end
 
 T["store"]["compaction preserves totals in the report"] = function()
@@ -368,7 +408,7 @@ T["store"]["compaction preserves totals in the report"] = function()
     local after = report.aggregate(dir)
 
     MiniTest.expect.equality(before[1].count, 3)
-    MiniTest.expect.equality(after[1].count, 3, "compaction must not change what the report shows")
+    MiniTest.expect.equality(after[1].count, 3, { fail_reason = "compaction must not change what the report shows" })
     MiniTest.expect.equality(after[1].last, JULY)
 end
 
@@ -378,7 +418,11 @@ T["store"]["dates a legacy file by its newest event"] = function()
 
     store.compact(dir, { retention_months = 1, now = JULY })
 
-    MiniTest.expect.equality(vim.fn.filereadable(dir .. "/h.jsonl"), 0, "pre-rotation file is compacted too")
+    MiniTest.expect.equality(
+        vim.fn.filereadable(dir .. "/h.jsonl"),
+        0,
+        { fail_reason = "pre-rotation file is compacted too" }
+    )
     MiniTest.expect.equality(vim.fn.filereadable(dir .. "/summary-h-2026-06.json"), 1)
 end
 
@@ -409,7 +453,7 @@ T["retro denylist"]["removes matching events and summary rows"] = function()
     MiniTest.expect.equality(removed.rows_removed, 1)
 
     local rows = report.aggregate(dir)
-    MiniTest.expect.equality(#rows, 1, "denied key is gone from both raw and summarized history")
+    MiniTest.expect.equality(#rows, 1, { fail_reason = "denied key is gone from both raw and summarized history" })
     MiniTest.expect.equality(rows[1].key, "ciw")
 end
 
@@ -428,12 +472,16 @@ T["retro denylist"]["detects a changed denylist"] = function()
     install(dir)
     patterns.save(dir, { denylist = { "j" }, groups = {} })
 
-    MiniTest.expect.equality(usage.denylist_drifted(), false, "nothing applied yet, so nothing to drift from")
+    MiniTest.expect.equality(
+        usage.denylist_drifted(),
+        false,
+        { fail_reason = "nothing applied yet, so nothing to drift from" }
+    )
     store.write_applied_denylist(dir, "testhost", { "j" })
     MiniTest.expect.equality(usage.denylist_drifted(), false)
 
     patterns.save(dir, { denylist = { "j", "k" }, groups = {} })
-    MiniTest.expect.equality(usage.denylist_drifted(), true, "a new pattern needs a retro pass")
+    MiniTest.expect.equality(usage.denylist_drifted(), true, { fail_reason = "a new pattern needs a retro pass" })
 end
 
 T["capture"] = MiniTest.new_set()
@@ -448,7 +496,7 @@ T["capture"]["skips a denied key at capture time"] = function()
     invoke("<leader>zd")
     usage.flush()
 
-    MiniTest.expect.equality(#map_events(dir), 0, "denied keys never reach disk")
+    MiniTest.expect.equality(#map_events(dir), 0, { fail_reason = "denied keys never reach disk" })
     vim.keymap.del("n", "<leader>zd")
 end
 
@@ -462,7 +510,7 @@ T["capture"]["omits the host from each event"] = function()
 
     local events = map_events(dir)
     MiniTest.expect.equality(#events, 1)
-    MiniTest.expect.equality(events[1].host, nil, "the filename already carries the host")
+    MiniTest.expect.equality(events[1].host, nil, { fail_reason = "the filename already carries the host" })
     vim.keymap.del("n", "<leader>zh")
 end
 
@@ -483,7 +531,7 @@ T["map echo"]["drops a motion that repeats the keymap just fired"] = function()
 
     local events = read_events(store.raw_path(dir, "testhost", store.month_of(os.time())))
     local kinds = vim.tbl_map(function(e) return e.kind end, events)
-    MiniTest.expect.equality(kinds, { "map" }, "the motion echo must not be counted a second time")
+    MiniTest.expect.equality(kinds, { "map" }, { fail_reason = "the motion echo must not be counted a second time" })
 
     vim.keymap.del("n", "<leader>zm")
 end
@@ -498,7 +546,7 @@ T["map echo"]["keeps a motion that no keymap fired"] = function()
     local events = read_events(store.raw_path(dir, "testhost", store.month_of(os.time())))
     MiniTest.expect.equality(#events, 1)
     MiniTest.expect.equality(events[1].kind, "motion")
-    MiniTest.expect.equality(events[1].key, "c*w", "grouped onto its family")
+    MiniTest.expect.equality(events[1].key, "c*w", { fail_reason = "grouped onto its family" })
 end
 
 T["noise suggestions"] = MiniTest.new_set()
@@ -512,7 +560,7 @@ T["noise suggestions"]["ranks noisy ungrouped motions"] = function()
     }
     local noisy = report.noise(rows, { min_count = 20 })
 
-    MiniTest.expect.equality(#noisy, 1, "only ungrouped motions past the threshold qualify")
+    MiniTest.expect.equality(#noisy, 1, { fail_reason = "only ungrouped motions past the threshold qualify" })
     MiniTest.expect.equality(noisy[1].key, "x")
 end
 
@@ -523,7 +571,7 @@ T["noise suggestions"]["never writes patterns.json"] = function()
 
     report.noise({ { kind = "motion", key = "x", count = 99, last = 1 } })
 
-    MiniTest.expect.equality(patterns.load(dir).denylist, { "j" }, "suggestions are read-only")
+    MiniTest.expect.equality(patterns.load(dir).denylist, { "j" }, { fail_reason = "suggestions are read-only" })
 end
 
 if MiniTest.current.all_cases == nil then MiniTest.run() end

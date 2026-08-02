@@ -34,7 +34,7 @@ return {
                             local cursor = vim.api.nvim_win_get_cursor(0)
 
                             MiniTest.expect.equality(lines, { "line2", "line1", "line3" })
-                            MiniTest.expect.equality(cursor[1], 2, "Cursor should move with line")
+                            MiniTest.expect.equality(cursor[1], 2, { fail_reason = "Cursor should move with line" })
 
                             helpers.delete_buffer(bufnr)
                         end,
@@ -58,7 +58,7 @@ return {
                             local cursor = vim.api.nvim_win_get_cursor(0)
 
                             MiniTest.expect.equality(lines, { "line2", "line1", "line3" })
-                            MiniTest.expect.equality(cursor[1], 1, "Cursor should move with line")
+                            MiniTest.expect.equality(cursor[1], 1, { fail_reason = "Cursor should move with line" })
 
                             helpers.delete_buffer(bufnr)
                         end,

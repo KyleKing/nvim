@@ -77,12 +77,20 @@ return {
                             -- Create horizontal split
                             vim.cmd("split")
                             local after_split = #vim.api.nvim_list_wins()
-                            MiniTest.expect.equality(after_split, initial_wins + 1, "Should have one more window")
+                            MiniTest.expect.equality(
+                                after_split,
+                                initial_wins + 1,
+                                { fail_reason = "Should have one more window" }
+                            )
 
                             -- Close the split
                             vim.cmd("close")
                             local after_close = #vim.api.nvim_list_wins()
-                            MiniTest.expect.equality(after_close, initial_wins, "Should restore original window count")
+                            MiniTest.expect.equality(
+                                after_close,
+                                initial_wins,
+                                { fail_reason = "Should restore original window count" }
+                            )
                         end,
                     },
                 },
@@ -118,11 +126,31 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Verify window management keymaps exist
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>wz", "n"), true, "zoom window")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>wm", "n"), true, "maximize window")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>w=", "n"), true, "equalize windows")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>w|", "n"), true, "maximize width")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>w_", "n"), true, "maximize height")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>wz", "n"),
+                                true,
+                                { fail_reason = "zoom window" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>wm", "n"),
+                                true,
+                                { fail_reason = "maximize window" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>w=", "n"),
+                                true,
+                                { fail_reason = "equalize windows" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>w|", "n"),
+                                true,
+                                { fail_reason = "maximize width" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>w_", "n"),
+                                true,
+                                { fail_reason = "maximize height" }
+                            )
                         end,
                     },
                 },

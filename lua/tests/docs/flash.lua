@@ -23,10 +23,14 @@ return {
                     name = "jump shows labels",
                     expect = {
                         fn = function(_ctx)
-                            local flash = require("flash")
+                            local flash = require("flash") --[[@as any]]
                             local MiniTest = require("mini.test")
                             -- Just verify flash module loads
-                            MiniTest.expect.equality(type(flash.jump), "function", "Flash should be loaded")
+                            MiniTest.expect.equality(
+                                type(flash.jump),
+                                "function",
+                                { fail_reason = "Flash should be loaded" }
+                            )
                         end,
                     },
                 },
@@ -40,9 +44,13 @@ return {
                     name = "treesitter jump available",
                     expect = {
                         fn = function(_ctx)
-                            local flash = require("flash")
+                            local flash = require("flash") --[[@as any]]
                             local MiniTest = require("mini.test")
-                            MiniTest.expect.equality(type(flash.treesitter), "function", "Treesitter jump available")
+                            MiniTest.expect.equality(
+                                type(flash.treesitter),
+                                "function",
+                                { fail_reason = "Treesitter jump available" }
+                            )
                         end,
                     },
                 },

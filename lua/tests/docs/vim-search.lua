@@ -55,7 +55,7 @@ return {
                             MiniTest.expect.equality(
                                 sms["S"],
                                 nil,
-                                "shortmess should not contain 'S' flag for search count display"
+                                { fail_reason = "shortmess should not contain 'S' flag for search count display" }
                             )
                         end,
                     },

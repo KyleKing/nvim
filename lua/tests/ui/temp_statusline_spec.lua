@@ -18,23 +18,31 @@ T["temp session statusline"]["mode info function returns label and highlight"] =
     local mode_info = utils.get_temp_mode_info()
 
     -- Should return a table with label and hl
-    MiniTest.expect.equality(type(mode_info), "table", "Mode info should return table")
-    MiniTest.expect.equality(type(mode_info.label), "string", "Mode info should have label string")
-    MiniTest.expect.equality(type(mode_info.hl), "string", "Mode info should have highlight group string")
-    MiniTest.expect.equality(mode_info.hl:match("^TempMode") ~= nil, true, "Highlight group should start with TempMode")
+    MiniTest.expect.equality(type(mode_info), "table", { fail_reason = "Mode info should return table" })
+    MiniTest.expect.equality(type(mode_info.label), "string", { fail_reason = "Mode info should have label string" })
+    MiniTest.expect.equality(
+        type(mode_info.hl),
+        "string",
+        { fail_reason = "Mode info should have highlight group string" }
+    )
+    MiniTest.expect.equality(
+        mode_info.hl:match("^TempMode") ~= nil,
+        true,
+        { fail_reason = "Highlight group should start with TempMode" }
+    )
 end
 
 T["temp session statusline"]["abbreviated session type returns short labels"] = function()
     local utils = require("kyleking.utils")
 
     local claude = utils.get_abbreviated_session_type("CLAUDE CODE EDITOR")
-    MiniTest.expect.equality(claude, "CLAUDE", "Should abbreviate CLAUDE CODE EDITOR")
+    MiniTest.expect.equality(claude, "CLAUDE", { fail_reason = "Should abbreviate CLAUDE CODE EDITOR" })
 
     local git = utils.get_abbreviated_session_type("GIT COMMIT")
-    MiniTest.expect.equality(git, "GIT", "Should abbreviate GIT COMMIT")
+    MiniTest.expect.equality(git, "GIT", { fail_reason = "Should abbreviate GIT COMMIT" })
 
     local other = utils.get_abbreviated_session_type("OTHER")
-    MiniTest.expect.equality(other, "OTHER", "Should return unknown types as-is")
+    MiniTest.expect.equality(other, "OTHER", { fail_reason = "Should return unknown types as-is" })
 end
 
 T["temp session statusline"]["filename truncation respects minimum width"] = function()
@@ -52,14 +60,14 @@ T["temp session statusline"]["filename truncation respects minimum width"] = fun
     local truncated = utils.get_truncated_filename()
 
     -- Should contain truncation indicator or full path
-    MiniTest.expect.equality(type(truncated), "string", "Should return string")
+    MiniTest.expect.equality(type(truncated), "string", { fail_reason = "Should return string" })
 
     -- If truncated, should start with ... (with or without /)
     if #long_path > 65 then
         MiniTest.expect.equality(
             truncated:match("^%.%.%.") ~= nil or truncated == long_path,
             true,
-            "Long paths should be truncated with ... prefix or shown in full"
+            { fail_reason = "Long paths should be truncated with ... prefix or shown in full" }
         )
     end
 
@@ -96,14 +104,18 @@ T["temp session statusline"]["mode highlight groups are defined"] = function()
 
         for _, hl_group in ipairs(mode_hl_groups) do
             local hl = vim.api.nvim_get_hl(0, { name = hl_group })
-            MiniTest.expect.equality(next(hl) ~= nil, true, "Temp mode highlight group should be defined: " .. hl_group)
+            MiniTest.expect.equality(
+                next(hl) ~= nil,
+                true,
+                { fail_reason = "Temp mode highlight group should be defined: " .. hl_group }
+            )
 
             -- Verify highlight has bg color (essential for visibility)
             if next(hl) ~= nil then
                 MiniTest.expect.equality(
                     hl.bg ~= nil,
                     true,
-                    "Highlight group should have background color: " .. hl_group
+                    { fail_reason = "Highlight group should have background color: " .. hl_group }
                 )
             end
         end
@@ -135,7 +147,11 @@ T["temp session statusline"]["session badge highlight groups are defined"] = fun
 
         for _, hl_group in ipairs(session_hl_groups) do
             local hl = vim.api.nvim_get_hl(0, { name = hl_group })
-            MiniTest.expect.equality(next(hl) ~= nil, true, "Session highlight group should be defined: " .. hl_group)
+            MiniTest.expect.equality(
+                next(hl) ~= nil,
+                true,
+                { fail_reason = "Session highlight group should be defined: " .. hl_group }
+            )
         end
     end
 
@@ -163,21 +179,21 @@ T["temp session statusline"]["statusline is set in temp session"] = function()
         MiniTest.expect.equality(
             statusline:match("TempMode") ~= nil,
             true,
-            "Statusline should contain mode highlight group"
+            { fail_reason = "Statusline should contain mode highlight group" }
         )
 
         -- Should contain filename call
         MiniTest.expect.equality(
             statusline:match("get_truncated_filename") ~= nil,
             true,
-            "Statusline should contain filename function call"
+            { fail_reason = "Statusline should contain filename function call" }
         )
 
         -- Should contain session badge
         MiniTest.expect.equality(
             statusline:match("TempSession") ~= nil,
             true,
-            "Statusline should contain session badge highlight"
+            { fail_reason = "Statusline should contain session badge highlight" }
         )
     end
 
@@ -198,15 +214,15 @@ T["temp session statusline"]["git commit file triggers temp session"] = function
     local utils = require("kyleking.utils")
     local is_temp, session_type = utils.detect_temp_session()
 
-    MiniTest.expect.equality(is_temp, true, "COMMIT_EDITMSG should trigger temp session")
-    MiniTest.expect.equality(session_type, "GIT COMMIT", "Should detect as GIT COMMIT session")
+    MiniTest.expect.equality(is_temp, true, { fail_reason = "COMMIT_EDITMSG should trigger temp session" })
+    MiniTest.expect.equality(session_type, "GIT COMMIT", { fail_reason = "Should detect as GIT COMMIT session" })
 
     -- Check statusline is set with mode highlight
     local statusline = vim.o.statusline
     MiniTest.expect.equality(
         statusline:match("TempMode") ~= nil,
         true,
-        "Git commit should have temp statusline with mode indicator"
+        { fail_reason = "Git commit should have temp statusline with mode indicator" }
     )
 
     -- Cleanup
@@ -229,7 +245,11 @@ T["temp session statusline"]["easy quit keymap is set in temp session"] = functi
     if is_temp then
         -- Check that <leader>q keymap is set for current buffer
         local keymap = vim.fn.maparg("<leader>q", "n", false, true)
-        MiniTest.expect.equality(keymap ~= nil and keymap.buffer == 1, true, "<leader>q should be buffer-local")
+        MiniTest.expect.equality(
+            keymap ~= nil and keymap.buffer == 1,
+            true,
+            { fail_reason = "<leader>q should be buffer-local" }
+        )
     end
 
     -- Cleanup

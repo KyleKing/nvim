@@ -32,7 +32,7 @@ T["setup"]["creates Preview command"] = function()
     preview.setup()
 
     local commands = vim.api.nvim_get_commands({})
-    MiniTest.expect.no_equality(commands["Preview"], nil, ":Preview command should exist")
+    MiniTest.expect.no_equality(commands["Preview"], nil, { fail_reason = ":Preview command should exist" })
 end
 
 T["setup"]["creates autocmd for markdown"] = function()
@@ -40,14 +40,14 @@ T["setup"]["creates autocmd for markdown"] = function()
     preview.setup()
 
     local autocmds = vim.api.nvim_get_autocmds({ group = "kyleking_preview", event = "FileType" })
-    MiniTest.expect.no_equality(#autocmds, 0, "Should create FileType autocmd")
+    MiniTest.expect.no_equality(#autocmds, 0, { fail_reason = "Should create FileType autocmd" })
 
     -- Check pattern includes markdown
     local has_markdown = false
     for _, cmd in ipairs(autocmds) do
         if cmd.pattern and vim.tbl_contains(vim.split(cmd.pattern, ","), "markdown") then has_markdown = true end
     end
-    MiniTest.expect.equality(has_markdown, true, "Should include markdown pattern")
+    MiniTest.expect.equality(has_markdown, true, { fail_reason = "Should include markdown pattern" })
 end
 
 T["setup"]["creates autocmd for djot"] = function()
@@ -61,7 +61,7 @@ T["setup"]["creates autocmd for djot"] = function()
     for _, cmd in ipairs(autocmds) do
         if cmd.pattern and vim.tbl_contains(vim.split(cmd.pattern, ","), "djot") then has_djot = true end
     end
-    MiniTest.expect.equality(has_djot, true, "Should include djot pattern")
+    MiniTest.expect.equality(has_djot, true, { fail_reason = "Should include djot pattern" })
 end
 
 T["setup"]["creates keymap in markdown files"] = function()
@@ -80,14 +80,14 @@ T["setup"]["creates keymap in markdown files"] = function()
         if map.lhs == " cp" or map.lhs:match("cp") then has_preview_map = true end
     end
 
-    MiniTest.expect.equality(has_preview_map, true, "Should map <leader>cp")
+    MiniTest.expect.equality(has_preview_map, true, { fail_reason = "Should map <leader>cp" })
 end
 
 T["preview"] = MiniTest.new_set()
 
 T["preview"]["function exists"] = function()
     local preview = require("kyleking.utils.preview")
-    MiniTest.expect.equality(type(preview.preview), "function", "preview() should be a function")
+    MiniTest.expect.equality(type(preview.preview), "function", { fail_reason = "preview() should be a function" })
 end
 
 T["preview"]["handles empty buffer name"] = function()
@@ -101,7 +101,7 @@ T["preview"]["handles empty buffer name"] = function()
     -- Should not error, but won't do anything without a filepath
     -- This just verifies the function handles the case gracefully
     local ok = pcall(preview.preview)
-    MiniTest.expect.equality(ok, true, "Should not error on empty buffer")
+    MiniTest.expect.equality(ok, true, { fail_reason = "Should not error on empty buffer" })
 end
 
 T["preview"]["handles unsupported filetype"] = function()
@@ -113,7 +113,7 @@ T["preview"]["handles unsupported filetype"] = function()
 
     -- Should handle gracefully
     local ok = pcall(preview.preview)
-    MiniTest.expect.equality(ok, true, "Should not error on unsupported filetype")
+    MiniTest.expect.equality(ok, true, { fail_reason = "Should not error on unsupported filetype" })
 end
 
 T["markdown_to_html"] = MiniTest.new_set()
@@ -129,8 +129,8 @@ T["markdown_to_html"]["detects available tools"] = function()
         vim.notify("Note: Neither pandoc nor Python found for markdown preview", vim.log.levels.WARN)
     end
 
-    MiniTest.expect.equality(type(has_pandoc), "boolean", "Pandoc detection should return boolean")
-    MiniTest.expect.equality(type(has_python), "boolean", "Python detection should return boolean")
+    MiniTest.expect.equality(type(has_pandoc), "boolean", { fail_reason = "Pandoc detection should return boolean" })
+    MiniTest.expect.equality(type(has_python), "boolean", { fail_reason = "Python detection should return boolean" })
 end
 
 T["djot_to_html"] = MiniTest.new_set()
@@ -142,7 +142,7 @@ T["djot_to_html"]["detects djot CLI"] = function()
         vim.notify("Note: djot CLI not found. Install with: npm install -g @djot/djot", vim.log.levels.INFO)
     end
 
-    MiniTest.expect.equality(type(has_djot), "boolean", "Djot detection should return boolean")
+    MiniTest.expect.equality(type(has_djot), "boolean", { fail_reason = "Djot detection should return boolean" })
 end
 
 T["integration"] = MiniTest.new_set()
@@ -176,7 +176,7 @@ T["integration"]["works with real markdown file"] = function()
     end
 
     local ok = pcall(preview.preview)
-    MiniTest.expect.equality(ok, true, "Should not error with real file")
+    MiniTest.expect.equality(ok, true, { fail_reason = "Should not error with real file" })
 
     -- Verify browser open was attempted
     local had_open_call = false
@@ -186,7 +186,7 @@ T["integration"]["works with real markdown file"] = function()
             break
         end
     end
-    MiniTest.expect.equality(had_open_call, true, "Should attempt to open browser")
+    MiniTest.expect.equality(had_open_call, true, { fail_reason = "Should attempt to open browser" })
 
     -- Restore original function
     vim.fn.system = original_system
@@ -236,14 +236,14 @@ T["integration"]["embeds relative images as data URIs"] = function()
     local ok = pcall(preview.preview)
     vim.fn.system = original_system
 
-    MiniTest.expect.equality(ok, true, "Should not error")
-    MiniTest.expect.no_equality(opened_html, nil, "Should open generated HTML")
+    MiniTest.expect.equality(ok, true, { fail_reason = "Should not error" })
+    MiniTest.expect.no_equality(opened_html, nil, { fail_reason = "Should open generated HTML" })
 
     local html = table.concat(vim.fn.readfile(opened_html), "\n")
     MiniTest.expect.equality(
         html:match('src="data:image') ~= nil,
         true,
-        "Relative image should be inlined as a data URI"
+        { fail_reason = "Relative image should be inlined as a data URI" }
     )
 
     vim.fn.delete(dir, "rf")
@@ -278,12 +278,20 @@ T["refresh"]["preview output has no auto-refresh polling"] = function()
     local ok = pcall(preview.preview)
     vim.fn.system = original_system
 
-    MiniTest.expect.equality(ok, true, "preview should not error")
-    MiniTest.expect.no_equality(opened_html, nil, "preview should open generated HTML")
+    MiniTest.expect.equality(ok, true, { fail_reason = "preview should not error" })
+    MiniTest.expect.no_equality(opened_html, nil, { fail_reason = "preview should open generated HTML" })
 
     local html = table.concat(vim.fn.readfile(opened_html), "\n")
-    MiniTest.expect.equality(html:match('http%-equiv="refresh"'), nil, "should not poll with meta refresh")
-    MiniTest.expect.equality(html:match("sessionStorage") ~= nil, true, "should restore scroll on reload")
+    MiniTest.expect.equality(
+        html:match('http%-equiv="refresh"'),
+        nil,
+        { fail_reason = "should not poll with meta refresh" }
+    )
+    MiniTest.expect.equality(
+        html:match("sessionStorage") ~= nil,
+        true,
+        { fail_reason = "should restore scroll on reload" }
+    )
 
     vim.fn.delete(temp_file)
     vim.fn.delete(opened_html)
@@ -313,14 +321,18 @@ T["refresh"]["re-renders the stable output on repeat invocation"] = function()
 
     pcall(preview.preview)
     local first = table.concat(vim.fn.readfile(out_path), "\n")
-    MiniTest.expect.equality(first:match("One") ~= nil, true, "preview should write initial content")
+    MiniTest.expect.equality(first:match("One") ~= nil, true, { fail_reason = "preview should write initial content" })
 
     vim.api.nvim_buf_set_lines(0, 0, -1, false, { "# Two" })
     local ok = pcall(preview.preview)
-    MiniTest.expect.equality(ok, true, "second preview should not error")
+    MiniTest.expect.equality(ok, true, { fail_reason = "second preview should not error" })
 
     local second = table.concat(vim.fn.readfile(out_path), "\n")
-    MiniTest.expect.equality(second:match("Two") ~= nil, true, "repeat preview should regenerate content")
+    MiniTest.expect.equality(
+        second:match("Two") ~= nil,
+        true,
+        { fail_reason = "repeat preview should regenerate content" }
+    )
 
     vim.fn.system = original_system
     vim.fn.delete(temp_file)

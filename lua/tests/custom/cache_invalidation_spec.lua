@@ -14,7 +14,7 @@ T["cache_invalidation"]["autocmds are registered"] = function()
     local autocmds = vim.api.nvim_get_autocmds({ group = "project_tools_cache" })
 
     -- Should have 3 autocmds: BufWritePost, DirChanged, VimResume
-    MiniTest.expect.no_equality(#autocmds, 0, "Should register cache invalidation autocmds")
+    MiniTest.expect.no_equality(#autocmds, 0, { fail_reason = "Should register cache invalidation autocmds" })
 
     local events = {}
     for _, autocmd in ipairs(autocmds) do
@@ -26,9 +26,9 @@ T["cache_invalidation"]["autocmds are registered"] = function()
     local has_dirchanged = vim.tbl_contains(events, "DirChanged")
     local has_vimresume = vim.tbl_contains(events, "VimResume")
 
-    MiniTest.expect.equality(has_bufwrite, true, "Should have BufWritePost autocmd")
-    MiniTest.expect.equality(has_dirchanged, true, "Should have DirChanged autocmd")
-    MiniTest.expect.equality(has_vimresume, true, "Should have VimResume autocmd")
+    MiniTest.expect.equality(has_bufwrite, true, { fail_reason = "Should have BufWritePost autocmd" })
+    MiniTest.expect.equality(has_dirchanged, true, { fail_reason = "Should have DirChanged autocmd" })
+    MiniTest.expect.equality(has_vimresume, true, { fail_reason = "Should have VimResume autocmd" })
 end
 
 T["cache_invalidation"]["BufWritePost clears cache for marker files"] = function()

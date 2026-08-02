@@ -87,7 +87,7 @@ return {
                             MiniTest.expect.equality(
                                 line:match("func%(") == nil,
                                 true,
-                                "Function call should be deleted"
+                                { fail_reason = "Function call should be deleted" }
                             )
                         end,
                     },

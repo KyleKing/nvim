@@ -82,7 +82,7 @@ T["registered"]["hands back the leader already expanded"] = function()
     MiniTest.expect.equality(
         row.key,
         vim.g.mapleader .. "zcx",
-        "this mismatch with the logged lhs is what normalize() has to bridge"
+        { fail_reason = "this mismatch with the logged lhs is what normalize() has to bridge" }
     )
 end
 
@@ -90,7 +90,7 @@ T["registered"]["skips plugin-internal mappings"] = function()
     vim.keymap.set("n", "<Plug>(usage-cold-test)", function() end)
 
     local internal = vim.tbl_filter(function(row) return row.key:find("<Plug>", 1, true) ~= nil end, cold.registered())
-    MiniTest.expect.equality(#internal, 0, "<Plug> targets are not things I type")
+    MiniTest.expect.equality(#internal, 0, { fail_reason = "<Plug> targets are not things I type" })
 
     pcall(vim.keymap.del, "n", "<Plug>(usage-cold-test)")
 end
@@ -103,7 +103,7 @@ T["registered"]["deduplicates a key registered in several modes"] = function()
         function(row) return cold.normalize(row.key) == cold.normalize("<leader>zcd") end,
         cold.registered()
     )
-    MiniTest.expect.equality(#hits, 1, "one lhs is one decision, however many modes it covers")
+    MiniTest.expect.equality(#hits, 1, { fail_reason = "one lhs is one decision, however many modes it covers" })
 
     pcall(vim.keymap.del, "x", "<leader>zcd")
 end
@@ -116,7 +116,7 @@ T["cold"]["reports an unlogged map as never used"] = function()
 
     local row = assert(find(cold.cold(dir), "<leader>zcn"))
     MiniTest.expect.equality(row.count, 0)
-    MiniTest.expect.equality(row.last, 0, "count 0 and last 0 read as never triggered")
+    MiniTest.expect.equality(row.last, 0, { fail_reason = "count 0 and last 0 read as never triggered" })
 end
 
 T["cold"]["matches a logged <leader> map against its expanded lhs"] = function()
@@ -125,7 +125,7 @@ T["cold"]["matches a logged <leader> map against its expanded lhs"] = function()
     write_log(dir, "mbp", { { kind = "map", key = "<leader>zcu", desc = "Used once", ts = JULY } })
 
     local row = assert(find(cold.cold(dir), "<leader>zcu"))
-    MiniTest.expect.equality(row.count, 1, "the log stores <leader>zcu while the keymap reads ' zcu'")
+    MiniTest.expect.equality(row.count, 1, { fail_reason = "the log stores <leader>zcu while the keymap reads ' zcu'" })
     MiniTest.expect.equality(row.last, JULY)
 end
 
@@ -134,7 +134,11 @@ T["cold"]["matches a logged control key across case variants"] = function()
     map("<C-\\><C-z>", "Ctrl map")
     write_log(dir, "mbp", { { kind = "map", key = "<C-\\><C-Z>", ts = JULY } })
 
-    MiniTest.expect.equality(find(cold.cold(dir), "<C-\\><C-z>").count, 1, "<C-z> and <C-Z> are one key")
+    MiniTest.expect.equality(
+        find(cold.cold(dir), "<C-\\><C-z>").count,
+        1,
+        { fail_reason = "<C-z> and <C-Z> are one key" }
+    )
 end
 
 T["cold"]["ranks never-used before used-once before used-often"] = function()
@@ -169,7 +173,7 @@ T["cold"]["breaks a count tie by the older last-used"] = function()
     MiniTest.expect.equality(ordered, {
         vim.g.mapleader .. "zco",
         vim.g.mapleader .. "zcy",
-    }, "the one dropped longest ago is the colder decision")
+    }, { fail_reason = "the one dropped longest ago is the colder decision" })
 end
 
 T["cold"]["omits a denied key"] = function()
@@ -179,7 +183,11 @@ T["cold"]["omits a denied key"] = function()
     map("<leader>zck", "Kept")
 
     local rows = cold.cold(dir)
-    MiniTest.expect.equality(find(rows, "<leader>zcq"), nil, "denied keys are noise, not cold features")
+    MiniTest.expect.equality(
+        find(rows, "<leader>zcq"),
+        nil,
+        { fail_reason = "denied keys are noise, not cold features" }
+    )
     MiniTest.expect.equality(find(rows, "<leader>zck") ~= nil, true)
 end
 
@@ -202,7 +210,11 @@ T["cold"]["degrades gracefully on a missing directory"] = function()
     map("<leader>zcm", "Never")
 
     local rows = cold.cold(vim.fn.tempname() .. "/does-not-exist")
-    MiniTest.expect.equality(find(rows, "<leader>zcm").count, 0, "no log means everything reads as never used")
+    MiniTest.expect.equality(
+        find(rows, "<leader>zcm").count,
+        0,
+        { fail_reason = "no log means everything reads as never used" }
+    )
 end
 
 T["render"] = MiniTest.new_set()
@@ -215,11 +227,15 @@ T["render"]["separates never-used from tried-then-dropped"] = function()
 
     local lines = cold.render(rows)
     MiniTest.expect.equality(lines[1]:find("1 of 2 registered never used", 1, true) ~= nil, true)
-    MiniTest.expect.equality(lines[3]:find("never", 1, true) ~= nil, true, "count 0 has no meaningful date")
+    MiniTest.expect.equality(
+        lines[3]:find("never", 1, true) ~= nil,
+        true,
+        { fail_reason = "count 0 has no meaningful date" }
+    )
     MiniTest.expect.equality(
         lines[4]:find(os.date("%Y-%m-%d", JUNE) --[[@as string]], 1, true) ~= nil,
         true,
-        "a dropped map is dated so it reads differently from one never discovered"
+        { fail_reason = "a dropped map is dated so it reads differently from one never discovered" }
     )
 end
 
@@ -229,7 +245,7 @@ T["render"]["honors the limit"] = function()
         rows[i] = { kind = "map", key = "k" .. i, count = 0, last = 0 }
     end
 
-    MiniTest.expect.equality(#cold.render(rows, 2), 4, "header, blank line, two rows")
+    MiniTest.expect.equality(#cold.render(rows, 2), 4, { fail_reason = "header, blank line, two rows" })
 end
 
 T["render"]["handles an empty list"] = function()

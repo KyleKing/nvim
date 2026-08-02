@@ -119,8 +119,8 @@ T["fuzz"]["extracts an embedded URL byte-for-byte regardless of surrounding nois
 
         local ok, err, opened = open_line(line)
         local ctx = ("iteration %d\nline: %q"):format(i, line)
-        MiniTest.expect.equality(ok, true, ctx .. "\nerror: " .. tostring(err))
-        MiniTest.expect.equality(opened, url, ctx)
+        MiniTest.expect.equality(ok, true, { fail_reason = ctx .. "\nerror: " .. tostring(err) })
+        MiniTest.expect.equality(opened, url, { fail_reason = ctx })
     end
 end
 
@@ -133,8 +133,8 @@ T["fuzz"]["resolves a plugin ref to its GitHub URL across plugin-manager call st
 
         local ok, err, opened = open_line(line)
         local ctx = ("iteration %d\nline: %q"):format(i, line)
-        MiniTest.expect.equality(ok, true, ctx .. "\nerror: " .. tostring(err))
-        MiniTest.expect.equality(opened, plugin.url, ctx)
+        MiniTest.expect.equality(ok, true, { fail_reason = ctx .. "\nerror: " .. tostring(err) })
+        MiniTest.expect.equality(opened, plugin.url, { fail_reason = ctx })
     end
 end
 
@@ -145,9 +145,9 @@ T["fuzz"]["never errors and never fabricates a link on pure noise"] = function()
 
         local ok, err, opened, warned = open_line(line)
         local ctx = ("iteration %d\nline: %q"):format(i, line)
-        MiniTest.expect.equality(ok, true, ctx .. "\nerror: " .. tostring(err))
-        MiniTest.expect.equality(opened, nil, ctx .. "\nunexpectedly opened: " .. tostring(opened))
-        MiniTest.expect.equality(warned ~= nil, true, ctx)
+        MiniTest.expect.equality(ok, true, { fail_reason = ctx .. "\nerror: " .. tostring(err) })
+        MiniTest.expect.equality(opened, nil, { fail_reason = ctx .. "\nunexpectedly opened: " .. tostring(opened) })
+        MiniTest.expect.equality(warned ~= nil, true, { fail_reason = ctx })
     end
 end
 
@@ -165,8 +165,8 @@ T["fuzz"]["resolves a requirements.txt package name across version/extras/commen
 
         local ok, err, opened = open_line_in_file(path, entry)
         local ctx = ("iteration %d\nline: %q"):format(i, entry)
-        MiniTest.expect.equality(ok, true, ctx .. "\nerror: " .. tostring(err))
-        MiniTest.expect.equality(opened, "https://pypi.org/project/" .. name, ctx)
+        MiniTest.expect.equality(ok, true, { fail_reason = ctx .. "\nerror: " .. tostring(err) })
+        MiniTest.expect.equality(opened, "https://pypi.org/project/" .. name, { fail_reason = ctx })
     end
 
     vim.fn.delete(vim.fn.fnamemodify(path, ":h"), "rf")
@@ -183,8 +183,8 @@ T["fuzz"]["resolves a pyproject.toml list-entry package name across version/extr
 
         local ok, err, opened = open_line_in_file(path, entry)
         local ctx = ("iteration %d\nline: %q"):format(i, entry)
-        MiniTest.expect.equality(ok, true, ctx .. "\nerror: " .. tostring(err))
-        MiniTest.expect.equality(opened, "https://pypi.org/project/" .. name, ctx)
+        MiniTest.expect.equality(ok, true, { fail_reason = ctx .. "\nerror: " .. tostring(err) })
+        MiniTest.expect.equality(opened, "https://pypi.org/project/" .. name, { fail_reason = ctx })
     end
 
     vim.fn.delete(vim.fn.fnamemodify(path, ":h"), "rf")

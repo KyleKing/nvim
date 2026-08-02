@@ -32,7 +32,7 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>ut", "n"),
                                 true,
-                                "trailspace toggle keymap"
+                                { fail_reason = "trailspace toggle keymap" }
                             )
 
                             -- Test multiple toggle cycles
@@ -54,21 +54,21 @@ return {
                                     MiniTest.expect.equality(
                                         success1,
                                         true,
-                                        "First toggle call should succeed: " .. tostring(err1)
+                                        { fail_reason = "First toggle call should succeed: " .. tostring(err1) }
                                     )
 
                                     local success2, err2 = pcall(toggle_map.callback)
                                     MiniTest.expect.equality(
                                         success2,
                                         true,
-                                        "Second toggle call should succeed: " .. tostring(err2)
+                                        { fail_reason = "Second toggle call should succeed: " .. tostring(err2) }
                                     )
 
                                     local success3, err3 = pcall(toggle_map.callback)
                                     MiniTest.expect.equality(
                                         success3,
                                         true,
-                                        "Third toggle call should succeed: " .. tostring(err3)
+                                        { fail_reason = "Third toggle call should succeed: " .. tostring(err3) }
                                     )
                                 end
                             end

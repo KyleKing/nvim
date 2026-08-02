@@ -40,11 +40,11 @@ T["large_buf guard"]["stops treesitter on oversized markdown"] = function()
     local n_blocks = math.ceil(constants.LARGE_BUF.MAX_LINES / 4)
     local buf = open_markdown_buffer(n_blocks)
 
-    MiniTest.expect.equality(vim.b[buf].large_buf, true, "Oversized markdown should be flagged")
+    MiniTest.expect.equality(vim.b[buf].large_buf, true, { fail_reason = "Oversized markdown should be flagged" })
     MiniTest.expect.equality(
         vim.treesitter.highlighter.active[buf],
         nil,
-        "Treesitter highlight should be stopped on oversized markdown"
+        { fail_reason = "Treesitter highlight should be stopped on oversized markdown" }
     )
 
     vim.api.nvim_buf_delete(buf, { force = true })
@@ -53,11 +53,15 @@ end
 T["large_buf guard"]["keeps highlight on normal markdown"] = function()
     local buf = open_markdown_buffer(30)
 
-    MiniTest.expect.equality(vim.b[buf].large_buf == nil, true, "Normal markdown should not be flagged")
+    MiniTest.expect.equality(
+        vim.b[buf].large_buf == nil,
+        true,
+        { fail_reason = "Normal markdown should not be flagged" }
+    )
     MiniTest.expect.equality(
         vim.treesitter.highlighter.active[buf] ~= nil,
         true,
-        "Treesitter highlight should stay active on normal markdown"
+        { fail_reason = "Treesitter highlight should stay active on normal markdown" }
     )
 
     vim.api.nvim_buf_delete(buf, { force = true })
@@ -91,11 +95,19 @@ T["injection rendering"]["parses many code blocks without errors"] = function()
 
     print(string.format("Parsed 300-block markdown in %.0fms", elapsed))
 
-    MiniTest.expect.equality(result.code, 0, "Should open complex markdown: " .. (result.stderr or ""))
+    MiniTest.expect.equality(
+        result.code,
+        0,
+        { fail_reason = "Should open complex markdown: " .. (result.stderr or "") }
+    )
     local stderr = result.stderr or ""
     local has_error = stderr:match("[Ee]rror") ~= nil or stderr:match("E%d+:") ~= nil
-    MiniTest.expect.equality(has_error, false, "Should have no errors on complex markdown: " .. stderr)
-    MiniTest.expect.equality(elapsed < 10000, true, "Should parse complex markdown under 10s")
+    MiniTest.expect.equality(
+        has_error,
+        false,
+        { fail_reason = "Should have no errors on complex markdown: " .. stderr }
+    )
+    MiniTest.expect.equality(elapsed < 10000, true, { fail_reason = "Should parse complex markdown under 10s" })
 
     vim.fn.delete(tmpfile)
 end

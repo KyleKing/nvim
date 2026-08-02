@@ -41,9 +41,13 @@ T["VimResized autocmd"]["resizes TUI terminal floating windows"] = function()
     local updated_config = vim.api.nvim_win_get_config(winid)
 
     -- Verify window is still floating and properly configured
-    MiniTest.expect.equality(updated_config.relative, "editor", "Window should be floating relative to editor")
-    MiniTest.expect.equality(type(updated_config.width), "number", "Width should be a number")
-    MiniTest.expect.equality(type(updated_config.height), "number", "Height should be a number")
+    MiniTest.expect.equality(
+        updated_config.relative,
+        "editor",
+        { fail_reason = "Window should be floating relative to editor" }
+    )
+    MiniTest.expect.equality(type(updated_config.width), "number", { fail_reason = "Width should be a number" })
+    MiniTest.expect.equality(type(updated_config.height), "number", { fail_reason = "Height should be a number" })
 
     -- Cleanup
     if vim.api.nvim_win_is_valid(winid) then pcall(vim.api.nvim_win_close, winid, true) end
@@ -65,8 +69,8 @@ T["VimResized autocmd"]["resizes other centered floating windows"] = function()
 
     -- Verify the window was created with correct properties
     local config = vim.api.nvim_win_get_config(winid)
-    MiniTest.expect.equality(config.relative, "editor", "Window should be floating")
-    MiniTest.expect.equality(config.style, "minimal", "Window should have minimal style")
+    MiniTest.expect.equality(config.relative, "editor", { fail_reason = "Window should be floating" })
+    MiniTest.expect.equality(config.style, "minimal", { fail_reason = "Window should have minimal style" })
 
     -- Test that nvim_win_set_config can update dimensions (used by VimResized handler)
     local new_config = ui.create_centered_window({
@@ -78,7 +82,7 @@ T["VimResized autocmd"]["resizes other centered floating windows"] = function()
 
     -- Verify update succeeded
     local updated = vim.api.nvim_win_get_config(winid)
-    MiniTest.expect.equality(updated.relative, "editor", "Window should still be floating")
+    MiniTest.expect.equality(updated.relative, "editor", { fail_reason = "Window should still be floating" })
 
     -- Cleanup
     if vim.api.nvim_win_is_valid(winid) then pcall(vim.api.nvim_win_close, winid, true) end
@@ -92,7 +96,7 @@ T["VimResized autocmd"]["verifies autocmd is registered"] = function()
         group = "kyleking",
     })
 
-    MiniTest.expect.equality(#autocmds > 0, true, "VimResized autocmd should be registered")
+    MiniTest.expect.equality(#autocmds > 0, true, { fail_reason = "VimResized autocmd should be registered" })
 end
 
 T["VimResized autocmd"]["verifies window config structure"] = function()
@@ -105,12 +109,12 @@ T["VimResized autocmd"]["verifies window config structure"] = function()
         style = "minimal",
     })
 
-    MiniTest.expect.equality(type(config.width), "number", "Config should have width")
-    MiniTest.expect.equality(type(config.height), "number", "Config should have height")
-    MiniTest.expect.equality(type(config.row), "number", "Config should have row")
-    MiniTest.expect.equality(type(config.col), "number", "Config should have col")
-    MiniTest.expect.equality(config.relative, "editor", "Config should have relative='editor'")
-    MiniTest.expect.equality(config.style, "minimal", "Config should have style='minimal'")
+    MiniTest.expect.equality(type(config.width), "number", { fail_reason = "Config should have width" })
+    MiniTest.expect.equality(type(config.height), "number", { fail_reason = "Config should have height" })
+    MiniTest.expect.equality(type(config.row), "number", { fail_reason = "Config should have row" })
+    MiniTest.expect.equality(type(config.col), "number", { fail_reason = "Config should have col" })
+    MiniTest.expect.equality(config.relative, "editor", { fail_reason = "Config should have relative='editor'" })
+    MiniTest.expect.equality(config.style, "minimal", { fail_reason = "Config should have style='minimal'" })
 end
 
 if ... == nil then MiniTest.run() end

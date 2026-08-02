@@ -72,7 +72,7 @@ T["query matching"]["fuzzy match finds non-contiguous characters"] = function()
     for _, idx in ipairs(result) do
         found[stritems[idx]] = true
     end
-    MiniTest.expect.equality(found["fuzzy-finder.lua"], true, "Should match 'fz' in fuzzy-finder.lua")
+    MiniTest.expect.equality(found["fuzzy-finder.lua"], true, { fail_reason = "Should match 'fz' in fuzzy-finder.lua" })
 end
 
 T["query matching"]["exact match with apostrophe prefix"] = function()
@@ -86,8 +86,12 @@ T["query matching"]["exact match with apostrophe prefix"] = function()
     for _, idx in ipairs(result) do
         found[stritems[idx]] = true
     end
-    MiniTest.expect.equality(found["flash_spec.lua"], true, "Exact match should find flash_spec.lua")
-    MiniTest.expect.equality(found["fuzzy-finder.lua"], nil, "Exact match should not find fuzzy-finder.lua")
+    MiniTest.expect.equality(found["flash_spec.lua"], true, { fail_reason = "Exact match should find flash_spec.lua" })
+    MiniTest.expect.equality(
+        found["fuzzy-finder.lua"],
+        nil,
+        { fail_reason = "Exact match should not find fuzzy-finder.lua" }
+    )
 end
 
 T["query matching"]["start-anchored match with caret prefix"] = function()
@@ -101,9 +105,9 @@ T["query matching"]["start-anchored match with caret prefix"] = function()
     for _, idx in ipairs(result) do
         found[stritems[idx]] = true
     end
-    MiniTest.expect.equality(found["init.lua"], true, "^in should match init.lua")
-    MiniTest.expect.equality(found["inline.lua"], true, "^in should match inline.lua")
-    MiniTest.expect.equality(found["setup.lua"], nil, "^in should not match setup.lua")
+    MiniTest.expect.equality(found["init.lua"], true, { fail_reason = "^in should match init.lua" })
+    MiniTest.expect.equality(found["inline.lua"], true, { fail_reason = "^in should match inline.lua" })
+    MiniTest.expect.equality(found["setup.lua"], nil, { fail_reason = "^in should not match setup.lua" })
 end
 
 T["query matching"]["end-anchored match with dollar suffix"] = function()
@@ -117,8 +121,8 @@ T["query matching"]["end-anchored match with dollar suffix"] = function()
     for _, idx in ipairs(result) do
         found[stritems[idx]] = true
     end
-    MiniTest.expect.equality(found["test.lua"], true, ".lua$ should match test.lua")
-    MiniTest.expect.equality(found["test.md"], nil, ".lua$ should not match test.md")
+    MiniTest.expect.equality(found["test.lua"], true, { fail_reason = ".lua$ should match test.lua" })
+    MiniTest.expect.equality(found["test.md"], nil, { fail_reason = ".lua$ should not match test.md" })
 end
 
 T["query matching"]["empty query returns all items"] = function()
@@ -128,7 +132,7 @@ T["query matching"]["empty query returns all items"] = function()
 
     local result = MiniPick.default_match(stritems, inds, {}, { sync = true })
 
-    MiniTest.expect.equality(#result, 3, "Empty query should return all items")
+    MiniTest.expect.equality(#result, 3, { fail_reason = "Empty query should return all items" })
 end
 
 T["query matching"]["respects smartcase"] = function()
@@ -139,15 +143,15 @@ T["query matching"]["respects smartcase"] = function()
     -- mini.pick lowercases both stritems and query before calling `match` when the query
     -- has "ignore case" properties, so smartcase lives in the picker and default_match
     -- itself always compares verbatim
-    MiniTest.expect.equality(vim.o.ignorecase, true, "'ignorecase' drives case insensitive picking")
-    MiniTest.expect.equality(vim.o.smartcase, true, "'smartcase' makes a mixed-case query exact")
+    MiniTest.expect.equality(vim.o.ignorecase, true, { fail_reason = "'ignorecase' drives case insensitive picking" })
+    MiniTest.expect.equality(vim.o.smartcase, true, { fail_reason = "'smartcase' makes a mixed-case query exact" })
 
     local folded = { "minipick", "minipick", "minipick" }
     local result_lower = MiniPick.default_match(folded, inds, { "m", "i", "n", "i" }, { sync = true })
     local result_upper = MiniPick.default_match(stritems, inds, { "M", "i", "n", "i" }, { sync = true })
 
-    MiniTest.expect.equality(#result_lower, 3, "Lowercased items should all match a lowercase query")
-    MiniTest.expect.equality(#result_upper, 1, "Mixed-case query should match only the exact casing")
+    MiniTest.expect.equality(#result_lower, 3, { fail_reason = "Lowercased items should all match a lowercase query" })
+    MiniTest.expect.equality(#result_upper, 1, { fail_reason = "Mixed-case query should match only the exact casing" })
 end
 
 -- -- Keymap descriptions -- --
@@ -180,12 +184,12 @@ T["keymap descriptions"]["all picker keymaps have descriptive desc fields"] = fu
     for _, entry in ipairs(expected) do
         local lhs, mode, desc_pattern = entry[1], entry[2], entry[3]
         local keymap = vim.fn.maparg(lhs, mode, false, true)
-        MiniTest.expect.equality(keymap.lhs ~= nil, true, "Missing keymap: " .. lhs)
+        MiniTest.expect.equality(keymap.lhs ~= nil, true, { fail_reason = "Missing keymap: " .. lhs })
         local has_desc = keymap.desc and keymap.desc:lower():find(desc_pattern:lower()) ~= nil
         MiniTest.expect.equality(
             has_desc,
             true,
-            lhs .. " desc should contain '" .. desc_pattern .. "', got: " .. (keymap.desc or "nil")
+            { fail_reason = lhs .. " desc should contain '" .. desc_pattern .. "', got: " .. (keymap.desc or "nil") }
         )
     end
 end

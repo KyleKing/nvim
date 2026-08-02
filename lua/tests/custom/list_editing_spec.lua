@@ -34,7 +34,7 @@ T["list detection"]["detects unordered lists"] = function()
     for _, pattern in ipairs(patterns) do
         set_line_and_cursor(pattern .. " one")
         local line = vim.api.nvim_get_current_line()
-        MiniTest.expect.no_equality(line:match("^%s*[%-%*%+]%s+"), nil, "Should match: " .. pattern)
+        MiniTest.expect.no_equality(line:match("^%s*[%-%*%+]%s+"), nil, { fail_reason = "Should match: " .. pattern })
     end
 end
 
@@ -43,7 +43,7 @@ T["list detection"]["detects ordered lists"] = function()
     for _, pattern in ipairs(patterns) do
         set_line_and_cursor(pattern)
         local line = vim.api.nvim_get_current_line()
-        MiniTest.expect.no_equality(line:match("^%s*%d+[%.%)]%s+"), nil, "Should match: " .. pattern)
+        MiniTest.expect.no_equality(line:match("^%s*%d+[%.%)]%s+"), nil, { fail_reason = "Should match: " .. pattern })
     end
 end
 
@@ -52,7 +52,7 @@ T["list detection"]["ignores non-list lines"] = function()
     for _, text in ipairs(non_lists) do
         set_line_and_cursor(text)
         local result = simulate_return()
-        MiniTest.expect.equality(result, "<CR>", "Should return default for: " .. text)
+        MiniTest.expect.equality(result, "<CR>", { fail_reason = "Should return default for: " .. text })
     end
 end
 
@@ -61,19 +61,19 @@ T["handle_return"] = MiniTest.new_set()
 T["handle_return"]["continues unordered list"] = function()
     set_line_and_cursor("- item one")
     local result = simulate_return()
-    MiniTest.expect.no_equality(result:match("^<CR>"), nil, "Should contain CR")
-    MiniTest.expect.no_equality(result:match("%-"), nil, "Should contain dash marker")
+    MiniTest.expect.no_equality(result:match("^<CR>"), nil, { fail_reason = "Should contain CR" })
+    MiniTest.expect.no_equality(result:match("%-"), nil, { fail_reason = "Should contain dash marker" })
 end
 
 T["handle_return"]["continues ordered list"] = function()
     set_line_and_cursor("1. item one")
     local result = simulate_return()
     -- Result should be a string
-    MiniTest.expect.equality(type(result), "string", "Should return a string")
+    MiniTest.expect.equality(type(result), "string", { fail_reason = "Should return a string" })
     -- Should not be just the default <CR>
-    MiniTest.expect.no_equality(result, "<CR>", "Should not be default behavior")
+    MiniTest.expect.no_equality(result, "<CR>", { fail_reason = "Should not be default behavior" })
     -- Should be longer than just <CR> (includes list continuation)
-    MiniTest.expect.equality(#result > 4, true, "Result should include list marker")
+    MiniTest.expect.equality(#result > 4, true, { fail_reason = "Result should include list marker" })
 end
 
 T["handle_return"]["stops list on empty item"] = function()
@@ -81,10 +81,10 @@ T["handle_return"]["stops list on empty item"] = function()
     local result = simulate_return()
     -- Buffer mutation is deferred (vim.schedule) to avoid E565, so the expr
     -- result itself is just an empty string; the marker deletion is async.
-    MiniTest.expect.equality(result, "", "Should return empty string, deferring the edit")
+    MiniTest.expect.equality(result, "", { fail_reason = "Should return empty string, deferring the edit" })
 
     vim.wait(200, function() return vim.api.nvim_get_current_line() == "" end)
-    MiniTest.expect.equality(vim.api.nvim_get_current_line(), "", "Should delete the list marker")
+    MiniTest.expect.equality(vim.api.nvim_get_current_line(), "", { fail_reason = "Should delete the list marker" })
 end
 
 T["handle_return"]["does not raise E565 when stopping list via real keypress"] = function()
@@ -105,14 +105,14 @@ T["handle_return"]["does not raise E565 when stopping list via real keypress"] =
     end)
     vim.cmd("stopinsert")
 
-    MiniTest.expect.equality(ok, true, "Should not raise an error: " .. tostring(err))
+    MiniTest.expect.equality(ok, true, { fail_reason = "Should not raise an error: " .. tostring(err) })
 end
 
 T["handle_return"]["preserves indentation"] = function()
     set_line_and_cursor("  - indented item")
     local result = simulate_return()
     -- Result should maintain indentation
-    MiniTest.expect.no_equality(result:match("  "), nil, "Should preserve indent")
+    MiniTest.expect.no_equality(result:match("  "), nil, { fail_reason = "Should preserve indent" })
 end
 
 T["handle_tab"] = MiniTest.new_set()
@@ -125,7 +125,7 @@ T["handle_tab"]["indents list item"] = function()
     vim.wait(200, function() return vim.api.nvim_get_current_line():match("^  %-") ~= nil end)
 
     local line = vim.api.nvim_get_current_line()
-    MiniTest.expect.no_equality(line:match("^  %-"), nil, "Should be indented by 2 spaces")
+    MiniTest.expect.no_equality(line:match("^  %-"), nil, { fail_reason = "Should be indented by 2 spaces" })
 end
 
 T["handle_tab"]["returns tab for non-list"] = function()
@@ -134,7 +134,7 @@ T["handle_tab"]["returns tab for non-list"] = function()
 
     local result = list_editing.handle_tab()
 
-    MiniTest.expect.equality(result, "<Tab>", "Should return default tab")
+    MiniTest.expect.equality(result, "<Tab>", { fail_reason = "Should return default tab" })
 end
 
 T["handle_tab"]["inserts blank line for djot"] = function()
@@ -149,8 +149,8 @@ T["handle_tab"]["inserts blank line for djot"] = function()
     vim.wait(200, function() return #vim.api.nvim_buf_get_lines(0, 0, -1, false) == 3 end)
 
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-    MiniTest.expect.equality(#lines, 3, "Should insert blank line")
-    MiniTest.expect.equality(lines[2], "", "Second line should be blank")
+    MiniTest.expect.equality(#lines, 3, { fail_reason = "Should insert blank line" })
+    MiniTest.expect.equality(lines[2], "", { fail_reason = "Second line should be blank" })
 end
 
 T["handle_shift_tab"] = MiniTest.new_set()
@@ -163,7 +163,7 @@ T["handle_shift_tab"]["dedents list item"] = function()
     vim.wait(200, function() return vim.api.nvim_get_current_line():match("^  %-") ~= nil end)
 
     local line = vim.api.nvim_get_current_line()
-    MiniTest.expect.no_equality(line:match("^  %-"), nil, "Should be dedented by 2 spaces")
+    MiniTest.expect.no_equality(line:match("^  %-"), nil, { fail_reason = "Should be dedented by 2 spaces" })
 end
 
 T["handle_shift_tab"]["stops at zero indent"] = function()
@@ -174,7 +174,7 @@ T["handle_shift_tab"]["stops at zero indent"] = function()
     vim.wait(200, function() return vim.api.nvim_get_current_line():match("^%-") ~= nil end)
 
     local line = vim.api.nvim_get_current_line()
-    MiniTest.expect.no_equality(line:match("^%-"), nil, "Should remain at zero indent")
+    MiniTest.expect.no_equality(line:match("^%-"), nil, { fail_reason = "Should remain at zero indent" })
 end
 
 T["handle_shift_tab"]["returns default for non-list"] = function()
@@ -183,7 +183,7 @@ T["handle_shift_tab"]["returns default for non-list"] = function()
 
     local result = list_editing.handle_shift_tab()
 
-    MiniTest.expect.equality(result, "<S-Tab>", "Should return default shift-tab")
+    MiniTest.expect.equality(result, "<S-Tab>", { fail_reason = "Should return default shift-tab" })
 end
 
 T["setup"] = MiniTest.new_set()
@@ -193,14 +193,14 @@ T["setup"]["creates autocmd for markdown"] = function()
     list_editing.setup()
 
     local autocmds = vim.api.nvim_get_autocmds({ group = "kyleking_list_editing", event = "FileType" })
-    MiniTest.expect.no_equality(#autocmds, 0, "Should create FileType autocmd")
+    MiniTest.expect.no_equality(#autocmds, 0, { fail_reason = "Should create FileType autocmd" })
 
     -- Check pattern includes markdown
     local has_markdown = false
     for _, cmd in ipairs(autocmds) do
         if cmd.pattern and vim.tbl_contains(vim.split(cmd.pattern, ","), "markdown") then has_markdown = true end
     end
-    MiniTest.expect.equality(has_markdown, true, "Should include markdown pattern")
+    MiniTest.expect.equality(has_markdown, true, { fail_reason = "Should include markdown pattern" })
 end
 
 T["setup"]["creates autocmd for djot"] = function()
@@ -214,7 +214,7 @@ T["setup"]["creates autocmd for djot"] = function()
     for _, cmd in ipairs(autocmds) do
         if cmd.pattern and vim.tbl_contains(vim.split(cmd.pattern, ","), "djot") then has_djot = true end
     end
-    MiniTest.expect.equality(has_djot, true, "Should include djot pattern")
+    MiniTest.expect.equality(has_djot, true, { fail_reason = "Should include djot pattern" })
 end
 
 T["setup"]["creates keymaps in autocmd"] = function()
@@ -237,9 +237,9 @@ T["setup"]["creates keymaps in autocmd"] = function()
         if map.lhs == "<S-Tab>" then has_shift_tab = true end
     end
 
-    MiniTest.expect.equality(has_cr, true, "Should map <CR>")
-    MiniTest.expect.equality(has_tab, true, "Should map <Tab>")
-    MiniTest.expect.equality(has_shift_tab, true, "Should map <S-Tab>")
+    MiniTest.expect.equality(has_cr, true, { fail_reason = "Should map <CR>" })
+    MiniTest.expect.equality(has_tab, true, { fail_reason = "Should map <Tab>" })
+    MiniTest.expect.equality(has_shift_tab, true, { fail_reason = "Should map <S-Tab>" })
 end
 
 -- Allow running this file directly

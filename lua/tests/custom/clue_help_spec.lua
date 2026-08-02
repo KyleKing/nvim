@@ -22,7 +22,7 @@ T["show"]["handles special key notation"] = function()
 
     for _, trigger in ipairs(triggers) do
         local ok = pcall(clue_help.show, trigger)
-        MiniTest.expect.equality(ok, true, "Failed on trigger: " .. trigger)
+        MiniTest.expect.equality(ok, true, { fail_reason = "Failed on trigger: " .. trigger })
     end
 end
 
@@ -36,6 +36,7 @@ T["show_menu"]["provides trigger menu"] = function()
     -- by mocking vim.ui.select
     local original_select = vim.ui.select
     local select_called = false
+    ---@type {name: string, keys: string}[]?
     local triggers_arg = nil
 
     vim.ui.select = function(items, _opts, _on_choice)
@@ -54,8 +55,7 @@ T["show_menu"]["provides trigger menu"] = function()
     MiniTest.expect.equality(#triggers_arg > 0, true)
 
     -- Verify trigger structure
-    ---@diagnostic disable-next-line: need-check-nil
-    local first_trigger = triggers_arg[1]
+    local first_trigger = assert(triggers_arg, "Expected triggers_arg to be set")[1]
     assert(first_trigger, "Expected at least one trigger")
     MiniTest.expect.equality(type(first_trigger.name), "string")
     MiniTest.expect.equality(type(first_trigger.keys), "string")
@@ -63,6 +63,7 @@ end
 
 T["show_menu"]["includes expected triggers"] = function()
     local original_select = vim.ui.select
+    ---@type {name: string, keys: string}[]?
     local triggers_arg = nil
 
     vim.ui.select = function(items, _opts, _on_choice) triggers_arg = items end
@@ -77,7 +78,7 @@ T["show_menu"]["includes expected triggers"] = function()
 
     for _, expected in ipairs(expected_triggers) do
         local found = vim.tbl_contains(trigger_keys, expected)
-        MiniTest.expect.equality(found, true, "Missing trigger: " .. expected)
+        MiniTest.expect.equality(found, true, { fail_reason = "Missing trigger: " .. expected })
     end
 end
 

@@ -22,7 +22,11 @@ T["mini.clue"] = MiniTest.new_set()
 T["mini.clue"]["mini.clue is configured"] = function()
     -- Wait for later() to execute
     helpers.wait_for_plugins()
-    MiniTest.expect.equality(helpers.is_plugin_loaded("mini.clue"), true, "mini.clue should be loaded")
+    MiniTest.expect.equality(
+        helpers.is_plugin_loaded("mini.clue"),
+        true,
+        { fail_reason = "mini.clue should be loaded" }
+    )
 end
 
 T["clue configuration"] = MiniTest.new_set()
@@ -48,7 +52,7 @@ T["clue configuration"]["leader triggers are configured"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_leader_trigger, true, "Leader trigger should be configured")
+    MiniTest.expect.equality(has_leader_trigger, true, { fail_reason = "Leader trigger should be configured" })
 end
 
 T["clue configuration"]["built-in triggers are configured"] = function()
@@ -65,7 +69,7 @@ T["clue configuration"]["built-in triggers are configured"] = function()
 
     local expected_triggers = { "g", "'", "`", '"', "<C-w>", "z", "[", "]" }
     for _, key in ipairs(expected_triggers) do
-        MiniTest.expect.equality(trigger_keys[key] ~= nil, true, "Trigger should exist: " .. key)
+        MiniTest.expect.equality(trigger_keys[key] ~= nil, true, { fail_reason = "Trigger should exist: " .. key })
     end
 end
 
@@ -75,8 +79,8 @@ T["clue configuration"]["window config has delay"] = function()
     local MiniClue = require("mini.clue")
     local config = MiniClue.config
 
-    MiniTest.expect.equality(type(config.window.delay), "number", "Window delay should be a number")
-    MiniTest.expect.equality(config.window.delay, 500, "Window delay should be 500ms")
+    MiniTest.expect.equality(type(config.window.delay), "number", { fail_reason = "Window delay should be a number" })
+    MiniTest.expect.equality(config.window.delay, 500, { fail_reason = "Window delay should be 500ms" })
 end
 
 T["clue configuration"]["window has rounded border"] = function()
@@ -86,8 +90,16 @@ T["clue configuration"]["window has rounded border"] = function()
     local config = MiniClue.config
 
     -- Height depends on 'lines', so the config is a callable rather than a table
-    MiniTest.expect.equality(vim.is_callable(config.window.config), true, "Window config should be callable")
-    MiniTest.expect.equality(config.window.config().border, "rounded", "Window should have rounded border")
+    MiniTest.expect.equality(
+        vim.is_callable(config.window.config),
+        true,
+        { fail_reason = "Window config should be callable" }
+    )
+    MiniTest.expect.equality(
+        (config.window.config --[[@as fun(): table]])().border,
+        "rounded",
+        { fail_reason = "Window should have rounded border" }
+    )
 end
 
 T["clue configuration"]["registers one string mode per trigger"] = function()
@@ -103,21 +115,29 @@ T["clue configuration"]["registers one string mode per trigger"] = function()
         MiniTest.expect.equality(
             type(trigger.mode),
             "string",
-            string.format("Trigger '%s' should use a string mode", tostring(trigger.keys))
+            { fail_reason = string.format("Trigger '%s' should use a string mode", tostring(trigger.keys)) }
         )
         local id = trigger.mode .. trigger.keys
         MiniTest.expect.equality(
             seen[id],
             nil,
-            string.format("Duplicate trigger '%s' in mode '%s'", trigger.keys, trigger.mode)
+            { fail_reason = string.format("Duplicate trigger '%s' in mode '%s'", trigger.keys, trigger.mode) }
         )
         seen[id] = true
     end
 
     -- Triggers shared by normal and visual mode need both entries to fire in both
     for _, key in ipairs({ "<Leader>", "g", "'", "`", '"', "z" }) do
-        MiniTest.expect.equality(seen["n" .. key], true, string.format("Trigger '%s' missing in normal mode", key))
-        MiniTest.expect.equality(seen["x" .. key], true, string.format("Trigger '%s' missing in visual mode", key))
+        MiniTest.expect.equality(
+            seen["n" .. key],
+            true,
+            { fail_reason = string.format("Trigger '%s' missing in normal mode", key) }
+        )
+        MiniTest.expect.equality(
+            seen["x" .. key],
+            true,
+            { fail_reason = string.format("Trigger '%s' missing in visual mode", key) }
+        )
     end
 end
 
@@ -154,7 +174,7 @@ T["group descriptions"]["leader groups are defined"] = function()
     }
 
     for keys, expected_desc in pairs(expected_groups) do
-        MiniTest.expect.equality(groups[keys], expected_desc, "Group should exist: " .. keys)
+        MiniTest.expect.equality(groups[keys], expected_desc, { fail_reason = "Group should exist: " .. keys })
     end
 end
 
@@ -169,8 +189,8 @@ T["group descriptions"]["LSP subgroups are defined"] = function()
         if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then groups[clue.keys] = clue.desc end
     end
 
-    MiniTest.expect.equality(groups["<Leader>lg"], "+LSP Go to", "LSP Go to group should exist")
-    MiniTest.expect.equality(groups["<Leader>ls"], "+Semantic", "Semantic group should exist")
+    MiniTest.expect.equality(groups["<Leader>lg"], "+LSP Go to", { fail_reason = "LSP Go to group should exist" })
+    MiniTest.expect.equality(groups["<Leader>ls"], "+Semantic", { fail_reason = "Semantic group should exist" })
 end
 
 T["group descriptions"]["UI subgroups are defined"] = function()
@@ -184,8 +204,8 @@ T["group descriptions"]["UI subgroups are defined"] = function()
         if type(clue) == "table" and clue.desc and clue.desc:match("^%+") then groups[clue.keys] = clue.desc end
     end
 
-    MiniTest.expect.equality(groups["<Leader>uc"], "+Color", "Color group should exist")
-    MiniTest.expect.equality(groups["<Leader>ug"], "+Git", "Git UI group should exist")
+    MiniTest.expect.equality(groups["<Leader>uc"], "+Color", { fail_reason = "Color group should exist" })
+    MiniTest.expect.equality(groups["<Leader>ug"], "+Git", { fail_reason = "Git UI group should exist" })
 end
 
 -- Maintenance test: ensure new mini.clue generators are tracked
@@ -247,7 +267,7 @@ T["builtin clue generators"]["all available gen_clues are used or intentionally 
         table.insert(errors, "Configured gen_clues no longer exist: " .. table.concat(missing_generators, ", "))
     end
 
-    MiniTest.expect.equality(#errors, 0, table.concat(errors, "; "))
+    MiniTest.expect.equality(#errors, 0, { fail_reason = table.concat(errors, "; ") })
 end
 
 T["clue completeness"] = MiniTest.new_set()
@@ -267,12 +287,10 @@ T["clue completeness"]["no groups use default +# descriptions"] = function()
         end
     end
 
-    MiniTest.expect.equality(
-        #invalid_descriptions,
-        0,
-        "All groups should have custom descriptions, found default descriptions: "
-            .. table.concat(invalid_descriptions, ", ")
-    )
+    MiniTest.expect.equality(#invalid_descriptions, 0, {
+        fail_reason = "All groups should have custom descriptions, found default descriptions: "
+            .. table.concat(invalid_descriptions, ", "),
+    })
 end
 
 T["clue completeness"]["all leader group prefixes have descriptions"] = function()
@@ -315,11 +333,10 @@ T["clue completeness"]["all leader group prefixes have descriptions"] = function
 
     table.sort(missing_clues)
 
-    MiniTest.expect.equality(
-        #missing_clues,
-        0,
-        "All leader prefixes should have clue descriptions. Missing: " .. table.concat(missing_clues, ", ")
-    )
+    MiniTest.expect.equality(#missing_clues, 0, {
+        fail_reason = "All leader prefixes should have clue descriptions. Missing: "
+            .. table.concat(missing_clues, ", "),
+    })
 end
 
 T["clue completeness"]["no orphan clue groups"] = function()
@@ -333,6 +350,7 @@ T["clue completeness"]["no orphan clue groups"] = function()
     local buffer_local_groups = { ["<Leader>c"] = true, ["<Leader>k"] = true }
 
     local groups = {}
+    ---@cast config {clues: {desc: string?, keys: string, mode: string?}[]}
     for _, clue in ipairs(config.clues) do
         if type(clue) == "table" and clue.desc and clue.desc:match("^%+") and not buffer_local_groups[clue.keys] then
             table.insert(groups, { keys = clue.keys, mode = clue.mode or "n" })
@@ -355,7 +373,11 @@ T["clue completeness"]["no orphan clue groups"] = function()
 
     table.sort(orphans)
 
-    MiniTest.expect.equality(#orphans, 0, "Clue groups without any keymaps underneath: " .. table.concat(orphans, ", "))
+    MiniTest.expect.equality(
+        #orphans,
+        0,
+        { fail_reason = "Clue groups without any keymaps underneath: " .. table.concat(orphans, ", ") }
+    )
 end
 
 T["group descriptions"]["no duplicate descriptions among siblings"] = function()
@@ -392,7 +414,7 @@ T["group descriptions"]["no duplicate descriptions among siblings"] = function()
     MiniTest.expect.equality(
         #duplicates,
         0,
-        "Duplicate descriptions among sibling groups: " .. table.concat(duplicates, ", ")
+        { fail_reason = "Duplicate descriptions among sibling groups: " .. table.concat(duplicates, ", ") }
     )
 end
 
@@ -414,7 +436,7 @@ T["group descriptions"]["descriptions follow +Name pattern"] = function()
     MiniTest.expect.equality(
         #malformed,
         0,
-        "Group descriptions should match +Name (uppercase after +): " .. table.concat(malformed, ", ")
+        { fail_reason = "Group descriptions should match +Name (uppercase after +): " .. table.concat(malformed, ", ") }
     )
 end
 

@@ -23,6 +23,7 @@ T["keymap compatibility"]["all keymaps have valid modes for mini.clue"] = functi
 
     for _, mode in ipairs(modes) do
         local ok, keymaps = pcall(vim.api.nvim_get_keymap, mode)
+        ---@cast keymaps table[]
         if not ok then
             table.insert(invalid_keymaps, "Mode '" .. mode .. "' failed: " .. tostring(keymaps))
         else
@@ -41,7 +42,7 @@ T["keymap compatibility"]["all keymaps have valid modes for mini.clue"] = functi
     MiniTest.expect.equality(
         #invalid_keymaps,
         0,
-        "All keymaps should be valid for mini.clue. Errors: " .. table.concat(invalid_keymaps, "; ")
+        { fail_reason = "All keymaps should be valid for mini.clue. Errors: " .. table.concat(invalid_keymaps, "; ") }
     )
 end
 
@@ -58,9 +59,11 @@ T["keymap compatibility"]["mode arrays in vim.keymap.set don't break mini.clue"]
     -- mini.clue should be able to query both modes without error
     local ok_n, keymaps_n = pcall(vim.api.nvim_get_keymap, "n")
     local ok_x, keymaps_x = pcall(vim.api.nvim_get_keymap, "x")
+    ---@cast keymaps_n table[]
+    ---@cast keymaps_x table[]
 
-    MiniTest.expect.equality(ok_n, true, "Should query normal mode keymaps without error")
-    MiniTest.expect.equality(ok_x, true, "Should query visual mode keymaps without error")
+    MiniTest.expect.equality(ok_n, true, { fail_reason = "Should query normal mode keymaps without error" })
+    MiniTest.expect.equality(ok_x, true, { fail_reason = "Should query visual mode keymaps without error" })
 
     -- nvim_get_keymap reports the resolved leader, not the "<leader>" placeholder
     local resolved_key = (vim.g.mapleader or "\\") .. "xtest"
@@ -73,8 +76,8 @@ T["keymap compatibility"]["mode arrays in vim.keymap.set don't break mini.clue"]
         if k.lhs == resolved_key then found_x = true end
     end
 
-    MiniTest.expect.equality(found_n, true, "Keymap should exist in normal mode")
-    MiniTest.expect.equality(found_x, true, "Keymap should exist in visual mode")
+    MiniTest.expect.equality(found_n, true, { fail_reason = "Keymap should exist in normal mode" })
+    MiniTest.expect.equality(found_x, true, { fail_reason = "Keymap should exist in visual mode" })
 
     -- Cleanup
     vim.keymap.del("n", test_key)
@@ -105,7 +108,7 @@ T["common keypress scenarios"]["pressing 'g' doesn't error"] = function()
 
     local has_clue_error = result.stderr:match("mini%.clue%.lua:%d+:") ~= nil
     MiniTest.expect.equality(has_clue_error, false, "Pressing 'g' should not cause mini.clue error: " .. result.stderr)
-    MiniTest.expect.equality(result.code, 0, "Should exit cleanly")
+    MiniTest.expect.equality(result.code, 0, { fail_reason = "Should exit cleanly" })
 end
 
 T["common keypress scenarios"]["pressing 'gg' navigation works"] = function()
@@ -282,6 +285,7 @@ T["keymap validation"]["no keymaps have nil mode"] = function()
 
     for _, mode in ipairs(modes) do
         local ok, keymaps = pcall(vim.api.nvim_get_keymap, mode)
+        ---@cast keymaps table[]
         if ok then
             for _, keymap in ipairs(keymaps) do
                 -- Check for any keymap that might have problematic values
@@ -295,7 +299,11 @@ T["keymap validation"]["no keymaps have nil mode"] = function()
         end
     end
 
-    MiniTest.expect.equality(#problems, 0, "All keymaps should have valid structure: " .. table.concat(problems, "; "))
+    MiniTest.expect.equality(
+        #problems,
+        0,
+        { fail_reason = "All keymaps should have valid structure: " .. table.concat(problems, "; ") }
+    )
 end
 
 T["keymap validation"]["all mode arrays are properly expanded"] = function()
@@ -312,8 +320,8 @@ T["keymap validation"]["all mode arrays are properly expanded"] = function()
     local n_keymap = vim.fn.maparg(test_lhs, "n", false, true)
     local v_keymap = vim.fn.maparg(test_lhs, "v", false, true)
 
-    MiniTest.expect.equality(type(n_keymap), "table", "Normal mode keymap should exist")
-    MiniTest.expect.equality(type(v_keymap), "table", "Visual mode keymap should exist")
+    MiniTest.expect.equality(type(n_keymap), "table", { fail_reason = "Normal mode keymap should exist" })
+    MiniTest.expect.equality(type(v_keymap), "table", { fail_reason = "Visual mode keymap should exist" })
 
     -- Cleanup
     pcall(vim.keymap.del, "n", test_lhs)

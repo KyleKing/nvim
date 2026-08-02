@@ -36,7 +36,11 @@ T["keybinding conflicts"]["no duplicate ] keymaps"] = function()
         end
     end
 
-    MiniTest.expect.equality(#duplicates, 0, "Should have no duplicate ] keymaps: " .. vim.inspect(duplicates))
+    MiniTest.expect.equality(
+        #duplicates,
+        0,
+        { fail_reason = "Should have no duplicate ] keymaps: " .. vim.inspect(duplicates) }
+    )
 end
 
 T["keybinding conflicts"]["no duplicate [ keymaps"] = function()
@@ -56,7 +60,11 @@ T["keybinding conflicts"]["no duplicate [ keymaps"] = function()
         end
     end
 
-    MiniTest.expect.equality(#duplicates, 0, "Should have no duplicate [ keymaps: " .. vim.inspect(duplicates))
+    MiniTest.expect.equality(
+        #duplicates,
+        0,
+        { fail_reason = "Should have no duplicate [ keymaps: " .. vim.inspect(duplicates) }
+    )
 end
 
 T["keybinding conflicts"]["treesitter and nap coexist"] = function()
@@ -88,12 +96,12 @@ T["keybinding conflicts"]["treesitter and nap coexist"] = function()
         if map.lhs == "]b" then has_nap_b = true end
     end
 
-    MiniTest.expect.equality(has_treesitter_m, true, "Should have ]m (treesitter methods)")
-    MiniTest.expect.equality(has_treesitter_z, true, "Should have ]z (treesitter arguments)")
-    MiniTest.expect.equality(has_treesitter_k, true, "Should have ]k (treesitter blocks)")
-    MiniTest.expect.equality(has_nap_a, true, "Should have ]a (nap tabs)")
-    MiniTest.expect.equality(has_nap_f, true, "Should have ]f (nap files)")
-    MiniTest.expect.equality(has_nap_b, true, "Should have ]b (nap buffers)")
+    MiniTest.expect.equality(has_treesitter_m, true, { fail_reason = "Should have ]m (treesitter methods)" })
+    MiniTest.expect.equality(has_treesitter_z, true, { fail_reason = "Should have ]z (treesitter arguments)" })
+    MiniTest.expect.equality(has_treesitter_k, true, { fail_reason = "Should have ]k (treesitter blocks)" })
+    MiniTest.expect.equality(has_nap_a, true, { fail_reason = "Should have ]a (nap tabs)" })
+    MiniTest.expect.equality(has_nap_f, true, { fail_reason = "Should have ]f (nap files)" })
+    MiniTest.expect.equality(has_nap_b, true, { fail_reason = "Should have ]b (nap buffers)" })
 
     helpers.delete_buffer(bufnr)
 end
@@ -120,7 +128,7 @@ T["treesitter movement"]["navigate methods with ]m"] = function()
 
     -- Should be at second function
     local cursor = vim.api.nvim_win_get_cursor(0)
-    MiniTest.expect.equality(cursor[1], 5, "Cursor should be at line 5 (second function)")
+    MiniTest.expect.equality(cursor[1], 5, { fail_reason = "Cursor should be at line 5 (second function)" })
 
     helpers.delete_buffer(bufnr)
 end
@@ -141,10 +149,10 @@ T["treesitter movement"]["navigate arguments with ]z"] = function()
 
     -- Cursor should be in argument list
     local cursor = vim.api.nvim_win_get_cursor(0)
-    MiniTest.expect.equality(cursor[1], 1, "Cursor should still be on line 1")
+    MiniTest.expect.equality(cursor[1], 1, { fail_reason = "Cursor should still be on line 1" })
     -- Just verify it moved (exact position depends on treesitter)
     local moved = cursor[2] > 0
-    MiniTest.expect.equality(moved, true, "Cursor should have moved into arguments")
+    MiniTest.expect.equality(moved, true, { fail_reason = "Cursor should have moved into arguments" })
 
     helpers.delete_buffer(bufnr)
 end
@@ -169,7 +177,7 @@ T["treesitter movement"]["navigate blocks with ]k"] = function()
 
     -- Should be at second if statement
     local cursor = vim.api.nvim_win_get_cursor(0)
-    MiniTest.expect.equality(cursor[1], 5, "Cursor should be at line 5 (second block)")
+    MiniTest.expect.equality(cursor[1], 5, { fail_reason = "Cursor should be at line 5 (second block)" })
 
     helpers.delete_buffer(bufnr)
 end
@@ -192,7 +200,7 @@ T["treesitter selection"]["select method with am"] = function()
 
     -- Should have visual selection
     local mode = vim.fn.mode()
-    MiniTest.expect.equality(mode == "v" or mode == "V", true, "Should be in visual mode")
+    MiniTest.expect.equality(mode == "v" or mode == "V", true, { fail_reason = "Should be in visual mode" })
 
     -- Exit visual mode
     vim.cmd("normal \27")
@@ -216,7 +224,7 @@ T["treesitter selection"]["select argument with az"] = function()
 
     -- Should have visual selection
     local mode = vim.fn.mode()
-    MiniTest.expect.equality(mode == "v" or mode == "V", true, "Should be in visual mode")
+    MiniTest.expect.equality(mode == "v" or mode == "V", true, { fail_reason = "Should be in visual mode" })
 
     -- Exit visual mode
     vim.cmd("normal \27")
@@ -256,7 +264,7 @@ T["treesitter swap"]["swap methods with >M"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_second_first, true, "second() should be swapped to first position")
+    MiniTest.expect.equality(has_second_first, true, { fail_reason = "second() should be swapped to first position" })
 
     helpers.delete_buffer(bufnr)
 end
@@ -275,7 +283,7 @@ T["nap navigation preserved"]["tabs navigation with ]a"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_nap_a, true, "Should have ]a keybinding for nap tabs")
+    MiniTest.expect.equality(has_nap_a, true, { fail_reason = "Should have ]a keybinding for nap tabs" })
 end
 
 T["nap navigation preserved"]["files navigation with ]f"] = function()
@@ -290,7 +298,7 @@ T["nap navigation preserved"]["files navigation with ]f"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_nap_f, true, "Should have ]f keybinding for nap files")
+    MiniTest.expect.equality(has_nap_f, true, { fail_reason = "Should have ]f keybinding for nap files" })
 end
 
 T["nap navigation preserved"]["buffers navigation with ]b"] = function()
@@ -305,7 +313,7 @@ T["nap navigation preserved"]["buffers navigation with ]b"] = function()
         end
     end
 
-    MiniTest.expect.equality(has_nap_b, true, "Should have ]b keybinding for nap buffers")
+    MiniTest.expect.equality(has_nap_b, true, { fail_reason = "Should have ]b keybinding for nap buffers" })
 end
 
 if MiniTest.run == nil then MiniTest.run() end

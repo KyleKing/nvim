@@ -26,7 +26,7 @@ T["parse_file_location"]["parses simple file path"] = function()
     vim.fn.writefile({}, temp_file)
 
     local result = file_opener.parse_file_location(temp_file)
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing valid file path")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, nil)
@@ -40,7 +40,7 @@ T["parse_file_location"]["parses file path with line number"] = function()
     vim.fn.writefile({}, temp_file)
 
     local result = file_opener.parse_file_location(temp_file .. ":42")
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing file path with line number")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, 42)
@@ -54,7 +54,7 @@ T["parse_file_location"]["parses file path with line and column"] = function()
     vim.fn.writefile({}, temp_file)
 
     local result = file_opener.parse_file_location(temp_file .. ":42:10")
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing file path with line and column")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, 42)
@@ -76,7 +76,7 @@ T["parse_file_location"]["expands relative paths"] = function()
     local basename = vim.fn.fnamemodify(temp_file, ":t")
 
     local result = file_opener.parse_file_location(basename, cwd)
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing relative path")
     MiniTest.expect.equality(result.path, temp_file)
 
@@ -135,7 +135,7 @@ T["parse_file_location"]["handles relative paths with line and column"] = functi
     local basename = vim.fn.fnamemodify(temp_file, ":t")
 
     local result = file_opener.parse_file_location(basename .. ":10:5", cwd)
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing relative path with line and column")
     MiniTest.expect.equality(result.path, temp_file)
     MiniTest.expect.equality(result.line, 10)
@@ -153,7 +153,7 @@ T["parse_file_location"]["handles nested relative paths"] = function()
     vim.fn.writefile({}, temp_file)
 
     local result = file_opener.parse_file_location("subdir/test.lua", temp_dir)
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing nested relative path")
     MiniTest.expect.equality(result.path, temp_file)
 
@@ -170,7 +170,7 @@ T["parse_file_location"]["handles absolute path with tilde"] = function()
         local expanded = vim.fn.expand(relative_to_home)
 
         local result = file_opener.parse_file_location(expanded)
-        MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+        MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
         assert(result, "result should not be nil after parsing path with tilde")
         MiniTest.expect.equality(result.path, temp_file)
     end
@@ -185,7 +185,7 @@ T["parse_file_location"]["handles path with spaces"] = function()
     vim.fn.writefile({}, temp_file)
 
     local result = file_opener.parse_file_location(temp_file)
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing path with spaces")
     MiniTest.expect.equality(result.path, temp_file)
 
@@ -201,7 +201,7 @@ T["parse_file_location"]["handles path with dots"] = function()
     vim.fn.writefile({}, temp_file)
 
     local result = file_opener.parse_file_location("subdir/../subdir/test.lua", temp_dir)
-    MiniTest.expect.equality(result ~= nil, true, "Result should not be nil")
+    MiniTest.expect.equality(result ~= nil, true, { fail_reason = "Result should not be nil" })
     assert(result, "result should not be nil after parsing path with dots")
 
     local normalized_result = vim.fn.resolve(vim.fn.fnamemodify(result.path, ":p"))
@@ -227,8 +227,8 @@ T["open_from_terminal"]["opens absolute path from terminal"] = function()
 
     vim.wait(500, function() return vim.fn.tabpagenr("$") > initial_tab_count end)
 
-    MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count + 1, "Should open new tab")
-    MiniTest.expect.equality(vim.fn.expand("%:p"), temp_file, "Should open correct file")
+    MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count + 1, { fail_reason = "Should open new tab" })
+    MiniTest.expect.equality(vim.fn.expand("%:p"), temp_file, { fail_reason = "Should open correct file" })
 
     vim.fn.delete(temp_file)
 end
@@ -253,8 +253,8 @@ T["open_from_terminal"]["opens relative path from terminal cwd"] = function()
 
     vim.wait(500, function() return vim.fn.tabpagenr("$") > initial_tab_count end)
 
-    MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count + 1, "Should open new tab")
-    MiniTest.expect.equality(vim.fn.expand("%:p"), temp_file, "Should open correct file")
+    MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count + 1, { fail_reason = "Should open new tab" })
+    MiniTest.expect.equality(vim.fn.expand("%:p"), temp_file, { fail_reason = "Should open correct file" })
 
     vim.fn.delete(temp_dir, "rf")
 end
@@ -272,7 +272,7 @@ T["open_from_terminal"]["opens path with line number"] = function()
     vim.wait(500, function() return vim.api.nvim_win_get_cursor(0)[1] == 2 end)
 
     local cursor = vim.api.nvim_win_get_cursor(0)
-    MiniTest.expect.equality(cursor[1], 2, "Should jump to line 2")
+    MiniTest.expect.equality(cursor[1], 2, { fail_reason = "Should jump to line 2" })
 
     vim.fn.delete(temp_file)
 end
@@ -290,8 +290,8 @@ T["open_from_terminal"]["opens path with line and column"] = function()
     vim.wait(500, function() return vim.api.nvim_win_get_cursor(0)[1] == 2 end)
 
     local cursor = vim.api.nvim_win_get_cursor(0)
-    MiniTest.expect.equality(cursor[1], 2, "Should jump to line 2")
-    MiniTest.expect.equality(cursor[2], 7, "Should jump to column 8")
+    MiniTest.expect.equality(cursor[1], 2, { fail_reason = "Should jump to line 2" })
+    MiniTest.expect.equality(cursor[2], 7, { fail_reason = "Should jump to column 8" })
 
     vim.fn.delete(temp_file)
 end
@@ -315,8 +315,8 @@ T["open_from_terminal"]["shows warning for non-existent file"] = function()
     vim.wait(500, function() return notified end)
     vim.notify = original_notify
 
-    MiniTest.expect.equality(notified, true, "Should notify about non-existent file")
-    MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count, "Should not open new tab")
+    MiniTest.expect.equality(notified, true, { fail_reason = "Should notify about non-existent file" })
+    MiniTest.expect.equality(vim.fn.tabpagenr("$"), initial_tab_count, { fail_reason = "Should not open new tab" })
 end
 
 if ... == nil then MiniTest.run() end

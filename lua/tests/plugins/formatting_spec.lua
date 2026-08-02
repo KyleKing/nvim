@@ -25,7 +25,7 @@ T["conform.nvim"]["can format lua buffer"] = function()
 
     local line = vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1]
     local is_formatted = line:match("local x = 1")
-    MiniTest.expect.equality(is_formatted ~= nil, true, "Line should be formatted by stylua")
+    MiniTest.expect.equality(is_formatted ~= nil, true, { fail_reason = "Line should be formatted by stylua" })
 
     helpers.delete_buffer(bufnr)
 end
@@ -41,13 +41,17 @@ T["conform.nvim"]["formatters_by_ft functions handle buffer numbers"] = function
 
         local success, err = pcall(function()
             local formatters = conform.list_formatters(bufnr)
-            MiniTest.expect.equality(type(formatters), "table", "Should return formatters list for " .. ft)
+            MiniTest.expect.equality(
+                type(formatters),
+                "table",
+                { fail_reason = "Should return formatters list for " .. ft }
+            )
         end)
 
         MiniTest.expect.equality(
             success,
             true,
-            "Should not error for filetype: " .. ft .. " (error: " .. tostring(err) .. ")"
+            { fail_reason = "Should not error for filetype: " .. ft .. " (error: " .. tostring(err) .. ")" }
         )
         helpers.delete_buffer(bufnr)
     end
@@ -60,7 +64,11 @@ T["conform.nvim"]["<leader>lf keybinding works"] = function()
 
     local success, err = pcall(function() require("conform").format({ timeout_ms = 1000 }) end)
 
-    MiniTest.expect.equality(success, true, "<leader>lf should not error (error: " .. tostring(err) .. ")")
+    MiniTest.expect.equality(
+        success,
+        true,
+        { fail_reason = "<leader>lf should not error (error: " .. tostring(err) .. ")" }
+    )
     helpers.delete_buffer(bufnr)
 end
 
@@ -78,8 +86,12 @@ T["conform.nvim"]["dynamic formatters return valid lists"] = function()
         local bufnr = helpers.create_test_buffer({ "test" }, tc.ft)
         local formatters = conform.list_formatters(bufnr)
 
-        MiniTest.expect.equality(type(formatters), "table", "Should return table for " .. tc.ft)
-        MiniTest.expect.equality(#formatters > 0, true, "Should have at least one formatter for " .. tc.ft)
+        MiniTest.expect.equality(type(formatters), "table", { fail_reason = "Should return table for " .. tc.ft })
+        MiniTest.expect.equality(
+            #formatters > 0,
+            true,
+            { fail_reason = "Should have at least one formatter for " .. tc.ft }
+        )
 
         helpers.delete_buffer(bufnr)
     end

@@ -53,8 +53,8 @@ return {
                                 if map.lhs == "[m" then has_prev = true end
                             end
 
-                            MiniTest.expect.equality(has_next, true, "Should have ]m keybinding")
-                            MiniTest.expect.equality(has_prev, true, "Should have [m keybinding")
+                            MiniTest.expect.equality(has_next, true, { fail_reason = "Should have ]m keybinding" })
+                            MiniTest.expect.equality(has_prev, true, { fail_reason = "Should have [m keybinding" })
                         end,
                     },
                 },
@@ -78,8 +78,8 @@ return {
                                 if map.lhs == "[z" then has_prev = true end
                             end
 
-                            MiniTest.expect.equality(has_next, true, "Should have ]z keybinding")
-                            MiniTest.expect.equality(has_prev, true, "Should have [z keybinding")
+                            MiniTest.expect.equality(has_next, true, { fail_reason = "Should have ]z keybinding" })
+                            MiniTest.expect.equality(has_prev, true, { fail_reason = "Should have [z keybinding" })
                         end,
                     },
                 },
@@ -103,8 +103,8 @@ return {
                                 if map.lhs == "[k" then has_prev = true end
                             end
 
-                            MiniTest.expect.equality(has_next, true, "Should have ]k keybinding")
-                            MiniTest.expect.equality(has_prev, true, "Should have [k keybinding")
+                            MiniTest.expect.equality(has_next, true, { fail_reason = "Should have ]k keybinding" })
+                            MiniTest.expect.equality(has_prev, true, { fail_reason = "Should have [k keybinding" })
                         end,
                     },
                 },
@@ -120,14 +120,22 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ai = require("mini.ai")
-                            MiniTest.expect.no_equality(ai.config.custom_textobjects.m, nil, "mini.ai should define m")
+                            MiniTest.expect.no_equality(
+                                ai.config.custom_textobjects.m,
+                                nil,
+                                { fail_reason = "mini.ai should define m" }
+                            )
                             vim.cmd("enew")
                             vim.bo.filetype = "lua"
                             vim.api.nvim_buf_set_lines(0, 0, -1, false, { "local function foo()", "  return 1", "end" })
                             vim.treesitter.start(0, "lua")
                             vim.api.nvim_win_set_cursor(0, { 2, 3 })
                             local region = ai.find_textobject("i", "m")
-                            MiniTest.expect.no_equality(region, nil, "im should resolve a function-inner region")
+                            MiniTest.expect.no_equality(
+                                region,
+                                nil,
+                                { fail_reason = "im should resolve a function-inner region" }
+                            )
                             -- Delete through the helper: setting filetype above queued an LSP
                             -- autostart, which the helper drains while the buffer is still valid
                             require("tests.helpers").delete_buffer(vim.api.nvim_get_current_buf())
@@ -146,7 +154,11 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ai = require("mini.ai")
-                            MiniTest.expect.no_equality(ai.config.custom_textobjects.z, nil, "mini.ai should define z")
+                            MiniTest.expect.no_equality(
+                                ai.config.custom_textobjects.z,
+                                nil,
+                                { fail_reason = "mini.ai should define z" }
+                            )
                         end,
                     },
                 },
@@ -165,11 +177,15 @@ return {
 
                             -- nvim_get_keymap reports a leading "<" as "<lt>", so scanning
                             -- it for a literal "<M" never matches. maparg resolves both.
-                            MiniTest.expect.equality(helpers.check_keymap(">M", "n"), true, "Should have >M keybinding")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap(">M", "n"),
+                                true,
+                                { fail_reason = "Should have >M keybinding" }
+                            )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<lt>M", "n"),
                                 true,
-                                "Should have <M keybinding"
+                                { fail_reason = "Should have <M keybinding" }
                             )
                         end,
                     },

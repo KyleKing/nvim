@@ -49,7 +49,11 @@ return {
 
                             -- Verify LspAttach autocmd exists (sets up toggle keybinding)
                             local autocmds = vim.api.nvim_get_autocmds({ event = "LspAttach" })
-                            MiniTest.expect.equality(#autocmds > 0, true, "Should have LspAttach autocmd configured")
+                            MiniTest.expect.equality(
+                                #autocmds > 0,
+                                true,
+                                { fail_reason = "Should have LspAttach autocmd configured" }
+                            )
                         end,
                     },
                 },
@@ -69,7 +73,7 @@ return {
                             -- but we can verify the buffers exist and are independent
                             MiniTest.expect.equality(vim.api.nvim_buf_is_valid(buf1), true)
                             MiniTest.expect.equality(vim.api.nvim_buf_is_valid(buf2), true)
-                            MiniTest.expect.no_equality(buf1, buf2, "Buffers should be independent")
+                            MiniTest.expect.no_equality(buf1, buf2, { fail_reason = "Buffers should be independent" })
 
                             helpers.delete_buffer(buf1)
                             helpers.delete_buffer(buf2)
@@ -92,7 +96,11 @@ return {
                             MiniTest.expect.equality(type(vim.lsp.completion), "table")
                             -- 0.11 exposed trigger(); 0.12 replaced it with get()
                             local has_trigger = vim.lsp.completion.get ~= nil or vim.lsp.completion.trigger ~= nil
-                            MiniTest.expect.equality(has_trigger, true, "Should have completion trigger mechanism")
+                            MiniTest.expect.equality(
+                                has_trigger,
+                                true,
+                                { fail_reason = "Should have completion trigger mechanism" }
+                            )
                         end,
                     },
                 },
@@ -110,7 +118,11 @@ return {
 
                             -- Verify LspAttach autocmd exists (which sets up buffer-local keymaps)
                             local autocmds = vim.api.nvim_get_autocmds({ event = "LspAttach" })
-                            MiniTest.expect.equality(#autocmds > 0, true, "Should have LspAttach autocmd configured")
+                            MiniTest.expect.equality(
+                                #autocmds > 0,
+                                true,
+                                { fail_reason = "Should have LspAttach autocmd configured" }
+                            )
 
                             -- Verify pumvisible function exists (used for conditional navigation)
                             MiniTest.expect.equality(type(vim.fn.pumvisible), "function")

@@ -103,7 +103,7 @@ return {
                                 { source = { name = "Buffers", items = { "a", "b", "c" } } },
                                 function() return MiniPick.is_picker_active() end
                             )
-                            MiniTest.expect.equality(is_active, true, "Picker should be active")
+                            MiniTest.expect.equality(is_active, true, { fail_reason = "Picker should be active" })
                         end,
                     },
                 },
@@ -130,7 +130,7 @@ return {
                                 { source = { name = "Resume" } },
                                 function() return MiniPick.is_picker_active() end
                             )
-                            MiniTest.expect.equality(is_active, true, "Resume should start picker")
+                            MiniTest.expect.equality(is_active, true, { fail_reason = "Resume should start picker" })
                         end,
                     },
                 },
@@ -155,7 +155,11 @@ return {
                                     return active
                                 end
                             )
-                            MiniTest.expect.equality(was_active, true, "Picker should be active for navigation")
+                            MiniTest.expect.equality(
+                                was_active,
+                                true,
+                                { fail_reason = "Picker should be active for navigation" }
+                            )
                         end,
                     },
                 },
@@ -177,11 +181,15 @@ return {
                                 { source = { name = "Test", items = { "apple", "banana", "cherry" } } },
                                 function()
                                     MiniPick.set_picker_query({ "t", "e", "s", "t" })
-                                    return table.concat(MiniPick.get_picker_query())
+                                    return table.concat(MiniPick.get_picker_query() or {})
                                 end
                             )
 
-                            MiniTest.expect.equality(initial_query, "test", "Initial query should be 'test'")
+                            MiniTest.expect.equality(
+                                initial_query,
+                                "test",
+                                { fail_reason = "Initial query should be 'test'" }
+                            )
                         end,
                     },
                 },
@@ -203,7 +211,7 @@ return {
                             MiniTest.expect.equality(
                                 has_toggle_info,
                                 true,
-                                "toggle_info mapping should be available (default <C-w>)"
+                                { fail_reason = "toggle_info mapping should be available (default <C-w>)" }
                             )
                         end,
                     },
@@ -221,11 +229,11 @@ return {
                                 function()
                                     -- Set query programmatically (simulates editing)
                                     MiniPick.set_picker_query(vim.split("new query", ""))
-                                    return table.concat(MiniPick.get_picker_query())
+                                    return table.concat(MiniPick.get_picker_query() or {})
                                 end
                             )
 
-                            MiniTest.expect.equality(query, "new query", "Query should be updated")
+                            MiniTest.expect.equality(query, "new query", { fail_reason = "Query should be updated" })
                         end,
                     },
                 },
@@ -242,7 +250,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fh", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fh keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>fh keymap" }
+                            )
                         end,
                     },
                 },
@@ -259,7 +271,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fk", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fk keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>fk keymap" }
+                            )
                         end,
                     },
                 },
@@ -276,7 +292,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fi", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fi keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>fi keymap" }
+                            )
                         end,
                     },
                 },
@@ -293,7 +313,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fo", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fo keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>fo keymap" }
+                            )
                         end,
                     },
                 },
@@ -310,7 +334,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fr", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fr keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>fr keymap" }
+                            )
                         end,
                     },
                 },
@@ -328,8 +356,16 @@ return {
                             local helpers = require("tests.helpers")
                             local has_keymap_n = helpers.check_keymap("<leader>fp", "n")
                             local has_keymap_x = helpers.check_keymap("<leader>fp", "x")
-                            MiniTest.expect.equality(has_keymap_n, true, "Should have <leader>fp in normal mode")
-                            MiniTest.expect.equality(has_keymap_x, true, "Should have <leader>fp in visual mode")
+                            MiniTest.expect.equality(
+                                has_keymap_n,
+                                true,
+                                { fail_reason = "Should have <leader>fp in normal mode" }
+                            )
+                            MiniTest.expect.equality(
+                                has_keymap_x,
+                                true,
+                                { fail_reason = "Should have <leader>fp in visual mode" }
+                            )
                         end,
                     },
                 },
@@ -350,7 +386,7 @@ return {
                             MiniTest.expect.equality(
                                 reg_content,
                                 "from register a",
-                                "Register should have expected content"
+                                { fail_reason = "Register should have expected content" }
                             )
 
                             helpers.delete_buffer(bufnr)
@@ -370,7 +406,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>f'", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>f' keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>f' keymap" }
+                            )
                         end,
                     },
                 },
@@ -387,7 +427,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
                             local has_keymap = helpers.check_keymap("<leader>fl", "n")
-                            MiniTest.expect.equality(has_keymap, true, "Should have <leader>fl keymap")
+                            MiniTest.expect.equality(
+                                has_keymap,
+                                true,
+                                { fail_reason = "Should have <leader>fl keymap" }
+                            )
                         end,
                     },
                 },

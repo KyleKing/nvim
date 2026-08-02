@@ -30,8 +30,8 @@ T["temp session detection"]["detects temp sessions"] = function()
         vim.api.nvim_set_current_buf(bufnr)
 
         local is_temp, session_type, _ = utils.detect_temp_session()
-        MiniTest.expect.equality(is_temp, case.expected, case.path)
-        MiniTest.expect.equality(session_type, case.session_type, case.path)
+        MiniTest.expect.equality(is_temp, case.expected, { fail_reason = case.path })
+        MiniTest.expect.equality(session_type, case.session_type, { fail_reason = case.path })
 
         helpers.delete_buffer(bufnr)
     end
@@ -46,7 +46,9 @@ T["filename utilities"]["truncates long filenames"] = function()
     vim.api.nvim_set_current_buf(bufnr)
 
     local truncated = utils.get_truncated_filename()
-    if #long_path > 70 then MiniTest.expect.equality(truncated:sub(1, 3), "...", "Long path should be truncated") end
+    if #long_path > 70 then
+        MiniTest.expect.equality(truncated:sub(1, 3), "...", { fail_reason = "Long path should be truncated" })
+    end
 
     helpers.delete_buffer(bufnr)
 end

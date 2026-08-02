@@ -33,7 +33,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, bufjump = pcall(require, "bufjump")
-                            MiniTest.expect.equality(ok, true, "bufjump should be available")
+                            MiniTest.expect.equality(ok, true, { fail_reason = "bufjump should be available" })
                             if ok then
                                 MiniTest.expect.equality(type(bufjump.forward), "function")
                                 MiniTest.expect.equality(type(bufjump.backward), "function")

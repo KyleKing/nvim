@@ -90,8 +90,8 @@ return {
                             local j_map = vim.tbl_filter(function(m) return m.lhs == "j" end, keymaps)[1]
                             local k_map = vim.tbl_filter(function(m) return m.lhs == "k" end, keymaps)[1]
 
-                            MiniTest.expect.equality(j_map ~= nil, true, "j keymap should exist")
-                            MiniTest.expect.equality(k_map ~= nil, true, "k keymap should exist")
+                            MiniTest.expect.equality(j_map ~= nil, true, { fail_reason = "j keymap should exist" })
+                            MiniTest.expect.equality(k_map ~= nil, true, { fail_reason = "k keymap should exist" })
                         end,
                     },
                 },
@@ -125,7 +125,7 @@ return {
                             MiniTest.expect.equality(
                                 reg_content,
                                 "",
-                                "Default register should be empty after dd on empty line"
+                                { fail_reason = "Default register should be empty after dd on empty line" }
                             )
 
                             helpers.delete_buffer(bufnr)
@@ -154,9 +154,13 @@ return {
                             MiniTest.expect.equality(
                                 a_map_o ~= nil,
                                 true,
-                                "A keymap should exist in operator-pending mode"
+                                { fail_reason = "A keymap should exist in operator-pending mode" }
                             )
-                            MiniTest.expect.equality(a_map_x ~= nil, true, "A keymap should exist in visual mode")
+                            MiniTest.expect.equality(
+                                a_map_x ~= nil,
+                                true,
+                                { fail_reason = "A keymap should exist in visual mode" }
+                            )
                         end,
                     },
                 },
@@ -174,44 +178,72 @@ return {
                             local helpers = require("tests.helpers")
 
                             -- Background
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>ub", "n"), true, "dark background")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>uB", "n"), true, "light background")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>ub", "n"),
+                                true,
+                                { fail_reason = "dark background" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>uB", "n"),
+                                true,
+                                { fail_reason = "light background" }
+                            )
                             -- Toggles
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>uc", "n"),
                                 true,
-                                "conceallevel toggle"
+                                { fail_reason = "conceallevel toggle" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>ud", "n"),
                                 true,
-                                "diagnostics toggle"
+                                { fail_reason = "diagnostics toggle" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>ui", "n"),
                                 true,
-                                "indent scope toggle"
+                                { fail_reason = "indent scope toggle" }
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>ul", "n"), true, "list chars toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>ul", "n"),
+                                true,
+                                { fail_reason = "list chars toggle" }
+                            )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>un", "n"),
                                 true,
-                                "line numbers toggle"
+                                { fail_reason = "line numbers toggle" }
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>up", "n"), true, "paste mode toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>up", "n"),
+                                true,
+                                { fail_reason = "paste mode toggle" }
+                            )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>uN", "n"),
                                 true,
-                                "relative numbers toggle"
+                                { fail_reason = "relative numbers toggle" }
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>us", "n"), true, "spellcheck toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>us", "n"),
+                                true,
+                                { fail_reason = "spellcheck toggle" }
+                            )
                             -- Note: <leader>ut is for trailspace toggle (checked in editing-support.lua)
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>uT", "n"), true, "treesitter toggle")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>uw", "n"), true, "wrap toggle")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>uT", "n"),
+                                true,
+                                { fail_reason = "treesitter toggle" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>uw", "n"),
+                                true,
+                                { fail_reason = "wrap toggle" }
+                            )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>uy", "n"),
                                 true,
-                                "syntax highlight toggle"
+                                { fail_reason = "syntax highlight toggle" }
                             )
                         end,
                     },
@@ -233,13 +265,33 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>wf", "n"),
                                 true,
-                                "toggle window focus"
+                                { fail_reason = "toggle window focus" }
                             )
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>wz", "n"), true, "zoom window")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>wm", "n"), true, "maximize window")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>w=", "n"), true, "equalize windows")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>w|", "n"), true, "maximize width")
-                            MiniTest.expect.equality(helpers.check_keymap("<leader>w_", "n"), true, "maximize height")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>wz", "n"),
+                                true,
+                                { fail_reason = "zoom window" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>wm", "n"),
+                                true,
+                                { fail_reason = "maximize window" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>w=", "n"),
+                                true,
+                                { fail_reason = "equalize windows" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>w|", "n"),
+                                true,
+                                { fail_reason = "maximize width" }
+                            )
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<leader>w_", "n"),
+                                true,
+                                { fail_reason = "maximize height" }
+                            )
                         end,
                     },
                 },
@@ -259,7 +311,7 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<Esc>", "n"),
                                 true,
-                                "Esc keymap should exist"
+                                { fail_reason = "Esc keymap should exist" }
                             )
                         end,
                     },
@@ -280,12 +332,12 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<C-\\><C-n>", "t"),
                                 true,
-                                "terminal mode escape with C-\\C-n"
+                                { fail_reason = "terminal mode escape with C-\\C-n" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<Esc><Esc>", "t"),
                                 true,
-                                "terminal mode escape with double Esc"
+                                { fail_reason = "terminal mode escape with double Esc" }
                             )
                         end,
                     },
@@ -303,7 +355,11 @@ return {
                             local MiniTest = require("mini.test")
                             local helpers = require("tests.helpers")
 
-                            MiniTest.expect.equality(helpers.check_keymap("<C-q>", "n"), true, "force quit keymap")
+                            MiniTest.expect.equality(
+                                helpers.check_keymap("<C-q>", "n"),
+                                true,
+                                { fail_reason = "force quit keymap" }
+                            )
                         end,
                     },
                 },
@@ -323,12 +379,12 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>bw", "n"),
                                 true,
-                                "wipeout buffer keymap"
+                                { fail_reason = "wipeout buffer keymap" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>bW", "n"),
                                 true,
-                                "wipeout all buffers keymap"
+                                { fail_reason = "wipeout all buffers keymap" }
                             )
                         end,
                     },
@@ -349,17 +405,17 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>y", "n"),
                                 true,
-                                "Should have <leader>y keymap"
+                                { fail_reason = "Should have <leader>y keymap" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>y", "x"),
                                 true,
-                                "Should have <leader>y in visual mode"
+                                { fail_reason = "Should have <leader>y in visual mode" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>Y", "n"),
                                 true,
-                                "Should have <leader>Y keymap"
+                                { fail_reason = "Should have <leader>Y keymap" }
                             )
                         end,
                     },
@@ -374,17 +430,17 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>p", "n"),
                                 true,
-                                "Should have <leader>p keymap"
+                                { fail_reason = "Should have <leader>p keymap" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>p", "x"),
                                 true,
-                                "Should have <leader>p in visual mode"
+                                { fail_reason = "Should have <leader>p in visual mode" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>P", "n"),
                                 true,
-                                "Should have <leader>P keymap"
+                                { fail_reason = "Should have <leader>P keymap" }
                             )
                         end,
                     },
@@ -399,12 +455,12 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>d", "n"),
                                 true,
-                                "Should have <leader>d keymap"
+                                { fail_reason = "Should have <leader>d keymap" }
                             )
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<leader>d", "x"),
                                 true,
-                                "Should have <leader>d in visual mode"
+                                { fail_reason = "Should have <leader>d in visual mode" }
                             )
                         end,
                     },
@@ -419,7 +475,7 @@ return {
                             MiniTest.expect.equality(
                                 helpers.check_keymap("<C-v>", "i"),
                                 true,
-                                "Should have <C-v> in insert mode"
+                                { fail_reason = "Should have <C-v> in insert mode" }
                             )
                         end,
                     },
@@ -447,7 +503,7 @@ return {
                             MiniTest.expect.equality(
                                 clipboard_content:match("test line") ~= nil,
                                 true,
-                                "Clipboard should contain yanked text"
+                                { fail_reason = "Clipboard should contain yanked text" }
                             )
 
                             helpers.delete_buffer(bufnr)
@@ -477,7 +533,7 @@ return {
                             MiniTest.expect.equality(
                                 reg_content,
                                 "previous content",
-                                "Default register should not be affected by black hole delete"
+                                { fail_reason = "Default register should not be affected by black hole delete" }
                             )
 
                             helpers.delete_buffer(bufnr)
@@ -516,7 +572,7 @@ return {
                             MiniTest.expect.equality(
                                 lines[3]:match("register content") ~= nil,
                                 true,
-                                "Should paste content from named register"
+                                { fail_reason = "Should paste content from named register" }
                             )
 
                             helpers.delete_buffer(bufnr)
@@ -551,7 +607,7 @@ return {
                             MiniTest.expect.equality(
                                 lines[3]:match("yank me") ~= nil,
                                 true,
-                                "Yank register (0) should preserve yank despite delete"
+                                { fail_reason = "Yank register (0) should preserve yank despite delete" }
                             )
 
                             helpers.delete_buffer(bufnr)

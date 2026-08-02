@@ -58,7 +58,7 @@ return {
                             MiniTest.expect.equality(
                                 type(handler),
                                 "function",
-                                "Signature help handler should be configured"
+                                { fail_reason = "Signature help handler should be configured" }
                             )
                         end,
                     },
@@ -71,7 +71,11 @@ return {
 
                             -- Verify LspAttach autocmd exists (sets up <leader>ks keybinding)
                             local autocmds = vim.api.nvim_get_autocmds({ event = "LspAttach" })
-                            MiniTest.expect.equality(#autocmds > 0, true, "Should have LspAttach autocmd configured")
+                            MiniTest.expect.equality(
+                                #autocmds > 0,
+                                true,
+                                { fail_reason = "Should have LspAttach autocmd configured" }
+                            )
                         end,
                     },
                 },
@@ -87,7 +91,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, lint = pcall(require, "lint")
-                            MiniTest.expect.equality(ok, true, "nvim-lint should be available")
+                            MiniTest.expect.equality(ok, true, { fail_reason = "nvim-lint should be available" })
                             if ok then
                                 MiniTest.expect.equality(type(lint.try_lint), "function")
                                 MiniTest.expect.equality(type(lint.linters_by_ft), "table")

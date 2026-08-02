@@ -12,7 +12,11 @@ T["mini.input"] = MiniTest.new_set()
 
 T["mini.input"]["overrides vim.ui.input"] = function()
     local MiniInput = require("mini.input")
-    MiniTest.expect.equality(vim.ui.input, MiniInput.ui_input, "vim.ui.input should route through mini.input")
+    MiniTest.expect.equality(
+        vim.ui.input,
+        MiniInput.ui_input,
+        { fail_reason = "vim.ui.input should route through mini.input" }
+    )
 end
 
 T["mini.input"]["default scope is editor"] = function()

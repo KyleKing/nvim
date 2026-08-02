@@ -36,7 +36,7 @@ T["mini.files"]["can open file browser"] = function()
     MiniFiles.close()
     vim.fn.delete(tmpdir, "rf")
 
-    MiniTest.expect.equality(has_files_buffer, true, "mini.files should open successfully")
+    MiniTest.expect.equality(has_files_buffer, true, { fail_reason = "mini.files should open successfully" })
 end
 
 T["mini.files"]["can create file"] = function()
@@ -64,7 +64,7 @@ T["mini.files"]["can create file"] = function()
 
     vim.fn.delete(tmpdir, "rf")
 
-    MiniTest.expect.equality(file_exists, true, "Should create file via mini.files")
+    MiniTest.expect.equality(file_exists, true, { fail_reason = "Should create file via mini.files" })
 end
 
 T["mini.files"]["can delete file"] = function()
@@ -93,7 +93,7 @@ T["mini.files"]["can delete file"] = function()
 
     vim.fn.delete(tmpdir, "rf")
 
-    MiniTest.expect.equality(file_exists, false, "Should delete file via mini.files")
+    MiniTest.expect.equality(file_exists, false, { fail_reason = "Should delete file via mini.files" })
 end
 
 T["mini.files"]["can navigate directories"] = function()
@@ -115,32 +115,40 @@ T["mini.files"]["can navigate directories"] = function()
     MiniFiles.close()
     vim.fn.delete(tmpdir, "rf")
 
-    MiniTest.expect.equality(is_at_tmpdir, true, "Should navigate to correct directory")
+    MiniTest.expect.equality(is_at_tmpdir, true, { fail_reason = "Should navigate to correct directory" })
 end
 
 T["mini.files"]["config validation"] = function()
     local MiniFiles = require("mini.files")
 
     -- Verify config is set up
-    MiniTest.expect.equality(type(MiniFiles.config), "table", "mini.files config should be loaded")
-    MiniTest.expect.equality(type(MiniFiles.open), "function", "open function should be available")
-    MiniTest.expect.equality(type(MiniFiles.close), "function", "close function should be available")
-    MiniTest.expect.equality(type(MiniFiles.synchronize), "function", "synchronize function should be available")
+    MiniTest.expect.equality(type(MiniFiles.config), "table", { fail_reason = "mini.files config should be loaded" })
+    MiniTest.expect.equality(type(MiniFiles.open), "function", { fail_reason = "open function should be available" })
+    MiniTest.expect.equality(type(MiniFiles.close), "function", { fail_reason = "close function should be available" })
+    MiniTest.expect.equality(
+        type(MiniFiles.synchronize),
+        "function",
+        { fail_reason = "synchronize function should be available" }
+    )
 end
 
 T["mini.files"]["lsp integration is enabled"] = function()
     local MiniFiles = require("mini.files")
 
     -- lsp_timeout > 0 keeps rename/create/delete LSP-aware (willRename/didRename); 0 disables it
-    MiniTest.expect.equality(MiniFiles.config.options.lsp_timeout, 1000, "LSP file operations should be enabled")
+    MiniTest.expect.equality(
+        MiniFiles.config.options.lsp_timeout,
+        1000,
+        { fail_reason = "LSP file operations should be enabled" }
+    )
 end
 
 T["mini.files"]["keybindings are set"] = function()
     -- maparg (via check_keymap) resolves <leader>; nvim_get_keymap returns the space-prefixed lhs instead
     local exists, keymap = helpers.check_keymap("<leader>e", "n")
 
-    MiniTest.expect.equality(exists, true, "mini.files <leader>e keymap should be set")
-    MiniTest.expect.equality(keymap.desc, "Explorer", "keymap should describe the explorer")
+    MiniTest.expect.equality(exists, true, { fail_reason = "mini.files <leader>e keymap should be set" })
+    MiniTest.expect.equality(keymap.desc, "Explorer", { fail_reason = "keymap should describe the explorer" })
 end
 
 -- For manual running

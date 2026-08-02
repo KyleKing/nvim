@@ -13,15 +13,23 @@ T["git hunks"] = MiniTest.new_set()
 T["git hunks"]["mini.diff is configured"] = function()
     local MiniDiff = require("mini.diff")
 
-    MiniTest.expect.equality(type(MiniDiff.config), "table", "mini.diff should be configured")
-    MiniTest.expect.equality(type(MiniDiff.toggle_overlay), "function", "toggle_overlay should be available")
+    MiniTest.expect.equality(type(MiniDiff.config), "table", { fail_reason = "mini.diff should be configured" })
+    MiniTest.expect.equality(
+        type(MiniDiff.toggle_overlay),
+        "function",
+        { fail_reason = "toggle_overlay should be available" }
+    )
 end
 
 T["git hunks"]["mini.git is configured"] = function()
     local MiniGit = require("mini.git")
 
-    MiniTest.expect.equality(type(MiniGit.config), "table", "mini.git should be configured")
-    MiniTest.expect.equality(type(MiniGit.show_at_cursor), "function", "show_at_cursor should be available")
+    MiniTest.expect.equality(type(MiniGit.config), "table", { fail_reason = "mini.git should be configured" })
+    MiniTest.expect.equality(
+        type(MiniGit.show_at_cursor),
+        "function",
+        { fail_reason = "show_at_cursor should be available" }
+    )
 end
 
 T["git hunks"]["navigation keybindings exist"] = function()
@@ -48,7 +56,7 @@ T["git hunks"]["navigation keybindings exist"] = function()
     MiniTest.expect.equality(
         has_hunk_nav or has_bracket_h,
         true,
-        "Git hunk navigation keybindings should be configured"
+        { fail_reason = "Git hunk navigation keybindings should be configured" }
     )
 end
 
@@ -61,7 +69,7 @@ T["git hunks"]["overlay toggle works"] = function()
         MiniTest.expect.equality(type(MiniDiff.toggle_overlay), "function")
     end)
 
-    MiniTest.expect.equality(success, true, "toggle_overlay should be callable")
+    MiniTest.expect.equality(success, true, { fail_reason = "toggle_overlay should be callable" })
 end
 
 T["git hunks"]["show_at_cursor works"] = function()
@@ -70,7 +78,7 @@ T["git hunks"]["show_at_cursor works"] = function()
     -- Test that show_at_cursor function is callable
     local success = pcall(function() MiniTest.expect.equality(type(MiniGit.show_at_cursor), "function") end)
 
-    MiniTest.expect.equality(success, true, "show_at_cursor should be callable")
+    MiniTest.expect.equality(success, true, { fail_reason = "show_at_cursor should be callable" })
 end
 
 -- For manual running

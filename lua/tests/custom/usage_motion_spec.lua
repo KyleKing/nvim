@@ -40,7 +40,7 @@ T["assembler"]["assembles an operator and text object into one sequence"] = func
     feed_all(assembler, { { "c", "n" }, { "i", "no" }, { "w", "no" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, { "ciw" }, "one semantic unit, not three keys")
+    MiniTest.expect.equality(seen, { "ciw" }, { fail_reason = "one semantic unit, not three keys" })
 end
 
 T["assembler"]["emits nothing past the length cap"] = function()
@@ -48,7 +48,7 @@ T["assembler"]["emits nothing past the length cap"] = function()
     feed_all(assembler, { { "d", "n" }, { "i", "no" }, { "2", "no" }, { "a", "no" }, { "w", "no" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, {}, "an over-long buffer is discarded, never truncated")
+    MiniTest.expect.equality(seen, {}, { fail_reason = "an over-long buffer is discarded, never truncated" })
     MiniTest.expect.equality(assembler.pending(), "")
 end
 
@@ -58,7 +58,7 @@ T["assembler"]["recovers at the next rest state after an overflow"] = function()
     feed_all(assembler, { { "x", "n" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, { "x" }, "the next sequence must not inherit the overflow")
+    MiniTest.expect.equality(seen, { "x" }, { fail_reason = "the next sequence must not inherit the overflow" })
 end
 
 T["assembler"]["ignores keys typed outside normal and visual"] = function()
@@ -76,7 +76,7 @@ T["assembler"]["flushes a pending sequence when the mode leaves normal"] = funct
     -- Typing the replacement text is the first observation of insert mode.
     feed_all(assembler, { { "X", "i" } })
 
-    MiniTest.expect.equality(seen, { "ciw" }, "leaving normal mode resolves the operation")
+    MiniTest.expect.equality(seen, { "ciw" }, { fail_reason = "leaving normal mode resolves the operation" })
 end
 
 T["assembler"]["starts a new sequence on returning to rest"] = function()
@@ -85,7 +85,11 @@ T["assembler"]["starts a new sequence on returning to rest"] = function()
     feed_all(assembler, { { "j", "n" } })
 
     MiniTest.expect.equality(seen, { "dd" })
-    MiniTest.expect.equality(assembler.pending(), "j", "the key at the boundary opens the next sequence")
+    MiniTest.expect.equality(
+        assembler.pending(),
+        "j",
+        { fail_reason = "the key at the boundary opens the next sequence" }
+    )
 end
 
 T["assembler"]["splits repeated navigation into separate sequences"] = function()
@@ -93,18 +97,18 @@ T["assembler"]["splits repeated navigation into separate sequences"] = function(
     feed_all(assembler, { { "j", "n" }, { "j", "n" }, { "k", "n" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, { "j", "j", "k" }, "the denylist has to see one key per row")
+    MiniTest.expect.equality(seen, { "j", "j", "k" }, { fail_reason = "the denylist has to see one key per row" })
 end
 
 T["assembler"]["flush emits a pending sequence and nothing when empty"] = function()
     local assembler, seen = collector()
     assembler.flush()
-    MiniTest.expect.equality(seen, {}, "an empty buffer must not emit a blank sequence")
+    MiniTest.expect.equality(seen, {}, { fail_reason = "an empty buffer must not emit a blank sequence" })
 
     feed_all(assembler, { { "d", "n" }, { "d", "no" } })
     assembler.flush()
     assembler.flush()
-    MiniTest.expect.equality(seen, { "dd" }, "flushing twice must not emit twice")
+    MiniTest.expect.equality(seen, { "dd" }, { fail_reason = "flushing twice must not emit twice" })
 end
 
 T["assembler"]["keeps magic characters literal"] = function()
@@ -114,7 +118,7 @@ T["assembler"]["keeps magic characters literal"] = function()
     feed_all(assembler, { { "c", "n" }, { "i", "no" }, { '"', "no" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, { "di(", 'ci"' }, "sequences are plain strings, not patterns")
+    MiniTest.expect.equality(seen, { "di(", 'ci"' }, { fail_reason = "sequences are plain strings, not patterns" })
 end
 
 T["assembler"]["keeps a char-argument motion together"] = function()
@@ -149,7 +153,7 @@ T["assembler"]["breaks a count prefix off as its own sequence"] = function()
     feed_all(assembler, { { "3", "n" }, { "c", "n" }, { "i", "no" }, { "w", "no" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, { "3", "ciw" }, "documented misattribution: the count is dropped")
+    MiniTest.expect.equality(seen, { "3", "ciw" }, { fail_reason = "documented misattribution: the count is dropped" })
 end
 
 T["assembler"]["honors a custom rest predicate"] = function()
@@ -157,7 +161,7 @@ T["assembler"]["honors a custom rest predicate"] = function()
     feed_all(assembler, { { "j", "n" }, { "k", "n" } })
     assembler.flush()
 
-    MiniTest.expect.equality(seen, { "jk" }, "nothing rests, so everything accumulates")
+    MiniTest.expect.equality(seen, { "jk" }, { fail_reason = "nothing rests, so everything accumulates" })
 end
 
 T["attach"] = MiniTest.new_set()
@@ -176,15 +180,15 @@ T["attach"]["detaches its on_key handler and augroup on stop"] = function()
     local before = vim.on_key()
     local handle = attach()
 
-    MiniTest.expect.equality(vim.on_key(), before + 1, "attach registers exactly one listener")
+    MiniTest.expect.equality(vim.on_key(), before + 1, { fail_reason = "attach registers exactly one listener" })
     MiniTest.expect.equality(#vim.api.nvim_get_autocmds({ group = "kyleking_usage_motion" }) > 0, true)
 
     handle.stop()
 
-    MiniTest.expect.equality(vim.on_key(), before, "stop must leave no listener behind")
+    MiniTest.expect.equality(vim.on_key(), before, { fail_reason = "stop must leave no listener behind" })
     local ok = pcall(vim.api.nvim_get_autocmds, { group = "kyleking_usage_motion" })
-    MiniTest.expect.equality(ok, false, "the augroup is gone, so querying it errors")
-    MiniTest.expect.equality(pcall(handle.stop), true, "stopping twice must not error")
+    MiniTest.expect.equality(ok, false, { fail_reason = "the augroup is gone, so querying it errors" })
+    MiniTest.expect.equality(pcall(handle.stop), true, { fail_reason = "stopping twice must not error" })
 end
 
 --- Other specs can leave the editor in insert mode with keys still queued, which would
@@ -206,7 +210,7 @@ T["attach"]["assembles real keystrokes"] = function()
     -- ModeChanged, which the headless test runner does not always deliver.
     handle.assembler.flush()
 
-    MiniTest.expect.equality(seen, { "ciw", "dd" }, "insert-mode text must not leak into the log")
+    MiniTest.expect.equality(seen, { "ciw", "dd" }, { fail_reason = "insert-mode text must not leak into the log" })
     helpers.delete_buffer(bufnr)
 end
 
@@ -219,7 +223,7 @@ T["attach"]["skips keys replayed by a mapping"] = function()
     vim.api.nvim_feedkeys("dd", "x", false)
     handle.assembler.flush()
 
-    MiniTest.expect.equality(seen, {}, "a keymap is already counted by the map hook")
+    MiniTest.expect.equality(seen, {}, { fail_reason = "a keymap is already counted by the map hook" })
     helpers.delete_buffer(bufnr)
 end
 

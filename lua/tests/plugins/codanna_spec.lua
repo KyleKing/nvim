@@ -12,10 +12,19 @@ T["codanna"] = MiniTest.new_set()
 
 T["codanna"]["setup configures mini.pick as preferred picker"] = function()
     local codanna = require("codanna")
-    MiniTest.expect.equality(codanna.config.preferred_picker, "mini", "Config should prefer mini.pick")
+    MiniTest.expect.equality(
+        codanna.config.preferred_picker,
+        "mini",
+        { fail_reason = "Config should prefer mini.pick" }
+    )
 
     local ok, mini_picker = pcall(require, "codanna.mini")
-    MiniTest.expect.equality(ok and next(mini_picker) ~= nil, true, "mini.pick backend should be available")
+    ---@cast mini_picker table
+    MiniTest.expect.equality(
+        ok and next(mini_picker) ~= nil,
+        true,
+        { fail_reason = "mini.pick backend should be available" }
+    )
 end
 
 T["codanna"]["exec surfaces CLI errors instead of raising"] = function()
@@ -25,8 +34,8 @@ T["codanna"]["exec surfaces CLI errors instead of raising"] = function()
     end
 
     local data, err = require("codanna.core").exec("mcp", { "find_symbol", "name:nonexistent_symbol_xyz" })
-    MiniTest.expect.equality(data, nil, "Missing symbol should return no data")
-    MiniTest.expect.equality(type(err), "string", "Error message should be returned")
+    MiniTest.expect.equality(data, nil, { fail_reason = "Missing symbol should return no data" })
+    MiniTest.expect.equality(type(err), "string", { fail_reason = "Error message should be returned" })
 end
 
 if ... == nil then MiniTest.run() end

@@ -44,7 +44,7 @@ T["redos"]["open() stays fast when a ssh_git-shaped line never closes"] = functi
     local elapsed = timed(link_open.open)
     vim.notify = original_notify
 
-    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, string.format("took %.3fs", elapsed))
+    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, { fail_reason = string.format("took %.3fs", elapsed) })
 end
 
 T["redos"]["open() stays fast when a plugin-shaped line never contains nvim"] = function()
@@ -63,7 +63,7 @@ T["redos"]["open() stays fast when a plugin-shaped line never contains nvim"] = 
     local elapsed = timed(link_open.open)
     vim.notify = original_notify
 
-    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, string.format("took %.3fs", elapsed))
+    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, { fail_reason = string.format("took %.3fs", elapsed) })
 end
 
 T["redos"]["open() stays fast when a md_link-shaped line never closes"] = function()
@@ -76,7 +76,7 @@ T["redos"]["open() stays fast when a md_link-shaped line never closes"] = functi
     local elapsed = timed(link_open.open)
     vim.notify = original_notify
 
-    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, string.format("took %.3fs", elapsed))
+    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, { fail_reason = string.format("took %.3fs", elapsed) })
 end
 
 T["redos"]["open() stays fast when a real link sits after a long filler run"] = function()
@@ -94,7 +94,7 @@ T["redos"]["open() stays fast when a real link sits after a long filler run"] = 
     vim.ui.open = original_open
 
     MiniTest.expect.equality(opened, "https://github.com/KyleKing/simple-crypt")
-    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, string.format("took %.3fs", elapsed))
+    MiniTest.expect.equality(elapsed < BUDGET_SECONDS, true, { fail_reason = string.format("took %.3fs", elapsed) })
 end
 
 T["redos"]["mini.hipatterns highlighting stays fast on an adversarial long line"] = function()
@@ -112,7 +112,7 @@ T["redos"]["mini.hipatterns highlighting stays fast on an adversarial long line"
     end)
     hipatterns.disable(0)
 
-    MiniTest.expect.equality(elapsed < BUDGET_SECONDS * 5, true, string.format("took %.3fs", elapsed))
+    MiniTest.expect.equality(elapsed < BUDGET_SECONDS * 5, true, { fail_reason = string.format("took %.3fs", elapsed) })
 end
 
 if ... == nil then MiniTest.run() end

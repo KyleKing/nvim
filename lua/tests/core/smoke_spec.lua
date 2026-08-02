@@ -94,7 +94,7 @@ T["vim.pack startup"]["no errors during deferred plugin loading"] = function()
     }, { text = true }):wait(10000)
     local output = (result.stdout or "") .. (result.stderr or "")
     local error_start = output:find("E%d+:") or output:find("stack traceback") or output:find("pack %a+ error")
-    MiniTest.expect.equality(error_start, nil, "deferred loading errors:\n" .. output)
+    MiniTest.expect.equality(error_start, nil, { fail_reason = "deferred loading errors:\n" .. output })
 end
 
 T["nvim configuration"] = MiniTest.new_set()
@@ -111,8 +111,8 @@ T["nvim configuration"]["config directory is accessible"] = function()
 end
 
 T["nvim configuration"]["vim.pack manages plugins and mini.nvim is installed"] = function()
-    MiniTest.expect.equality(type(vim.pack), "table", "vim.pack should be available (Neovim 0.12+)")
-    MiniTest.expect.equality(#vim.pack.get() > 0, true, "vim.pack should manage installed plugins")
+    MiniTest.expect.equality(type(vim.pack), "table", { fail_reason = "vim.pack should be available (Neovim 0.12+)" })
+    MiniTest.expect.equality(#vim.pack.get() > 0, true, { fail_reason = "vim.pack should manage installed plugins" })
     MiniTest.expect.no_error(function() require("mini.test") end)
 end
 

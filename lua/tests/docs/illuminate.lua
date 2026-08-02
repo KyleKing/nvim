@@ -43,7 +43,7 @@ return {
                         fn = function(_ctx)
                             local MiniTest = require("mini.test")
                             local ok, illuminate = pcall(require, "illuminate")
-                            MiniTest.expect.equality(ok, true, "illuminate should be available")
+                            MiniTest.expect.equality(ok, true, { fail_reason = "illuminate should be available" })
                             if ok then
                                 MiniTest.expect.equality(type(illuminate.goto_next_reference), "function")
                                 MiniTest.expect.equality(type(illuminate.goto_prev_reference), "function")

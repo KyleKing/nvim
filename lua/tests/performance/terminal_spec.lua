@@ -39,7 +39,11 @@ T["terminal performance"]["terminal creation is fast"] = function()
     local elapsed_ms = (vim.uv.hrtime() - start_time) / 1000000
 
     -- Terminal creation should be fast (< 500ms)
-    MiniTest.expect.equality(elapsed_ms < 500, true, string.format("Terminal creation took %.2fms", elapsed_ms))
+    MiniTest.expect.equality(
+        elapsed_ms < 500,
+        true,
+        { fail_reason = string.format("Terminal creation took %.2fms", elapsed_ms) }
+    )
 
     -- Cleanup
     vim.api.nvim_buf_delete(bufnr, { force = true })
@@ -69,11 +73,9 @@ T["terminal performance"]["statusline refresh in terminal is fast"] = function()
     local per_refresh = elapsed_ms / iterations
 
     -- Each statusline refresh should be < 5ms in terminal buffers
-    MiniTest.expect.equality(
-        per_refresh < 5,
-        true,
-        string.format("Statusline refresh took %.2fms per call (%.2fms total)", per_refresh, elapsed_ms)
-    )
+    MiniTest.expect.equality(per_refresh < 5, true, {
+        fail_reason = string.format("Statusline refresh took %.2fms per call (%.2fms total)", per_refresh, elapsed_ms),
+    })
 
     vim.api.nvim_buf_delete(bufnr, { force = true })
 end
@@ -102,7 +104,7 @@ T["terminal performance"]["mode changes in terminal are fast"] = function()
     MiniTest.expect.equality(
         per_change < 2,
         true,
-        string.format("ModeChanged took %.2fms per event (%.2fms total)", per_change, elapsed_ms)
+        { fail_reason = string.format("ModeChanged took %.2fms per event (%.2fms total)", per_change, elapsed_ms) }
     )
 
     vim.api.nvim_buf_delete(bufnr, { force = true })
@@ -124,11 +126,15 @@ T["terminal performance"]["terminal output handling is fast"] = function()
     local elapsed_ms = (vim.uv.hrtime() - start_time) / 1000000
 
     -- Terminal output handling should be fast (< 2000ms for 100 lines)
-    MiniTest.expect.equality(elapsed_ms < 2000, true, string.format("Output handling took %.2fms", elapsed_ms))
+    MiniTest.expect.equality(
+        elapsed_ms < 2000,
+        true,
+        { fail_reason = string.format("Output handling took %.2fms", elapsed_ms) }
+    )
 
     -- Verify output was received
     local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    MiniTest.expect.equality(#lines > 50, true, "Should have received output")
+    MiniTest.expect.equality(#lines > 50, true, { fail_reason = "Should have received output" })
 
     vim.api.nvim_buf_delete(bufnr, { force = true })
 end
@@ -155,7 +161,7 @@ T["terminal performance"]["project root detection uses cache"] = function()
     MiniTest.expect.equality(
         warm_time < 1,
         true,
-        string.format("Cached call took %.2fms (cold: %.2fms)", warm_time, cold_time)
+        { fail_reason = string.format("Cached call took %.2fms (cold: %.2fms)", warm_time, cold_time) }
     )
 
     -- Results should be identical
@@ -185,7 +191,7 @@ T["terminal performance"]["vcs detection uses cache"] = function()
     MiniTest.expect.equality(
         warm_time < 1,
         true,
-        string.format("Cached VCS call took %.2fms (cold: %.2fms)", warm_time, cold_time)
+        { fail_reason = string.format("Cached VCS call took %.2fms (cold: %.2fms)", warm_time, cold_time) }
     )
 
     -- Results should be identical
@@ -225,7 +231,7 @@ T["terminal performance"]["illuminate disabled in terminal buffers"] = function(
     local should_enable = config.get().should_enable
     if should_enable then
         local enabled = should_enable(bufnr)
-        MiniTest.expect.equality(enabled, false, "Illuminate should be disabled in terminal buffers")
+        MiniTest.expect.equality(enabled, false, { fail_reason = "Illuminate should be disabled in terminal buffers" })
     end
 
     vim.api.nvim_buf_delete(bufnr, { force = true })

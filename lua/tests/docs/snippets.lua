@@ -24,12 +24,20 @@ return {
                         fn = function(_ctx)
                             local snippets = require("mini.snippets")
                             local MiniTest = require("mini.test")
-                            MiniTest.expect.equality(type(snippets.expand), "function", "expand function exists")
-                            MiniTest.expect.equality(type(snippets.session), "table", "session table exists")
+                            MiniTest.expect.equality(
+                                type(snippets.expand),
+                                "function",
+                                { fail_reason = "expand function exists" }
+                            )
+                            MiniTest.expect.equality(
+                                type(snippets.session),
+                                "table",
+                                { fail_reason = "session table exists" }
+                            )
                             MiniTest.expect.equality(
                                 type(snippets.session.jump),
                                 "function",
-                                "session.jump function exists"
+                                { fail_reason = "session.jump function exists" }
                             )
                         end,
                     },
@@ -47,7 +55,11 @@ return {
                             local helpers = require("tests.helpers")
                             local MiniTest = require("mini.test")
                             local exists = helpers.check_keymap("<C-c>", "i")
-                            MiniTest.expect.equality(exists, true, "<C-c> stop-session keymap should exist")
+                            MiniTest.expect.equality(
+                                exists,
+                                true,
+                                { fail_reason = "<C-c> stop-session keymap should exist" }
+                            )
                         end,
                     },
                 },
@@ -60,12 +72,12 @@ return {
                             MiniTest.expect.equality(
                                 type(snippets.session.stop),
                                 "function",
-                                "session.stop function exists"
+                                { fail_reason = "session.stop function exists" }
                             )
                             MiniTest.expect.equality(
                                 type(snippets.session.get),
                                 "function",
-                                "session.get function exists"
+                                { fail_reason = "session.get function exists" }
                             )
                         end,
                     },

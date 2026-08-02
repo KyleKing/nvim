@@ -77,7 +77,7 @@ T["collision detection"]["no direct collisions in normal mode"] = function()
                     collision.second.desc or "(no desc)"
                 )
         end
-        MiniTest.expect.equality(#collisions, 0, msg)
+        MiniTest.expect.equality(#collisions, 0, { fail_reason = msg })
     end
 end
 
@@ -134,7 +134,7 @@ T["collision detection"]["no prefix collisions in normal mode"] = function()
         msg = msg .. "  2. Use different prefix for compound bindings\n"
         msg = msg .. "  3. Add to ACCEPTABLE_PREFIX_OVERLAPS if intentional (e.g., mini.clue shows submenu)\n"
 
-        MiniTest.expect.equality(#prefix_conflicts, 0, msg)
+        MiniTest.expect.equality(#prefix_conflicts, 0, { fail_reason = msg })
     end
 end
 
@@ -167,7 +167,7 @@ T["collision detection"]["no direct collisions in visual mode"] = function()
                     collision.second.desc or "(no desc)"
                 )
         end
-        MiniTest.expect.equality(#collisions, 0, msg)
+        MiniTest.expect.equality(#collisions, 0, { fail_reason = msg })
     end
 end
 
@@ -200,7 +200,7 @@ T["collision detection"]["no direct collisions in insert mode"] = function()
                     collision.second.desc or "(no desc)"
                 )
         end
-        MiniTest.expect.equality(#collisions, 0, msg)
+        MiniTest.expect.equality(#collisions, 0, { fail_reason = msg })
     end
 end
 

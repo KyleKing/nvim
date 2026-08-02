@@ -90,7 +90,7 @@ end
 T["linting integration"]["nvim-lint is configured"] = function()
     helpers.wait_for_plugins()
     local lint = require("lint")
-    MiniTest.expect.equality(type(lint.linters_by_ft), "table", "Linters should be configured")
+    MiniTest.expect.equality(type(lint.linters_by_ft), "table", { fail_reason = "Linters should be configured" })
 end
 
 -- For manual running

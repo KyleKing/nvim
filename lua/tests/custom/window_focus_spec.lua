@@ -59,7 +59,11 @@ T["toggle_window_focus"]["resizes active window in focused mode"] = function()
 
     -- Active window should be larger than initial equal split
     local focused_height = vim.fn.winheight(0)
-    MiniTest.expect.equality(focused_height > initial_height, true, "Active window should be enlarged in focused mode")
+    MiniTest.expect.equality(
+        focused_height > initial_height,
+        true,
+        { fail_reason = "Active window should be enlarged in focused mode" }
+    )
 end
 
 T["toggle_window_focus"]["handles multiple splits"] = function()
