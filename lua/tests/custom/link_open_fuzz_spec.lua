@@ -112,6 +112,7 @@ local SUFFIX_VARIANTS = {
 T["fuzz"] = MiniTest.new_set()
 
 T["fuzz"]["extracts an embedded URL byte-for-byte regardless of surrounding noise"] = function()
+    ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
     math.randomseed(SEED)
     for i = 1, ITERATIONS do
         local url = pick(URL_POOL)
@@ -125,6 +126,7 @@ T["fuzz"]["extracts an embedded URL byte-for-byte regardless of surrounding nois
 end
 
 T["fuzz"]["resolves a plugin ref to its GitHub URL across plugin-manager call styles"] = function()
+    ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
     math.randomseed(SEED + 1)
     for i = 1, ITERATIONS do
         local plugin = pick(PLUGIN_POOL)
@@ -139,6 +141,7 @@ T["fuzz"]["resolves a plugin ref to its GitHub URL across plugin-manager call st
 end
 
 T["fuzz"]["never errors and never fabricates a link on pure noise"] = function()
+    ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
     math.randomseed(SEED + 2)
     for i = 1, ITERATIONS do
         local line = random_noise(20) .. random_noise(20)
@@ -152,6 +155,7 @@ T["fuzz"]["never errors and never fabricates a link on pure noise"] = function()
 end
 
 T["fuzz"]["resolves a requirements.txt package name across version/extras/comment variety"] = function()
+    ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
     math.randomseed(SEED + 3)
     local path = vim.fn.tempname() .. "/requirements.txt"
     vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
@@ -173,6 +177,7 @@ T["fuzz"]["resolves a requirements.txt package name across version/extras/commen
 end
 
 T["fuzz"]["resolves a pyproject.toml list-entry package name across version/extras variety"] = function()
+    ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
     math.randomseed(SEED + 4)
     local path = vim.fn.tempname() .. "/pyproject.toml"
     vim.fn.mkdir(vim.fn.fnamemodify(path, ":h"), "p")
