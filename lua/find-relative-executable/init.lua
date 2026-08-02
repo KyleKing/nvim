@@ -89,9 +89,9 @@ end
 function M.resolve(tool_name, buf_path)
     local buf_dir = buf_path and vim.fn.fnamemodify(buf_path, ":h") or vim.fn.getcwd()
 
-    local eco = ecosystems[tool_name]
+    local eco = ecosystems[tool_name] --[[@as string?]]
     if eco then
-        local strategy = strategies[eco]
+        local strategy = assert(strategies[eco], "ecosystems value must have a matching strategy")
         local found = vim.fs.find(strategy.marker, { upward = true, path = buf_dir })
         local cache_key = tool_name .. ":" .. (found[1] or "global")
         if cache[cache_key] ~= nil then return cache[cache_key] end
