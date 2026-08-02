@@ -139,12 +139,14 @@ local function toggle_tui_float(opts)
         vim.fn.termopen({ vim.o.shell, "-c", opts.cmd }, {
             on_exit = function()
                 vim.schedule(function()
-                    if tui_terminals[term_id] then
-                        if tui_terminals[term_id].winid and vim.api.nvim_win_is_valid(tui_terminals[term_id].winid) then
-                            pcall(vim.api.nvim_win_close, tui_terminals[term_id].winid, true)
+                    local entry = tui_terminals[term_id]
+                    ---@cast entry {bufnr: number, winid: number|nil}?
+                    if entry then
+                        if entry.winid and vim.api.nvim_win_is_valid(entry.winid) then
+                            pcall(vim.api.nvim_win_close, entry.winid, true)
                         end
-                        if vim.api.nvim_buf_is_valid(tui_terminals[term_id].bufnr) then
-                            pcall(vim.api.nvim_buf_delete, tui_terminals[term_id].bufnr, { force = true })
+                        if vim.api.nvim_buf_is_valid(entry.bufnr) then
+                            pcall(vim.api.nvim_buf_delete, entry.bufnr, { force = true })
                         end
                         tui_terminals[term_id] = nil
                     end
