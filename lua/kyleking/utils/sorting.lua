@@ -90,6 +90,7 @@ local function find_sortable_containers(bufnr, start_row, end_row)
 
     local ok, query = pcall(vim.treesitter.query.parse, lang, query_string)
     if not ok then return {} end
+    ---@cast query any
 
     parser:parse()
     local tree = parser:trees()[1]
@@ -215,6 +216,7 @@ local function sort_by_indentation(bufnr, start_row, end_row, opts)
 
     -- Group lines by indentation blocks
     local groups = {}
+    ---@type {lines: string[], key: string}?
     local current_group = nil
 
     for _, line in ipairs(lines) do
@@ -312,6 +314,7 @@ function M.sort_range(bufnr, start_row, end_row, opts)
         return success
     elseif opts.mode == "indent" then
         return sort_by_indentation(bufnr, start_row, end_row, opts)
+    ---@diagnostic disable-next-line: unnecessary-if -- opts.mode may not respect its declared type at runtime
     elseif opts.mode == "line" then
         return sort_by_lines(bufnr, start_row, end_row, opts)
     else
@@ -509,6 +512,7 @@ local function find_sortable_blocks(bufnr, start_row, end_row)
 
     local ok, query = pcall(vim.treesitter.query.parse, lang, query_string)
     if not ok then return sortable_ranges end
+    ---@cast query any
 
     parser:parse()
     local tree = parser:trees()[1]
