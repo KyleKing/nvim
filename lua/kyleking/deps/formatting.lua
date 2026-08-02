@@ -112,16 +112,11 @@ later(function()
     })
 
     local K = vim.keymap.set
-    K(
-        { "n", "v" },
-        "<leader>lf",
-        function()
-            require("conform").format({
-                lsp_format = "fallback",
-                async = false,
-                timeout_ms = 3000,
-            })
-        end,
-        { desc = "Format file or range" }
-    )
+    K({ "n", "v" }, "<leader>lf", function()
+        require("conform").format({
+            lsp_format = "fallback",
+            async = false,
+            timeout_ms = 3000,
+        } --[[@as conform.FormatOpts]])
+    end, { desc = "Format file or range" })
 end)
