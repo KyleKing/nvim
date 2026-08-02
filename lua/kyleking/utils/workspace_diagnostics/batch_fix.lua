@@ -96,7 +96,7 @@ function M.qf._batch_fix_interactive(qf_items, filter)
             return
         end
 
-        local item = qf_items[current_idx]
+        local item = assert(qf_items[current_idx], "current_idx out of range")
         local filename = vim.fn.bufname(item.bufnr)
         local rel_path = vim.fn.fnamemodify(filename, ":~:.")
 
@@ -179,7 +179,7 @@ function M.qf._batch_fix_navigate(qf_items, _filter)
     end
 
     -- Jump to first item
-    local first_item = qf_items[1]
+    local first_item = assert(qf_items[1], "qf_items must be non-empty")
     vim.cmd("buffer " .. first_item.bufnr)
     vim.api.nvim_win_set_cursor(0, { first_item.lnum, math.max(0, first_item.col - 1) })
 
