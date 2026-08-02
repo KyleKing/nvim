@@ -28,6 +28,7 @@ for key in ("fFtTrmqgzZ'`\"@[]"):gmatch(".") do
     CONTINUES[key] = true
 end
 
+---@type table<string, boolean>
 local VISUAL = { v = true, V = true, ["\22"] = true }
 
 --- Normal (including operator-pending and terminal-normal) or visual. Insert, replace,
