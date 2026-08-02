@@ -11,6 +11,14 @@ function M.path_exists(path)
     return false
 end
 
+--- Run a command, returning whether it exited successfully.
+---@param cmd string[]
+---@return boolean
+function M.cmd(cmd)
+    vim.fn.system(cmd)
+    return vim.v.shell_error == 0
+end
+
 --- Get the first worktree that a file belongs to (git or jj)
 ---@param file string? the file to check, defaults to the current file
 ---@return table<string, string>|nil # a table specifying the `toplevel` and `gitdir`/`jjdir` of a worktree or nil if not found
@@ -36,7 +44,7 @@ function M.file_worktree(file)
                 "ls-files",
                 "--error-unmatch",
                 file,
-            }, false)
+            })
         then
             worktree.vcs = "git"
             return worktree
