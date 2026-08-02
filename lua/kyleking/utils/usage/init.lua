@@ -11,6 +11,25 @@ local writer = require("kyleking.utils.usage.writer")
 
 local M = {}
 
+---@class kyleking.usage.Cfg
+---@field root string
+---@field dir string
+---@field host string
+---@field flush_interval_ms integer
+---@field retention_months integer
+---@field track {maps: boolean, commands: boolean, motions: boolean}
+---@field redact_cwd boolean
+---@field explicit_dir boolean
+---@field enabled boolean
+
+---@class kyleking.usage.State
+---@field installed boolean
+---@field writer {add: fun(event: table), flush: fun(), close: fun()}?
+---@field cfg kyleking.usage.Cfg?
+---@field original_set function?
+---@field motion {stop: fun(), assembler: table}?
+---@field last_map {key: string, at: integer}?
+---@field patterns {denylist: string[], groups: string[]}
 local state = {
     installed = false,
     writer = nil,
@@ -65,13 +84,17 @@ function M.command_name(line)
     local typed = line:match("^%s*[^%a]*(%a[%w_]*)")
     if typed == nil then return nil end
     local ok, full = pcall(vim.fn.fullcommand, typed)
-    if ok and full ~= nil and full ~= "" then return full end
+    if ok and full ~= nil and full ~= "" then
+        return full --[[@as string]]
+    end
     return typed
 end
 
 local function project_name()
     local cwd = vim.uv.cwd() or ""
-    if state.cfg.redact_cwd then return vim.fn.fnamemodify(cwd, ":t") end
+    -- Only called from record(), which returns early unless install() has already set cfg.
+    local cfg = assert(state.cfg, "usage tracking must be installed before recording events")
+    if cfg.redact_cwd then return vim.fn.fnamemodify(cwd, ":t") end
     return cwd
 end
 
@@ -131,7 +154,9 @@ local function patched_set(mode, lhs, rhs, opts)
     -- String and expr-string rhs have no callback to wrap, so they are registered
     -- unwrapped and stay invisible to invocation counts (documented blind spot).
     if type(rhs) == "function" then rhs = wrap_rhs(lhs, rhs, opts and opts.desc) end
-    return state.original_set(mode, lhs, rhs, opts)
+    -- Only installed as vim.keymap.set once original_set is captured, just below.
+    local original_set = assert(state.original_set, "original_set must be captured before patching")
+    return original_set(mode, lhs, rhs, opts)
 end
 
 --- Start tracking. Returns true when tracking is active.

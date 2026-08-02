@@ -113,7 +113,7 @@ end
 --- Attach the assembler to the editor. Returns a handle whose stop() fully detaches.
 --- `on_sequence` receives a printable sequence ("ciw", "<Esc>"), unfiltered.
 ---@param opts table {on_sequence, max_seq_len, idle_ms, is_rest}
----@return table {stop, assembler}
+---@return {stop: fun(), assembler: table}
 function M.attach(opts)
     opts = opts or {}
     local idle_ms = opts.idle_ms or DEFAULT_IDLE_MS

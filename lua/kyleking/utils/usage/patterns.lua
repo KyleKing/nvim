@@ -54,7 +54,7 @@ local function patterns_path(dir) return dir .. "/patterns.json" end
 --- Read the denylist and groups from `dir/patterns.json`.
 --- A missing or malformed file yields empty lists rather than an error, so a bad hand
 --- edit degrades to "no filtering" instead of losing events.
----@return table {denylist, groups}
+---@return {denylist: string[], groups: string[]}
 function M.load(dir)
     local path = patterns_path(dir)
     if vim.fn.filereadable(path) == 0 then return { denylist = {}, groups = {} } end
