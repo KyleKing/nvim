@@ -62,10 +62,12 @@ end
 
 -- Themed HTML shell lives in preview_template.html so prettier and HTML checks apply to
 -- it. Read lazily (only when previewing) and cache for the session.
+---@type string?
 local template_cache
+---@return string
 local function template_html()
     if not template_cache then
-        local src = debug.getinfo(1, "S").source:sub(2)
+        local src = assert(debug.getinfo(1, "S"), "debug.getinfo(1) unavailable").source:sub(2)
         local path = vim.fn.fnamemodify(src, ":h") .. "/preview_template.html"
         template_cache = table.concat(vim.fn.readfile(path), "\n")
     end
