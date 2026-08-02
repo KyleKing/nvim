@@ -13,6 +13,7 @@ local constants = require("kyleking.utils.constants")
 --- yet when this file loaded (a task without NVIM_TEST_SYNC, where plugins load
 --- deferred), the load-time call is a no-op and only the teardown call catches it.
 local function silence_surround_highlight()
+    ---@type any
     local surround = package.loaded["mini.surround"]
     if surround ~= nil and surround.config ~= nil then surround.config.highlight_duration = 0 end
 end

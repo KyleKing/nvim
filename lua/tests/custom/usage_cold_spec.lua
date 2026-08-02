@@ -196,11 +196,13 @@ T["cold"]["lists a registered user command"] = function()
     vim.api.nvim_create_user_command("UsageColdTestCmd", function() end, { desc = "Cold cmd" })
 
     local rows = cold.cold(dir)
+    ---@type {kind: string, key: string, count: integer}?
     local hit = nil
     for _, row in ipairs(rows) do
         if row.kind == "cmd" and row.key == "UsageColdTestCmd" then hit = row end
     end
     hit = assert(hit, "user commands reconcile the same way maps do")
+    ---@cast hit {kind: string, key: string, count: integer}
     MiniTest.expect.equality(hit.count, 0)
 
     pcall(vim.api.nvim_del_user_command, "UsageColdTestCmd")
@@ -226,14 +228,17 @@ T["render"]["separates never-used from tried-then-dropped"] = function()
     }
 
     local lines = cold.render(rows)
-    MiniTest.expect.equality(lines[1]:find("1 of 2 registered never used", 1, true) ~= nil, true)
     MiniTest.expect.equality(
-        lines[3]:find("never", 1, true) ~= nil,
+        assert(lines[1], "line 1 exists"):find("1 of 2 registered never used", 1, true) ~= nil,
+        true
+    )
+    MiniTest.expect.equality(
+        assert(lines[3], "line 3 exists"):find("never", 1, true) ~= nil,
         true,
         { fail_reason = "count 0 has no meaningful date" }
     )
     MiniTest.expect.equality(
-        lines[4]:find(os.date("%Y-%m-%d", JUNE) --[[@as string]], 1, true) ~= nil,
+        assert(lines[4], "line 4 exists"):find(os.date("%Y-%m-%d", JUNE) --[[@as string]], 1, true) ~= nil,
         true,
         { fail_reason = "a dropped map is dated so it reads differently from one never discovered" }
     )

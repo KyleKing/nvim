@@ -10,6 +10,7 @@ local ACCEPTABLE_PREFIX_OVERLAPS = {
 }
 
 -- Get all custom keymaps (exclude default vim mappings and plugin internal mappings)
+---@return {lhs: string, desc: string?}[]
 local function get_custom_keymaps(mode)
     local keymaps = vim.api.nvim_get_keymap(mode)
     local custom = {}
