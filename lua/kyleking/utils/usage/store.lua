@@ -92,8 +92,11 @@ M.read_json = read_json
 
 --- Month string `n` months before `ts`.
 function M.month_before(ts, n)
-    local date = os.date("*t", ts) --[[@as osdate]]
-    date.month = date.month - n
+    local date = os.date("*t", ts) --[[@as std.osdate]]
+    date.month = (
+        date.month --[[@as integer]]
+        - n
+    ) --[[@as integer]]
     date.day = 1
     return os.date("%Y-%m", os.time(date))
 end
@@ -113,6 +116,7 @@ function M.compact(dir, opts)
         -- A legacy file has no month; date it by its newest event so it still compacts.
         local events = read_lines(path)
         if month == nil and #events > 0 then
+            ---@type number
             local newest = 0
             for _, event in ipairs(events) do
                 newest = math.max(newest, tonumber(event.ts) or 0)
