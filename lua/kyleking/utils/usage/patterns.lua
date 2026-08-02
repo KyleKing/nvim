@@ -15,7 +15,10 @@ local compiled = {}
 ---@return string
 function M.normalize(key)
     local ok, replaced = pcall(vim.api.nvim_replace_termcodes, key, true, true, true)
-    if ok and replaced ~= nil then return replaced end
+    if ok and replaced ~= nil then
+        ---@cast replaced string
+        return replaced
+    end
     return key
 end
 

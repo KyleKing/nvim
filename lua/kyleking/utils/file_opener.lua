@@ -47,6 +47,7 @@ end
 ---@param input string|nil File path, defaults to <cfile> under cursor
 function M.open_from_terminal(input)
     input = input or vim.fn.expand("<cfile>")
+    ---@cast input string
 
     local term_cwd = vim.b.terminal_job_cwd or vim.fn.getcwd()
 

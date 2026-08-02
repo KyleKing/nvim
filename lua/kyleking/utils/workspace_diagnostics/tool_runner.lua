@@ -110,6 +110,7 @@ function M.run_in_current_project(tool_name, args)
     end
 
     vim.notify(string.format("Running %s in %s...", tool_name, project_root), vim.log.levels.INFO)
+    ---@cast project_root string
     vim.schedule(function()
         local output = _run_tool_in_project(tool_name, project_root, args)
         if not output then
