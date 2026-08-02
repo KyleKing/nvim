@@ -316,6 +316,6 @@ T["nap navigation preserved"]["buffers navigation with ]b"] = function()
     MiniTest.expect.equality(has_nap_b, true, { fail_reason = "Should have ]b keybinding for nap buffers" })
 end
 
-if MiniTest.run == nil then MiniTest.run() end
+if ... == nil then MiniTest.run() end
 
 return T

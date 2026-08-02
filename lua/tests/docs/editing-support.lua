@@ -40,6 +40,7 @@ return {
                             if ok then
                                 -- Get the keymap function
                                 local keymaps = vim.api.nvim_get_keymap("n")
+                                ---@type {lhs: string, callback: function?}?
                                 local toggle_map = nil
                                 for _, map in ipairs(keymaps) do
                                     if map.lhs == " ut" then
