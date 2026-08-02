@@ -12,6 +12,16 @@ later(function()
 
     local K = vim.keymap.set
 
+    -- Visual selection as a mini.diff do_hunks() line range
+    local function visual_hunk_range()
+        local line_start = vim.fn.line("v")
+        local line_end = vim.fn.line(".")
+        if line_start > line_end then
+            line_start, line_end = line_end, line_start
+        end
+        return { line_start = line_start, line_end = line_end }
+    end
+
     -- Generic VCS command runner with lazy evaluation
     -- Detects jj or git and runs appropriate command
     local function run_vcs_cmd(git_cmd, jj_cmd, git_fn, jj_fn)
@@ -42,10 +52,30 @@ later(function()
 
     -- mini.diff: hunk operations (work for both git and jj)
     -- See: https://github.com/nvim-mini/mini.diff
-    K("n", "<leader>gha", function() diff.apply("visual") end, { desc = "VCS: apply hunk" })
-    K("x", "<leader>gha", function() diff.apply("visual") end, { desc = "VCS: apply hunk (visual)" })
-    K("n", "<leader>ghr", function() diff.reset("visual") end, { desc = "VCS: reset hunk" })
-    K("x", "<leader>ghr", function() diff.reset("visual") end, { desc = "VCS: reset hunk (visual)" })
+    K(
+        "n",
+        "<leader>gha",
+        function() diff.do_hunks(0, "apply", { line_start = vim.fn.line("."), line_end = vim.fn.line(".") }) end,
+        { desc = "VCS: apply hunk" }
+    )
+    K(
+        "x",
+        "<leader>gha",
+        function() diff.do_hunks(0, "apply", visual_hunk_range()) end,
+        { desc = "VCS: apply hunk (visual)" }
+    )
+    K(
+        "n",
+        "<leader>ghr",
+        function() diff.do_hunks(0, "reset", { line_start = vim.fn.line("."), line_end = vim.fn.line(".") }) end,
+        { desc = "VCS: reset hunk" }
+    )
+    K(
+        "x",
+        "<leader>ghr",
+        function() diff.do_hunks(0, "reset", visual_hunk_range()) end,
+        { desc = "VCS: reset hunk (visual)" }
+    )
     K("n", "]h", function() diff.goto_hunk("next") end, { desc = "Next hunk" })
     K("n", "[h", function() diff.goto_hunk("prev") end, { desc = "Previous hunk" })
     K("n", "]H", function() diff.goto_hunk("last") end, { desc = "Last hunk" })
@@ -85,5 +115,5 @@ later(function()
     end, { desc = "VCS: commit/describe" })
 
     -- mini.diff: toggle overlay
-    K("n", "<leader>ugd", function() diff.toggle_overlay() end, { desc = "Toggle diff overlay" })
+    K("n", "<leader>ugd", function() diff.toggle_overlay(0) end, { desc = "Toggle diff overlay" })
 end)
