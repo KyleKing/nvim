@@ -107,6 +107,7 @@ local function parse_range(str)
 end
 
 --- Parse .snap file into table keyed by test name (with caching)
+---@return table
 function M.load_snapshots(fixture_path)
     local snap_path = fixture_path:gsub("%.lua$", ".snap")
 
@@ -137,6 +138,7 @@ function M.load_snapshots(fixture_path)
     -- Parse each block
     for _, block in ipairs(blocks) do
         local snapshot = {}
+        ---@type string?
         local name = nil
         local i = 1
 
@@ -375,6 +377,7 @@ function M.run_fixture(fixture_path)
     snapshots._dirty = false
 
     local update_mode = vim.env.UPDATE_SNAPSHOTS == "1"
+    ---@type {fixture: string, grammars: table[], total_tests: integer, total_duration_ms: number}
     local profile_data = {
         fixture = vim.fn.fnamemodify(fixture_path, ":t:r"),
         grammars = {},
@@ -384,6 +387,7 @@ function M.run_fixture(fixture_path)
 
     for _, grammar in ipairs(fixture.grammars) do
         local grammar_start = M.profiling.enabled and vim.uv.hrtime() or nil
+        ---@type {pattern: string, tests: table[], duration_ms: number}
         local grammar_data = {
             pattern = grammar.pattern,
             tests = {},
@@ -412,6 +416,7 @@ function M.run_fixture(fixture_path)
     end
 
     -- Prune unused snapshots in update mode
+    ---@diagnostic disable-next-line: unnecessary-if -- _dirty is set true elsewhere in run_test(), not statically knowable here
     if update_mode and snapshots._dirty then
         for key in pairs(snapshots) do
             if key:sub(1, 1) ~= "_" and not snapshots._used[key] then snapshots[key] = nil end

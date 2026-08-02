@@ -258,15 +258,12 @@ T["report"]["unions hosts and ranks by count"] = function()
 
     local rows = report.aggregate(dir)
     MiniTest.expect.equality(#rows, 2)
-    MiniTest.expect.equality(rows[1].key, "<leader>ff")
-    MiniTest.expect.equality(rows[1].count, 3, { fail_reason = "counts must sum across host files" })
-    MiniTest.expect.equality(
-        rows[1].desc,
-        "Find files",
-        { fail_reason = "desc carries over from the event that had one" }
-    )
-    MiniTest.expect.equality(rows[1].last, 300, { fail_reason = "last-used is the newest across hosts" })
-    MiniTest.expect.equality(rows[2].count, 2)
+    local row1 = assert(rows[1], "expected at least one row")
+    MiniTest.expect.equality(row1.key, "<leader>ff")
+    MiniTest.expect.equality(row1.count, 3, { fail_reason = "counts must sum across host files" })
+    MiniTest.expect.equality(row1.desc, "Find files", { fail_reason = "desc carries over from the event that had one" })
+    MiniTest.expect.equality(row1.last, 300, { fail_reason = "last-used is the newest across hosts" })
+    MiniTest.expect.equality(assert(rows[2], "expected a second row").count, 2)
 end
 
 T["report"]["skips malformed lines"] = function()
@@ -280,7 +277,11 @@ T["report"]["skips malformed lines"] = function()
 
     local rows = report.aggregate(dir)
     MiniTest.expect.equality(#rows, 1)
-    MiniTest.expect.equality(rows[1].count, 2, { fail_reason = "a torn line must not lose the valid ones" })
+    MiniTest.expect.equality(
+        assert(rows[1], "expected at least one row").count,
+        2,
+        { fail_reason = "a torn line must not lose the valid ones" }
+    )
 end
 
 T["report"]["handles an empty directory"] = function()
@@ -407,9 +408,10 @@ T["store"]["compaction preserves totals in the report"] = function()
     store.compact(dir, { retention_months = 1, now = JULY })
     local after = report.aggregate(dir)
 
-    MiniTest.expect.equality(before[1].count, 3)
-    MiniTest.expect.equality(after[1].count, 3, { fail_reason = "compaction must not change what the report shows" })
-    MiniTest.expect.equality(after[1].last, JULY)
+    local after1 = assert(after[1], "expected at least one row after compaction")
+    MiniTest.expect.equality(assert(before[1], "expected at least one row before compaction").count, 3)
+    MiniTest.expect.equality(after1.count, 3, { fail_reason = "compaction must not change what the report shows" })
+    MiniTest.expect.equality(after1.last, JULY)
 end
 
 T["store"]["dates a legacy file by its newest event"] = function()
@@ -454,7 +456,7 @@ T["retro denylist"]["removes matching events and summary rows"] = function()
 
     local rows = report.aggregate(dir)
     MiniTest.expect.equality(#rows, 1, { fail_reason = "denied key is gone from both raw and summarized history" })
-    MiniTest.expect.equality(rows[1].key, "ciw")
+    MiniTest.expect.equality(assert(rows[1], "expected at least one row").key, "ciw")
 end
 
 T["retro denylist"]["leaves data alone when the denylist is empty"] = function()
@@ -561,7 +563,7 @@ T["noise suggestions"]["ranks noisy ungrouped motions"] = function()
     local noisy = report.noise(rows, { min_count = 20 })
 
     MiniTest.expect.equality(#noisy, 1, { fail_reason = "only ungrouped motions past the threshold qualify" })
-    MiniTest.expect.equality(noisy[1].key, "x")
+    MiniTest.expect.equality(assert(noisy[1], "expected at least one noisy row").key, "x")
 end
 
 T["noise suggestions"]["never writes patterns.json"] = function()

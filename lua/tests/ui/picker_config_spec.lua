@@ -46,7 +46,7 @@ T["config"]["window config returns valid floating window table"] = function()
 
     MiniTest.expect.equality(type(win_config), "function")
 
-    local result = win_config()
+    local result = (win_config --[[@as fun(): table]])()
     MiniTest.expect.equality(type(result.width), "number")
     MiniTest.expect.equality(type(result.height), "number")
     MiniTest.expect.equality(type(result.row), "number")
@@ -69,7 +69,7 @@ T["query matching"]["fuzzy match finds non-contiguous characters"] = function()
     local result = MiniPick.default_match(stritems, inds, { "f", "z" }, { sync = true })
 
     local found = {}
-    for _, idx in ipairs(result) do
+    for _, idx in ipairs(result or {}) do
         found[stritems[idx]] = true
     end
     MiniTest.expect.equality(found["fuzzy-finder.lua"], true, { fail_reason = "Should match 'fz' in fuzzy-finder.lua" })
@@ -83,7 +83,7 @@ T["query matching"]["exact match with apostrophe prefix"] = function()
     local result = MiniPick.default_match(stritems, inds, { "'", "f", "l", "a", "s", "h" }, { sync = true })
 
     local found = {}
-    for _, idx in ipairs(result) do
+    for _, idx in ipairs(result or {}) do
         found[stritems[idx]] = true
     end
     MiniTest.expect.equality(found["flash_spec.lua"], true, { fail_reason = "Exact match should find flash_spec.lua" })
@@ -102,7 +102,7 @@ T["query matching"]["start-anchored match with caret prefix"] = function()
     local result = MiniPick.default_match(stritems, inds, { "^", "i", "n" }, { sync = true })
 
     local found = {}
-    for _, idx in ipairs(result) do
+    for _, idx in ipairs(result or {}) do
         found[stritems[idx]] = true
     end
     MiniTest.expect.equality(found["init.lua"], true, { fail_reason = "^in should match init.lua" })
@@ -118,7 +118,7 @@ T["query matching"]["end-anchored match with dollar suffix"] = function()
     local result = MiniPick.default_match(stritems, inds, { ".", "l", "u", "a", "$" }, { sync = true })
 
     local found = {}
-    for _, idx in ipairs(result) do
+    for _, idx in ipairs(result or {}) do
         found[stritems[idx]] = true
     end
     MiniTest.expect.equality(found["test.lua"], true, { fail_reason = ".lua$ should match test.lua" })
