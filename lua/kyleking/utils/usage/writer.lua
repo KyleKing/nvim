@@ -54,6 +54,7 @@ function M.new(cfg)
         if #buffered >= MAX_BUFFERED then flush() end
     end
 
+    ---@type any
     local timer
     if (cfg.flush_interval_ms or 0) > 0 then
         timer = vim.uv.new_timer()
