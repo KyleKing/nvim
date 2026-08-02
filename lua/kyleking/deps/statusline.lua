@@ -13,6 +13,7 @@ if not is_temp_session then
 
         -- Statusline section cache with configurable TTLs
         -- Balance UI responsiveness with avoiding stale data
+        ---@type table<string, {value: string, timestamp: number}>
         local section_cache = {}
         local SECTION_CACHE_TTL_MS = 1000 -- Default sections: 1s (LSP, diagnostics change frequently)
         local BRANCH_CACHE_TTL_MS = 300000 -- Branch metadata: 5min (git operations are expensive, branches change slowly)
@@ -30,6 +31,7 @@ if not is_temp_session then
 
         -- Profile system: compact (minimal) vs info-dense (full context)
         local current_profile = "compact"
+        ---@type integer?
         local info_dense_timer = nil
         local INFO_DENSE_TIMEOUT_MS = 300000 -- Auto-revert info-dense: 5min (prevent cluttered statusline long-term)
 
@@ -131,7 +133,9 @@ if not is_temp_session then
 
                 if vcs.type == "git" then
                     -- Get branch, PR, file status, ahead/behind, stash (all async, parallel)
+                    ---@type { pr: string?, branch: string, file_status: string, ahead_behind: string, stash: string }
                     local result_data = { pr = nil, branch = "", file_status = "", ahead_behind = "", stash = "" }
+                    ---@type { branch: boolean, pr: boolean, status: boolean, ahead_behind: boolean, stash: boolean }
                     local completed =
                         { branch = false, pr = false, status = false, ahead_behind = false, stash = false }
 
@@ -189,6 +193,7 @@ if not is_temp_session then
                             function(pr_result)
                                 if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
                                     local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
+                                    ---@cast pr_data {number: integer, title: string}
                                     if ok and pr_data.number then
                                         local title = pr_data.title:sub(1, 25)
                                         if #pr_data.title > 25 then title = title .. "…" end
@@ -264,8 +269,8 @@ if not is_temp_session then
                         completed.stash = true
                         try_update_cache()
                     end)
-                elseif vcs.type == "jj" then
-                    -- Get jj change ID + PR info
+                else
+                    -- vcs.type == "jj": get jj change ID + PR info
                     vim.system(
                         { "jj", "log", "-r", "@", "--no-graph", "-T", "change_id.short()" },
                         { cwd = vcs.root },
@@ -282,6 +287,7 @@ if not is_temp_session then
                                         function(pr_result)
                                             if pr_result.code == 0 and pr_result.stdout and pr_result.stdout ~= "" then
                                                 local ok, pr_data = pcall(vim.json.decode, pr_result.stdout)
+                                                ---@cast pr_data {number: integer, title: string}
                                                 if ok and pr_data.number then
                                                     local title = pr_data.title:sub(1, 25)
                                                     if #pr_data.title > 25 then title = title .. "…" end
@@ -323,7 +329,8 @@ if not is_temp_session then
         end
 
         -- LSP status with progress tracking
-        local lsp_progress_state = {} -- { [client_id] = { title = "...", message = "..." } }
+        ---@type table<integer, {title: string, message: string, percentage: integer?}>
+        local lsp_progress_state = {}
 
         vim.api.nvim_create_autocmd("LspProgress", {
             callback = function(args)
@@ -355,9 +362,11 @@ if not is_temp_session then
                 if #clients == 0 then return "" end
 
                 -- Check for active progress
+                ---@type string?
                 local progress_info = nil
                 for _, client in ipairs(clients) do
                     local progress = lsp_progress_state[client.id]
+                    ---@cast progress {title: string, message: string, percentage: integer?}?
                     if progress then
                         local msg = progress.message ~= "" and progress.message or progress.title
                         progress_info = string.format("󰦖 %s", msg)
