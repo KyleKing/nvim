@@ -52,6 +52,7 @@ local function collect_keymaps(rows, seen)
         end
         for _, buf in ipairs(buffers) do
             local ok, buf_maps = pcall(vim.api.nvim_buf_get_keymap, buf, mode)
+            ---@cast buf_maps table[]
             for _, km in ipairs(ok and buf_maps or {}) do
                 add(rows, seen, { kind = "map", key = km.lhs or "", desc = km.desc, mode = mode })
             end
@@ -65,6 +66,7 @@ local function collect_commands(rows, seen)
     end
     for _, buf in ipairs(vim.api.nvim_list_bufs()) do
         local ok, cmds = pcall(vim.api.nvim_buf_get_commands, buf, {})
+        ---@cast cmds table<string, table>
         for name, def in pairs(ok and cmds or {}) do
             add(rows, seen, { kind = "cmd", key = name, desc = def.definition })
         end
@@ -155,7 +157,7 @@ function M.render(rows, limit)
         "",
     }
     for i = 1, math.min(limit, #rows) do
-        local row = rows[i]
+        local row = assert(rows[i], "i within bounds of rows")
         local last = row.count > 0 and row.last > 0 and os.date("%Y-%m-%d", row.last) or "never"
         lines[#lines + 1] = ("%6d  %-4s %-24s %-12s %s"):format(row.count, row.kind, row.key, last, row.desc or "")
     end
