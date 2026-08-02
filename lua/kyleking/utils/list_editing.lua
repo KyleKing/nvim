@@ -69,6 +69,7 @@ function M.handle_tab()
     -- Buffer/window changes are disallowed while an expr-mapping is being evaluated (E565),
     -- so defer all of the mutation below until after this function returns.
     vim.schedule(function()
+        ---@cast indent_len integer
         -- For djot, we need to check if previous line is blank
         if ft == "djot" then
             local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -106,6 +107,7 @@ function M.handle_shift_tab()
     -- Buffer/window changes are disallowed while an expr-mapping is being evaluated (E565),
     -- so defer the dedent until after this function returns.
     vim.schedule(function()
+        ---@cast indent_len integer
         -- Dedent by 2 spaces (minimum 0)
         local new_indent_len = math.max(0, indent_len - 2)
         local new_indent = string.rep(" ", new_indent_len)
