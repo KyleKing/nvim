@@ -125,4 +125,4 @@ description = "Show every emmylua_check diagnostic, including the warning backlo
 run = "emmylua_check ."
 
 [tools]
-"github:EmmyLuaLs/emmylua-analyzer-rust[exe=emmylua_check]" = "0.24.0"
+"cargo:emmylua_check" = "0.24.0"
