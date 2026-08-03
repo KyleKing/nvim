@@ -30,7 +30,7 @@ run = 'NVIM_TEST_SYNC=1 nvim --headless -c "lua require(\"tests.docs.generator\"
 # Documentation tasks
 [tasks."doc:vimdoc"]
 description = "Generate vimdoc from markdown sources using panvimdoc"
-run = "prek run panvimdoc --all-files"
+run = "./scripts/panvimdoc.sh"
 
 [tasks."fixture:profile"]
 description = "Profile fixture performance"
@@ -46,29 +46,29 @@ description = "Update snapshots (creates new, updates changed, prunes stale)"
 run = 'UPDATE_SNAPSHOTS=1 NVIM_TEST_SYNC=1 nvim --headless -c "lua MiniTest.run_file(\"lua/tests/docs/runner_spec.lua\")" -c "qall!"'
 
 [tasks.fmt]
-description = "Run all pre-commit hooks (stylua, selene, prettier, mdformat, etc.)"
-run = "prek run --all-files"
+description = "Run all hk fix steps (stylua, selene, prettier, mdformat, etc.)"
+run = "hk fix --all"
 
 [tasks."fmt:mdformat"]
 description = "Run only mdformat"
-run = "prek run mdformat --all-files"
+run = "hk fix --all --step mdformat"
 
 [tasks."fmt:prettier"]
 description = "Run only Prettier formatter"
-run = "prek run prettier --all-files"
+run = "hk fix --all --step prettier"
 
 [tasks."fmt:selene"]
 description = "Run only Selene linter"
-run = "prek run selene --all-files"
+run = "hk fix --all --step selene"
 
 [tasks."fmt:stylua"]
 description = "Run only StyLua formatter"
-run = "prek run stylua-system --all-files"
+run = "hk fix --all --step stylua"
 
 # Diagnostic tasks
 [tasks."lint:lua"]
 description = "Check for Lua/Neovim API deprecations using lua-language-server directly (~2s)"
-run = 'scripts/check-lua-lsp.sh'
+run = "scripts/check-lua-lsp.sh"
 
 # Utility tasks
 [tasks.measure]
@@ -126,3 +126,13 @@ run = "emmylua_check ."
 
 [tools]
 "cargo:emmylua_check" = "0.24.0"
+"cargo:selene" = "latest"
+hk = "1.54.0"
+jq = "latest"
+"npm:prettier" = "latest"
+"pipx:yamllint" = "latest"
+pkl = "latest"
+shfmt = "latest"
+stylua = "latest"
+tombi = "latest"
+uv = "latest"  # mdformat and its plugins run through uvx

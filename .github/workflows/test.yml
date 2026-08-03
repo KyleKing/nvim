@@ -69,20 +69,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
+      - name: Install mise
+        uses: jdx/mise-action@v2
 
-      - name: Install pre-commit
-        run: pip install pre-commit
-
-      - name: Run pre-commit hooks
-        run: pre-commit run --all-files
+      - name: Run hk
+        run: mise exec -- hk check --all
         env:
-          # Skip hooks requiring tools not available in CI:
-          # - stylua-system/selene: needs system binaries installed
-          # - panvimdoc: path issues, docs generated locally
-          # - generate-plugin-docs/helptags: needs nvim
-          # - mini-test: already runs in test job
-          SKIP: generate-plugin-docs,helptags,lua-diagnostics,mini-test,panvimdoc,selene,stylua-system
+          # Steps needing tools the runner lacks or work another job already does:
+          # - generate-plugin-docs/helptags/panvimdoc: need nvim and pandoc
+          # - lua-diagnostics: needs lua-language-server
+          # - measure-startup/mini-test: need nvim; tests run in the test job
+          HK_SKIP_STEPS: generate-plugin-docs,helptags,lua-diagnostics,measure-startup,mini-test,panvimdoc

@@ -5,7 +5,7 @@
 set -e
 
 # Check if luacov is installed
-if ! command -v luacov &> /dev/null; then
+if ! command -v luacov &>/dev/null; then
     echo "Error: luacov not found. Install with: luarocks install luacov"
     exit 1
 fi

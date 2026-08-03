@@ -1,4 +1,4 @@
-std = "vim" # Defined in vim.toml (https://kampfkarren.github.io/selene/usage/std.html)
+std = "vim"  # Defined in vim.toml (https://kampfkarren.github.io/selene/usage/std.html)
 
 [lints]
 mixed_table = "allow"

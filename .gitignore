@@ -27,6 +27,9 @@ tags
 # For prettier cache
 node_modules
 
+# Tools cloned by scripts/ (panvimdoc)
+deps/
+
 # Generated documentation from test fixtures
 doc/generated/
 .luacov.*.out
