@@ -366,7 +366,6 @@ if not is_temp_session then
                 local progress_info = nil
                 for _, client in ipairs(clients) do
                     local progress = lsp_progress_state[client.id]
-                    ---@cast progress {title: string, message: string, percentage: integer?}?
                     if progress then
                         local msg = progress.message ~= "" and progress.message or progress.title
                         progress_info = string.format("󰦖 %s", msg)

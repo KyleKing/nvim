@@ -92,7 +92,7 @@ M.read_json = read_json
 
 --- Month string `n` months before `ts`.
 function M.month_before(ts, n)
-    local date = os.date("*t", ts) --[[@as std.osdate]]
+    local date = os.date("*t", ts) --[[@as osdate]]
     date.month = (
         date.month --[[@as integer]]
         - n

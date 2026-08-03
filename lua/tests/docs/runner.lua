@@ -416,7 +416,6 @@ function M.run_fixture(fixture_path)
     end
 
     -- Prune unused snapshots in update mode
-    ---@diagnostic disable-next-line: unnecessary-if -- _dirty is set true elsewhere in run_test(), not statically knowable here
     if update_mode and snapshots._dirty then
         for key in pairs(snapshots) do
             if key:sub(1, 1) ~= "_" and not snapshots._used[key] then snapshots[key] = nil end

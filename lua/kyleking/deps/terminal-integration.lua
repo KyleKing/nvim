@@ -140,7 +140,6 @@ local function toggle_tui_float(opts)
             on_exit = function()
                 vim.schedule(function()
                     local entry = tui_terminals[term_id]
-                    ---@cast entry {bufnr: number, winid: number|nil}?
                     if entry then
                         if entry.winid and vim.api.nvim_win_is_valid(entry.winid) then
                             pcall(vim.api.nvim_win_close, entry.winid, true)

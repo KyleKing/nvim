@@ -314,7 +314,6 @@ function M.sort_range(bufnr, start_row, end_row, opts)
         return success
     elseif opts.mode == "indent" then
         return sort_by_indentation(bufnr, start_row, end_row, opts)
-    ---@diagnostic disable-next-line: unnecessary-if -- opts.mode may not respect its declared type at runtime
     elseif opts.mode == "line" then
         return sort_by_lines(bufnr, start_row, end_row, opts)
     else

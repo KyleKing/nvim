@@ -170,7 +170,6 @@ function M.run_all_tests(only_failed, shuffle, seed)
     if shuffle then
         seed = seed or os.time()
         emit(string.format("Random order (seed: %d)", seed))
-        ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
         math.randomseed(seed --[[@as integer]])
         for i = #files, 2, -1 do
             local j = math.random(i)
@@ -203,7 +202,6 @@ function M.run_tests_parallel(shuffle, seed)
     -- Shuffle if requested
     if shuffle then
         seed = seed or os.time()
-        ---@diagnostic disable-next-line: access-invisible -- LuaJIT implements the Lua 5.1 math.randomseed(x) overload
         math.randomseed(seed --[[@as integer]])
         print(string.format("Running tests in random order (seed: %d)", seed))
 

@@ -36,7 +36,7 @@ later(function()
     local function _override_linter_cmd(linter_name, tool_name)
         local linter = lint.linters[linter_name]
         if not linter then return end
-        linter.cmd = fre.cmd_for(tool_name)
+        linter.cmd = fre.cmd_for(tool_name) --[[@as string]] -- nvim-lint's cmd field also accepts a fun():string at runtime (see lint.lua's eval_fn_or_id)
     end
 
     _override_linter_cmd("oxlint", "oxlint")
